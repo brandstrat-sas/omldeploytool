@@ -20,7 +20,7 @@ ExecStart=/usr/bin/podman run \
   --env-file=/etc/default/nginx.env \
   --name=oml-nginx-server \
   --volume=/etc/omnileads/certs:/etc/omnileads/certs \
-  --volume=/opt/omnileads/static:/opt/omnileads/static \
+  #--volume=/opt/omnileads/static:/opt/omnileads/static \
   --rm  \
   {{ container_image_registry }}/freetechsolutions/omlnginx:{{ nginx_version }}
 ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id

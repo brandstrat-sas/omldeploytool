@@ -40,7 +40,7 @@
 
   - name: NGINX Copy nginx systemd service Debian
     template:
-      src: "{{ nginx_repo_path }}templates/omnileads-nginx.service"
+      src: "{{ nginx_repo_path }}templates/nginx.service"
       dest: /etc/systemd/system/nginx.service
     tags:
       - upgrade
