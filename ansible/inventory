@@ -1,0 +1,240 @@
+#############################################
+# Omnileads inventory .ini file for ansible #
+#############################################
+
+[omnileads-app]
+#localhost ansible_connection=local ansible_user=root
+172.16.101.11 ansible_ssh_port=22 ansible_user=root
+
+
+[everyone:vars]
+
+################################################################################
+# ********** Below are the img versions used for OMniLeads deploy ************ #
+# ********** Below are the img versions used for OMniLeads deploy ************ #
+################################################################################
+
+virtualenv_version=220921.oml175
+
+django_version=djangovue
+websockets_version=latest
+nginx_version=latest
+asterisk_version=latest
+kamailio_version=latest
+rtpengine_version=latest
+
+################################################################################
+# ****************** Network location - OMniLeads components  **************** #
+# ****************** Network location - OMniLeads components  **************** #
+################################################################################
+
+# --- Set the timezone
+TZ=America/Argentina/Cordoba
+
+#asterisk_host=
+#django_host=
+#postgres_host=
+#postgres_local=false
+#rtpengine_host=
+#kamailio_host=
+#websocket_host=
+#redis_host=
+#nginx_host=
+#dialer_host=
+
+
+################################################################################
+# ************************** Prometheus Monitoring  ************************** #
+# ************************** Prometheus Monitoring  ************************** #
+################################################################################
+
+prometheus_enable=true
+
+################################################################################
+# ************************* POSTGRESQL parameters **************************** #
+# ************************* POSTGRESQL parameters **************************** #
+################################################################################
+
+# %%%%%%%%% Clients (django - asterisk) side Variables # %%%%%%%%% #
+# %%%%%%%%% Clients (django - asterisk) side Variables # %%%%%%%%% #
+
+postgres_port=5432
+postgres_user=omnileads
+postgres_password=AVNS_m0GH-Fk0ZXWWOxNWdSY
+postgres_database=omnileads
+
+# ----  to activate ssl on asterisk odbc.ini
+postgres_ssl=false
+# ----  to create plperl extension from django playbook
+postgres_cloud=false
+
+
+# %%%%%%%%%%%%%%%% Server PosgreSQL Engine Variables %%%%%%%%%%% #
+# %%%%%%%%%%%%%%%% Server PosgreSQL Engine Variables %%%%%%%%%%% #
+
+# ***** bind addr separate with commas: 127.0.0.1,192.168.0.10
+#postgres_bind=
+
+###################################
+# HA variables ####################
+###################################
+# ----  to activate HA deploy set "true"
+postgres_ha=false
+# ----  RO (Read Only) postgres node IP/HOSTNAME
+postgres_ro_host=
+
+# ---- if you put true postgres_ha, uncomment and set:
+#pgsql_ip_node=
+#pgsql_deploy_ha=true
+#pgsql_ha_rol=
+#pgsql_ha_vip_nic=
+#pgsql_ha_vip_main=
+#pgsql_ha_vip_backup=
+
+
+###############################################################################
+# *********************** Object Storage parameters  ************************ #
+# *********************** Object Storage parameters  ************************ #
+###############################################################################
+
+# ---- if you want to deploy Minio like selfhosted omnileasds Bucket,
+# ---- you must to set minio admin user/pass and bucket_url must be comment
+s3_http_admin_user=omnileads
+s3_http_admin_pass=098098ZZZ
+
+# --- if you want to use cloud provider bucket, must uncomment & set this:
+#bucket_url=
+# VULTR: https://ewr1.vultrobjects.com
+# Digital Ocean: https://sfo3.digitaloceanspaces.com
+
+bucket_access_key=dsadsadsad
+bucket_secret_key=BNVBNbnvghfhg76574632ghfgh
+bucket_name=omnileads
+bucket_region=us-east-1
+
+
+###############################################################################
+# ************************* Asterisk parameters ***************************** #
+# ************************* Asterisk parameters ***************************** #
+###############################################################################
+# ami credentials
+ami_user=omnileads
+ami_password=C12H17N2O4P_o98o98
+
+###################################
+# HA variables ####################
+###################################
+#acd_deploy_ha=true
+#acd_ha_rol=
+#acd_ha_vip=
+#acd_ha_vip_nic=
+#acd_ha_tenant=
+#acd_ha_notification_email=
+#acd_ha_node_main_host=
+
+
+###############################################################################
+# ********************** WebRTC GW: Kamailio/Rtpengine ********************** #
+# ********************** WebRTC GW: Kamailio/Rtpengine ********************** #
+###############################################################################
+
+
+### Kamailio Memory parameters ####
+### SHM is the maximum memory ammount ###
+### PKG is the minimum memory ammount ###
+shm_size=64
+pkg_size=8
+
+
+###############################################################################
+# ***************************** REDIS variable ****************************** #
+# ***************************** REDIS variable ****************************** #
+###############################################################################
+
+# only when deploy REDIS HA cluster with Sentinel
+redis_ha=false
+
+#sentinel_host_01=
+#sentinel_host_02=
+#sentinel_host_03=
+
+###################################
+# HA variables ####################
+###################################
+#redis_deploy_ha=true
+#redis_ha_rol=
+#redis_host_ip=
+#redis_host_port=
+#redis_master_ip=
+#redis_master_port=
+
+
+###############################################################################
+# ************************ DJANGO omlapp Variables ************************** #
+# ************************ DJANGO omlapp Variables ************************** #
+###############################################################################
+
+###############################################################
+# Tell to OMniLeads Web App the Wombat dialer params          #
+###############################################################
+dialer_user=demoadmin
+dialer_password=demo
+
+################################################################
+# turn to false in order to activate the webadmin pass-reset   #
+################################################################
+reset_admin_password=false
+#####################################################################
+# Session Cookie Age (SCA) is the time in seconds that will last    #
+# the https session when inactivity #                               #
+# is detected in the session (by default is 1 hour)                 #
+#####################################################################
+SCA=3600
+
+#######################################################################
+# Ephemeral Credentials TTL (ECTTL) is the time in seconds            #
+# that will last the SIP credentials used to authenticate a SIP user  #
+# in the telephony system (by default 8 hours)                        #
+#######################################################################
+ECCTL=28800
+
+###########################################################
+# Login failure limit (LFM) is the attempts a user has to #
+# enter an incorrect password in login                    #
+###########################################################
+LOGIN_FAILURE_LIMIT=10
+
+####################################
+# Name of schedule disposition     #
+####################################
+schedule=Agenda
+
+#################################################
+# In case of high load > 200 simultaneus usuers #
+#################################################
+high_load=false
+
+###################
+# Google maps API #
+###################
+google_maps_api_key=NULL
+google_maps_center='{ "lat": -31.416668, "lng": -64.183334 }'
+
+#########################################
+#         SMTP external server          #
+#########################################
+
+email_smtp_relay=false
+#email_backend=
+#email_default_from=
+#email_host=
+#email_password=
+#email_user=
+#email_port=
+#email_ssl_certfile=
+#email_ssl_keyfile=
+#email_use_ssl=
+#email_use_tls=
+
+[everyone:children]
+omnileads-app

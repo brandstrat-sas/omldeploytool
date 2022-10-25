@@ -1,0 +1,30 @@
+Vagrant.configure("2") do |config|
+  config.env.enable
+  config.vm.define "redhat" do |omnileads|
+    omnileads.vm.box = "rockylinux/8"
+    omnileads.vm.hostname = "omnileads.testing"
+
+    omnileads.vm.network "public_network", bridge: "en0: Wi-Fi (AirPort)"
+
+    #omnileads.vm.synced_folder "/Users/fpignataro/repos/omnileads/omldeploy/onpremise", "/opt"
+
+    omnileads.vm.provision "shell", name: "prepare", inline: <<-END
+      set -ex
+      yum -y install \
+      curl \
+      podman
+    END
+
+
+    # omnileads.vm.provision "shell", name: "prepare", inline: <<-END
+    #   set -ex
+    #   cd /opt/onpremise
+    # END
+
+    omnileads.vm.provider "virtualbox" do |vb|
+      vb.name = "OML RedHat"
+      vb.memory = "2048"
+      vb.cpus = "2"
+    end
+  end
+end

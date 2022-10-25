@@ -1,0 +1,74 @@
+# Copyright (C) 2018 Freetech Solutions
+
+# This file is part of OMniLeads
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see http://www.gnu.org/licenses/.
+#
+---
+
+- name: BACKUP asterisk custom config files
+  s3_sync:
+    bucket: '{{ bucket_name }}'
+    file_root: '{{ asterisk_location_conf }}/custom'
+  tags:
+    - asterisk
+  when: bucket_url is defined
+
+- name: BACKUP asterisk custom config files MINIO selfhosted
+  s3_sync:
+    bucket: '{{ bucket_name }}'
+    file_root: '{{ asterisk_location_conf }}/custom/'
+    validate_certs: no
+    region: '{{ bucket_region }}'
+    aws_access_key: '{{ bucket_access_key }}'
+    aws_secret_key: '{{ bucket_secret_key }}'
+    ec2_url: 'http://{{ minio_host }}:9000'
+  when: bucket_url is not defined
+
+- name: "BACKUP Set timestamp of the backup"
+  set_fact:
+    now: "{{ ansible_date_time.iso8601 }}"
+
+- name: "BACKUP database"
+  postgresql_db:
+   state: dump
+   name: '{{ postgres_database }}'
+   target: "/tmp/pgsql-backup-{{ now }}.dump.gz"
+   ssl_mode: disable
+   login_user: '{{ postgres_user }}'
+   login_password: '{{ postgres_password }}'
+   login_host: '{{ postgres_host }}'
+  tags:
+    - pgsql
+
+- name: BACKUP upload to MINIO selfhosted
+  s3_sync:
+   bucket: '{{ bucket_name }}'
+   file_root: 'tmp/pgsql-backup-{{ now }}.dump.gz'
+   validate_certs: no
+   region: '{{ bucket_region }}'
+   aws_access_key: '{{ bucket_access_key }}'
+   aws_secret_key: '{{ bucket_secret_key }}'
+   ec2_url: 'http://{{ minio_host }}:9000'
+  when: bucket_url is not defined
+
+  #command: 'aws --endpoint-url http://{{ minio_host }}:9000 --no-verify-ssl s3 sync {{ asterisk_location_conf }}/custom s3://{{ bucket_name }}'
+
+
+
+# - name: BACKUP asterisk custom files
+#   command: aws s3 sync
+#   tags:
+#       - upgrade
+#       - pgsql

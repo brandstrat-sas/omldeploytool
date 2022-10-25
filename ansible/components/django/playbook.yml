@@ -1,0 +1,91 @@
+# Copyright (C) 2022 Freetech Solutions
+
+# This file is part of OMniLeads
+
+# This program is free software: You can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY, without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see http://www.gnu.org/licenses/.
+
+---
+
+- name: DJANGO OMniLeads application installation
+  hosts: omnileads-app
+  tags:
+    - aio
+    - app
+    - django
+  vars:
+    img_repo: '{{ container_image_registry }}/freetechsolutions/omlapp'
+    INSTALL_PREFIX: "/opt/omnileads"
+
+  tasks:
+
+  # Create file .pgpass
+  - name: DJANGO Create file .pgpass
+    template:
+      src: "{{ django_repo_path }}templates/.pgpass"
+      dest: "{{ item }}.pgpass"
+      mode: 060
+      owner: "{{ usuario }}"
+      group: "{{ usuario }}"
+    with_items:
+      - "{{ django_deploy_path }}"
+      - /root/
+    when: postgres_host != "localhost"
+    tags:
+      - upgrade
+
+  - name: Set Django environment variables for this installation
+    template:
+      src: "{{ django_repo_path }}templates/django.env"
+      dest: /etc/default/django.env
+      mode: 666
+      owner: "{{ usuario }}"
+      group: "{{ usuario }}"
+    tags:
+      - upgrade
+  ########### WA temporal permisos dajango .env #################
+  ########### WA temporal permisos dajango .env #################
+  - name: DJANGO Change file ownership, group and permissions
+    file:
+      path:  /etc/default/django.env
+      owner: omnileads
+      group: omnileads
+      mode: '0666'
+
+  # Create extension plperl, when the OMniLeads PostgreSQL package is not used
+  - name: Create extension plperl
+    shell: PGUSER={{ postgres_user }} PGDATABASE={{ postgres_database }} PGHOST={{ postgres_host }} PGPORT={{ postgres_port }} PGPASSWORD={{ postgres_password }} psql -c "CREATE EXTENSION plperl;"
+    args:
+      executable: /bin/bash
+    when: postgres_cloud == "true"
+    ignore_errors: yes
+    when:
+      - postgres_host is defined
+      - postgres_cloud == "true"
+
+  - name: DJANGO Copy systemd service
+    template:
+      src: "{{ django_repo_path }}templates/django.service"
+      dest: /etc/systemd/system/omnileads.service
+
+  - name: DJANGO Pull image
+    command: podman pull --quiet {{ img_repo }}:{{ django_version }}
+    register: podman_pull
+    until: podman_pull is success
+
+  - name: DJANGO Enable and start systemd service
+    systemd:
+      name: omnileads.service
+      state: started
+      enabled: yes
+      daemon_reload: yes

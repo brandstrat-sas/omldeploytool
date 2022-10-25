@@ -1,0 +1,5 @@
+onpremise/.vagrant
+onpremise/instances
+vagrant/debian/.vagrant
+vagrant/redhat/.vagrant
+omnileads

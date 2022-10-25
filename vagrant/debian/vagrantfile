@@ -1,0 +1,23 @@
+Vagrant.configure("2") do |config|
+  config.env.enable
+  config.vm.define "debian" do |omnileads|
+    omnileads.vm.box = "ubuntu/jammy64"
+    omnileads.vm.hostname = "omnileads.testing"
+
+    omnileads.vm.network "public_network", bridge: "en0: Wi-Fi (AirPort)"
+
+    config.vm.synced_folder "/Users/fpignataro/repos/omnileads/omldeploy/onpremise", "/opt/omnileads-deployer"
+
+    config.vm.provision "shell", name: "prepare", inline: <<-END
+      set -ex
+      apt update && apt install -y curl podman
+      cd /opt/omnileads-deployer
+    END
+
+    omnileads.vm.provider "virtualbox" do |vb|
+      vb.name = "OML Debian"
+      vb.memory = "2048"
+      vb.cpus = "2"
+    end
+  end
+end

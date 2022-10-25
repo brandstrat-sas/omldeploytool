@@ -1,0 +1,42 @@
+- name: KAMAILIO Kamailio installation and configuration
+  hosts: omnileads-app
+  tags:
+    - aio
+    - voice
+    - kamailio
+  vars:
+    img_repo: '{{ container_image_registry }}/freetechsolutions/omlkam'
+  tasks:
+
+    - name: KAMAILIO environment variables for this installation
+      template:
+        src: "{{ kamailio_repo_path }}templates/kamailio.env"
+        dest: /etc/default/kamailio.env
+        mode: 664
+        owner: "{{ usuario }}"
+        group: "{{ usuario }}"
+      tags:
+        - upgrade
+
+    - name: KAMAILIO Copy kamailio.service Systemd file
+      template:
+        src: "{{ kamailio_repo_path }}templates/kamailio.service"
+        dest: /etc/systemd/system/kamailio.service
+      tags:
+        - upgrade
+
+    - name: KAMAILIO Pull image
+      command: podman pull --quiet {{ img_repo }}:{{ kamailio_version }}
+      register: podman_pull
+      until: podman_pull is success
+      tags:
+        - upgrade
+
+    - name: KAMAILIO Enable and start service
+      systemd:
+        name: kamailio.service
+        state: restarted
+        enabled: yes
+        daemon_reload: yes
+      tags:
+        - upgrade
