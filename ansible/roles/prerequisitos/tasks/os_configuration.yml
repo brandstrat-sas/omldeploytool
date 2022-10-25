@@ -126,19 +126,12 @@
     - kamailio
     - asterisk
 
-# - name: Copy host ENV VARS
-#   template:
-#     src: "templates/omnileads_host.env"
-#     dest: /etc/profile.d/omnileads.sh
-#     owner: "{{ usuario }}"
-#     group: "{{ usuario }}"
-#     mode: 0750
-#   tags:
-#     - aio
-#     - voice
-#     - app
-#     - asterisk
-
+- name: Copy oml_manage script
+  template:
+    src: "templates/oml_manage.sh"
+    dest: /usr/local/bin/oml_manage.sh
+    mode: 0755
+  
 # Se setea el timezone
 - name: Set timezone of server
   timezone: name={{ TZ }}

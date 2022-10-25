@@ -19,7 +19,7 @@ ExecStart=/usr/bin/podman run \
   --network=host \
   --env-file=/etc/default/postgres.env \
   --name=oml-postgresql-server \
-  --volume={{ postgres_persistent_path }}:/var/lib/postgresql/data \
+  --volume=oml_postgres:/var/lib/postgresql/data \
   --rm  \
   {{ container_image_registry }}/freetechsolutions/omlpgsql:{{ postgres_version }}
 ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id

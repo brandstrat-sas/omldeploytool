@@ -4,7 +4,7 @@
 
 [omnileads-app]
 #localhost ansible_connection=local ansible_user=root
-172.16.101.11 ansible_ssh_port=22 ansible_user=root
+172.16.101.221 ansible_ssh_port=22 ansible_user=root
 
 
 [everyone:vars]
