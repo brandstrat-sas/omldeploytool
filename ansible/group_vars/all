@@ -72,3 +72,6 @@ mysql_root_password: ""
 mariadb_host: localhost
 
 minio_persistent_path: /var/lib/omnileads/minio
+
+redis_ha: false
+high_load: false

@@ -18,20 +18,20 @@ echo "***************************** filter ********************************* "
 echo "***************************** filter ********************************* "
 
 
-if [ -z ${oml_infra+x} ]; then
-  echo "ERROR oml_infra var is unset";
-  exit 1
-else
-  if [ -z ${wan_ip+x} ]; then
-    echo "\e[31m ERROR oml_nic var is unset #31 \e[0m";
-    exit 1
-  fi
-fi
-
-if [ -z ${lan_ip+x} ]; then
-  echo "\e[31m ERROR oml_nic var is unset #31 \e[0m";
-  exit 1
-fi
+# if [ -z ${oml_infra+x} ]; then
+#   echo "ERROR oml_infra var is unset";
+#   exit 1
+# else
+#   if [ -z ${wan_ip+x} ]; then
+#     echo "\e[31m ERROR oml_nic var is unset #31 \e[0m";
+#     exit 1
+#   fi
+# fi
+#
+# if [ -z ${lan_ip+x} ]; then
+#   echo "\e[31m ERROR oml_nic var is unset #31 \e[0m";
+#   exit 1
+# fi
 
 case ${oml_action} in
   install)
@@ -103,7 +103,8 @@ echo "************************ Exec ANSIBLE matrix *************************"
 
 sleep 2
 
-ansible-playbook matrix.yml --extra-vars "django_repo_path=$(pwd)/components/django/ \
+ansible-playbook matrix.yml --extra-vars \
+  "django_repo_path=$(pwd)/components/django/ \
   redis_repo_path=$(pwd)/components/redis/ \
   pgsql_repo_path=$(pwd)/components/postgresql/ \
   kamailio_repo_path=$(pwd)/components/kamailio/ \
@@ -113,14 +114,11 @@ ansible-playbook matrix.yml --extra-vars "django_repo_path=$(pwd)/components/dja
   nginx_repo_path=$(pwd)/components/nginx/ \
   minio_repo_path=$(pwd)/components/minio/ \
   prometheus_repo_path=$(pwd)/monitoring/prometheus/ \
-  omni_ip_lan=$lan_ip \
-  omni_ip_wan=$wan_ip \
-  infra_env=$oml_infra \
   rebrand=false \
   commit=ascd \
   build_date=\"$(env LC_hosts=C LC_TIME=C date)\"" \
   --tags "$oml_action, $oml_component" \
-  -i inventory
+  -i inventory.yml
 
 ResultadoAnsible=`echo $?`
 
@@ -174,23 +172,23 @@ do
       oml_component="${i#*=}"
       shift
     ;;
-    --lan_ip=*)
-      lan_ip="${i#*=}"
-      shift
-    ;;
-    --wan_ip=*)
-      wan_ip="${i#*=}"
-      shift
-    ;;
-    --infra=*)
-      oml_infra="${i#*=}"
-      shift
-    ;;
+    # --lan_ip=*)
+    #   lan_ip="${i#*=}"
+    #   shift
+    # ;;
+    # --wan_ip=*)
+    #   wan_ip="${i#*=}"
+    #   shift
+    # ;;
+    # --infra=*)
+    #   oml_infra="${i#*=}"
+    #   shift
+    # ;;
     --help|-h)
       echo "
 How to use it:
 
-./deploy.sh --action= --component= --lan_ip= --wan_ip= --infra=
+./deploy.sh --action= --component=
 
 -- action=
         install
@@ -213,10 +211,7 @@ How to use it:
         websockets
         nginx
         prometheus
--- lan_ip=instance LAN ip
--- wan_ip=instance WAN ip (in case of cloud deploy)
--- infra=kind of deploy (cloud, lan, hybrid)
-  "
+"
       shift
       exit 1
     ;;

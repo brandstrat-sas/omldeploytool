@@ -21,7 +21,9 @@
 # It uses the file /var/tmp/ansible/ansible.cfg, as configuration file
 
 - name: OMniLeads installation
-  hosts: omnileads-app
+  hosts:
+    - omnileads-voice
+    - omnileads-app
   gather_facts: True
   roles:
     - prerequisitos
@@ -30,28 +32,28 @@
   when: bucket_url is not defined
 
 - import_playbook: components/redis/playbook.yml
-  when: redis_local == true
+  when: application_host is not defined
 
 - import_playbook: components/postgresql/playbook.yml
-  when: postgres_local == true
+  when: postgres_host == "localhost"
 
 - import_playbook: components/rtpengine/playbook.yml
-  when: rtpengine_local == true
+  when: voice_host is not defined
 
 - import_playbook: components/kamailio/playbook.yml
-  when: kamailio_local == true
+  when: application_host is not defined
 
 - import_playbook: components/websockets/playbook.yml
-  when: websocket_local == true
+  when: application_host is not defined
 
 - import_playbook: components/asterisk/playbook.yml
-  when: asterisk_local == true
+  when: voice_host is not defined
 
 - import_playbook: components/django/playbook.yml
-  when: django_local == true
+  when: application_host is not defined
 
 - import_playbook: components/nginx/playbook.yml
-  when: nginx_local == true
+  when: application_host is not defined
 
 - import_playbook: monitoring/prometheus/playbook.yml
   when: prometheus_enable is defined
