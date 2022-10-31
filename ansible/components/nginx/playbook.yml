@@ -60,15 +60,3 @@
       daemon_reload: yes
     tags:
       - upgrade
-
-
-########### WA temporal para asterisk_reloader #############
-########### WA temporal para asterisk_reloader #############
-########### WA temporal para asterisk_reloader #############
-
-  - name: NGINX restart asterisk container
-    systemd:
-      name: asterisk.service
-      state: restarted
-      enabled: yes
-      daemon_reload: yes

@@ -1,4 +1,4 @@
-# Copyright (C) 2018 Freetech Solutions
+# Copyright (C) 2022 Freetech Solutions
 
 # This file is part of OMniLeads
 
@@ -18,15 +18,19 @@
 ---
 
 - name: Asterisk installation and configuration
-  hosts: omnileads-app
+  hosts: omnileads-voice
   tags:
     - aio
     - voice
-    - asterisk
   vars:
     img_repo: '{{ container_image_registry }}/freetechsolutions/omlacd'
-
   tasks:
+
+  - name:  ASTERISK Setting postgres_host as application_host
+    set_fact:
+      postgres_host: "{{ application_host }}"
+    changed_when: false
+    when: postgres_host == "localhost"
 
   - name: ASTERISK Set environment variables for this installation
     template:
@@ -64,16 +68,11 @@
     with_items:
       - oml_amd_custom.conf
       - oml_dahdi_custom.conf
-      - oml_extensions_bridgecall_custom.conf
-      - oml_extensions_commonsub_custom.conf
       - oml_extensions_custom.conf
       - oml_extensions_globals_custom.conf
       - oml_extensions_inr_custom.conf
       - oml_extensions_ivr_custom.conf
-      - oml_extensions_modules_custom.conf
       - oml_extensions_outr_custom.conf
-      - oml_extensions_postcall_custom.conf
-      - oml_extensions_precall_custom.conf
       - oml_extensions_tc_custom.conf
       - oml_func_odbc_custom.conf
       - oml_http_custom.conf
@@ -110,22 +109,19 @@
       - oml_voicemail_override.conf
     when: ast_custom_exists.rc == 0
 
-  - name: ASTERISK Download asterisk sounds
-    get_url:
-      url: '{{ item }}'
-      dest: /tmp
-      mode: '0666'
+  - name: ASTERISK Copy some _custom.conf files
+    copy:
+      src: "{{ asterisk_repo_path }}templates/{{ item }}"
+      dest: /etc/asterisk/custom
     loop:
-      - '{{ asterisk_audios_url }}'
-      - '{{ asterisk_audios_oml_url }}'
-
-  # - name: ASTERISK untar asterisk sounds
-  #   unarchive:
-  #     src: '/tmp/{{ item }}'
-  #     dest: '{{ asterisk_sounds_host_path }}'
-  #   loop:
-  #     - '{{ asterisk_sounds }}'
-  #     - '{{ oml_sounds }}'
+      - oml_extensions_custom.conf
+      - oml_extensions_bridgecall_custom.conf
+      - oml_extensions_commonsub_custom.conf
+      - oml_extensions_modules_custom.conf
+      - oml_extensions_postcall_custom.conf
+      - oml_extensions_precall_custom.conf
+    tags:
+        - upgrade
 
   - name: ASTERISK Copy systemd service
     template:

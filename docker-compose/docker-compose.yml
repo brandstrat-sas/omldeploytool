@@ -8,8 +8,6 @@ services:
       - acd
       - minio
     dns: 8.8.8.8
-    command:
-      - 'python3 manage.py cambiar_admin_password'
     environment:
       - TZ=${TZ}
       - ASTERISK_HOSTNAME=${ASTERISK_HOSTNAME}
@@ -24,7 +22,7 @@ services:
       - PGHOSTHA=${PGHOSTHA}
       - PGHOSTRO=${PGHOSTRO}
       - REDIS_HOSTNAME=${REDIS_HOSTNAME}
-      - WEBSOCKET_HOST=${WEBSOCKET_HOST}
+      - WEBSOCKET_HOST=${WEBSOCKET_HOSTNAME}
       - WEBSOCKET_PORT=${WEBSOCKET_PORT}
       - CALIFICACION_REAGENDA=${CALIFICACION_REAGENDA}
       - DJANGO_SETTINGS_MODULE=ominicontacto.settings.develop

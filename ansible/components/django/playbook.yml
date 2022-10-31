@@ -29,7 +29,6 @@
 
   tasks:
 
-  # Create file .pgpass
   - name: DJANGO Create file .pgpass
     template:
       src: "{{ django_repo_path }}templates/.pgpass"
@@ -53,8 +52,7 @@
       group: "{{ usuario }}"
     tags:
       - upgrade
-  ########### WA temporal permisos dajango .env #################
-  ########### WA temporal permisos dajango .env #################
+
   - name: DJANGO Change file ownership, group and permissions
     file:
       path:  /etc/default/django.env
@@ -62,16 +60,24 @@
       group: omnileads
       mode: '0666'
 
-  # Create extension plperl, when the OMniLeads PostgreSQL package is not used
-  - name: Create extension plperl
-    shell: PGUSER={{ postgres_user }} PGDATABASE={{ postgres_database }} PGHOST={{ postgres_host }} PGPORT={{ postgres_port }} PGPASSWORD={{ postgres_password }} psql -c "CREATE EXTENSION plperl;"
-    args:
-      executable: /bin/bash
-    when: postgres_cloud == "true"
-    ignore_errors: yes
-    when:
-      - postgres_host is defined
-      - postgres_cloud == "true"
+  - name: Create a new database with name {{ postgres_database }}
+    postgresql_db:
+      name: "{{ postgres_database }}"
+      login_host: "{{ postgres_host }}"
+      login_password: "{{ postgres_password }}"
+      login_user: "{{ postgres_user }}"
+      port: "{{ postgres_port }}"
+      maintenance_db: "{{ postgres_maintenance_db }}"
+      state: present
+
+  - name: Adds plperl extension to the database {{ postgres_database }}
+    postgresql_ext:
+      name: plperl
+      db: "{{ postgres_database }}"
+      login_host: "{{ postgres_host }}"
+      login_password: "{{ postgres_password }}"
+      login_user: "{{ postgres_user }}"
+      port: "{{ postgres_port }}"
 
   - name: DJANGO Copy systemd service
     template:
