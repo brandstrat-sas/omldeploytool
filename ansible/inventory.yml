@@ -1,0 +1,84 @@
+---
+
+all:
+  hosts:
+    omnileads-voice:
+      ansible_host: 123.123.123.123
+      omni_ip_lan: 10.10.10.3
+      application_host: 10.10.10.4
+    omnileads-app:
+      ansible_host: 234.234.234.234
+      omni_ip_lan: 10.10.10.4
+      voice_host: 10.10.10.3
+      shm_size: 64
+      pkg_size: 8
+      SCA: 3600
+      ECCTL: 28800
+      LOGIN_FAILURE_LIMIT: 10
+      schedule: Agenda
+      google_maps_api_key: NULL
+      google_maps_center: '{ "lat": -31.416668, "lng": -64.183334 }'
+      email_smtp_relay: false
+      #email_backend:
+      #email_default_from:
+      #email_host:
+      #email_password:
+      #email_user:
+      #email_port:
+      #email_ssl_certfile:
+      #email_ssl_keyfile:
+      #email_use_ssl:
+      #email_use_tls:
+  vars:
+    # -- version images to deploy
+    django_version: latest
+    websockets_version: latest
+    nginx_version: latest
+    kamailio_version: latest
+    asterisk_version: latest
+    rtpengine_version: latest
+    # --- "cloud" instance (access through public IP)
+    # --- or "lan" instance (access through private IP)
+    infra_env: cloud # (values: cloud or lan)
+    # --- ansible user & port connection
+    ansible_ssh_port: 22
+    ansible_user: root
+    # --- time zone
+    TZ: America/Argentina/Cordoba
+    # ---  enable prometheus exporter redis & pgsql
+    prometheus_enable: true
+    # --- postgresl params
+    # --- set postgres_host if you have your own postgres:
+    postgres_host: oml-concicarpinella-do-user-6023066-0.b.db.ondigitalocean.com
+    # --- set true if you have an postgres isolate or cloud instance
+    postgres_port: 25060
+    postgres_user: omnileads
+    postgres_password: AVNS_9qqJhQXkJ3AW-mRDjFA
+    postgres_database: omnileads
+    postgres_maintenance_db: postgres #defaultdb
+    postgres_ssl: true
+    # --- If you have a PGSQL cluster you can activated cluster mode
+    postgres_ha: false
+    # --- Read Only connection host address
+    postgres_ro_host:
+    # --- if you have your own bucket uncomment and put here the URL:
+    # --- on contrary (comment) a minIO podman container will run on appplication_host instance
+    # --- example VULTR: https://ewr1.vultrobjects.com
+    # --- example Digital Ocean: https://sfo3.digitaloceanspaces.com
+    bucket_url: https://sfo3.digitaloceanspaces.com
+    # --- minio auth API params
+    s3_http_admin_user: omnileads
+    s3_http_admin_pass: 098098ZZZ
+    # --- bucket params
+    bucket_access_key: 4k3hkjh4kjh23kj4h3k2jh4j2k
+    bucket_secret_key: dsadasdsadasdsadas
+    bucket_name: omnileads
+    bucket_region: us-east-1
+    # --- Asterisk AMI user & password
+    ami_user: omnileads
+    ami_password: C12H17N2O4P_o98o98
+    # --- SIP HOMER capture activated
+    homer_enable: true
+    # --- Dialer API user & pass
+    dialer_user: demoadmin
+    dialer_password: demo

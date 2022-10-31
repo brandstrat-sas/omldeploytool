@@ -19,11 +19,10 @@
 ---
 
 - name: RTPENGINE installation and configuration
-  hosts: omnileads-app
+  hosts: omnileads-voice
   tags:
     - aio
     - voice
-    - rtpengine
   vars:
     img_repo: '{{ container_image_registry }}/freetechsolutions/rtpengine'
   tasks:

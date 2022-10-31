@@ -3,22 +3,23 @@
 case $1 in
   --reset_pass)
     echo "reset django admin password"
-    docker exec -it omlapp python3 manage.py cambiar_admin_password
+    docker exec -it omlapp python3 /opt/omnileads/ominicontacto/manage.py cambiar_admin_password
     ;;
   --init_env)
-    docker exec -it omlapp python3 manage.py inicializar_entorno
+    docker exec -it omlapp python3 /opt/omnileads/ominicontacto/manage.py inicializar_entorno
     ;;
   --delete_pgsql)
     echo "echo drop all on PostgreSQL"
     docker stop omlpostgresql
     docker rm omlpostgresql
-    docker volume rm devenv_postgresql_data
+    docker volume rm prodenv_postgresql_data
+    docker-compose up -d
     ;;
   --delete_redis)
     echo "echo drop all on REDIS"
     docker stop omlredis
     docker rm omlredis
-    docker volume rm devenv_redis_data
+    docker volume rm prodenv_redis_data
     ;;
   --help)
     echo "

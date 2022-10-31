@@ -26,6 +26,33 @@ case $1 in
     sleep 2
     systemctl start oml-redis-server
     ;;
+  --asterisk_cli)
+    podman exec -it oml-asterisk-server asterisk -rvvvv
+    ;;
+  --asterisk_bash)
+    podman exec -it oml-asterisk-server bash
+    ;;
+  --asterisk_logs)
+    podman exec -it oml-asterisk-server bash
+    ;;
+  --kamailio_logs)
+    podman logs -f oml-kamailio-server
+    ;;
+  --django_logs)
+    podman logs -f oml-django-server
+    ;;
+  --rtpengine_logs)
+    podman logs -f oml-rtpengine-server
+    ;;
+  --websockets_logs)
+    podman logs -f oml-websockets-server
+    ;;
+  --rtpengine_conf)
+    podman exec -it oml-rtpengine-server cat /etc/rtpengine.conf
+    ;;
+  --nginx_t)
+    podman exec -it oml-nginx-server nginx -t
+    ;;
   --help)
     echo "
 NAME:
