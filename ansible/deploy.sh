@@ -17,22 +17,6 @@ AnsibleExec() {
 echo "***************************** filter ********************************* "
 echo "***************************** filter ********************************* "
 
-
-# if [ -z ${oml_infra+x} ]; then
-#   echo "ERROR oml_infra var is unset";
-#   exit 1
-# else
-#   if [ -z ${wan_ip+x} ]; then
-#     echo "\e[31m ERROR oml_nic var is unset #31 \e[0m";
-#     exit 1
-#   fi
-# fi
-#
-# if [ -z ${lan_ip+x} ]; then
-#   echo "\e[31m ERROR oml_nic var is unset #31 \e[0m";
-#   exit 1
-# fi
-
 case ${oml_action} in
   install)
     echo "deploy: $oml_action"
@@ -94,7 +78,7 @@ case ${oml_component} in
   ;;
   *)
     echo "\e[31m ERROR oml_component var is unset #31 \e[0m";
-    exit 1
+    oml_component=aio
   ;;
 esac
 

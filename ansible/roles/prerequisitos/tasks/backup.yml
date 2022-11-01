@@ -1,4 +1,4 @@
-# Copyright (C) 2018 Freetech Solutions
+# Copyright (C) 2022 Freetech Solutions
 
 # This file is part of OMniLeads
 
@@ -21,8 +21,6 @@
   s3_sync:
     bucket: '{{ bucket_name }}'
     file_root: '{{ asterisk_location_conf }}/custom'
-  tags:
-    - asterisk
   when: bucket_url is defined
 
 - name: BACKUP asterisk custom config files MINIO selfhosted
@@ -49,8 +47,6 @@
    login_user: '{{ postgres_user }}'
    login_password: '{{ postgres_password }}'
    login_host: '{{ postgres_host }}'
-  tags:
-    - pgsql
 
 - name: BACKUP upload to MINIO selfhosted
   s3_sync:
@@ -62,13 +58,3 @@
    aws_secret_key: '{{ bucket_secret_key }}'
    ec2_url: 'http://{{ minio_host }}:9000'
   when: bucket_url is not defined
-
-  #command: 'aws --endpoint-url http://{{ minio_host }}:9000 --no-verify-ssl s3 sync {{ asterisk_location_conf }}/custom s3://{{ bucket_name }}'
-
-
-
-# - name: BACKUP asterisk custom files
-#   command: aws s3 sync
-#   tags:
-#       - upgrade
-#       - pgsql

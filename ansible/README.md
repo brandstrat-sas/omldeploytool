@@ -1,16 +1,34 @@
-## Gestion de OMniLeads basada en Ansible
+# Gestion de OMniLeads basada en Ansible
 
-Este formato de gestión se abarca instalaciones de nuevas instancias, manejo de actualizaciones y procedimientos de backups & restore,
-utilizando un único script y archivo de configuración, invocado con diferentes flags dependiendo de la acción a concretar sobre la
-instancia en cuestión.
+Esta forma de gestión abarca desde instalaciones de nuevas instancias, manejo de actualizaciones hasta la ejecución de procedimientos de backups & restore,
+utilizando un único script y archivo de configuración.
 
-................
+![Diagrama deploy tool](./png/deploy-tool-ansible-deploy-instances-multiples.png)
 
-La gestión se realiza desde la estación de trabajo del sysadmin a parir de dos archivos; deploy.sh e inventory.
+## Bash, Ansible & System D 📋
+
+La gestión se realiza desde la estación de trabajo del sysadmin a parir de dos archivos; deploy.sh e inventory.yml.
 El primero es a quien se invoca para disparar la acción en concreto (deploy, upgrade, backup, etc.), el segundo
 sirve para ajustar parámetros de configuración a ser implementados sobre la instancia a aplicar el despliegue.
 
-# Ansible + Inventory
+Cada instancia de OMniLeads se materializa a partir de como minimo dos instancias de Linux (aplicacion y voz). Es decir que vamos a contar con un Linux host dedicado a ejecutar los contenedores "de aplicacion" mientras que en el segundo se ejecutan
+los contenedores "de procesamiento de voz".
+
+![Diagrama deploy tool zoom](./png/deploy-tool-ansible-deploy-instances.png)
+
+Luego una vez desplegada la aplicación en las instancias (app & voice), la gestión de componentes sera a través de systemd.
+
+```
+systemd start component
+systemd restart component
+systemd stop component
+```
+
+Esto aplica para los componentes desplegados sobre la instancia app (nginx, websockets, django, kamailio, postgresql, redis y minio)
+así como también sobre la instancia voice (asterisk y rtpengine).
+
+
+## Ansible + Inventory 🔧
 
 El archivo de inventario es la fuente de configuración de la instancia sobre la cual se va a trabajar.
 Allí se ajustan parámetros como las versiones de las imágenes de cada componente o cuestiones de configuración
@@ -19,164 +37,161 @@ de base de datos (usuarios, passwords, etc.)
 Respecto a este archivo, vamos a repasar los parámetros principales, es decir los que si o si debo
 ajustar para lograr una instalación exitosa.
 
-Antes que nada en la seccion [omnileads-app], debemos ingresar el host o listado de hosts sobre los cuales deseamos
-instalar OMniLeads.
-
-
 ```
-[omnileads-app]
-
-algarrobo ansible_host=147.182.235.93 ansible_ssh_port=22 omni_ip_lan=10.10.1.2 omni_ip_wan=147.182.235.93 infra_env=cloud
-qubracho ansible_host=147.182.323.11 ansible_ssh_port=22 omni_ip_lan=172.16.10.2 omni_ip_wan=147.182.323.11 infra_env=cloud
-moye ansible_host=147.182.223.12 ansible_ssh_port=22 omni_ip_lan=192.168.10.12 omni_ip_wan=147.182.223.12 infra_env=lan
-```
-
-Cada entrada correspondiente a cada instancia de OMniLeads debe contar con los siguientes parámetros:
-
-* nombre de referencia: se declara el nombre con el que Ansible hara referencia a la instancia
-* ansible_host: la dirección IP o fqdn para acceder al host desde el nodo ansible
-* ansible_ssh_port: el puerto SSH para acceder al host desde el nodo ansible
-* omni_ip_lan: la dirección IP local de la instancia
-* omni_ip_wan: la dirección IP WAN de la instancia o bien con la que sale a internet (NAT)
-* infra_env: el tipo de infraestructura sobre la cual se va a desplegar la App; lan, cloud o hybrid.
-
-Luego tenemos la sección [everyone:vars], en donde se van a ajustar variables de OMniLeads en general.
-Sin embargo vamos a poner énfasis en la sección de versionado de componentes.
-
-Cada componente tiene asociado una version de imagen de contenedor.
-
-```
-################################################################################
-# ********** Below are the img versions used for OMniLeads deploy ************ #
-# ********** Below are the img versions used for OMniLeads deploy ************ #
-################################################################################
-
-django_version=djangovue
-websockets_version=latest
-nginx_version=latest
-kamailio_version=latest
-asterisk_version=latest
-rtpengine_version=latest
+all:
+  hosts:
+    omnileads-voice:
+      ansible_host: 190.19.111.23
+      omni_ip_lan: 10.10.10.3
+      application_host: 10.10.10.4
+    omnileads-app:
+      ansible_host: 190.19.111.22
+      omni_ip_lan: 10.10.10.4
+      voice_host: 10.10.10.3
 ```
 
-Luego se debe ajustar la zona horaria. Vamos a ignorar por ahora los parámetros referidos a los _host de cada componente.
+omnileads-voice refiere a la instancia sobre la cual se van a desplegar los componentes asterisk y rtpengine, se debera especificar
+ la direccion utilizada para que ansible se conecte y ejecute las tareas (ansible_host), luego la direccion de red local y
+ finalmente la direccion del servidor de aplicacion sobre el cual se va a desplegar los componentes
+ (nginx, websockets, django, kamailio, postgresql, redis y minio).
+
+
+Respecto a las variables de deploy, por un lado tenemos variables exclusivas para la instancia de aplicacion, las mismas se encuentran
+dentro del tab omnileads-app, como por ejemplo:
 
 ```
-################################################################################
-# ****************** Network location - OMniLeads components  **************** #
-# ****************** Network location - OMniLeads components  **************** #
-################################################################################
-
-# --- Set the timezone
-TZ=America/Argentina/Cordoba
-
-#application_host=
-#voice_host=
-#postgres_host=
+omnileads-app:
+  ansible_host: 234.234.234.234
+  omni_ip_lan: 10.10.10.4
+  voice_host: 10.10.10.3
+  # ---  kamailio shm & pkg memory params
+  shm_size: 64
+  pkg_size: 8
+  # --- is the time in seconds that will last the https session when inactivity
+  SCA: 3600
+  ...
+  ...
+  ...
+  ...
 ```
 
-El resto de los parámetros son sencillos de asimilar y cuentan con su descripción
-dentro del mismo archivo.
+mientras que ademas contamos con las variables de omnileads existentes dentro del tab "hosts" que son parametros
+que heredan ambas instancias (omnileads-app y omnileads-voice).
 
-# Bash Script deploy.sh
+```
+vars:
+  # -- version images to deploy
+  django_version: latest
+  websockets_version: latest
+  nginx_version: latest
+  kamailio_version: latest
+  asterisk_version: latest
+  rtpengine_version: latest
+  # --- "cloud" instance (access through public IP)
+  # --- or "lan" instance (access through private IP)
+  infra_env: cloud # (values: cloud or lan)
+  # --- ansible user & port connection
+  ansible_ssh_port: 22
+  ansible_user: root
+  ....
+  ....
+  ....
+  ....
+```
+
+
+## Bash Script deploy.sh 📄
 
 Este script recibe parámetros que comandan la acción a efectuar, esta acción tiene que ver con invocar a la Playbook
-matrix.yml quien a partir del archivo de inventario previamente editado terminara desplegando la acción en concreto sobre la instancia o grupo de instancias.
+matrix.yml quien a partir del archivo de inventario previamente editado terminara desplegando la acción en concreto sobre las instancias app y voice.
 
 ```
 $ ./deploy.sh --help
 
 ```
 
-A la hora de una instalacion o actualizacion se deben enviar dos parametros:
+A la hora de una instalacion o actualizacion se deben enviar dos parámetros:
 
 * --action=
 * --component=
 
-El nombre del componente puede ser
-
-## Deploy de nueva instancia - All in One
-
-Como primer paso se debe editar el archivo de inventario de acuerdo a las personalizaciones que se deseen implementar, para luego invocar el script de deploy.sh.
-
-Aqui simplemente tener en cuenta que si la instancia va a ser accedida solamente desde la LAN, entonces el inventory tendra este aspecto:
+Si solamente pasamos --action=install y se obvia el segundo parametro entonces se asume una instalacion de "all" es decir
+omnileads-app y omnileads-voice.
 
 ```
-[omnileads-app]
-omnileads ansible_host=147.182.235.93 ansible_ssh_port=22 ansible_user=root omni_ip_lan=10.10.10.2 omni_ip_wan=147.182.235.93 infra_env=lan
-```
-
-Mientras que si la instancia se hostea en la nube para ser accedida desde internet:
-
-```
-[omnileads-app]
-omnileads ansible_host=147.182.235.93 ansible_ssh_port=22 ansible_user=root omni_ip_lan=10.10.10.2 omni_ip_wan=147.182.235.93 infra_env=cloud
-```
-
-Es decir, lo unico que cambio es la variable "infra_env", en la linea declaratoria de la instancia a desplegar. Luego simplemente se debe ejecutar el deploy.sh.
-
-```
-./deploy.sh --action=install --component=aio
+$ ./deploy.sh --action=install
 
 ```
 
-## Deploy instancia con Backing como servicio administrado del Cloud
+Si quisiéramos enfocarnos en algún componente en particular, por ejemplo:
 
-En este formato se asumo que PostgreSQL y Object Storage DB seran proporcionados por el proveeedor cloud seleccionado. Esto implica que
-esos dos servicios en lugar de desplegarlos nosotros, simplemente debemos informar en el archivo de inventory sus datos de conexion.
+```
+$ ./deploy.sh --action=install --component=asterisk
+
+```
+
+## Deploy de nueva instancia LAN con Backing (Postgresl y Object Storage MinIO) auto hosteado  🚀
+
+Antes que nada se debe trabajar en el archivo inventory.yml
+
+Respecto a las direcciones y conexiónes:
+
+```
+omnileads-voice:
+  ansible_host: 10.10.10.3
+  omni_ip_lan: 10.10.10.3
+  application_host: 10.10.10.4
+omnileads-app:
+  ansible_host: 10.10.10.4
+  omni_ip_lan: 10.10.10.4
+  voice_host: 10.10.10.3
+```
+
+El parametro infra_env deberá inicializarse como 'lan'.
+
+```
+infra_env: lan
+```
+
+Y finalmente se deben comentar los parámetros ```bucket_url``` y ```postgres_host```, para que así ambos (PostgreSQL y Object Storage MinIO) sean desplegados dentro de la instancia de aplicación.
+
+El resto de los parámetros se pueden personalizar como sea deseado.
+
+Finalmente se debe ejecutar el deploy.sh.
+
+```
+./deploy.sh --action=install
+
+```
+
+## Deploy de nueva instancia con Backing (Postgresl y Object Storage) como servicio administrado del Cloud  🚀
+
+En este formato se asume que PostgreSQL y Object Storage DB van a ser proporcionados como servicios administrados por el proveedor cloud seleccionado.
+Esto implica que esos dos servicios en lugar de desplegarlos nosotros, simplemente debemos informar en el archivo de inventory sus datos de conexión.
 
 De esta manera OMniLeads va a almacenar los datos relacionales (SQL) y las grabaciones & backups sobre (Object Storage) del cloud, obviando
-la instalacion de ambos componentes dentro de la instancia Linux donde corre OMniLeads.
+la instalación de ambos componentes dentro de la instancia Linux donde corre OMniLeads.
 
-Vamos a plantear un inventory de referencia, en donde se supone que el cloud provider nos brinda los datos de conexion a Postgres. Observar que lo primero a hacer es descomentar postgres_host y asignarle el string de conexion correspondiente.
+Vamos a plantear un inventory de referencia, en donde se supone que el cloud provider nos brinda los datos de conexión a Postgres.
+En el parametro *postgres_host* se debe asignar el string de conexión correspondiente.
+Luego simplemente se trata de ajustar los otros parámetros de conexión, de acuerdo a si vamos a necesitar establecer una conexión SSL, poner el *postgres_ssl: true*.
+Si el servicio de PostgreSQL implica un cluster con mas de un nodo, entonces se puede activar mediante *postgres_ha: true*  y *postgres_ro_host: X.X.X.X*
+para indicar que las queries se impacten sobre el nodo de replica del cluster.
 
-Luego simplemente se trata de ajustar los demas parametros de conexion, de acuerdo a si vamos
-a necesitar establecer una conexion SSL, poner el postgres_cloud=yes para que se cree plperl y si el servicio de PostgreSQL implica un cluster con mas de un nodo, entonces se puede activar mediante
-postgres_ha=true y postgres_ro_host=X.X.X.X para indicar que las queries se impacten sobre el nodo de replica del cluster.
-
-```
-postgres_host=string_de_conexion_pgsql_cloud_provider
-
-postgres_port=5432
-postgres_user=omnileads
-postgres_password=AVNS_m0GH-Fk0ZXWWOxNWdSY
-postgres_database=omnileads
-
-# ----  to activate ssl on asterisk odbc.ini (some cloud providers imply SSL)
-postgres_ssl=false
-# ----  to create plperl extension
-postgres_cloud=false
-
-# ----  to activate HA deploy set "true"
-postgres_ha=false
-# ----  RO (Read Only) postgres node IP/HOSTNAME
-postgres_ro_host=
-```
-
-Con respecto a Object Storage, simplemente se debe descomentar bucket_url y asignarle el valor correspondiente al cloud indicado. Tambien los parametros de autenticacion deberan ser proporcionados. Respecto al bucket_region en caso de no necesitar especificar nada, se debe dejarlo
-con el valor actual.
-
-```
-# --- if you want to use cloud provider bucket, must uncomment & set this:
-bucket_url=https://ewr1.vultrobjects.com
-
-bucket_access_key=dsadsadsad
-bucket_secret_key=BNVBNbnvghfhg76574632ghfgh
-bucket_name=omnileads
-bucket_region=us-east-1
-```
+Con respecto a Object Storage, simplemente se debe proporcionar el URL en *bucket_url*.
+También los parámetros de autenticación deberán ser proporcionados; *bucket_access_key* & *bucket_secret_key* así como también el *bucket_name*.
+Respecto al bucket_region en caso de no necesitar especificar nada, se debe dejarlo con el valor actual.
 
 Finalmente se lanza el deploy:
 
 ```
-./deploy.sh --action=install --component=aio
-
+./deploy.sh --action=install
 ```
-
-## Deploy de actualizaciones
-
 
 ## Deploy de backup
 
 
-## Deploy de disaster recovery
+
+## Deploy de actualizaciones
+
+## Disasters recovery

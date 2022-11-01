@@ -51,7 +51,7 @@ case $1 in
     podman exec -it oml-rtpengine-server cat /etc/rtpengine.conf
     ;;
   --nginx_t)
-    podman exec -it oml-nginx-server nginx -t
+    podman exec -it oml-nginx-server nginx -T
     ;;
   --help)
     echo "
