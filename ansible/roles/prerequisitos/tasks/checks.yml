@@ -55,7 +55,7 @@
 
 - name: Setting postgres_host as localhost
   set_fact:
-    postgres_host: "{{ omni_ip_lan }}"
+    postgres_host: localhost
   tags: always
   changed_when: false
   when:
