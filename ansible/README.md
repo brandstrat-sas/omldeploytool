@@ -106,27 +106,24 @@ Este script recibe parámetros que comandan la acción a efectuar, esta acción 
 matrix.yml quien a partir del archivo de inventario previamente editado terminara desplegando la acción en concreto sobre las instancias app y voice.
 
 ```
-$ ./deploy.sh --help
+./deploy.sh --help
 
 ```
 
-A la hora de una instalacion o actualizacion se deben enviar dos parámetros:
+A la hora de una instalación o actualización se deben enviar dos parámetros:
 
 * --action=
 * --component=
 
-Si solamente pasamos --action=install y se obvia el segundo parametro entonces se asume una instalacion de "all" es decir
-omnileads-app y omnileads-voice.
-
 ```
-$ ./deploy.sh --action=install
+./deploy.sh --action=install --component=all
 
 ```
 
 Si quisiéramos enfocarnos en algún componente en particular, por ejemplo:
 
 ```
-$ ./deploy.sh --action=install --component=asterisk
+./deploy.sh --action=install --component=asterisk
 
 ```
 
@@ -160,7 +157,7 @@ El resto de los parámetros se pueden personalizar como sea deseado.
 Finalmente se debe ejecutar el deploy.sh.
 
 ```
-./deploy.sh --action=install
+./deploy.sh --action=install --component=all
 
 ```
 
@@ -185,13 +182,28 @@ Respecto al bucket_region en caso de no necesitar especificar nada, se debe deja
 Finalmente se lanza el deploy:
 
 ```
-./deploy.sh --action=install
+./deploy.sh --action=install --component=all
 ```
 
 ## Deploy de backup
 
+El deploy de un backup implica a los archivos de configuración personalizados de asterisk /etc/asterisk/custom por un lado y la base de datos
+por el otro, utilizando el bucket asociado a la instancia como bitácora de los backups.
 
+Para lanzar un backup simplemente se debe invocar el script de deploy.sh:
+
+```
+./deploy.sh --action=backup
+```
 
 ## Deploy de actualizaciones
+
+Para aplicar actualizaciones simplemente debemos indicar a nivel de inventory.yml si es que se desea desplegar
+versiones especificas de los componentes, por el contrario se procede con un "pull" de "latest".
+Luego se debe invocar al script de deploy.sh con el parámetro --upgrade.
+
+```
+./deploy.sh --action=upgrade --component=all
+```
 
 ## Disasters recovery

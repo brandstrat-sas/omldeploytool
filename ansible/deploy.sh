@@ -43,8 +43,9 @@ case ${oml_component} in
   backing)
     echo "install omnileads component/s $oml_component"
   ;;
-  aio)
+  all)
     echo "install omnileads component/s $oml_component"
+    oml_component=aio
   ;;
   monitoring)
     echo "install omnileads component/s $oml_component"
@@ -77,8 +78,7 @@ case ${oml_component} in
     echo "install omnileads component/s $oml_component"
   ;;
   *)
-    echo "\e[31m ERROR oml_component var is unset #31 \e[0m";
-    oml_component=aio
+    echo "\e[31m oml_component var is unset #31 \e[0m";
   ;;
 esac
 

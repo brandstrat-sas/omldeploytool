@@ -17,6 +17,14 @@
 #
 ---
 
+- name: Disable firewallD or ufw
+  systemd:
+    name: ufw
+    state: stopped
+    enabled: no
+    daemon_reload: yes
+  ignore_errors: yes
+
 - name: Ensure group {{ usuario }} exists
   group:
     name: '{{ usuario }}'
@@ -131,7 +139,7 @@
     src: "templates/oml_manage.sh"
     dest: /usr/local/bin/oml_manage.sh
     mode: 0755
-  
+
 # Se setea el timezone
 - name: Set timezone of server
   timezone: name={{ TZ }}
