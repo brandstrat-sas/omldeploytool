@@ -35,22 +35,16 @@
         mode: 666
         owner: "{{ usuario }}"
         group: "{{ usuario }}"
-      tags:
-        - upgrade
 
     - name: PROMETHEUS Copy systemd file
       template:
         src: "{{ prometheus_repo_path }}prometheus.service"
         dest: /etc/systemd/system/prometheus.service
-      tags:
-        - upgrade
 
     - name: PROMETHEUS Pull image
       command: podman pull --quiet {{ img_prometheus_repo }}
       register: podman_pull
       until: podman_pull is success
-      tags:
-        - upgrade
 
     - name: PROMETHEUS Enable and start service
       systemd:
@@ -58,5 +52,3 @@
         state: restarted
         enabled: yes
         daemon_reload: yes
-      tags:
-        - upgrade

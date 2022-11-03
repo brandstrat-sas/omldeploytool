@@ -29,19 +29,19 @@
 
   tasks:
 
-  - name: DJANGO Create file .pgpass
-    template:
-      src: "{{ django_repo_path }}templates/.pgpass"
-      dest: "{{ item }}.pgpass"
-      mode: 060
-      owner: "{{ usuario }}"
-      group: "{{ usuario }}"
-    with_items:
-      - "{{ django_deploy_path }}"
-      - /root/
-    when: postgres_host != "localhost"
-    tags:
-      - upgrade
+  # - name: DJANGO Create file .pgpass
+  #   template:
+  #     src: "{{ django_repo_path }}templates/.pgpass"
+  #     dest: "{{ item }}.pgpass"
+  #     mode: 060
+  #     owner: "{{ usuario }}"
+  #     group: "{{ usuario }}"
+  #   with_items:
+  #     - "{{ django_deploy_path }}"
+  #     - /root/
+  #   when: postgres_host != "localhost"
+  #   tags:
+  #     - upgrade
 
   - name: Set Django environment variables for this installation
     template:
@@ -83,11 +83,15 @@
     template:
       src: "{{ django_repo_path }}templates/django.service"
       dest: /etc/systemd/system/omnileads.service
+    tags:
+        - upgrade
 
   - name: DJANGO Pull image
     command: podman pull --quiet {{ img_repo }}:{{ django_version }}
     register: podman_pull
     until: podman_pull is success
+    tags:
+        - upgrade
 
   - name: DJANGO Enable and start systemd service
     systemd:
@@ -95,3 +99,5 @@
       state: started
       enabled: yes
       daemon_reload: yes
+    tags:
+        - upgrade

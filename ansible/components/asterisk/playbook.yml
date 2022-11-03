@@ -114,8 +114,6 @@
       - oml_extensions_modules_custom.conf
       - oml_extensions_postcall_custom.conf
       - oml_extensions_precall_custom.conf
-    tags:
-        - upgrade
 
   - name: ASTERISK Copy systemd service
     template:

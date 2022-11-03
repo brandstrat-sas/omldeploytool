@@ -203,7 +203,7 @@ versiones especificas de los componentes, por el contrario se procede con un "pu
 Luego se debe invocar al script de deploy.sh con el parámetro --upgrade.
 
 ```
-./deploy.sh --action=upgrade --component=all
+./deploy.sh --action=upgrade
 ```
 
 ## Disasters recovery

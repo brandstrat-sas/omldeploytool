@@ -152,7 +152,7 @@ do
       oml_action="${i#*=}"
       shift
     ;;
-    --component=aio|--component=app|--component=voice|--component=backing|--component=monitoring|--component=django|--component=asterisk|--component=kamailio|--component=rtpengine|--component=redis|--component=pgsql|--component=minio|--component=haproxy|--component=websockets|--component=nginx|--component=prometheus)
+    --component=aio|--component=app|--component=voice|--component=backing|--component=monitoring|--component=django|--component=asterisk|--component=kamailio|--component=rtpengine|--component=redis|--component=pgsql|--component=minio|--component=haproxy|--component=websockets|--component=nginx|--component=prometheus|--component=all)
       oml_component="${i#*=}"
       shift
     ;;

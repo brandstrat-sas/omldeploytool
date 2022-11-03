@@ -17,13 +17,21 @@
 #
 ---
 
-- name: Disable firewallD or ufw
-  systemd:
-    name: ufw
-    state: stopped
-    enabled: no
-    daemon_reload: yes
-  ignore_errors: yes
+# - name: Disable ufw
+#   systemd:
+#     name: ufw
+#     state: stopped
+#     enabled: no
+#     daemon_reload: yes
+#   ignore_errors: yes
+#
+# - name: Disable firewallD
+#   systemd:
+#     name: firewalld
+#     state: stopped
+#     enabled: no
+#     daemon_reload: yes
+#   ignore_errors: yes
 
 - name: Ensure group {{ usuario }} exists
   group:
