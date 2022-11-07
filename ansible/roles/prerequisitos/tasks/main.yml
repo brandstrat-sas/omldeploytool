@@ -23,65 +23,17 @@
 #     update: dist
 #
 
-- name: Install required Ubuntu packages
-  apt:
-    name:
-      - curl
-      - net-tools
-      - podman
-      - wget
-      - jq
-      - sngrep
-      - awscli
-      - python3-boto3
-      - python3-psycopg2
-      - postgresql-client
-    state: latest
-    update_cache: yes
-  tags: install
-  when: ansible_distribution == "Ubuntu"
 
-- name: Install required Debian packages
-  apt:
-    name:
-      - curl
-      - net-tools
-      - podman
-      - wget
-      - jq
-      - sngrep
-      - awscli
-      - python3-boto3
-      - python3-psycopg2
-      - postgresql-client
-    update_cache: yes
-    state: latest
-  tags: install
-  when: ansible_distribution == "Debian"
-
-- name: Install required RedHat packages
-  yum:
-    name:
-      - curl
-      - net-tools
-      - podman
-      - wget
-    state: latest
-  tags: install
-  when: ansible_os_family == "RedHat"
-
-# Chequeos internos
-- name: Check if Omnileads has been installed previously
+- name: MAIN Check if Omnileads has been installed previously
   include: checks.yml
   tags: always
 
-- name: Perform a backup
+- name: MAIN Perform a backup
   include: backup.yml
   tags:
     - backup
 
-# primeras configuraciones de servidores
-- name: First configuration in server or servers
+- name: MAIN First configuration in server or servers
   include: os_configuration.yml
   tags:
     - install

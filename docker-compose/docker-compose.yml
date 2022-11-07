@@ -88,6 +88,7 @@ services:
       - HOMERHOST=${HOMERHOST}
       - HOMERPORT=${HOMERPORT}
       - HOMER_ENABLE=True
+      - NETWORK_MODE=bridge
     image: ${OMLACD_IMG}
     networks:
       - omnileads

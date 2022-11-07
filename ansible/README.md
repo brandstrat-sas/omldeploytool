@@ -200,6 +200,40 @@ Para lanzar un backup simplemente se debe invocar el script de deploy.sh:
 
 Para aplicar actualizaciones simplemente debemos indicar a nivel de inventory.yml si es que se desea desplegar
 versiones especificas de los componentes, por el contrario se procede con un "pull" de "latest".
+
+```
+vars:
+  # --- version images to deploy
+  django_version: latest
+  websockets_version: latest
+  nginx_version: latest
+  kamailio_version: latest
+  asterisk_version: latest
+  rtpengine_version: latest
+```
+
+Luego se debe invocar al script de deploy.sh con el parámetro --upgrade.
+
+```
+./deploy.sh --action=upgrade
+```
+
+## Deploy de rollbacks
+
+El uso de contenedores a la hora de ejecutar los componentes de OMniLeads nos permite fácilmente aplicar rollbacks hacia versiones
+históricas congeladas y accesible a través del "tag".
+
+```
+vars:
+  # --- version images to deploy
+  django_version: latest
+  websockets_version: latest
+  nginx_version: latest
+  kamailio_version: latest
+  asterisk_version: ff63617b
+  rtpengine_version: face6cfa
+```
+
 Luego se debe invocar al script de deploy.sh con el parámetro --upgrade.
 
 ```

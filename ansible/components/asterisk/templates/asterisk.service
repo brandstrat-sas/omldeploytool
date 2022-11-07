@@ -19,7 +19,6 @@ ExecStart=/usr/bin/podman run \
   --network=host \
   --env-file=/etc/default/asterisk.env \
   --volume=/etc/asterisk/custom/:/etc/asterisk/custom \
-  --volume=/var/lib/omnileads/asterisk/sounds/:/var/lib/asterisk/sounds \
   --name=oml-asterisk-server \
   --rm  \
   {{ container_image_registry }}/freetechsolutions/omlacd:{{ asterisk_version }}

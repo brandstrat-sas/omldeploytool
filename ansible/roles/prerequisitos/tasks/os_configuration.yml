@@ -33,6 +33,65 @@
 #     daemon_reload: yes
 #   ignore_errors: yes
 
+- name: OS CONFIGS Install required Debian packages
+  apt:
+    name:
+      - curl
+      - net-tools
+      - podman
+      - wget
+      - jq
+      - sngrep
+      - awscli
+      - python3-boto3
+      - python3-psycopg2
+      - postgresql-client
+    update_cache: yes
+    state: latest
+  tags: install
+  when: ansible_distribution == "Debian"
+
+- name: OS CONFIGS Enable EPEL Repository on Rocky Linux
+  dnf:
+    name: epel-release
+    state: latest
+  tags: install
+  when: ansible_distribution == "Rocky"
+
+- name: OS CONFIGS enable postgres dnf module ROCKY
+  command: 'dnf -y module enable postgresql:{{ postgres_version }}'
+  tags: install
+  when: ansible_distribution == "Rocky"
+
+- name: OS CONFIGS Install required Rocky Linux packages
+  dnf:
+    name:
+      - python3
+      - python3-pip
+      - podman
+      - jq
+      - postgresql
+      - python3-psycopg2
+      - python3-boto3
+      - awscli
+    state: latest
+  tags: install
+  when: ansible_distribution == "Rocky"
+
+- name: OS CONFIGS Disable SELinux Rocky Linux
+  selinux:
+    state: disabled
+  tags: install
+  when: ansible_distribution == "Rocky"
+
+- name: OS CONFIGS Stop service firewalld Rocky Linux
+  systemd:
+    name: firewalld
+    state: stopped
+    enabled: no
+  tags: install
+  when: ansible_distribution == "Rocky"
+
 - name: Ensure group {{ usuario }} exists
   group:
     name: '{{ usuario }}'
