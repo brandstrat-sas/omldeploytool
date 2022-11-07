@@ -17,22 +17,6 @@ AnsibleExec() {
 echo "***************************** filter ********************************* "
 echo "***************************** filter ********************************* "
 
-
-# if [ -z ${oml_infra+x} ]; then
-#   echo "ERROR oml_infra var is unset";
-#   exit 1
-# else
-#   if [ -z ${wan_ip+x} ]; then
-#     echo "\e[31m ERROR oml_nic var is unset #31 \e[0m";
-#     exit 1
-#   fi
-# fi
-#
-# if [ -z ${lan_ip+x} ]; then
-#   echo "\e[31m ERROR oml_nic var is unset #31 \e[0m";
-#   exit 1
-# fi
-
 case ${oml_action} in
   install)
     echo "deploy: $oml_action"
@@ -59,8 +43,9 @@ case ${oml_component} in
   backing)
     echo "install omnileads component/s $oml_component"
   ;;
-  aio)
+  all)
     echo "install omnileads component/s $oml_component"
+    oml_component=aio
   ;;
   monitoring)
     echo "install omnileads component/s $oml_component"
@@ -93,8 +78,7 @@ case ${oml_component} in
     echo "install omnileads component/s $oml_component"
   ;;
   *)
-    echo "\e[31m ERROR oml_component var is unset #31 \e[0m";
-    exit 1
+    echo "\e[31m oml_component var is unset #31 \e[0m";
   ;;
 esac
 
@@ -168,7 +152,7 @@ do
       oml_action="${i#*=}"
       shift
     ;;
-    --component=aio|--component=app|--component=voice|--component=backing|--component=monitoring|--component=django|--component=asterisk|--component=kamailio|--component=rtpengine|--component=redis|--component=pgsql|--component=minio|--component=haproxy|--component=websockets|--component=nginx|--component=prometheus)
+    --component=aio|--component=app|--component=voice|--component=backing|--component=monitoring|--component=django|--component=asterisk|--component=kamailio|--component=rtpengine|--component=redis|--component=pgsql|--component=minio|--component=haproxy|--component=websockets|--component=nginx|--component=prometheus|--component=all)
       oml_component="${i#*=}"
       shift
     ;;

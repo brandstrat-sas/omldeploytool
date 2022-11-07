@@ -19,7 +19,7 @@ ExecStart=/usr/bin/podman run \
   --network=host \
   --env-file=/etc/default/minio.env \
   --name=oml-minio-server \
-  --volume={{ minio_persistent_path }}:/data \
+  --volume=oml_minio:/data \
   --rm  \
   quay.io/minio/minio:{{ minio_version }} server /data --console-address ":9090"
 ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id

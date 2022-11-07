@@ -20,6 +20,19 @@
 # Chequeos de red, de servicios instalados, folders y archivos creados #
 ########################################################################
 
+# Me aseguro que se quiera instalar OML esté dentro de los SO permitidos.
+- name: Print omni_distribution
+  debug: msg="omni_distribution es {{ ansible_os_family }}"
+  changed_when: false
+  tags: always
+
+# Si no es asi, esta task generara un error esto es para AIO
+- name: Check omni_distribution
+  fail: msg="omni_distribution con valor {{ ansible_os_family }} es invalida"
+  when: ansible_os_family != "Debian" and ansible_os_family != "Rocky" 
+  changed_when: false
+  tags: always
+
 - name: Check if exists /etc/omnileads
   stat:
     path: "/etc/omnileads"
@@ -40,121 +53,102 @@
     path: "/var/lib/omnileads/pgsql"
   register: var_lib_omnileads_pgsql
 
-- name: Check if exists podman network
-  shell: bash -lc "podman network ls |grep {{ container_network }} |awk '{print $2}'"
-  args:
-    executable: /bin/bash
-  register: podman_net
-  failed_when: false
-  changed_when: false
-  tags: always
-
-# Obtengo hostname del nodo
-- name: Get the hostname of node
-  command: hostname
-  register: hostname
-  changed_when: false
-  tags: always
-
-# Seteo variable omni_fqdn con hostname obtenido
-- name: Set omni_fqdn ansible variable
-  set_fact: omni_fqdn="{{ hostname.stdout }}"
-  changed_when: false
-  tags: always
-
-#shell: bash -lc 'if [ -z $PGPASSWORD ]; then exit 1; else echo $PGPASSWORD; exit 0; fi'
-#podman network ls |grep omnileads
-
-- name: Setting kamailio_host as machine hostname
-  set_fact:
-    kamailio_host: "{{ omni_ip_lan }}"
-    kamailio_local: true
-  tags: always
-  changed_when: false
-  when: kamailio_host is not defined
-
-- name: Setting asterisk_host as instance IP
-  set_fact:
-    asterisk_host: "{{ omni_ip_lan }}"
-    asterisk_local: true
-  tags: always
-  changed_when: false
-  when: asterisk_host is not defined
-
 - name: Setting postgres_host as localhost
   set_fact:
     postgres_host: localhost
   tags: always
   changed_when: false
-  when: postgres_host is not defined
-    
-- name: Setting minio_host as instance IP
+  when:
+    - postgres_host is not defined
+    - application_host is not defined
+
+- name: Setting minio_host as instance LAN IP
   set_fact:
     minio_host: "{{ omni_ip_lan }}"
-    minio_local: true
   tags: always
   changed_when: false
-  when: minio_host is not defined
+  when:
+    - minio_host is not defined
+    - application_host is not defined
 
-- name: Setting postgres_bind as instance IP
+- name: Setting websockets_host as localhost
   set_fact:
-    postgres_bind: '{{ omni_ip_lan }}'
+    websockets_host: "{{ omni_ip_lan }}"
   tags: always
   changed_when: false
-  when: postgres_bind is not defined
+  when:
+    - websockets_host is not defined
+    - application_host is not defined
 
-- name: Setting rtpengine_host as instance IP
+- name: Setting kamailio_host as localhost
   set_fact:
-    rtpengine_host: "{{ omni_ip_lan }}"
-    rtpengine_local: true
+    kamailio_host: "{{ omni_ip_lan }}"
   tags: always
   changed_when: false
-  when: rtpengine_host is not defined
+  when:
+    - kamailio_host is not defined
+    - application_host is not defined
 
-- name: Setting django_host as 127.0.0.1
-  set_fact:
-    django_host: localhost
-    django_local: true
-  tags: always
-  changed_when: false
-  when: django_host is not defined
-
-- name: Setting websockets as instance IP
-  set_fact:
-    websocket_host: "{{ omni_ip_lan }}"
-    websocket_local: true
-  tags: always
-  changed_when: false
-  when: websocket_host is not defined
-
-- name: Setting nginx as localhost
-  set_fact:
-    nginx_host: "{{ omni_ip_lan }}"
-    nginx_local: true
-  tags: always
-  changed_when: false
-  when: nginx_host is not defined
-
-- name: Setting redis as localhost
+- name: Setting redis_host as localhost
   set_fact:
     redis_host: "{{ omni_ip_lan }}"
-    redis_local: true
   tags: always
   changed_when: false
-  when: redis_host is not defined
+  when:
+    - redis_host is not defined
+    - application_host is not defined
 
-# Me aseguro que se quiera instalar OML esté dentro de los SO permitidos.
-- name: Print omni_distribution
-  debug: msg="omni_distribution es {{ ansible_os_family }}"
-  changed_when: false
+- name: Setting asterisk_host as voice_host
+  set_fact:
+    asterisk_host: "{{ voice_host }}"
   tags: always
+  changed_when: false
+  when:
+    - asterisk_host is not defined
+    - application_host is not defined
 
-# Si no es asi, esta task generara un error esto es para AIO
-- name: Check omni_distribution
-  fail: msg="omni_distribution con valor {{ ansible_os_family }} es invalida"
-  when: ansible_os_family != "Debian" and ansible_os_family != "RedHat" and prodenv == 1
-  changed_when: false
+- name: Setting rtpengine_host as voice_host
+  set_fact:
+    rtpengine_host: "{{ voice_host }}"
   tags: always
+  changed_when: false
+  when:
+    - rtpengine_host is not defined
+    - application_host is not defined
+
+- name:  Setting postgres_host as application_host
+  set_fact:
+    postgres_host: "{{ application_host }}"
+  changed_when: false
+  when:
+    - postgres_host is not defined
+    - voice_host is not defined
+
+- name:  Setting minio_host as application_host
+  set_fact:
+    minio_host: "{{ application_host }}"
+  changed_when: false
+  when:
+    - minio_host is not defined
+    - voice_host is not defined
+
+- name: Setting redis_host as application_host
+  set_fact:
+    redis_host: "{{ application_host }}"
+  tags: always
+  changed_when: false
+  when:
+    - redis_host is not defined
+    - voice_host is not defined
+
+- name: Setting nginx_host as application_host
+  set_fact:
+    nginx_host: "{{ application_host }}"
+  tags: always
+  changed_when: false
+  when:
+    - nginx_host is not defined
+    - voice_host is not defined
 
 ######################################################################################################
 # Chequeo de variables de entorno:                                                                   #
