@@ -1,4 +1,4 @@
-# Copyright (C) 2018 Freetech Solutions
+# Copyright (C) 2022 Freetech Solutions
 
 # This file is part of OMniLeads
 
@@ -21,20 +21,23 @@
   s3_sync:
     bucket: '{{ bucket_name }}'
     file_root: '{{ asterisk_location_conf }}/custom'
-  tags:
-    - asterisk
-  when: bucket_url is defined
+  when:
+    - bucket_url is defined
+    - voice_host is not defined
 
 - name: BACKUP asterisk custom config files MINIO selfhosted
   s3_sync:
     bucket: '{{ bucket_name }}'
+    key_prefix: backups/asterisk
     file_root: '{{ asterisk_location_conf }}/custom/'
     validate_certs: no
     region: '{{ bucket_region }}'
     aws_access_key: '{{ bucket_access_key }}'
     aws_secret_key: '{{ bucket_secret_key }}'
     ec2_url: 'http://{{ minio_host }}:9000'
-  when: bucket_url is not defined
+  when:
+    - bucket_url is not defined
+    - voice_host is not defined
 
 - name: "BACKUP Set timestamp of the backup"
   set_fact:
@@ -49,26 +52,20 @@
    login_user: '{{ postgres_user }}'
    login_password: '{{ postgres_password }}'
    login_host: '{{ postgres_host }}'
-  tags:
-    - pgsql
+  when: application_host is not defined
 
-- name: BACKUP upload to MINIO selfhosted
-  s3_sync:
-   bucket: '{{ bucket_name }}'
-   file_root: 'tmp/pgsql-backup-{{ now }}.dump.gz'
-   validate_certs: no
-   region: '{{ bucket_region }}'
-   aws_access_key: '{{ bucket_access_key }}'
-   aws_secret_key: '{{ bucket_secret_key }}'
-   ec2_url: 'http://{{ minio_host }}:9000'
-  when: bucket_url is not defined
-
-  #command: 'aws --endpoint-url http://{{ minio_host }}:9000 --no-verify-ssl s3 sync {{ asterisk_location_conf }}/custom s3://{{ bucket_name }}'
-
-
-
-# - name: BACKUP asterisk custom files
-#   command: aws s3 sync
-#   tags:
-#       - upgrade
-#       - pgsql
+- name: BACKUP upload postgres backup to MINIO selfhosted
+  aws_s3:
+    bucket: '{{ bucket_name }}'
+    object: 'backups/db/pgsql-backup-{{ now }}.dump.gz'
+    src: '/tmp/pgsql-backup-{{ now }}.dump.gz'
+    mode: put
+    validate_certs: no
+    region: '{{ bucket_region }}'
+    aws_access_key: '{{ bucket_access_key }}'
+    aws_secret_key: '{{ bucket_secret_key }}'
+    s3_url: 'http://{{ minio_host }}:9000'
+    encrypt: no
+  when:
+    - bucket_url is not defined
+    - application_host is not defined

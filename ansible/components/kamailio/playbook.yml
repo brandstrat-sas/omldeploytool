@@ -23,7 +23,7 @@
     - app
     - kamailio
   vars:
-    img_repo: '{{ container_image_registry }}/freetechsolutions/omlkam'
+    img_repo: '{{ container_image_registry }}/freetechsolutions/kamailio'
   tasks:
 
     - name: KAMAILIO environment variables for this installation

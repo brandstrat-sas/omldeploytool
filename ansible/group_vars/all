@@ -75,3 +75,4 @@ minio_persistent_path: /var/lib/omnileads/minio
 
 redis_ha: false
 high_load: false
+schedule: Agenda

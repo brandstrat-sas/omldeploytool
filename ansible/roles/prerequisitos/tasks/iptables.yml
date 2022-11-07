@@ -1,4 +1,4 @@
-# Copyright (C) 2018 Freetech Solutions
+# Copyright (C) 2022 Freetech Solutions
 
 # This file is part of OMniLeads
 
@@ -16,25 +16,3 @@
 # along with this program.  If not, see http://www.gnu.org/licenses/.
 #
 ---
-
-# Se instala net-tools necesario para obtener la subnet privada
-# - name: Upgrade all packages on servers
-#   apt:
-#     update: dist
-#
-
-
-- name: MAIN Check if Omnileads has been installed previously
-  include: checks.yml
-  tags: always
-
-- name: MAIN Perform a backup
-  include: backup.yml
-  tags:
-    - backup
-
-- name: MAIN First configuration in server or servers
-  include: os_configuration.yml
-  tags:
-    - install
-    - upgrade
