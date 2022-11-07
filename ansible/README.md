@@ -198,18 +198,25 @@ Para lanzar un backup simplemente se debe invocar el script de deploy.sh:
 
 ## Deploy de actualizaciones
 
+Cada actualización es materializada a través de un "push" a "latest". Es decir la imagen "latest" de cada componente
+va a contar con los últimos cambios. Junto a la publicación de "latest" se sube tambien una imagen idéntica con un tag
+basado en los 8 primeros caracteres del hash del commit inherente al cambio publicado en el repositorio.
+
+```
+face6cfa	Image	an hour ago	3 days ago
+latest	  Image	an hour ago	3 days ago
+```
+
 Para aplicar actualizaciones simplemente debemos indicar a nivel de inventory.yml si es que se desea desplegar
 versiones especificas de los componentes, por el contrario se procede con un "pull" de "latest".
 
 ```
-vars:
-  # --- version images to deploy
-  django_version: latest
-  websockets_version: latest
-  nginx_version: latest
-  kamailio_version: latest
-  asterisk_version: latest
-  rtpengine_version: latest
+django_version: latest
+websockets_version: latest
+nginx_version: latest
+kamailio_version: latest
+asterisk_version: latest
+rtpengine_version: latest
 ```
 
 Luego se debe invocar al script de deploy.sh con el parámetro --upgrade.
@@ -224,14 +231,12 @@ El uso de contenedores a la hora de ejecutar los componentes de OMniLeads nos pe
 históricas congeladas y accesible a través del "tag".
 
 ```
-vars:
-  # --- version images to deploy
-  django_version: latest
-  websockets_version: latest
-  nginx_version: latest
-  kamailio_version: latest
-  asterisk_version: ff63617b
-  rtpengine_version: face6cfa
+django_version: latest
+websockets_version: latest
+nginx_version: latest
+kamailio_version: latest
+asterisk_version: ff63617b
+rtpengine_version: face6cfa
 ```
 
 Luego se debe invocar al script de deploy.sh con el parámetro --upgrade.
@@ -239,5 +244,3 @@ Luego se debe invocar al script de deploy.sh con el parámetro --upgrade.
 ```
 ./deploy.sh --action=upgrade
 ```
-
-## Disasters recovery
