@@ -5,6 +5,18 @@ utilizando un único script y archivo de configuración.
 
 ![Diagrama deploy tool](./png/deploy-tool-ansible-deploy-instances-multiples.png)
 
+
+## Indice
+
+* [Bash, Ansible & System D](#bash-ansible-systemd)
+* [Ansible + Inventory](#ansible-inventory)
+* [Bash Script deploy.sh](#bash-script-deploy)
+* [Deploy de nueva instancia LAN con Backing (Postgres y Object Storage) auto hosteado](#deploy-backing-self-hosted)
+* [Deploy de nueva instancia con Backing (Postgres y Object Storage) como servicio Cloud](#deploy-backing-cloud-service)
+* [Deploy de backup](#deploy-backup)
+* [Deploy de actualizaciones](#deploy-upgrade)
+* [Deploy de rollbacks](#deploy-rollbacks)
+
 ## Bash, Ansible & System D 📋
 
 La gestión se realiza desde la estación de trabajo del sysadmin a parir de dos archivos; deploy.sh e inventory.yml.
@@ -127,11 +139,14 @@ Si quisiéramos enfocarnos en algún componente en particular, por ejemplo:
 
 ```
 
-## Deploy de nueva instancia LAN con Backing (Postgresl y Object Storage MinIO) auto hosteado  🚀
+## Deploy de nueva instancia LAN con Backing (Postgres y Object Storage) auto hosteado 🚀
 
-Antes que nada se debe trabajar en el archivo inventory.yml
+Se debe disponer de dos instancias Linux (Debian 11 o Rocky 8) con salida a internet y su clave publica (ssh) disponible, ya que
+Ansible necesita establecer una conexión SSH para desplegar las acciones.
 
-Respecto a las direcciones y conexiónes:
+Luego se debe trabajar en el archivo inventory.yml
+
+Respecto a las direcciones y conexiones:
 
 ```
 omnileads-voice:
@@ -144,7 +159,7 @@ omnileads-app:
   voice_host: 10.10.10.3
 ```
 
-El parametro infra_env deberá inicializarse como 'lan'.
+El parámetro infra_env deberá inicializarse como 'lan'.
 
 ```
 infra_env: lan
@@ -158,13 +173,16 @@ Finalmente se debe ejecutar el deploy.sh.
 
 ```
 ./deploy.sh --action=install --component=all
-
 ```
 
-## Deploy de nueva instancia con Backing (Postgresl y Object Storage) como servicio administrado del Cloud  🚀
+## Deploy de nueva instancia con Backing (Postgres y Object Storage) como servicio administrado del Cloud 🚀
 
-En este formato se asume que PostgreSQL y Object Storage DB van a ser proporcionados como servicios administrados por el proveedor cloud seleccionado.
-Esto implica que esos dos servicios en lugar de desplegarlos nosotros, simplemente debemos informar en el archivo de inventory sus datos de conexión.
+Se debe disponer de dos instancias Linux (Debian 11 o Rocky 8) con salida a internet y su clave publica (ssh) disponible, ya que
+Ansible necesita establecer una conexión SSH para desplegar las acciones.
+
+Ademas bajo este formato se asume que PostgreSQL y Object Storage DB van a ser proporcionados como servicios administrados por el proveedor cloud seleccionado.
+Esto implica que esos dos componentes de OMniLeads, en lugar de ser desplegados por nuestro Ansible, solamente debemos informar en el archivo
+de inventory sus datos de conexión.
 
 De esta manera OMniLeads va a almacenar los datos relacionales (SQL) y las grabaciones & backups sobre (Object Storage) del cloud, obviando
 la instalación de ambos componentes dentro de la instancia Linux donde corre OMniLeads.
@@ -175,7 +193,7 @@ Luego simplemente se trata de ajustar los otros parámetros de conexión, de acu
 Si el servicio de PostgreSQL implica un cluster con mas de un nodo, entonces se puede activar mediante *postgres_ha: true*  y *postgres_ro_host: X.X.X.X*
 para indicar que las queries se impacten sobre el nodo de replica del cluster.
 
-Con respecto a Object Storage, simplemente se debe proporcionar el URL en *bucket_url*.
+Con respecto a Object Storage, se debe proporcionar el URL en *bucket_url*.
 También los parámetros de autenticación deberán ser proporcionados; *bucket_access_key* & *bucket_secret_key* así como también el *bucket_name*.
 Respecto al bucket_region en caso de no necesitar especificar nada, se debe dejarlo con el valor actual.
 
@@ -199,8 +217,9 @@ Para lanzar un backup simplemente se debe invocar el script de deploy.sh:
 ## Deploy de actualizaciones
 
 Cada actualización es materializada a través de un "push" a "latest". Es decir la imagen "latest" de cada componente
-va a contar con los últimos cambios. Junto a la publicación de "latest" se sube tambien una imagen idéntica con un tag
-basado en los 8 primeros caracteres del hash del commit inherente al cambio publicado en el repositorio.
+va a contar con los últimos cambios. Junto a la publicación de "latest" se sube también una imagen idéntica con un tag
+basado en los 8 primeros caracteres del hash del commit inherente al cambio publicado en el repositorio. Esto ultimo
+nos permite volver sobre una version anterior en caso de ser necesario un procedimiento de rollback.
 
 ```
 face6cfa	Image	an hour ago	3 days ago
@@ -225,7 +244,7 @@ Luego se debe invocar al script de deploy.sh con el parámetro --upgrade.
 ./deploy.sh --action=upgrade
 ```
 
-## Deploy de rollbacks
+### Rollback
 
 El uso de contenedores a la hora de ejecutar los componentes de OMniLeads nos permite fácilmente aplicar rollbacks hacia versiones
 históricas congeladas y accesible a través del "tag".

@@ -19,7 +19,7 @@
 - name: WEBSOCKETS OMniLeads Websocket installation and configuration
   hosts: omnileads-app
   vars:
-    img_repo: '{{ container_image_registry }}/freetechsolutions/omlwebsockets'
+    img_repo: '{{ container_image_registry }}/omnileads/websockets'
     network: omnileads
   tags:
     - aio

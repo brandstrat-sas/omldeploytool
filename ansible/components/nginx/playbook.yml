@@ -24,7 +24,7 @@
     - app
     - nginx
   vars:
-    img_repo: '{{ container_image_registry }}/freetechsolutions/nginx'
+    img_repo: '{{ container_image_registry }}/omnileads/nginx'
 
   tasks:
 

@@ -25,7 +25,7 @@ services:
       - WEBSOCKET_HOST=${WEBSOCKET_HOSTNAME}
       - WEBSOCKET_PORT=${WEBSOCKET_PORT}
       - CALIFICACION_REAGENDA=${CALIFICACION_REAGENDA}
-      - DJANGO_SETTINGS_MODULE=ominicontacto.settings.develop
+      - DJANGO_SETTINGS_MODULE=${DJANGO_SETTINGS_MODULE}
       - EPHEMERAL_USER_TTL=${EPHEMERAL_USER_TTL}
       - INSTALL_PREFIX=${INSTALL_PREFIX}
       - LOGIN_FAILURE_LIMIT=${LOGIN_FAILURE_LIMIT}
@@ -265,6 +265,23 @@ services:
         REDIS_USER: null
         REDIS_PASSWORD: null
 
+  pbxemulator:
+    container_name: omlpbxemulator
+    hostname: pbxemulator
+    dns: 8.8.8.8
+    environment:
+      - TZ=${TZ}
+    image: ${OMLPSTNEMULATOR_IMG}
+    networks:
+      - omnileads
+    ports:
+      - 6060:6060/udp
+      - 10000-10020:10000-10020/udp
+    privileged: true
+    restart: on-failure
+    stdin_open: true
+    stop_grace_period: 1m30s
+    tty: true
 
 networks:
   omnileads:

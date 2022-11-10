@@ -24,7 +24,7 @@
     - aio
     - voice
   vars:
-    img_repo: '{{ container_image_registry }}/freetechsolutions/rtpengine'
+    img_repo: '{{ container_image_registry }}/omnileads/rtpengine'
   tasks:
 
   - name: RTPENGINE Set environment variables

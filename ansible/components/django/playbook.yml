@@ -24,7 +24,7 @@
     - app
     - django
   vars:
-    img_repo: '{{ container_image_registry }}/freetechsolutions/omlapp'
+    img_repo: '{{ container_image_registry }}/omnileads/omlapp'
     INSTALL_PREFIX: "/opt/omnileads"
 
   tasks:

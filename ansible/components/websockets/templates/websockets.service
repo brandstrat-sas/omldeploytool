@@ -21,7 +21,7 @@ ExecStart=/usr/bin/podman run \
 --env-file=/etc/default/websockets.env \
 --name=oml-websockets-server \
 --network=host \
-{{ container_image_registry }}/freetechsolutions/omlwebsockets:{{ websockets_version }}
+{{ container_image_registry }}/omnileads/websockets:{{ websockets_version }}
 ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
 ExecStopPost=/usr/bin/podman rm -f --ignore --cidfile=%t/%n.ctr-id
 Type=notify
