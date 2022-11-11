@@ -59,14 +59,15 @@ services:
     tty: true
     working_dir: /opt/omnileads/ominicontacto
 
-  app-channels:
+  channels:
     container_name: omlapp-channels
     # depends_on:
     #   - redis
     dns: 8.8.8.8
-    command: /usr/local/bin/daphne -p 8099 -b 0.0.0.0 --proxy-headers --verbosity=3 ominicontacto.asgi:application
-    entrypoint: []
+    #command: /usr/local/bin/daphne -p 8099 -b 0.0.0.0 --proxy-headers --verbosity=3 ominicontacto.asgi:application
+    #entrypoint: []
     environment:
+      - DAHPNE_ENABLE=True
       - TZ=${TZ}
       - ASTERISK_HOSTNAME=${ASTERISK_HOSTNAME}
       - AMI_USER=${AMI_USER}
@@ -199,6 +200,7 @@ services:
       - TZ=${TZ}
       - ENV=devenv
       - DJANGO_HOSTNAME=${DJANGO_HOSTNAME}
+      - DAPHNE_HOSTNAME=${DAPHNE_HOSTNAME}
       - KAMAILIO_HOSTNAME=${KAMAILIO_HOSTNAME}
       - WEBSOCKETS_HOSTNAME=${WEBSOCKET_HOSTNAME}
       - S3_ENDPOINT=${S3_ENDPOINT_MINIO}
