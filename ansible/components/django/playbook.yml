@@ -29,7 +29,7 @@
 
   tasks:
 
-  - name: Set Django environment variables for this installation
+  - name: DJANGO environment variables for this installation
     template:
       src: "{{ django_repo_path }}templates/django.env"
       dest: /etc/default/django.env
@@ -45,6 +45,16 @@
       owner: omnileads
       group: omnileads
       mode: '0666'
+
+  - name: DJANGO Channels Daphne environment variables
+    template:
+      src: "{{ django_repo_path }}templates/daphne.env"
+      dest: /etc/default/daphne.env
+      mode: 666
+      owner: "{{ usuario }}"
+      group: "{{ usuario }}"
+    tags:
+      - upgrade
 
   - name: Create a new database with name {{ postgres_database }}
     postgresql_db:
@@ -72,6 +82,13 @@
     tags:
         - upgrade
 
+  - name: DJANGO Copy Daphne systemd service
+    template:
+      src: "{{ django_repo_path }}templates/daphne.service"
+      dest: /etc/systemd/system/dahpne.service
+    tags:
+        - upgrade
+
   - name: DJANGO Pull image
     command: podman pull --quiet {{ img_repo }}:{{ django_version }}
     register: podman_pull
@@ -82,7 +99,16 @@
   - name: DJANGO Enable and start systemd service
     systemd:
       name: omnileads.service
-      state: started
+      state: restarted
+      enabled: yes
+      daemon_reload: yes
+    tags:
+        - upgrade
+
+  - name: DJANGO Channels Enable and start Daphne systemd service
+    systemd:
+      name: daphne.service
+      state: restarted
       enabled: yes
       daemon_reload: yes
     tags:
