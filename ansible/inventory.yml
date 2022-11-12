@@ -3,11 +3,11 @@
 all:
   hosts:
     omnileads-voice:
-      ansible_host: 165.232.140.65
+      ansible_host: 147.182.238.37
       omni_ip_lan: 10.10.10.2
       application_host: 10.10.10.3
     omnileads-app:
-      ansible_host: 147.182.227.33
+      ansible_host: 137.184.41.175
       omni_ip_lan:  10.10.10.3
       voice_host: 10.10.10.2
       # ---  kamailio shm & pkg memory params
@@ -81,7 +81,7 @@ all:
     # --- bucket params
     bucket_access_key: 64H3UZE3TD0CMKXYXK9W
     bucket_secret_key: RyLRKsAgMOVSpJcGdloxXlw1qbI0PZCWqDRU4QgN
-    bucket_name: concicarpinella
+    bucket_name: omnileads
     bucket_region: us-east-1
     # --- Asterisk AMI user & password
     ami_user: omnileads

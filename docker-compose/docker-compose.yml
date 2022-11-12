@@ -69,7 +69,7 @@ services:
     #command: /usr/local/bin/daphne -p 8099 -b 0.0.0.0 --proxy-headers --verbosity=3 ominicontacto.asgi:application
     #entrypoint: []
     environment:
-      - DAHPNE_ENABLE=True
+      - DAPHNE_ENABLE=True
       - TZ=${TZ}
       - ASTERISK_HOSTNAME=${ASTERISK_HOSTNAME}
       - AMI_USER=${AMI_USER}

@@ -85,7 +85,7 @@
   - name: DJANGO Copy Daphne systemd service
     template:
       src: "{{ django_repo_path }}templates/daphne.service"
-      dest: /etc/systemd/system/dahpne.service
+      dest: /etc/systemd/system/daphne.service
     tags:
         - upgrade
 
