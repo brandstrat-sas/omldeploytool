@@ -58,6 +58,8 @@ services:
     stop_grace_period: 1m30s
     tty: true
     working_dir: /opt/omnileads/ominicontacto
+    volumes:
+      - django_static:/opt/omnileads/static
 
   channels:
     container_name: omlapp-channels
@@ -212,6 +214,8 @@ services:
       - ${NGINX_EXT_PORT}:443/tcp
     restart: on-failure
     stop_grace_period: 1m30s
+    volumes:
+      - django_static:/opt/omnileads/static
 
   postgresql:
     container_name: omlpostgresql
@@ -270,15 +274,18 @@ services:
       - EVENT_LOOP=uvloop
       - LOGGERS=${WEBSOCKET_LOGGER}
       - REDIS_HOST=${WEBSOCKET_REDIS_HOSTNAME}
+      - PYTHONUNBUFFERED=1
     ports:
       - "${WEBSOCKET_EXT_PORT}:8000"
     networks:
       - omnileads
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health-checks"]
-      interval: 30s
+      interval: 1s
       timeout: 10s
       retries: 10
+    # volumes:
+    #   - ../../omlwebsockets/src/fts:/opt/fts-oml-services-websockets/.venv/lib/python3.10/site-packages/fts/
 
   minio:
     tty: true
@@ -355,3 +362,4 @@ volumes:
   postgresql_data:
   redis_data:
   minio_data:
+  django_static:
