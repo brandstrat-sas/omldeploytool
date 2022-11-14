@@ -4,14 +4,14 @@ case $1 in
   --create-ubuntu)
     echo "deploy: $1"
     doctl compute droplet create --image ubuntu-22-10-x64 \
-    --size s-1vcpu-2gb --region sfo3 \
+    --size s-1vcpu-1gb --region sfo3 \
     --ssh-keys ${SSH_DOCTL} \
     oml-$2
     ;;
     --create-debian)
       echo "deploy: $1"
       doctl compute droplet create --image debian-11-x64 \
-      --size s-1vcpu-2gb --region sfo3 \
+      --size s-1vcpu-1gb --region sfo3 \
       --ssh-keys ${SSH_DOCTL} \
       oml-$2
     ;;
