@@ -31,6 +31,7 @@ case ${os_host} in
     chmod +x $HOME/minio-binaries/mc
     export PATH=$PATH:$HOME/minio-binaries/
   ;;
+esac
 
 echo "***[OML devenv] Cloning the repositories of modules"
 repositories=("acd" "kamailio" "nginx" "pgsql" "redis" "rtpengine" "haproxy")
@@ -56,7 +57,7 @@ fi
 
 echo "***[OML devenv] All repositories were cloned in $(pwd)"
 
-repositories=("acd" "kamailio" "nginx" "pgsql" "redis" "rtpengine" "haproxy" "omlwebsockets" "omlapp")
+repositories=("acd" "kamailio" "nginx" "pgsql" "redis" "rtpengine" "haproxy" "websockets" "app")
 for i in "${repositories[@]}"; do
 cd oml${i} && git checkout dev-oml-2.0 && cd ..
 done
