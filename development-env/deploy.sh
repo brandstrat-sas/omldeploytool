@@ -64,7 +64,8 @@ done
 
 cd ../
 cp env .env
-docker-compose up -d
+docker-compose pull
+docker-compose up -d --no-build
 
 mc alias set MINIO http://localhost:9000 minio s3minio123
 mc mb MINIO/devenv
@@ -72,7 +73,7 @@ mc admin user add MINIO devenv s3devenv123
 mc admin policy set MINIO readwrite user=devenv
 
 docker-compose down
-docker-compose up -d
+docker-compose up -d --no-build
 }
 #############################################################################
 #############################################################################
