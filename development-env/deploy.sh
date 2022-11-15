@@ -34,7 +34,7 @@ case ${os_host} in
 esac
 
 echo "***[OML devenv] Cloning the repositories of modules"
-repositories=("acd" "kamailio" "nginx" "pgsql" "redis" "rtpengine" "haproxy")
+repositories=("acd" "kamailio" "nginx" "pgsql" "rtpengine")
 for i in "${repositories[@]}"; do
   if [ ! -d "oml${i}" ]; then
     if [ "$gitlab_clone" == "ssh" ]; then
@@ -57,9 +57,9 @@ fi
 
 echo "***[OML devenv] All repositories were cloned in $(pwd)"
 
-repositories=("acd" "kamailio" "nginx" "pgsql" "redis" "rtpengine" "haproxy" "websockets" "app")
+repositories=("acd" "kamailio" "nginx" "rtpengine" "websockets" "app")
 for i in "${repositories[@]}"; do
-cd oml${i} && git checkout dev-oml-2.0 && cd ..
+cd oml${i} && git checkout oml-dev-2.0 && cd ..
 done
 
 cd ../
