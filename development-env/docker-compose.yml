@@ -175,7 +175,7 @@ services:
   postgresql:
     build:
       target: run
-      context: ${REPO_PATH}/omlpostgres
+      context: ${REPO_PATH}/omlpgsql
     container_name: oml-postgres
     dns: 8.8.8.8
     environment:
