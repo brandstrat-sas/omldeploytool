@@ -3,11 +3,11 @@
 all:
   hosts:
     omnileads-voice:
-      ansible_host: 147.182.238.37
+      ansible_host: 164.92.77.132
       omni_ip_lan: 10.10.10.2
       application_host: 10.10.10.3
     omnileads-app:
-      ansible_host: 137.184.41.175
+      ansible_host: 164.92.77.181
       omni_ip_lan:  10.10.10.3
       voice_host: 10.10.10.2
       # ---  kamailio shm & pkg memory params

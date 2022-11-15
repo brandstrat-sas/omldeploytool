@@ -8,12 +8,12 @@ case $1 in
     --ssh-keys ${SSH_DOCTL} \
     oml-$2
     ;;
-    --create-debian)
-      echo "deploy: $1"
-      doctl compute droplet create --image debian-11-x64 \
-      --size s-1vcpu-1gb --region sfo3 \
-      --ssh-keys ${SSH_DOCTL} \
-      oml-$2
+  --create-debian)
+    echo "deploy: $1"
+    doctl compute droplet create --image debian-11-x64 \
+    --size s-1vcpu-1gb --region sfo3 \
+    --ssh-keys ${SSH_DOCTL} \
+    oml-$2
     ;;
   --create-docker)
     echo "deploy: $1"

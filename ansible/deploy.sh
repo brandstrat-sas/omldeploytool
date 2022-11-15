@@ -20,23 +20,23 @@ echo "***************************** filter ********************************* "
 case ${oml_action} in
   install)
     echo "deploy: $oml_action"
-    ;;
+  ;;
   upgrade)
     echo "deploy: $oml_action"
-    ;;
+  ;;
   backup)
     echo "deploy: $oml_action"
-    ;;
+  ;;
   *)
     echo "ERROR oml_action var is unset";
     exit 1
-    ;;
+  ;;
 esac
 
 case ${oml_component} in
   voice)
     echo "install omnileads component/s $oml_component"
-    ;;
+  ;;
   django)
     echo "install omnileads component/s $oml_component"
   ;;
@@ -82,6 +82,8 @@ case ${oml_component} in
   ;;
 esac
 
+inventory=inventory.yml
+
 echo "************************ Exec ANSIBLE matrix *************************"
 echo "************************ Exec ANSIBLE matrix *************************"
 
@@ -102,7 +104,7 @@ ansible-playbook matrix.yml --extra-vars \
   commit=ascd \
   build_date=\"$(env LC_hosts=C LC_TIME=C date)\"" \
   --tags "$oml_action, $oml_component" \
-  -i inventory.yml
+  -i $inventory
 
 ResultadoAnsible=`echo $?`
 
@@ -156,29 +158,17 @@ do
       oml_component="${i#*=}"
       shift
     ;;
-    # --lan_ip=*)
-    #   lan_ip="${i#*=}"
-    #   shift
-    # ;;
-    # --wan_ip=*)
-    #   wan_ip="${i#*=}"
-    #   shift
-    # ;;
-    # --infra=*)
-    #   oml_infra="${i#*=}"
-    #   shift
-    # ;;
     --help|-h)
       echo "
 How to use it:
 
 ./deploy.sh --action= --component=
 
--- action=
+--action=
         install
         upgrade
         backup
--- component=
+--component=
         aio
         app
         backing
@@ -195,6 +185,8 @@ How to use it:
         websockets
         nginx
         prometheus
+--tenant=
+        the name of inventory file.
 "
       shift
       exit 1

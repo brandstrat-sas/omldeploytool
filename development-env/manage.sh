@@ -12,14 +12,14 @@ case $1 in
     echo "echo drop all on PostgreSQL"
     docker stop oml-postgres
     docker rm oml-postgres
-    docker volume rm prodenv_postgresql_data
+    docker volume rm devenv_postgresql_data
     docker-compose up -d --force-recreate --no-deps postgresql
     ;;
   --delete_redis)
     echo "echo drop all on REDIS"
     docker stop oml-redis
     docker rm oml-redis
-    docker volume rm prodenv_redis_data
+    docker volume rm devenv_redis_data
     docker-compose up -d --force-recreate --no-deps redis
     ;;
   --help)
