@@ -21,7 +21,7 @@ ExecStart=/usr/bin/podman run \
   --volume=/etc/asterisk/custom/:/etc/asterisk/custom \
   --name=oml-asterisk-server \
   --rm  \
-  {{ container_image_registry }}/freetechsolutions/omlacd:{{ asterisk_version }}
+  {{ container_image_registry }}/omnileads/asterisk:{{ asterisk_version }}
 ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
 ExecStopPost=/usr/bin/podman rm -f --ignore --cidfile=%t/%n.ctr-id
 Type=notify

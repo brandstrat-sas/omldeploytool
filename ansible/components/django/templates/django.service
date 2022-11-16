@@ -19,8 +19,9 @@ ExecStart=/usr/bin/podman run \
   --network=host \
   --env-file=/etc/default/django.env \
   --name=oml-django-server \
+  --volume=django_static:/opt/omnileads/static \
   --rm  \
-  {{ container_image_registry }}/freetechsolutions/omlapp:{{ django_version }}
+  {{ container_image_registry }}/omnileads/omlapp:{{ django_version }}
 ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
 ExecStopPost=/usr/bin/podman rm -f --ignore --cidfile=%t/%n.ctr-id
 Type=notify

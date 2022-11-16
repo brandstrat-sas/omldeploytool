@@ -23,7 +23,7 @@
     - aio
     - voice
   vars:
-    img_repo: '{{ container_image_registry }}/freetechsolutions/omlacd'
+    img_repo: '{{ container_image_registry }}/omnileads/asterisk'
   tasks:
 
   - name: ASTERISK Set environment variables for this installation

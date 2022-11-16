@@ -25,7 +25,7 @@
     - aio
 
   vars:
-    img_repo: '{{ container_image_registry }}/freetechsolutions/omlpgsql'
+    img_repo: '{{ container_image_registry }}/omnileads/postgres'
     img_prometheus_repo: 'docker.io/prometheuscommunity/postgres-exporter'
 
   tasks:

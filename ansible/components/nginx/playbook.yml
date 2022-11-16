@@ -24,7 +24,7 @@
     - app
     - nginx
   vars:
-    img_repo: '{{ container_image_registry }}/freetechsolutions/nginx'
+    img_repo: '{{ container_image_registry }}/omnileads/nginx'
 
   tasks:
 
@@ -38,7 +38,7 @@
     tags:
       - upgrade
 
-  - name: NGINX Copy nginx systemd service Debian
+  - name: NGINX Copy nginx systemd service
     template:
       src: "{{ nginx_repo_path }}templates/nginx.service"
       dest: /etc/systemd/system/nginx.service

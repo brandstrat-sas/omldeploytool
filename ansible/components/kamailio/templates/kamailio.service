@@ -21,7 +21,7 @@ ExecStart=/usr/bin/podman run \
   -v /etc/omnileads/certs:/etc/omnileads/certs \
   --name=oml-kamailio-server \
   --network=host \
-  {{ container_image_registry }}/freetechsolutions/omlkam:{{ kamailio_version }}
+  {{ container_image_registry }}/omnileads/kamailio:{{ kamailio_version }}
 ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
 ExecStopPost=/usr/bin/podman rm -f --ignore --cidfile=%t/%n.ctr-id
 Type=notify
