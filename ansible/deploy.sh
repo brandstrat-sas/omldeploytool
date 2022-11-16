@@ -104,7 +104,7 @@ ansible-playbook matrix.yml --extra-vars \
   commit=ascd \
   build_date=\"$(env LC_hosts=C LC_TIME=C date)\"" \
   --tags "$oml_action, $oml_component" \
-  -i $inventory
+  -i inventory.yml
 
 ResultadoAnsible=`echo $?`
 

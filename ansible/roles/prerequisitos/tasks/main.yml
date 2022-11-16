@@ -74,14 +74,6 @@
   tags: install
   when: ansible_distribution == "Rocky"
 
-- name: MAIN Stop service firewalld Rocky Linux
-  systemd:
-    name: firewalld
-    state: stopped
-    enabled: no
-  tags: install
-  when: ansible_distribution == "Rocky"
-
 - name: MAIN Check if Omnileads has been installed previously
   include: checks.yml
   tags: always

@@ -77,12 +77,11 @@ mc mb MINIO/devenv
 mc admin user add MINIO devenv s3devenv123
 mc admin policy set MINIO readwrite user=devenv
 
-docker-compose down
-docker-compose up -d --no-build
+docker-compose up -d --force-recreate --no-deps app acd
 }
-#############################################################################
-#############################################################################
 
+#############################################################################
+#############################################################################
 
 for i in "$@"
 do

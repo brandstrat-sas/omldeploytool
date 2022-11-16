@@ -23,6 +23,14 @@ case $1 in
     --user-data-file ../docker-compose/user-data.sh \
     oml-$2
     ;;
+  --create-devenv)
+    echo "deploy: $1"
+    doctl compute droplet create --image docker-20-04 \
+    --size s-2vcpu-2gb --region sfo3 \
+    --ssh-keys ${SSH_DOCTL} \
+    --user-data-file ../development-env/user-data.sh \
+    oml-$2
+    ;;
   --create-pgsql)
     echo "deploy PGSQL: $2"
     doctl databases create oml-$2 \

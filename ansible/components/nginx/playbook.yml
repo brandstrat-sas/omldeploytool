@@ -38,7 +38,7 @@
     tags:
       - upgrade
 
-  - name: NGINX Copy nginx systemd service Debian
+  - name: NGINX Copy nginx systemd service
     template:
       src: "{{ nginx_repo_path }}templates/nginx.service"
       dest: /etc/systemd/system/nginx.service
