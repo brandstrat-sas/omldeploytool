@@ -192,7 +192,7 @@ services:
     restart: on-failure
     stop_grace_period: 1m30s
     volumes:
-      - postgresql_data:/var/lib/postgresql/data
+      - postgres_persistent:/var/lib/postgresql/data
 
   redis:
     container_name: oml-redis
@@ -206,7 +206,7 @@ services:
     restart: on-failure
     stop_grace_period: 1m30s
     volumes:
-      - redis_data:/data
+      - redis_persistent:/data
 
   rtpengine:
     build:
@@ -259,7 +259,7 @@ services:
     volumes:
       - ${REPO_PATH}/omlapp/omnileads_ui/:/home/app/
       #- ${REPO_PATH}/omlapp/survey_app/:/home/survey/
-      - vuejs_data:/home/app/supervision/node_modules/
+      - vuejs_persistent:/home/app/supervision/node_modules/
 
   minio:
     tty: true
@@ -277,7 +277,7 @@ services:
       - 9001:9001
       - 9000:9000
     volumes:
-      - minio_data:/data
+      - minio_persistent:/data
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
       interval: 30s
@@ -310,8 +310,8 @@ networks:
         - subnet: "${SUBNET}"
 
 volumes:
-  postgresql_data:
-  redis_data:
-  minio_data:
+  postgres_persistent:
+  redis_persistent:
+  minio_persistent:
   django_static:
-  vuejs_data:
+  vuejs_persistent:

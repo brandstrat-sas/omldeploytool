@@ -11,7 +11,12 @@ NC='\033[0m' # No color
 #############################################################################
 
 Deploy() {
-mkdir ./omnileads-repos
+
+if [ ! -d omnileads-repos ]
+then
+  mkdir omnileads-repos
+fi
+
 cd omnileads-repos
 
 case ${os_host} in
