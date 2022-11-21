@@ -20,7 +20,13 @@
 - name: BACKUP asterisk custom config files
   s3_sync:
     bucket: '{{ bucket_name }}'
-    file_root: '{{ asterisk_location_conf }}/custom'
+    key_prefix: backups/asterisk
+    file_root: '{{ asterisk_location_conf }}/custom/'
+    validate_certs: no
+    region: '{{ bucket_region }}'
+    aws_access_key: '{{ bucket_access_key }}'
+    aws_secret_key: '{{ bucket_secret_key }}'
+    ec2_url: '{{ bucket_url }}'
   when:
     - bucket_url is defined
     - voice_host is not defined
@@ -68,4 +74,19 @@
     encrypt: no
   when:
     - bucket_url is not defined
+    - application_host is not defined
+
+- name: BACKUP upload postgres backup to cloud BUCKET
+  aws_s3:
+    bucket: '{{ bucket_name }}'
+    object: 'backups/postgres/pgsql-backup-{{ now }}.dump.gz'
+    src: '/tmp/pgsql-backup-{{ now }}.dump.gz'
+    mode: put
+    region: '{{ bucket_region }}'
+    aws_access_key: '{{ bucket_access_key }}'
+    aws_secret_key: '{{ bucket_secret_key }}'
+    s3_url: '{{ bucket_url }}'
+    encrypt: no
+  when:
+    - bucket_url is defined
     - application_host is not defined
