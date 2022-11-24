@@ -3,12 +3,12 @@
 all:
   hosts:
     omnileads-voice:
-      ansible_host: 164.92.89.13
+      ansible_host: 143.110.232.162
       omni_ip_lan: 10.10.10.2
       application_host: 10.10.10.3
     omnileads-app:
-      ansible_host: 146.190.38.127
-      omni_ip_lan:  10.10.10.3
+      ansible_host: 143.198.132.92
+      omni_ip_lan: 10.10.10.3
       voice_host: 10.10.10.2
       # ---  kamailio shm & pkg memory params
       shm_size: 64
@@ -74,20 +74,21 @@ all:
     # --- example Digital Ocean: https://sfo3.digitaloceanspaces.com
     # --- if you want to deploy minIO objects stporage on application_host, you must to put '#'
     # --- in order to comment bucket_url paramQue
-    #bucket_url: https://sjc1.vultrobjects.com
+    bucket_url: https://sfo3.digitaloceanspaces.com
     # --- minio auth API params
     s3_http_admin_user: omnileads
     s3_http_admin_pass: 098098ZZZ
     # --- bucket params
-    bucket_access_key: 64H3UZE3TD0CMKXYXK9W
-    bucket_secret_key: RyLRKsAgMOVSpJcGdloxXlw1qbI0PZCWqDRU4QgN
+    bucket_access_key: DO00CDTJAKWH7HEE4PVX
+    bucket_secret_key: DKB1L1cqq+jPI/R3NB3gzHKkbu8uCGDYXHE86R53mRs
     bucket_name: omnileads
     bucket_region: us-east-1
     # --- Asterisk AMI user & password
     ami_user: omnileads
     ami_password: C12H17N2O4P_o98o98
     # --- SIP HOMER capture activated
-    homer_enable: true
+    homer_enable: false
     # --- Dialer API user & pass
+    dialer_host: 10.10.10.4
     dialer_user: demoadmin
-    dialer_password: demo
+    dialer_password: 765765F1d3l10*
