@@ -109,8 +109,8 @@
   copy:
     src: "certs/cert.pem"
     dest: /etc/omnileads/certs/cert.pem
-    owner: omnileads
-    group: omnileads
+    owner: '{{ usuario }}'
+    group: '{{ usuario }}'
     mode: 0777
   tags:
     - install
@@ -122,8 +122,8 @@
   copy:
     src: "templates/bashrc"
     dest: /root/.bashrc
-    owner: omnileads
-    group: omnileads
+    owner: '{{ usuario }}'
+    group: '{{ usuario }}'
     mode: 0777
   tags:
     - install
@@ -152,3 +152,34 @@
 - name: Set timezone of server
   timezone: name={{ TZ }}
   tags: install
+
+- name: Copy CRONes
+  template:
+    src: "templates/crones"
+    dest: /var/spool/cron/crontabs/root
+    mode: 0600
+  tags:
+    - upgrade
+  when:
+    - app_host is not defined
+
+- name: Pull crones image
+  command: podman pull --quiet docker.io/omnileads/callrec_converter:latest
+  register: podman_pull
+  until: podman_pull is success
+  tags:
+    - upgrade
+  when:
+    - app_host is not defined
+
+- name: Callrec container environment variables
+  template:
+    src: "templates/callrec_converter.env"
+    dest: /etc/default/callrec_converter.env
+    mode: 666
+    owner: '{{ usuario }}'
+    group: '{{ usuario }}'
+  tags:
+    - upgrade
+  when:
+    - app_host is not defined
