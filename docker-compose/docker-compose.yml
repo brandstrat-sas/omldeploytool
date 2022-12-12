@@ -9,6 +9,7 @@ services:
       - minio
     dns: 8.8.8.8
     environment:
+      - CRON_ENABLE=false
       - TZ=${TZ}
       - ASTERISK_HOSTNAME=${ASTERISK_HOSTNAME}
       - AMI_USER=${AMI_USER}
@@ -66,6 +67,60 @@ services:
     dns: 8.8.8.8
     environment:
       - DAPHNE_ENABLE=True
+      - TZ=${TZ}
+      - ASTERISK_HOSTNAME=${ASTERISK_HOSTNAME}
+      - AMI_USER=${AMI_USER}
+      - AMI_PASSWORD=${AMI_PASSWORD}
+      - KAMAILIO_HOSTNAME=${KAMAILIO_HOSTNAME}
+      - PGHOST=${PGHOST}
+      - PGDATABASE=${PGDATABASE}
+      - PGPORT=${PGPORT}
+      - PGUSER=${PGUSER}
+      - PGPASSWORD=${PGPASSWORD}
+      - PGHOSTHA=${PGHOSTHA}
+      - PGHOSTRO=${PGHOSTRO}
+      - REDIS_HOSTNAME=${REDIS_HOSTNAME}
+      - WEBSOCKET_HOST=${WEBSOCKET_HOSTNAME}
+      - WEBSOCKET_PORT=${WEBSOCKET_PORT}
+      - CALIFICACION_REAGENDA=${CALIFICACION_REAGENDA}
+      - DJANGO_SETTINGS_MODULE=${DJANGO_SETTINGS_MODULE}
+      - EPHEMERAL_USER_TTL=${EPHEMERAL_USER_TTL}
+      - INSTALL_PREFIX=${INSTALL_PREFIX}
+      - LOGIN_FAILURE_LIMIT=${LOGIN_FAILURE_LIMIT}
+      - OMNILEADS_HOSTNAME=${OMNILEADS_HOSTNAME}
+      - PYTHONPATH=${PYTHONPATH}
+      - SESSION_COOKIE_AGE=${SESSION_COOKIE_AGE}
+      - CALLREC_DEVICE=${CALLREC_DEVICE}
+      - MONITORFORMAT=${MONITORFORMAT}
+      - S3_STORAGE_ENABLED=true
+      - S3_BUCKET_NAME=${S3_BUCKET_NAME}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - S3_ENDPOINT=${S3_ENDPOINT}
+      - AWS_DEFAULT_REGION=us-east-1
+      - GOOGLE_MAPS_API_KEY=${GOOGLE_MAPS_API_KEY}
+      - GOOGLE_MAPS_CENTER='${GOOGLE_MAPS_CENTER}'
+      - EMAIL_BACKEND=django.core.mail.backends.dummy.EmailBackend
+      - OML_BRANCH=${OML_BRANCH}
+      - OML_COMMIT=${OML_COMMIT}
+      - OML_BUILD_DATE=${OML_BUILD_DATE}
+      - WOMBAT_HOSTNAME=localhost
+      - WOMBAT_USER=${WOMBAT_USER}
+      - WOMBAT_PASSWORD=${WOMBAT_PASSWORD}
+    image: ${OMLAPP_IMG}
+    networks:
+      - omnileads
+    privileged: true
+    restart: on-failure
+    stdin_open: true
+    stop_grace_period: 1m30s
+    tty: true
+    working_dir: /opt/omnileads/ominicontacto
+
+  crones:
+    container_name: oml-django-cron
+    dns: 8.8.8.8
+    environment:
       - TZ=${TZ}
       - ASTERISK_HOSTNAME=${ASTERISK_HOSTNAME}
       - AMI_USER=${AMI_USER}

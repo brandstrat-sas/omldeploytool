@@ -72,7 +72,6 @@ services:
     depends_on:
       - postgresql
       - redis
-      - websockets
       - minio
     dns: 8.8.8.8
     environment:
@@ -355,3 +354,6 @@ volumes:
   minio_persistent:
   django_static:
   vuejs_persistent:
+  ast_conf:
+  ast_sounds:
+  ast_moh:

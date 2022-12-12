@@ -3,13 +3,13 @@
 all:
   hosts:
     omnileads-voice:
-      ansible_host: 143.198.63.10
-      omni_ip_lan: 10.10.10.3
-      application_host: 10.10.10.2
+      ansible_host: 172.16.101.11
+      omni_ip_lan: 172.16.101.11
+      application_host: 172.16.101.12
     omnileads-app:
-      ansible_host: 165.232.151.248
-      omni_ip_lan: 10.10.10.2
-      voice_host: 10.10.10.3
+      ansible_host: 172.16.101.12
+      omni_ip_lan: 172.16.101.12
+      voice_host: 172.16.101.11
       # ---  kamailio shm & pkg memory params
       shm_size: 64
       pkg_size: 8
@@ -38,7 +38,7 @@ all:
       #email_use_tls:
   vars:
     # --- version images to deploy
-    django_version: develop
+    django_version: latest
     websockets_version: latest
     nginx_version: latest
     kamailio_version: latest

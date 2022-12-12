@@ -1,10 +1,1 @@
-*/3 * * * * flock -n /tmp/actualizar_reporte_supervisores.lock podman exec -it oml-django-server python3 /opt/omnileads/ominicontacto/manage.py actualizar_reporte_supervisores
-*/2 * * * * flock -n /tmp/asterisk_logout_script.lock podman exec -it oml-django-server python3 /opt/omnileads/ominicontacto/manage.py logout_unavailable_agents
-* * * * * flock -n /tmp/actualizar_reportes_de_entrantes_job.lock podman exec -it oml-django-server python3 /opt/omnileads/ominicontacto/manage.py actualizar_reportes_llamadas_entrantes
-* * * * * flock -n /tmp/actualizar_reportes_salientes.lock podman exec -it oml-django-server python3 /opt/omnileads/ominicontacto/manage.py actualizar_reportes_llamadas_salientes
-* * * * * flock -n /tmp/actualizar_reportes_dialers.lock podman exec -it oml-django-server python3 /opt/omnileads/ominicontacto/manage.py actualizar_reportes_llamadas_dialers
-* * * * * flock -n /tmp/actualizar_reporte_dia_actual_agentes.lock podman exec -it oml-django-server python3 /opt/omnileads/ominicontacto/manage.py actualizar_reporte_dia_actual_agentes
-
-* * * * * podman exec -it oml-django-server python3 /opt/omnileads/ominicontacto/manage.py actualizar_campanas_preview
-* 2 * * * podman exec -it oml-django-server PGPASSWORD=AVNS_nevBaiuBJNXaqi8k-ZY /usr/bin/psql -U omnileads -h localhost -d omnileads -c 'DELETE FROM queue_log'
 0 1 * * * podman run --rm  --env-file=/etc/default/callrec_converter.env --network=host docker.io/omnileads/callrec_converter:latest converter.sh
