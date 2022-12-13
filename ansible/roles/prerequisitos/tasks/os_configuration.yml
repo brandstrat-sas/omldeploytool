@@ -17,7 +17,7 @@
 #
 ---
 
-- name: Disable ufw
+- name: OS_CONF Disable ufw
   systemd:
     name: ufw
     state: stopped
@@ -25,7 +25,7 @@
     daemon_reload: yes
   ignore_errors: yes
 
-- name: Disable firewallD
+- name: OS_CONF Disable firewallD
   systemd:
     name: firewalld
     state: stopped
@@ -33,13 +33,13 @@
     daemon_reload: yes
   ignore_errors: yes
 
-- name: Ensure group {{ usuario }} exists
+- name: OS_CONF Ensure group {{ usuario }} exists
   group:
     name: '{{ usuario }}'
     state: present
   tags: install
 
-- name: Add the {{ usuario }} user
+- name: OS_CONF Add the {{ usuario }} user
   user:
     name: '{{ usuario }}'
     group: '{{ usuario }}'
@@ -48,7 +48,7 @@
     home: '{{ django_deploy_path }}'
   tags: install
 
-- name: Creates /etc/omnileads directory
+- name: OS_CONF Creates /etc/omnileads directory
   file:
     path: /etc/omnileads
     state: directory
@@ -59,7 +59,7 @@
   when: etc_omnileads.stat.exists == false
   tags: install
 
-- name: Creates /etc/omnileads/certs directory
+- name: OS_CONF Creates /etc/omnileads/certs directory
   file:
     path: '{{ certs_location }}'
     state: directory
@@ -69,7 +69,7 @@
   when: etc_omnileads.stat.exists == false
   tags: install
 
-- name: Creates /var/lib/omnileads directory
+- name: OS_CONF Creates /var/lib/omnileads directory
   file:
     path: '{{ asterisk_sounds_host_path }}'
     state: directory
@@ -81,7 +81,7 @@
   tags:
     - install
 
-- name: Creates /var/lib/omnileads/minio directory
+- name: OS_CONF Creates /var/lib/omnileads/minio directory
   file:
     path: '{{ minio_persistent_path }}'
     state: directory
@@ -93,7 +93,7 @@
   tags:
     - install
 
-- name: Creates /var/lib/omnileads/pgsql directory
+- name: OS_CONF Creates /var/lib/omnileads/pgsql directory
   file:
     path: '{{ postgres_persistent_path }}'
     state: directory
@@ -105,7 +105,17 @@
   tags:
     - install
 
-- name: Copy SSL certs
+- name: OS_CONF Copy bashrc for alias
+  copy:
+    src: "templates/bashrc"
+    dest: /root/.bashrc
+    owner: '{{ usuario }}'
+    group: '{{ usuario }}'
+    mode: 0777
+  tags:
+    - install
+
+- name: OS_CONF Copy self-signed SSL certs
   copy:
     src: "certs/cert.pem"
     dest: /etc/omnileads/certs/cert.pem
@@ -117,18 +127,25 @@
     - nginx
     - kamailio
     - asterisk
+  when:
+    - certs == "self-signed"
 
-- name: Copy SSL certs
+- name: OS_CONF Copy custom SSL certs
   copy:
-    src: "templates/bashrc"
-    dest: /root/.bashrc
+    src: "../../../instances/{{ tenant_folder }}/cert.pem"
+    dest: /etc/omnileads/certs/cert.pem
     owner: '{{ usuario }}'
     group: '{{ usuario }}'
     mode: 0777
   tags:
     - install
+    - nginx
+    - kamailio
+    - asterisk
+  when:
+    - certs == "custom"
 
-- name: Copy SSL certs
+- name: OS_CONF Copy self-signed SSL certs
   copy:
     src: "certs/key.pem"
     dest: /etc/omnileads/certs/key.pem
@@ -141,19 +158,37 @@
     - nginx
     - kamailio
     - asterisk
+  when:
+    - certs == "self-signed"
 
-- name: Copy oml_manage script
+- name: OS_CONF Copy custom SSL certs
+  copy:
+    src: "../../../instances/{{ tenant_folder }}/key.pem"
+    dest: /etc/omnileads/certs/key.pem
+    owner: "{{ usuario }}"
+    group: "{{ usuario }}"
+    mode: 0777
+  tags:
+    - app
+    - aio
+    - nginx
+    - kamailio
+    - asterisk
+  when:
+    - certs == "custom"
+
+- name: OS_CONF Copy oml_manage script
   template:
     src: "templates/oml_manage.sh"
     dest: /usr/local/bin/oml_manage.sh
     mode: 0755
 
 # Se setea el timezone
-- name: Set timezone of server
+- name: OS_CONF Set timezone of server
   timezone: name={{ TZ }}
   tags: install
 
-- name: Copy CRONes
+- name: OS_CONF Copy CRONes
   template:
     src: "templates/crones"
     dest: /var/spool/cron/crontabs/root
@@ -163,7 +198,7 @@
   when:
     - app_host is not defined
 
-- name: Pull crones image
+- name: OS_CONF Pull crones image
   command: podman pull --quiet docker.io/omnileads/callrec_converter:latest
   register: podman_pull
   until: podman_pull is success
@@ -172,7 +207,7 @@
   when:
     - app_host is not defined
 
-- name: Callrec container environment variables
+- name: OS_CONF Callrec container environment variables
   template:
     src: "templates/callrec_converter.env"
     dest: /etc/default/callrec_converter.env
