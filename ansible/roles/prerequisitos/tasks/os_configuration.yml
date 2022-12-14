@@ -115,7 +115,7 @@
   tags:
     - install
 
-- name: OS_CONF Copy self-signed SSL certs
+- name: OS_CONF Copy selfsigned SSL certs
   copy:
     src: "certs/cert.pem"
     dest: /etc/omnileads/certs/cert.pem
@@ -128,7 +128,7 @@
     - kamailio
     - asterisk
   when:
-    - certs == "self-signed"
+    - certs == "selfsigned"
 
 - name: OS_CONF Copy custom SSL certs
   copy:
@@ -145,7 +145,7 @@
   when:
     - certs == "custom"
 
-- name: OS_CONF Copy self-signed SSL certs
+- name: OS_CONF Copy selfsigned SSL certs
   copy:
     src: "certs/key.pem"
     dest: /etc/omnileads/certs/key.pem
@@ -159,7 +159,7 @@
     - kamailio
     - asterisk
   when:
-    - certs == "self-signed"
+    - certs == "selfsigned"
 
 - name: OS_CONF Copy custom SSL certs
   copy:
