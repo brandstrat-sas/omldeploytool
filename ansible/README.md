@@ -251,6 +251,17 @@ Para lanzar un backup simplemente se debe invocar el script de deploy.sh:
 ./deploy.sh --action=backup --tenant=tenant_name_folder
 ```
 
+## Pasos de post-instalación
+
+Una vez disponible el URL con la App devolviendo la vista de login, se debe correr un comando
+para blanquear la contraseña de admin.
+
+```
+oml_manage.sh --reset_pass
+```
+
+A partir de entonces podemos ingresar con el usuario *admin*, contraseña *admin*.
+
 ## Deploy de actualizaciones
 
 Cada actualización es materializada a través de un "push" a "latest". Es decir la imagen "latest" de cada componente
