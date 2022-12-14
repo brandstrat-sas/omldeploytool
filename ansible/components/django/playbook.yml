@@ -42,14 +42,24 @@
   - name: DJANGO Change file ownership, group and permissions
     file:
       path:  /etc/default/django.env
-      owner: omnileads
-      group: omnileads
+      owner: "{{ usuario }}"
+      group: "{{ usuario }}"
       mode: '0666'
 
   - name: DJANGO Channels Daphne environment variables
     template:
       src: "{{ django_repo_path }}templates/daphne.env"
       dest: /etc/default/daphne.env
+      mode: 666
+      owner: "{{ usuario }}"
+      group: "{{ usuario }}"
+    tags:
+      - upgrade
+
+  - name: DJANGO Crones environment variables
+    template:
+      src: "{{ django_repo_path }}templates/cron.env"
+      dest: /etc/default/cron.env
       mode: 666
       owner: "{{ usuario }}"
       group: "{{ usuario }}"
@@ -89,6 +99,13 @@
     tags:
         - upgrade
 
+  - name: DJANGO Copy CRONES systemd service
+    template:
+      src: "{{ django_repo_path }}templates/cron.service"
+      dest: /etc/systemd/system/cron.service
+    tags:
+        - upgrade
+
   - name: DJANGO Pull image
     command: podman pull --quiet {{ img_repo }}:{{ django_version }}
     register: podman_pull
@@ -108,6 +125,15 @@
   - name: DJANGO Channels Enable and start Daphne systemd service
     systemd:
       name: daphne.service
+      state: restarted
+      enabled: yes
+      daemon_reload: yes
+    tags:
+        - upgrade
+
+  - name: DJANGO Crones Enable and start Daphne systemd service
+    systemd:
+      name: cron.service
       state: restarted
       enabled: yes
       daemon_reload: yes

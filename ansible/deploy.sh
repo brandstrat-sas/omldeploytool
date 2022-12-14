@@ -82,12 +82,12 @@ case ${oml_component} in
   ;;
 esac
 
-inventory=inventory.yml
-
 echo "************************ Exec ANSIBLE matrix *************************"
 echo "************************ Exec ANSIBLE matrix *************************"
 
 sleep 2
+
+cp instances/$oml_tenant/inventory.yml inventory.yml
 
 ansible-playbook matrix.yml --extra-vars \
   "django_repo_path=$(pwd)/components/django/ \
@@ -101,6 +101,7 @@ ansible-playbook matrix.yml --extra-vars \
   minio_repo_path=$(pwd)/components/minio/ \
   prometheus_repo_path=$(pwd)/monitoring/prometheus/ \
   rebrand=false \
+  tenant_folder=$oml_tenant \
   commit=ascd \
   build_date=\"$(env LC_hosts=C LC_TIME=C date)\"" \
   --tags "$oml_action, $oml_component" \
@@ -135,13 +136,14 @@ if [ $ResultadoAnsible == 0 ];then
   echo "#         OMniLeads installation ended successfully         #"
   echo "#############################################################"
   echo ""
-#  git checkout $current_directory/inventory
+  git checkout inventory.yml
 else
   echo ""
   echo "#######################################################################################"
   echo "#         OMniLeads installation failed. Check what happened and try it again         #"
   echo "#######################################################################################"
   echo ""
+  git checkout inventory.yml
 fi
 }
 
@@ -158,11 +160,15 @@ do
       oml_component="${i#*=}"
       shift
     ;;
+    --tenant=*)
+      oml_tenant="${i#*=}"
+      shift
+    ;;
     --help|-h)
       echo "
 How to use it:
 
-./deploy.sh --action= --component=
+./deploy.sh --action= --component= --tenant=
 
 --action=
         install
@@ -186,7 +192,7 @@ How to use it:
         nginx
         prometheus
 --tenant=
-        the name of inventory file.
+        Name of tenant instances folder.
 "
       shift
       exit 1

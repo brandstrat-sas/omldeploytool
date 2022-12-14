@@ -126,17 +126,45 @@ A la hora de una instalación o actualización se deben enviar dos parámetros:
 
 * --action=
 * --component=
+* --tenant=
 
 ```
-./deploy.sh --action=install --component=all
+./deploy.sh --action=install --component=all --tenant=tenant_name_folder
 
 ```
 
 Si quisiéramos enfocarnos en algún componente en particular, por ejemplo:
 
 ```
-./deploy.sh --action=install --component=asterisk
+./deploy.sh --action=install --component=asterisk --tenant=tenant_name_folder
 
+```
+
+## Carpeta de archivos y certificados de cada instancia a mantener
+
+Para poder gestionar multiples instancias de OMniLeads desde esta herramienta de despliegues, se deberá crear
+una carpeta llamadas **instances** en la raíz de este directorio. El nombre reservado para esta carpeta es
+**instances** ya que dicha cadena está dentro del .gitignore del repositorio.
+
+La idea es que la carpeta mencionada se trabaje como un repositorio GIT aparte, dotando así de la posibilidad
+de mantener un respaldo integro a su vez que el departamento de SRE o sistemas se apoye en el uso de GIT.
+
+```
+git clone your_tenants_config_repo instances
+```
+
+Luego por cada *instancia* a gestionar se deberá crear una sub-carpeta dentro de instances.
+Por ejemplo:
+
+```
+instances/demo
+```
+
+Una vez generada la carpeta de tenant, allí deberá ubicar una copia del archivo *inventory.yml* disponible
+en la raíz de este repositorio.
+
+```
+cp inventory.yml instances/tenant_name_folder
 ```
 
 ## Deploy de nueva instancia LAN con Backing (Postgres y Object Storage) auto hosteado 🚀
@@ -172,7 +200,7 @@ El resto de los parámetros se pueden personalizar como sea deseado.
 Finalmente se debe ejecutar el deploy.sh.
 
 ```
-./deploy.sh --action=install --component=all
+./deploy.sh --action=install --component=all --tenant=tenant_name_folder
 ```
 
 ## Deploy de nueva instancia con Backing (Postgres y Object Storage) como servicio administrado del Cloud 🚀
@@ -193,15 +221,24 @@ Luego simplemente se trata de ajustar los otros parámetros de conexión, de acu
 Si el servicio de PostgreSQL implica un cluster con mas de un nodo, entonces se puede activar mediante *postgres_ha: true*  y *postgres_ro_host: X.X.X.X*
 para indicar que las queries se impacten sobre el nodo de replica del cluster.
 
-Con respecto a Object Storage, se debe proporcionar el URL en *bucket_url*.
+Con respecto al almacenamiento sobre Object Storage, se debe proporcionar el URL en *bucket_url*.
 También los parámetros de autenticación deberán ser proporcionados; *bucket_access_key* & *bucket_secret_key* así como también el *bucket_name*.
 Respecto al bucket_region en caso de no necesitar especificar nada, se debe dejarlo con el valor actual.
 
 Finalmente se lanza el deploy:
 
 ```
-./deploy.sh --action=install --component=all
+./deploy.sh --action=install --component=all --tenant=tenant_name_folder
 ```
+
+## Certificados SSL
+
+A partir de la variable de inventory *certs* se puede indicar que hacer con los certificados SSL.
+Las posibles opciones son:
+
+* **selfsigned**: lo cual va a desplegar los certificados auto firmados (no recomendable para producción).
+* **custom**: si la idea es implementar sus propios certificados. Para ellos luego deberá ubicarlos dentro de instances/tenant_name_folder/ con los nombres: *cert.pem* para  y *key.pem*
+* **certbot**: si la idea es generar certificados utilizando el servicio gratuito de let's & crypt.
 
 ## Deploy de backup
 
@@ -211,8 +248,19 @@ por el otro, utilizando el bucket asociado a la instancia como bitácora de los 
 Para lanzar un backup simplemente se debe invocar el script de deploy.sh:
 
 ```
-./deploy.sh --action=backup
+./deploy.sh --action=backup --tenant=tenant_name_folder
 ```
+
+## Pasos de post-instalación
+
+Una vez disponible el URL con la App devolviendo la vista de login, se debe correr un comando
+para blanquear la contraseña de admin.
+
+```
+oml_manage.sh --reset_pass
+```
+
+A partir de entonces podemos ingresar con el usuario *admin*, contraseña *admin*.
 
 ## Deploy de actualizaciones
 
@@ -241,7 +289,7 @@ rtpengine_version: latest
 Luego se debe invocar al script de deploy.sh con el parámetro --upgrade.
 
 ```
-./deploy.sh --action=upgrade
+./deploy.sh --action=upgrade --tenant=tenant_name_folder
 ```
 
 ### Rollback
@@ -261,5 +309,5 @@ rtpengine_version: face6cfa
 Luego se debe invocar al script de deploy.sh con el parámetro --upgrade.
 
 ```
-./deploy.sh --action=upgrade
+./deploy.sh --action=upgrade --tenant=tenant_name_folder
 ```

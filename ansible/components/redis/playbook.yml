@@ -34,8 +34,8 @@
       src: "{{ redis_repo_path }}templates/redis.env"
       dest: /etc/default/redis.env
       mode: 664
-      owner: "{{ usuario }}"
-      group: "{{ usuario }}"
+      owner: '{{ usuario }}'
+      group: '{{ usuario }}'
     tags:
       - upgrade
 

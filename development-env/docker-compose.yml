@@ -49,7 +49,7 @@ services:
       - OML_BRANCH=${OML_BRANCH}
       - OML_COMMIT=${OML_COMMIT}
       - OML_BUILD_DATE=${OML_BUILD_DATE}
-      - WOMBAT_HOSTNAME=localhost
+      - WOMBAT_HOSTNAME=wombat
       - WOMBAT_USER=${WOMBAT_USER}
       - WOMBAT_PASSWORD=${WOMBAT_PASSWORD}
     image: ${OMLAPP_IMG}
@@ -72,7 +72,6 @@ services:
     depends_on:
       - postgresql
       - redis
-      - websockets
       - minio
     dns: 8.8.8.8
     environment:
@@ -248,6 +247,45 @@ services:
     volumes:
       - ${REPO_PATH}/omlwebsockets/source/:/opt/services/webapp/src/
 
+  mariadb:
+    container_name: oml-mariadb
+    dns: 8.8.8.8
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+      - TZ=${TZ}
+      - MARIADB_ROOT_PASSWORD=${MYSQL_ROOT_PASS}
+      - MARIADB_DATABASE=${WOMBAT_DB}
+      - MARIADB_USER=${WOMBAT_DB_USER}
+      - MARIADB_PASSWORD=${WOMBAT_DB_PASS}
+    image: ${MARIADB_IMG}
+    networks:
+      - omnileads
+    privileged: true
+    restart: on-failure
+    stop_grace_period: 1m30s
+    volumes:
+      - mariadb_persistent:/bitnami
+
+  wombat:
+    command: >
+      bash -c "sed -i '/JDBC_URL/c\JDBC_URL=jdbc:mariadb:\/\/${MYSQL_HOST}\/${WOMBAT_DB}?user=${WOMBAT_DB_USER}&password=${WOMBAT_DB_PASS}&autoReconnect=true' /usr/local/tomcat/webapps/wombat/WEB-INF/tpf.properties && catalina.sh run"
+    container_name: oml-wombat
+    depends_on:
+      - mariadb
+      - acd
+    dns: 8.8.8.8
+    environment:
+      - TZ=${TZ}
+      - MYSQL_PWD=${MYSQL_ROOT_PASS}
+    image: ${WOMBAT_IMG}
+    networks:
+      - omnileads
+    ports:
+      - 8082:8080/tcp
+    privileged: true
+    restart: on-failure
+    stop_grace_period: 1m30s
+
   vue-cli:
     tty: true
     container_name: oml-vuejs-cli
@@ -311,7 +349,11 @@ networks:
 
 volumes:
   postgres_persistent:
+  mariadb_persistent:
   redis_persistent:
   minio_persistent:
   django_static:
   vuejs_persistent:
+  ast_conf:
+  ast_sounds:
+  ast_moh:
