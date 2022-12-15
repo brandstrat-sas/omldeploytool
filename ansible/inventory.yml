@@ -47,11 +47,15 @@ all:
     # --- "cloud" instance (access through public IP)
     # --- or "lan" instance (access through private IP)
     infra_env: lan
+    fqdn: omnileads.domain
     # --- ansible user & port connection
     ansible_ssh_port: 22
     ansible_user: root
     # --- time zone
     TZ: America/Argentina/Cordoba
+    # --- selfsigned, custom or certbot
+    # --- if you have your own certs, put them into instances/tenant folder
+    certs: selfsigned
     # ---  enable prometheus exporter redis & pgsql
     prometheus_enable: true
     # --- postgresl params
