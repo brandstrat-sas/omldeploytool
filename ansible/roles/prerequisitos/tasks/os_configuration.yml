@@ -188,33 +188,33 @@
   timezone: name={{ TZ }}
   tags: install
 
-- name: OS_CONF Copy CRONes
-  template:
-    src: "templates/crones"
-    dest: /var/spool/cron/crontabs/root
-    mode: 0600
-  tags:
-    - upgrade
-  when:
-    - app_host is not defined
-
-- name: OS_CONF Pull crones image
-  command: podman pull --quiet docker.io/omnileads/callrec_converter:latest
-  register: podman_pull
-  until: podman_pull is success
-  tags:
-    - upgrade
-  when:
-    - app_host is not defined
-
-- name: OS_CONF Callrec container environment variables
-  template:
-    src: "templates/callrec_converter.env"
-    dest: /etc/default/callrec_converter.env
-    mode: 666
-    owner: '{{ usuario }}'
-    group: '{{ usuario }}'
-  tags:
-    - upgrade
-  when:
-    - app_host is not defined
+# - name: OS_CONF Copy CRONes
+#   template:
+#     src: "templates/crones"
+#     dest: /var/spool/cron/crontabs/root
+#     mode: 0600
+#   tags:
+#     - upgrade
+#   when:
+#     - app_host is not defined
+#
+# - name: OS_CONF Pull crones image
+#   command: podman pull --quiet docker.io/omnileads/callrec_converter:latest
+#   register: podman_pull
+#   until: podman_pull is success
+#   tags:
+#     - upgrade
+#   when:
+#     - app_host is not defined
+#
+# - name: OS_CONF Callrec container environment variables
+#   template:
+#     src: "templates/callrec_converter.env"
+#     dest: /etc/default/callrec_converter.env
+#     mode: 666
+#     owner: '{{ usuario }}'
+#     group: '{{ usuario }}'
+#   tags:
+#     - upgrade
+#   when:
+#     - app_host is not defined
