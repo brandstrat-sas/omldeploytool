@@ -8,7 +8,7 @@ case $1 in
   --init_env)
     docker exec -it oml-django python3 /opt/omnileads/ominicontacto/manage.py inicializar_entorno
     ;;
-  --delete_pgsql)
+  --delete_pgsql_db)
     echo "echo drop all on PostgreSQL"
     docker stop oml-postgres
     docker rm oml-postgres
@@ -21,6 +21,17 @@ case $1 in
     docker rm oml-redis
     docker volume rm devenv_redis_data
     docker-compose up -d --force-recreate --no-deps redis
+    ;;
+  --generate_call)
+    docker exec -it oml-pstn-emulator sipp -sn uac 127.0.0.1:5060 -s stress -m 1 -r 1 -d 60000 -l 1
+    ;;
+  --delete_pgsql_tables)
+    docker exec -it oml-django psql -c 'DELETE FROM queue_log'
+    docker exec -it oml-django psql -c 'DELETE FROM reportes_app_llamadalog'
+    docker exec -it oml-django psql -c 'DELETE FROM reportes_app_actividadagentelog'
+    docker exec -it oml-django psql -c 'DELETE FROM ominicontacto_app_respuestaformulariogestion'
+    docker exec -it oml-django psql -c 'DELETE FROM ominicontacto_app_auditoriacalificacion'
+    docker exec -it oml-django psql -c 'DELETE FROM ominicontacto_app_calificacioncliente'
     ;;
   --help)
     echo "

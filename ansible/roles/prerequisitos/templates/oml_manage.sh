@@ -26,14 +26,27 @@ case $1 in
     sleep 2
     systemctl start oml-redis-server
     ;;
-  --asterisk_cli)
+  --generate_call)
+    echo "generate an ibound call through PSTN-Emulator container"
+    podman exec -it oml-pstn-emulator sipp -sn uac 127.0.0.1:6060 -s stress -m 1 -r 1 -d 60000 -l 1
+    ;;
+  --delete_pgsql_tables)
+    echo "drop calls and agent count tables PostgreSQL"
+    podman exec-it oml-django-server psql -c 'DELETE FROM queue_log'
+    podman exec-it oml-django-server psql -c 'DELETE FROM reportes_app_llamadalog'
+    podman exec-it oml-django-server psql -c 'DELETE FROM reportes_app_actividadagentelog'
+    podman exec-it oml-django-server psql -c 'DELETE FROM ominicontacto_app_respuestaformulariogestion'
+    podman exec-it oml-django-server psql -c 'DELETE FROM ominicontacto_app_auditoriacalificacion'
+    podman exec-it oml-django-server psql -c 'DELETE FROM ominicontacto_app_calificacioncliente'
+    ;;
+  --asterisk_CLI)
     podman exec -it oml-asterisk-server asterisk -rvvvv
     ;;
-  --asterisk_bash)
+  --asterisk_terminal)
     podman exec -it oml-asterisk-server bash
     ;;
   --asterisk_logs)
-    podman exec -it oml-asterisk-server bash
+    podman logs -f oml-asterisk-server bash
     ;;
   --kamailio_logs)
     podman logs -f oml-kamailio-server
@@ -65,6 +78,16 @@ USAGE:
   -- init_env: init some basic configs in order to test it
   -- delete_pgsql: delete all PostgreSQL databases
   -- delete_redis: delete cache
+  -- asterisk_CLI: launch asterisk CLI
+  -- asterisk_terminal: launch asterisk container bash shell
+  --asterisk_logs: show asterisk container logs
+  --kamailio_logs: show container logs
+  --django_logs: show container logs
+  --rtpengine_logs: show container logs
+  --websockets_logs: show container logs
+  --nginx_t: print nginx container run config
+  -- generate_call: generate an ibound call through PSTN-Emulator container
+  -- delete_pgsql_tables: drop calls and agent count tables PostgreSQL
 "
     shift
     exit 1
