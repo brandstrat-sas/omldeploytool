@@ -34,6 +34,9 @@ case $1 in
     docker exec -it oml-django psql -c 'DELETE FROM ominicontacto_app_auditoriacalificacion'
     docker exec -it oml-django psql -c 'DELETE FROM ominicontacto_app_calificacioncliente'
     ;;
+  --regenerar_asterisk)
+    docker exec -it oml-django python3 manage.py regenerar_asterisk
+    ;;
   --help)
     echo "
 NAME:

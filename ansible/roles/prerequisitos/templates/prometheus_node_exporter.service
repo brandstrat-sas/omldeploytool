@@ -1,5 +1,5 @@
 [Unit]
-Description=Podman oml-prometheus-postgres.service
+Description=Podman prometheus_node_exporter.service
 Documentation=man:podman-generate-systemd(1)
 Wants=network-online.target
 After=network-online.target
@@ -16,12 +16,11 @@ ExecStart=/usr/bin/podman run \
   --sdnotify=conmon \
   --replace \
   --detach \
-  --publish=9090:9090 \
-  --volume=/etc/default/prometheus.yml:/etc/prometheus/prometheus.yml \
-  --volume=prometheus_data:/data/db:z \
-  --name=oml-prometheus-server \
+  --network=host \
+  --env-file=/etc/default/prometheus_node_exporter.env \
+  --name=oml-prometheus_node_exporter-server \
   --rm  \
-  {{ container_image_registry }}/prom/prometheus
+  {{ container_image_registry }}/prom/node-exporter:latest
 ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
 ExecStopPost=/usr/bin/podman rm -f --ignore --cidfile=%t/%n.ctr-id
 Type=notify
