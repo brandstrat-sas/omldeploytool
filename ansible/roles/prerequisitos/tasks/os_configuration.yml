@@ -198,3 +198,10 @@
     src: "templates/prometheus_node_exporter.env"
     dest: /etc/default/
     mode: 0600
+
+- name: OS_CONF Enable and start systemd Prometheus Node Exporter service
+  systemd:
+    name: prometheus_node_exporter
+    state: restarted
+    enabled: yes
+    daemon_reload: yes

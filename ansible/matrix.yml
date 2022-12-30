@@ -54,6 +54,3 @@
 
 - import_playbook: components/nginx/playbook.yml
   when: application_host is not defined
-
-- import_playbook: monitoring/prometheus/playbook.yml
-  when: prometheus_enable is defined
