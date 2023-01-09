@@ -25,7 +25,7 @@ TZ=America/Argentina/Cordoba
 #           Call recordings setting                    #
 # "local" (for container binding) or "s3-devenv"       #
 ########################################################
-CALLREC_DEVICE=s3-devenv
+CALLREC_DEVICE=s3-minio
 
 
 #########################################################################################################
@@ -101,7 +101,7 @@ OMLPGSQL_IMG=omnileads/postgres:latest
 PGHOST=postgresql
 PGDATABASE=omnileads
 PGPORT=5432
-PG_EXT_PORT=4444
+PG_EXT_PORT=5432
 PGUSER=omnileads
 PGPASSWORD=admin123
 
@@ -182,7 +182,7 @@ S3_STORAGE_ENABLED=True
 S3_BUCKET_NAME=omnileads
 S3_HTTP_ADMIN_USER=minio
 S3_HTTP_ADMIN_PASS=s3minio123
-AWS_ACCESS_KEY_ID=omlminio
+AWS_ACCESS_KEY_ID=devenv
 AWS_SECRET_ACCESS_KEY=s3omnileads123
 AWS_DEFAULT_REGION=us-east-1
 
@@ -193,11 +193,35 @@ S3_ENDPOINT=https://localhost
 # https://docs.min.io/docs/how-to-use-aws-sdk-for-python-with-minio-server.html
 S3_ENDPOINT_MINIO=http://minio:9000
 
+
+#########################################################################################################
+#                                    DIALER                                                             #
+#########################################################################################################
+
+WOMBAT_IMG=freetechsolutions/omldialer:21.06.2-7
 WOMBAT_USER=demoadmin
 WOMBAT_PASSWORD=demo
+WOMBAT_HOSTNAME=wombat
 
-OMLPSTNEMULATOR_IMG=freetechsolutions/omlpstn:latest
+WOMBAT_DB=wombat
+WOMBAT_DB_USER=wombat
+WOMBAT_DB_PASS=dials
+
+# MARIADB
+
+MARIADB_IMG=bitnami/mariadb:latest
+MYSQL_HOST=mariadb
+MYSQL_ROOT_PASS=admin123
+
+
+#########################################################################################################
+#                                    OTHERS                                                             #
+#########################################################################################################
+
+
+OMLPSTNEMULATOR_IMG=omnileads/pstn_emulator:latest
 OMLVUEJS_IMG=freetechsolutions/vue-cli:develop
+OMLACDPROVISIONER_IMG=omnileads/asterisk_provisioner:latest
 
 #########################################################################################################
 #                                          Monitoring                                                   #
