@@ -12,6 +12,7 @@ case $1 in
     echo "echo drop all on PostgreSQL"
     docker stop oml-postgres
     docker rm oml-postgres
+    sleep 2
     docker volume rm prodenv_postgresql_data
     docker-compose up -d --force-recreate --no-deps postgresql
     ;;
@@ -22,18 +23,42 @@ case $1 in
     docker volume rm prodenv_redis_data
     docker-compose up -d --force-recreate --no-deps redis
     ;;
+  --generate_call)
+    docker exec -it oml-pstn-emulator sipp -sn uac 127.0.0.1:6060 -s stress -m 1 -r 1 -d 60000 -l 1
+    ;;
+  --delete_pgsql_tables)
+    docker exec -it oml-django psql -c 'DELETE FROM queue_log'
+    docker exec -it oml-django psql -c 'DELETE FROM reportes_app_llamadalog'
+    docker exec -it oml-django psql -c 'DELETE FROM reportes_app_actividadagentelog'
+    docker exec -it oml-django psql -c 'DELETE FROM ominicontacto_app_respuestaformulariogestion'
+    docker exec -it oml-django psql -c 'DELETE FROM ominicontacto_app_auditoriacalificacion'
+    docker exec -it oml-django psql -c 'DELETE FROM ominicontacto_app_calificacioncliente'
+    ;;
+  --regenerar_asterisk)
+    docker exec -it oml-django python3 manage.py regenerar_asterisk
+    ;;
   --help)
     echo "
 NAME:
 OMniLeads docker-compose cmd tool
 
 USAGE:
-./manage.sh COMMAND
+./manage.sh ARG
 
   --reset_pass: reset admin password to admin admin
   --init_env: init some basic configs in order to test it
   --delete_pgsql: delete all PostgreSQL databases
   --delete_redis: delete cache
+  --asterisk_CLI: launch asterisk CLI
+  --asterisk_terminal: launch asterisk container bash shell
+  --asterisk_logs: show asterisk container logs
+  --kamailio_logs: show container logs
+  --django_logs: show container logs
+  --rtpengine_logs: show container logs
+  --websockets_logs: show container logs
+  --nginx_t: print nginx container run config
+  --generate_call: generate an ibound call through PSTN-Emulator container
+  --delete_pgsql_tables: drop calls and agent count tables PostgreSQL
 "
     shift
     exit 1

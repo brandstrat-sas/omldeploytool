@@ -29,7 +29,7 @@
 # Si no es asi, esta task generara un error esto es para AIO
 - name: CHECKS Check omni_distribution
   fail: msg="omni_distribution con valor {{ ansible_os_family }} es invalida"
-  when: ansible_os_family != "Debian" and ansible_os_family != "Rocky"
+  when: ansible_os_family != "Debian" and ansible_os_family != "Rocky" and ansible_os_family != "AlmaLinux" 
   changed_when: false
   tags: always
 
