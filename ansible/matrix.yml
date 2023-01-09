@@ -24,6 +24,7 @@
   hosts:
     - omnileads-voice
     - omnileads-app
+    - omnileads-observability
   gather_facts: True
   roles:
     - prerequisitos
@@ -54,3 +55,6 @@
 
 - import_playbook: components/nginx/playbook.yml
   when: application_host is not defined
+
+- import_playbook: components/observability/playbook.yml
+  when: observability_host is not defined
