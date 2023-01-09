@@ -1,0 +1,27 @@
+global:
+  scrape_interval: 15s
+  scrape_timeout: 10s
+  evaluation_interval: 15s
+
+alerting:
+  alertmanagers:
+  - follow_redirects: true
+    scheme: http
+    timeout: 10s
+    api_version: v2
+    static_configs:
+    - targets: []
+
+scrape_configs:
+  - job_name: prometheus
+    static_configs:
+      - targets: ["localhost:9090"]
+  - job_name: postgres
+    static_configs:
+      - targets: ["{{ redis_host }}:9187"]
+  - job_name: redis
+    static_configs:
+      - targets: ["{{ postgres_host }}:9121"]
+  - job_name: asterisk
+    static_configs:
+      - targets: ['{{ asterisk_host }}:7088']

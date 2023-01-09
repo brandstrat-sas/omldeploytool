@@ -183,25 +183,38 @@
     dest: /usr/local/bin/oml_manage.sh
     mode: 0755
 
+# Se setea el timezone
 - name: OS_CONF Set timezone of server
   timezone: name={{ TZ }}
   tags: install
 
-- name: OS_CONF Copy Prometheus Node Exporter service
+- name: OS_CONF Copy CRONes
   template:
-    src: "templates/prometheus_node_exporter.service"
-    dest: /etc/systemd/system/
+    src: "templates/crones"
+    dest: /var/spool/cron/crontabs/root
     mode: 0600
+  tags:
+    - upgrade
+  when:
+    - app_host is not defined
 
-- name: OS_CONF Copy Prometheus Node Exporter env
+- name: OS_CONF Pull crones image
+  command: podman pull --quiet docker.io/omnileads/callrec_converter:latest
+  register: podman_pull
+  until: podman_pull is success
+  tags:
+    - upgrade
+  when:
+    - app_host is not defined
+
+- name: OS_CONF Callrec container environment variables
   template:
-    src: "templates/prometheus_node_exporter.env"
-    dest: /etc/default/
-    mode: 0600
-
-- name: OS_CONF Enable and start systemd Prometheus Node Exporter service
-  systemd:
-    name: prometheus_node_exporter
-    state: restarted
-    enabled: yes
-    daemon_reload: yes
+    src: "templates/callrec_converter.env"
+    dest: /etc/default/callrec_converter.env
+    mode: 666
+    owner: '{{ usuario }}'
+    group: '{{ usuario }}'
+  tags:
+    - upgrade
+  when:
+    - app_host is not defined

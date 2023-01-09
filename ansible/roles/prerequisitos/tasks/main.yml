@@ -17,6 +17,12 @@
 #
 ---
 
+# Se instala net-tools necesario para obtener la subnet privada
+# - name: Upgrade all packages on servers
+#   apt:
+#     update: dist
+#
+
 - name: MAIN Install required Debian packages
   apt:
     name:
@@ -33,19 +39,19 @@
     update_cache: yes
     state: latest
   tags: install
-  when: ansible_os_family == "Debian"
+  when: ansible_distribution == "Debian"
 
 - name: MAIN Enable EPEL Repository on Rocky Linux
   dnf:
     name: epel-release
     state: latest
   tags: install
-  when: (ansible_os_family == "AlmaLinux") or (ansible_os_family == "Rocky")
+  when: ansible_distribution == "Rocky"
 
 - name: MAIN enable postgres dnf module ROCKY
   command: 'dnf -y module enable postgresql:{{ postgres_version }}'
   tags: install
-  when: (ansible_os_family == "AlmaLinux") or (ansible_os_family == "Rocky")
+  when: ansible_distribution == "Rocky"
 
 - name: MAIN Install required Rocky Linux packages
   dnf:
@@ -60,13 +66,13 @@
       - awscli
     state: latest
   tags: install
-  when: (ansible_os_family == "AlmaLinux") or (ansible_os_family == "Rocky")
+  when: ansible_distribution == "Rocky"
 
 - name: MAIN Disable SELinux Rocky Linux
   selinux:
     state: disabled
   tags: install
-  when: (ansible_os_family == "AlmaLinux") or (ansible_os_family == "Rocky")
+  when: ansible_distribution == "Rocky"
 
 - name: MAIN Check if Omnileads has been installed previously
   include: checks.yml

@@ -47,7 +47,7 @@ case ${oml_component} in
     echo "install omnileads component/s $oml_component"
     oml_component=aio
   ;;
-  observability)
+  monitoring)
     echo "install omnileads component/s $oml_component"
   ;;
   asterisk)
@@ -99,7 +99,7 @@ ansible-playbook matrix.yml --extra-vars \
   websockets_repo_path=$(pwd)/components/websockets/ \
   nginx_repo_path=$(pwd)/components/nginx/ \
   minio_repo_path=$(pwd)/components/minio/ \
-  observability_repo_path=$(pwd)/components/observability/ \
+  prometheus_repo_path=$(pwd)/monitoring/prometheus/ \
   rebrand=false \
   tenant_folder=$oml_tenant \
   commit=ascd \
@@ -156,7 +156,7 @@ do
       oml_action="${i#*=}"
       shift
     ;;
-    --component=aio|--component=app|--component=voice|--component=backing|--component=observability|--component=django|--component=asterisk|--component=kamailio|--component=rtpengine|--component=redis|--component=pgsql|--component=minio|--component=haproxy|--component=websockets|--component=nginx|--component=prometheus|--component=all)
+    --component=aio|--component=app|--component=voice|--component=backing|--component=monitoring|--component=django|--component=asterisk|--component=kamailio|--component=rtpengine|--component=redis|--component=pgsql|--component=minio|--component=haproxy|--component=websockets|--component=nginx|--component=prometheus|--component=all)
       oml_component="${i#*=}"
       shift
     ;;
@@ -190,7 +190,7 @@ How to use it:
         haproxy
         websockets
         nginx
-        observability
+        prometheus
 --tenant=
         Name of tenant instances folder.
 "

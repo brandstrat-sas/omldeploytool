@@ -3,4 +3,5 @@ vagrant/redhat/.vagrant
 development-env/omnileads-repos
 development-env/.env
 docker-compose/.env
+ansible/inventory.yml
 ansible/instances
