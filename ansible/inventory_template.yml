@@ -3,13 +3,13 @@
 all:
   hosts:
     omnileads-voice:
-      ansible_host: 172.16.101.11
-      omni_ip_lan: 172.16.101.11
-      application_host: 172.16.101.12
+      ansible_host: 10.10.10.2
+      omni_ip_lan: 10.10.10.2
+      application_host: 10.10.10.3
     omnileads-app:
-      ansible_host: 172.16.101.12
-      omni_ip_lan: 172.16.101.12
-      voice_host: 172.16.101.11
+      ansible_host: 10.10.10.3
+      omni_ip_lan:  10.10.10.3
+      voice_host: 10.10.10.2
       # ---  kamailio shm & pkg memory params
       shm_size: 64
       pkg_size: 8
@@ -46,7 +46,7 @@ all:
     rtpengine_version: latest
     # --- "cloud" instance (access through public IP)
     # --- or "lan" instance (access through private IP)
-    infra_env: lan
+    infra_env: cloud
     # --- ansible user & port connection
     ansible_ssh_port: 22
     ansible_user: root
@@ -56,13 +56,14 @@ all:
     prometheus_enable: true
     # --- postgresl params
     # --- set postgres_host if you have your own postgres:
-    #postgres_host: vultr-prod-2e6af73c-76fc-4185-988a-37587f96b70a-vultr-prod-a539.vultrdb.com
+    #postgres_host: vultr-prod-eb3bb5b3-202a-431b-a6ba-09bf9bc5cf80-vultr-prod-a539.vultrdb.com
     # --- set true if you have an postgres isolate or cloud instance
     postgres_port: 5432
     postgres_user: omnileads
-    postgres_password: AVNS_1VpA4nkIvuDy__Jfsdfdw
+    postgres_password: AVNS_nevBaiuBJNXaqi8k-ZY
     postgres_database: omnileads
-    postgres_maintenance_db: postgres #defaultdb
+    #postgres or defaultdb depend ...
+    postgres_maintenance_db: postgres
     postgres_ssl: false
     # --- If you have a PGSQL cluster you can activated cluster mode
     postgres_ha: false
@@ -73,21 +74,20 @@ all:
     # --- example Digital Ocean: https://sfo3.digitaloceanspaces.com
     # --- if you want to deploy minIO objects stporage on application_host, you must to put '#'
     # --- in order to comment bucket_url paramQue
-    #bucket_url: https://sfo3.digitaloceanspaces.com
+    #bucket_url: https://sjc1.vultrobjects.com
     # --- minio auth API params
     s3_http_admin_user: omnileads
     s3_http_admin_pass: 098098ZZZ
     # --- bucket params
-    bucket_access_key: 9dsffdsfsdfsd
-    bucket_secret_key: sZfsdfsdklfjdslkfjgt543
+    bucket_access_key: 64H3UZE3TD0CMKXYXK9W
+    bucket_secret_key: RyLRKsAgMOVSpJcGdloxXlw1qbI0PZCWqDRU4QgN
     bucket_name: omnileads
     bucket_region: us-east-1
     # --- Asterisk AMI user & password
     ami_user: omnileads
     ami_password: C12H17N2O4P_o98o98
     # --- SIP HOMER capture activated
-    homer_enable: false
+    homer_enable: true
     # --- Dialer API user & pass
-    dialer_host: 10.10.10.4
     dialer_user: demoadmin
-    dialer_password: 765765F1d3l10*
+    dialer_password: demo
