@@ -11,15 +11,6 @@ case $1 in
   --regenerar_asterisk)
     podman exec -it oml-django-server python3 /opt/omnileads/ominicontacto/manage.py regenerar_asterisk
     ;;
-  --delete_pgsql)
-    echo "drop all on PostgreSQL"
-    systemctl stop oml-postgresql-server
-    sleep 2
-    podman rm oml-postgresql-server
-    podman volume rm oml_postgres
-    sleep 2
-    systemctl start oml-postgresql-server
-    ;;
   --delete_redis)
     echo "drop all on REDIS"
     systemctl stop oml-redis-server
@@ -49,7 +40,7 @@ case $1 in
     podman exec -it oml-asterisk-server bash
     ;;
   --asterisk_logs)
-    podman logs -f oml-asterisk-server bash
+    podman logs -f oml-asterisk-server
     ;;
   --kamailio_logs)
     podman logs -f oml-kamailio-server
