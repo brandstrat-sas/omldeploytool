@@ -170,6 +170,7 @@ services:
     stop_grace_period: 1m30s
     volumes:
       - django_static:/opt/omnileads/static
+      - django_zip_callrec:/opt/omnileads/zip_callrec
 
   postgresql:
     build:

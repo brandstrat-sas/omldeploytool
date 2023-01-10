@@ -8,6 +8,7 @@ RED='\033[0;31m' # Red
 YELLOW='\033[1;33m' # Yellow
 NC='\033[0m' # No color
 current_directory=`pwd`
+DOCKER=$(which docker)
 
 #############################################################################
 #############################################################################
@@ -87,8 +88,11 @@ echo "************************ Exec ANSIBLE matrix *************************"
 
 sleep 2
 
+
 cp instances/$oml_tenant/inventory.yml inventory.yml
 
+if [ -z $DOCKER ]; then
+printf "$RED** [OMniLeads] Docker was not found, run with local Ansible\n"
 ansible-playbook matrix.yml --extra-vars \
   "django_repo_path=$(pwd)/components/django/ \
   redis_repo_path=$(pwd)/components/redis/ \
@@ -106,6 +110,30 @@ ansible-playbook matrix.yml --extra-vars \
   build_date=\"$(env LC_hosts=C LC_TIME=C date)\"" \
   --tags "$oml_action, $oml_component" \
   -i inventory.yml
+else
+printf "$GREEN** [OMniLeads] Pulling the latest image of Ansible $NC\n"
+docker pull omnileads/ansible:latest
+docker run -it --rm -v $(pwd):/home/ansible \
+  --workdir=/home/ansible \
+  omnileads/ansible:latest \
+  ansible-playbook matrix.yml --extra-vars \
+  "django_repo_path=/home/ansible/components/django/ \
+  redis_repo_path=/home/ansible/components/redis/ \
+  pgsql_repo_path=/home/ansible/components/postgresql/ \
+  kamailio_repo_path=/home/ansible/components/kamailio/ \
+  asterisk_repo_path=/home/ansible/components/asterisk/ \
+  rtpengine_repo_path=/home/ansible/components/rtpengine/ \
+  websockets_repo_path=/home/ansible/components/websockets/ \
+  nginx_repo_path=/home/ansible/components/nginx/ \
+  minio_repo_path=/home/ansible/components/minio/ \
+  observability_repo_path=/home/ansible/components/observability/ \
+  rebrand=false \
+  tenant_folder=$oml_tenant \
+  commit=ascd \
+  build_date=\"$(env LC_hosts=C LC_TIME=C date)\"" \
+  --tags "$oml_action, $oml_component" \
+  -i inventory.yml -k
+fi
 
 ResultadoAnsible=`echo $?`
 

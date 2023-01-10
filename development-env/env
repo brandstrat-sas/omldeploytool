@@ -31,7 +31,7 @@ CALLREC_DEVICE=s3-minio
 #########################################################################################################
 #                                      OMINICONTACTO DJANGO APP                                         #
 #########################################################################################################
-OMLAPP_IMG=omnileads/omlapp:latest
+OMLAPP_IMG=omnileads/omlapp:zipcallrec
 
 DJANGO_HOSTNAME=app
 DAPHNE_HOSTNAME=channels
