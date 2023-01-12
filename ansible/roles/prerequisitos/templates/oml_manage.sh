@@ -24,15 +24,6 @@ case $1 in
     echo "generate an ibound call through PSTN-Emulator container"
     podman exec -it oml-pstn-emulator sipp -sn uac 127.0.0.1:6060 -s stress -m 1 -r 1 -d 60000 -l 1
     ;;
-  --delete_pgsql_tables)
-    echo "drop calls and agent count tables PostgreSQL"
-    podman exec-it oml-django-server psql -c 'DELETE FROM queue_log'
-    podman exec-it oml-django-server psql -c 'DELETE FROM reportes_app_llamadalog'
-    podman exec-it oml-django-server psql -c 'DELETE FROM reportes_app_actividadagentelog'
-    podman exec-it oml-django-server psql -c 'DELETE FROM ominicontacto_app_respuestaformulariogestion'
-    podman exec-it oml-django-server psql -c 'DELETE FROM ominicontacto_app_auditoriacalificacion'
-    podman exec-it oml-django-server psql -c 'DELETE FROM ominicontacto_app_calificacioncliente'
-    ;;
   --asterisk_CLI)
     podman exec -it oml-asterisk-server asterisk -rvvvv
     ;;
