@@ -36,6 +36,7 @@
       - heplify.env
       - bootstrap
       - grafana.env
+      - loki.yml
 
   - name: OBSERVABILITY Copy service Systemd files
     template:
