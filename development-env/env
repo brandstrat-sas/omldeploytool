@@ -13,8 +13,8 @@ REPO_PATH=./omnileads-repos
 #######################################################################################
 # Subnet for the docker bridge network, change it if this subnet conflicts with yours #
 #######################################################################################
-SUBNET=10.12.12.0/24
-GATEWAY=10.12.12.254
+SUBNET=10.72.72.0/24
+GATEWAY=10.72.72.254
 
 ################################
 # Timezone for the environment #

@@ -42,6 +42,7 @@ services:
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
       - S3_ENDPOINT=${S3_ENDPOINT}
+      - S3_ENDPOINT_MINIO=${S3_ENDPOINT_MINIO}
       - AWS_DEFAULT_REGION=us-east-1
       - GOOGLE_MAPS_API_KEY=${GOOGLE_MAPS_API_KEY}
       - GOOGLE_MAPS_CENTER='${GOOGLE_MAPS_CENTER}'
@@ -52,6 +53,10 @@ services:
       - WOMBAT_HOSTNAME=wombat
       - WOMBAT_USER=${WOMBAT_USER}
       - WOMBAT_PASSWORD=${WOMBAT_PASSWORD}
+      - OML_LOGGING_SLOWSQL_ENABLED=
+      - OML_LOGGING_SLOWSQL_OUTPUT="-"
+      - OML_LOGGING_SLOWSQL_DURATION=1
+      - SURVEY_VERSION='develop'
     image: ${OMLAPP_IMG}
     networks:
       - omnileads
@@ -192,7 +197,7 @@ services:
     restart: on-failure
     stop_grace_period: 1m30s
     volumes:
-      - postgres_persistent:/var/lib/postgresql/data
+      - postgresql_persistent:/var/lib/postgresql/data
 
   redis:
     container_name: oml-redis
@@ -349,7 +354,7 @@ networks:
         - subnet: "${SUBNET}"
 
 volumes:
-  postgres_persistent:
+  postgresql_persistent:
   mariadb_persistent:
   redis_persistent:
   minio_persistent:

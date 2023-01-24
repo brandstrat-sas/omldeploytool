@@ -11,12 +11,17 @@ case $1 in
   --regenerar_asterisk)
     docker exec -it oml-django python3 /opt/omnileads/ominicontacto/manage.py regenerar_asterisk
     ;;
-  --delete_pgsql_db)
+  --delete_postgresql_db)
     echo "echo drop all on PostgreSQL"
     docker stop oml-postgres
+    docker stop oml-postgres
     docker rm oml-postgres
-    docker volume rm devenv_postgres_persistent
-    docker-compose up -d --force-recreate --no-deps postgresql app
+    docker volume rm devenv_postgresql_persistent
+    docker-compose up -d --force-recreate --no-deps postgresql
+    docker-compose up -d --force-recreate --no-deps app
+    until curl -sk --head  --request GET https://localhost |grep "302" > /dev/null; do echo "Environment still initializing , sleeping 10 seconds"; sleep 10; done; echo "Environment is up"
+    docker exec -it oml-django python3 /opt/omnileads/ominicontacto/manage.py cambiar_admin_password
+    docker exec -it oml-django python3 /opt/omnileads/ominicontacto/manage.py inicializar_entorno
     ;;
   --delete_redis)
     echo "echo drop all on REDIS"
@@ -38,7 +43,7 @@ case $1 in
     mc admin user add MINIO devenv s3omnileads123
     mc admin policy set MINIO readwrite user=devenv
     ;;
-  --delete_pgsql_tables)
+  --delete_postgresql_tables)
     echo "drop calls and agent count tables PostgreSQL"
     docker exec -it oml-django psql -c 'DELETE FROM queue_log'
     docker exec -it oml-django psql -c 'DELETE FROM reportes_app_llamadalog'
@@ -46,6 +51,10 @@ case $1 in
     docker exec -it oml-django psql -c 'DELETE FROM ominicontacto_app_respuestaformulariogestion'
     docker exec -it oml-django psql -c 'DELETE FROM ominicontacto_app_auditoriacalificacion'
     docker exec -it oml-django psql -c 'DELETE FROM ominicontacto_app_calificacioncliente'
+    ;;
+  --show_bucket)
+    mc alias set MINIO http://localhost:9001 minio s3minio123
+    mc ls --recursive MINIO/omnileads
     ;;
   --generate_call)
     echo "generate an ibound call through PSTN-Emulator container"
@@ -89,7 +98,7 @@ USAGE:
 --reset_pass: reset admin password to admin admin
 --init_env: init some basic configs in order to test it
 --regenerar_asterisk: populate asterisk / redis config
---delete_pgsql: delete all PostgreSQL databases
+--delete_postgresql_db: delete all PostgreSQL databases
 --delete_redis: delete cache
 --asterisk_CLI: launch asterisk CLI
 --asterisk_terminal: launch asterisk container bash shell
@@ -100,7 +109,7 @@ USAGE:
 --websockets_logs: show container logs
 --nginx_t: print nginx container run config
 --generate_call: generate an ibound call through PSTN-Emulator container
---delete_pgsql_tables: drop calls and agent count tables PostgreSQL
+--delete_postgresql_tables: drop calls and agent count tables PostgreSQL
 "
     shift
     exit 1
