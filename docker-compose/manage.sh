@@ -11,25 +11,31 @@ case $1 in
   --regenerar_asterisk)
     docker exec -it oml-django python3 /opt/omnileads/ominicontacto/manage.py regenerar_asterisk
     ;;
-  --delete_pgsql_db)
+  --clean_postgresql_db)
     echo "echo drop all on PostgreSQL"
+    docker stop oml-postgres
     docker stop oml-postgres
     docker rm oml-postgres
     docker volume rm prodenv_postgresql_data
     docker-compose up -d --force-recreate --no-deps postgresql
+    docker-compose up -d --force-recreate --no-deps app
+    until curl -sk --head  --request GET https://localhost |grep "302" > /dev/null; do echo "Environment still initializing , sleeping 10 seconds"; sleep 10; done; echo "Environment is up"
+    docker exec -it oml-django python3 /opt/omnileads/ominicontacto/manage.py cambiar_admin_password
+    docker exec -it oml-django python3 /opt/omnileads/ominicontacto/manage.py inicializar_entorno
     ;;
-  --delete_redis)
+  --clean_redis)
     echo "echo drop all on REDIS"
     docker stop oml-redis
     docker rm oml-redis
     docker volume rm prodenv_redis_data
     docker-compose up -d --force-recreate --no-deps redis
+    docker exec -it oml-django python3 /opt/omnileads/ominicontacto/manage.py regenerar_asterisk
     ;;
-  --delete_bucket)
+  --clean_bucket)
     echo "echo drop all on MINIO"
     docker stop oml-minio
     docker rm oml-minio
-    docker volume rm prodenv_minio_persistent
+    docker volume rm prodenv_minio_data
     docker-compose up -d --force-recreate --no-deps minio
     echo "waiting for MINIO raiseup"
     sleep 5
@@ -38,7 +44,18 @@ case $1 in
     mc admin user add MINIO omlminio s3omnileads123
     mc admin policy set MINIO readwrite user=omlminio
     ;;
-  --delete_pgsql_tables)
+  --create_bucket)
+    echo "Create MinIO user & bucket"
+    mc alias set MINIO http://localhost:9000 minio s3minio123
+    mc mb MINIO/omnileads
+    mc admin user add MINIO omlminio s3omnileads123
+    mc admin policy set MINIO readwrite user=omlminio
+    ;;
+  --show_bucket)
+    mc alias set MINIO http://localhost:9000 minio s3minio123
+    mc ls --recursive MINIO/omnileads
+    ;;
+  --clean_postgresql_tables)
     echo "drop calls and agent count tables PostgreSQL"
     docker exec -it oml-django psql -c 'DELETE FROM queue_log'
     docker exec -it oml-django psql -c 'DELETE FROM reportes_app_llamadalog'
@@ -50,6 +67,7 @@ case $1 in
   --generate_call)
     echo "generate an ibound call through PSTN-Emulator container"
     docker exec -it oml-pstn-emulator sipp -sn uac 127.0.0.1:5060 -s stress -m 1 -r 1 -d 60000 -l 1
+    docker exec -it oml-pstn-emulator sipp -sn uac 127.0.0.1:5060 -s stress -m $2 -r $4 -d 60000 -l $3
     ;;
   --asterisk_CLI)
     docker exec -it oml-asterisk asterisk -rvvvv
@@ -89,8 +107,8 @@ USAGE:
 --reset_pass: reset admin password to admin admin
 --init_env: init some basic configs in order to test it
 --regenerar_asterisk: populate asterisk / redis config
---delete_pgsql: delete all PostgreSQL databases
---delete_redis: delete cache
+--clean_postgresql_db: clean all PostgreSQL databases
+--clean_redis: clean cache
 --asterisk_CLI: launch asterisk CLI
 --asterisk_terminal: launch asterisk container bash shell
 --asterisk_logs: show asterisk container logs
@@ -100,7 +118,7 @@ USAGE:
 --websockets_logs: show container logs
 --nginx_t: print nginx container run config
 --generate_call: generate an ibound call through PSTN-Emulator container
---delete_pgsql_tables: drop calls and agent count tables PostgreSQL
+--clean_postgresql_tables: drop calls and agent count tables PostgreSQL
 "
     shift
     exit 1

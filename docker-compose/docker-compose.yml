@@ -40,6 +40,7 @@ services:
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
       - S3_ENDPOINT=${S3_ENDPOINT}
+      - S3_ENDPOINT_MINIO=${S3_ENDPOINT_MINIO}
       - AWS_DEFAULT_REGION=us-east-1
       - GOOGLE_MAPS_API_KEY=${GOOGLE_MAPS_API_KEY}
       - GOOGLE_MAPS_CENTER='${GOOGLE_MAPS_CENTER}'
@@ -50,6 +51,9 @@ services:
       - WOMBAT_HOSTNAME=localhost
       - WOMBAT_USER=${WOMBAT_USER}
       - WOMBAT_PASSWORD=${WOMBAT_PASSWORD}
+      - OML_LOGGING_SLOWSQL_ENABLED=
+      - OML_LOGGING_SLOWSQL_OUTPUT="-"
+      - OML_LOGGING_SLOWSQL_DURATION=1
     image: ${OMLAPP_IMG}
     networks:
       - omnileads
@@ -61,6 +65,7 @@ services:
     working_dir: /opt/omnileads/ominicontacto
     volumes:
       - django_static:/opt/omnileads/static
+      - django_callrec_zip:/opt/omnileads/asterisk/var/spool/asterisk/monitor
 
   channels:
     container_name: oml-django-channels
@@ -97,6 +102,7 @@ services:
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
       - S3_ENDPOINT=${S3_ENDPOINT}
+      - S3_ENDPOINT_MINIO=${S3_ENDPOINT_MINIO}
       - AWS_DEFAULT_REGION=us-east-1
       - GOOGLE_MAPS_API_KEY=${GOOGLE_MAPS_API_KEY}
       - GOOGLE_MAPS_CENTER='${GOOGLE_MAPS_CENTER}'
@@ -107,6 +113,9 @@ services:
       - WOMBAT_HOSTNAME=localhost
       - WOMBAT_USER=${WOMBAT_USER}
       - WOMBAT_PASSWORD=${WOMBAT_PASSWORD}
+      - OML_LOGGING_SLOWSQL_ENABLED=
+      - OML_LOGGING_SLOWSQL_OUTPUT="-"
+      - OML_LOGGING_SLOWSQL_DURATION=1
     image: ${OMLAPP_IMG}
     networks:
       - omnileads
@@ -150,7 +159,7 @@ services:
       - S3_BUCKET_NAME=${S3_BUCKET_NAME}
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
-      - S3_ENDPOINT=${S3_ENDPOINT}
+      - S3_ENDPOINT=${S3_ENDPOINT_MINIO}
       - AWS_DEFAULT_REGION=us-east-1
       - GOOGLE_MAPS_API_KEY=${GOOGLE_MAPS_API_KEY}
       - GOOGLE_MAPS_CENTER='${GOOGLE_MAPS_CENTER}'
@@ -161,6 +170,9 @@ services:
       - WOMBAT_HOSTNAME=localhost
       - WOMBAT_USER=${WOMBAT_USER}
       - WOMBAT_PASSWORD=${WOMBAT_PASSWORD}
+      - OML_LOGGING_SLOWSQL_ENABLED=
+      - OML_LOGGING_SLOWSQL_OUTPUT="-"
+      - OML_LOGGING_SLOWSQL_DURATION=1
     image: ${OMLAPP_IMG}
     networks:
       - omnileads
@@ -191,7 +203,7 @@ services:
       - PGUSER=${PGUSER}
       - PGDATABASE=${PGDATABASE}
       - PGPASSWORD=${PGPASSWORD}
-      - CALLREC_DEVICE=${CALLREC_DEVICE}
+      - CALLREC_DEVICE=s3-devenv
       - S3_BUCKET_NAME=${S3_BUCKET_NAME}
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
@@ -266,6 +278,7 @@ services:
     stop_grace_period: 1m30s
     volumes:
       - django_static:/opt/omnileads/static
+      - django_callrec_zip:/opt/omnileads/asterisk/var/spool/asterisk/monitor
 
   postgresql:
     container_name: oml-postgres
@@ -411,3 +424,4 @@ volumes:
   redis_data:
   minio_data:
   django_static:
+  django_callrec_zip:
