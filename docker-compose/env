@@ -1,0 +1,201 @@
+#############################
+#   Name of the project     #
+#############################
+COMPOSE_PROJECT_NAME=prodenv
+
+#######################################################################################
+# Subnet for the docker bridge network, change it if this subnet conflicts with yours #
+#######################################################################################
+SUBNET=10.12.12.0/24
+GATEWAY=10.12.12.254
+
+################################
+# Timezone for the environment #
+################################
+TZ=America/Argentina/Cordoba
+
+########################################################
+#           Call recordings setting                    #
+# "local" (for container binding) or "s3-devenv"       #
+########################################################
+CALLREC_DEVICE=s3-minio
+
+
+#########################################################################################################
+#                                      OMINICONTACTO DJANGO APP                                         #
+#########################################################################################################
+OMLAPP_IMG=omnileads/omlapp:latest
+
+DJANGO_HOSTNAME=app
+DAPHNE_HOSTNAME=channels
+
+# Session Cookie Age (SCA) is the time in seconds that will last the https session when inactivity
+# is detected in the session (by default is 1 hour)
+SESSION_COOKIE_AGE=3600
+
+# Ephemeral Credentials TTL (ECTTL) is the time in seconds that will last the SIP credentials used
+#to authenticate a SIP user in the telephony system (by default 8 hours)
+EPHEMERAL_USER_TTL=28800
+
+# Secret Key for creating auth ephemeral credentials
+AUTHEPH_SK=SUp3rS3cr3tK3y
+
+##################################
+# Name of the agenda disposition #
+##################################
+CALIFICACION_REAGENDA=AGENDA
+
+#################################################################################################
+# MONITORFORMAT refers to the format that your recordings will be converted.                    #
+# Mp3 is the preferred format because the small size of file.                                   #
+# If you want your recordings in format "wav" (asterisk default recording format), change this  #
+# variable to wav.                                                                              #
+# The conversion of recordings is scheduled to be done at 01:00 am everyday.                    #
+# You can edit this # changing crontab of omnileads user                                        #
+#################################################################################################
+MONITORFORMAT=mp3
+
+# Login failure limit (LFM) is the attempts a user has to enter an incorrect password in login
+# Decrease it if paranoic reasons
+LOGIN_FAILURE_LIMIT=10
+
+GOOGLE_MAPS_API_KEY=NULL
+GOOGLE_MAPS_CENTER='{ "lat": -31.416668, "lng": -64.183334 }'
+
+###########################
+# Django default settings #
+###########################
+OMLAPP_VERSION=develop
+DJANGO_SETTINGS_MODULE=ominicontacto.settings.production
+PYTHONPATH=/opt/omnileads/ominicontacto
+INSTALL_PREFIX=/opt/omnileads/
+OML_BRANCH=develop
+OML_COMMIT=XCOMIT
+OML_BUILD_DATE="hola"
+KAMAILIO_CERTS_LOCATION=/etc/omnileads/certs
+
+#########################################################################################################
+#                                           ASTERISK                                                    #
+#########################################################################################################
+OMLACD_IMG=omnileads/asterisk:latest
+
+ASTERISK_HOSTNAME=acd
+ASTERISK_LOCATION=
+
+AMI_USER=omnileadsami
+AMI_PASSWORD=5_MeO_DMT
+
+SIP_EXT_PORT=5060
+#########################################################################################################
+#                                           POSTGRESQL                                                  #
+#########################################################################################################
+OMLPGSQL_IMG=omnileads/postgres:latest
+
+PGHOST=postgresql
+PGDATABASE=omnileads
+PGPORT=5432
+PG_EXT_PORT=4444
+PGUSER=omnileads
+PGPASSWORD=admin123
+
+PGHOSTHA=false
+PGHOSTRO=
+
+#########################################################################################################
+#                                           WEBSOCKETS                                                  #
+#########################################################################################################
+OMLWS_IMG=omnileads/websockets:latest
+
+WEBSOCKET_HOSTNAME=websockets
+WEBSOCKET_PORT=8000
+WEBSOCKET_EXT_PORT=8000
+
+# *** Activete verbose ---> DEBUG:fts.oml.services.websockets,websockets.server
+WEBSOCKET_LOGGER=DEBUG:fts.oml.services.websockets;INFO:websockets.server
+
+# ******** HIGH AVAILABILITY ******* # # ******** HIGH AVAILABILITY ******* #
+# ******** HIGH AVAILABILITY ******* # # ******** HIGH AVAILABILITY ******* #
+# *** For redis sentinel cluster ---> redis+sentinel://master/sentinel_01,sentinel_02,sentinel_03
+# *** For simple redis ---> redis://redis:6379
+WEBSOCKET_REDIS_HOSTNAME=redis://redis:6379
+
+
+#########################################################################################################
+#                                           KAMAILIO                                                    #
+#########################################################################################################
+OMLKAM_IMG=omnileads/kamailio:latest
+
+KAMAILIO_HOSTNAME=kamailio
+
+# Variables for Kamailio memory. SHM is the maximum memory ammount.
+# PKG is the minimum memory ammount
+
+SHM_SIZE=64
+PKG_SIZE=8
+
+
+#########################################################################################################
+#                                       NGINX - RTPENGINE - REDIS                                       #
+#########################################################################################################
+# -----------------------------------------------------------------------------
+OMLNGINX_IMG=omnileads/nginx:latest
+
+# ******** HIGH AVAILABILITY ******* # # ******** HIGH AVAILABILITY ******* #
+# ******** HIGH AVAILABILITY ******* # # ******** HIGH AVAILABILITY ******* #
+# *** nginx or app_lb in case of HA *** #
+OMNILEADS_HOSTNAME=nginx
+
+NGINX_EXT_PORT=443
+
+
+
+# -----------------------------------------------------------------------------
+OMLREDISGEARS_IMG=redislabs/redisgears:1.0.9
+
+# ******** HIGH AVAILABILITY ******* # # ******** HIGH AVAILABILITY ******* #
+# ******** HIGH AVAILABILITY ******* # # ******** HIGH AVAILABILITY ******* #
+# *** redis or redis_lb in case of HA *** #
+REDIS_HOSTNAME=redis
+OMLSENTINEL_TAG=latest
+
+
+
+# ------------------------------------------------------------------------------
+OMLRTPENGINE_IMG=omnileads/rtpengine:latest
+RTPENGINE_HOSTNAME=rtpengine
+
+#########################################################################################################
+#                                    S3 BUCKET config                                                   #
+#########################################################################################################
+OMLMINIO_IMG=quay.io/minio/minio:latest
+
+# *** True (if CALLREC_DEVICE is s3-devenv) or False (if CALLREC_DEVICE is local or nfs)
+S3_STORAGE_ENABLED=True
+
+S3_BUCKET_NAME=omnileads
+S3_HTTP_ADMIN_USER=minio
+S3_HTTP_ADMIN_PASS=s3minio123
+AWS_ACCESS_KEY_ID=omlminio
+AWS_SECRET_ACCESS_KEY=s3omnileads123
+AWS_DEFAULT_REGION=us-east-1
+
+# *** used by storage_service.py & recordings & media_root views
+# your OMniLeads (nginx) ip/hostname
+S3_ENDPOINT=https://localhost
+# *** used by omni-callrec-move.sh Asterisk AGI
+# https://docs.min.io/docs/how-to-use-aws-sdk-for-python-with-minio-server.html
+S3_ENDPOINT_MINIO=http://minio:9000
+
+WOMBAT_USER=demoadmin
+WOMBAT_PASSWORD=demo
+
+OMLPSTNEMULATOR_IMG=omnileads/pstn_emulator:latest
+OMLVUEJS_IMG=freetechsolutions/vue-cli:develop
+
+#########################################################################################################
+#                                          Monitoring                                                   #
+#########################################################################################################
+
+HOMER_ENABLE=True
+HOMERHOST=heplify-server
+HOMERPORT=9060

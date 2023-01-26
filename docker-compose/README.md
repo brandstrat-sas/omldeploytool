@@ -4,6 +4,7 @@ This repository provides ready-to-run OMniLeads recipes using Docker and docker-
 To start your own bundle or choice, just run the following command inside the selected directory:
 
 ```
+$ cp env .env
 $ docker-compose up -d
 ```
 
@@ -29,6 +30,6 @@ The first time raise up the stack or every time you delete PostgreSQL databases 
 
 This is used to launch some administration actions:
 
-- reset django admin password
-- drop all postgres databases
-- drop all redis cache
+```
+./manage.sh --help
+```

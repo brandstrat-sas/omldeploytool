@@ -181,7 +181,7 @@ services:
     stdin_open: true
     stop_grace_period: 1m30s
     tty: true
-    working_dir: /opt/omnileads/ominicontacto
+    working_dir: /opt/omnileads
 
   acd:
     container_name: oml-asterisk
@@ -203,7 +203,7 @@ services:
       - PGUSER=${PGUSER}
       - PGDATABASE=${PGDATABASE}
       - PGPASSWORD=${PGPASSWORD}
-      - CALLREC_DEVICE=s3-devenv
+      - CALLREC_DEVICE=${CALLREC_DEVICE}
       - S3_BUCKET_NAME=${S3_BUCKET_NAME}
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
