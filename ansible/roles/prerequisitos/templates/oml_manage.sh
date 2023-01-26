@@ -6,12 +6,14 @@ case $1 in
     podman exec -it oml-django-server python3 /opt/omnileads/ominicontacto/manage.py cambiar_admin_password
     ;;
   --init_env)
+    echo "init Environment with some data"
     podman exec -it oml-django-server python3 /opt/omnileads/ominicontacto/manage.py inicializar_entorno
     ;;
   --regenerar_asterisk)
+    echo "regenerate redis asterisk data"
     podman exec -it oml-django-server python3 /opt/omnileads/ominicontacto/manage.py regenerar_asterisk
     ;;
-  --delete_redis)
+  --clean_redis)
     echo "drop all on REDIS"
     systemctl stop oml-redis-server
     sleep 2
@@ -19,10 +21,15 @@ case $1 in
     podman volume rm oml_redis
     sleep 2
     systemctl start oml-redis-server
+    sleep 5
+    podman exec -it oml-django-server python3 /opt/omnileads/ominicontacto/manage.py regenerar_asterisk
     ;;
   --generate_call)
     echo "generate an ibound call through PSTN-Emulator container"
     podman exec -it oml-pstn-emulator sipp -sn uac 127.0.0.1:6060 -s stress -m 1 -r 1 -d 60000 -l 1
+    ;;
+  --show_bucket)
+    podman exec -it oml-django-server aws --endpoint-url ${S3_ENDPOINT} s3 ls --recursive s3://${S3_BUCKET_NAME}
     ;;
   --asterisk_CLI)
     podman exec -it oml-asterisk-server asterisk -rvvvv
@@ -62,8 +69,7 @@ USAGE:
   --reset_pass: reset admin password to admin admin
   --init_env: init some basic configs in order to test it
   --regenerar_asterisk: populate asterisk / redis config
-  --delete_pgsql: delete all PostgreSQL databases
-  --delete_redis: delete cache
+  --clean_redis: clean cache
   --asterisk_CLI: launch asterisk CLI
   --asterisk_terminal: launch asterisk container bash shell
   --asterisk_logs: show asterisk container logs
@@ -73,7 +79,6 @@ USAGE:
   --websockets_logs: show container logs
   --nginx_t: print nginx container run config
   --generate_call: generate an ibound call through PSTN-Emulator container
-  --delete_pgsql_tables: drop calls and agent count tables PostgreSQL
 "
     shift
     exit 1

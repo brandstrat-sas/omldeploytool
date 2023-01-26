@@ -19,7 +19,7 @@ utilizando un único script y archivo de configuración.
 
 ## Bash, Ansible & System D 📋
 
-La gestión se realiza desde la estación de trabajo del sysadmin a parir de dos archivos; deploy.sh e inventory.yml.
+La gestión se realiza desde la estación de trabajo del SRE a parir de dos archivos; deploy.sh e inventory.yml.
 El primero es a quien se invoca para disparar la acción en concreto (deploy, upgrade, backup, etc.), el segundo
 sirve para ajustar parámetros de configuración a ser implementados sobre la instancia a aplicar el despliegue.
 

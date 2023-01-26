@@ -47,7 +47,6 @@ oml_os: bullseye
 admin_user: admin
 usuario: omnileads
 container_network: omnileads
-callrec_device: s3
 postgres_database: omnileads
 postgres_persistent_path: /var/lib/omnileads/pgsql
 django_deploy_path: /opt/omnileads/
