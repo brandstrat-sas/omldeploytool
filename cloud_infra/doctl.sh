@@ -10,9 +10,10 @@ case $1 in
     ;;
     --create-debian)
     echo "deploy: $1"
-    vultr-cli instance create --region=${VULTR_REGION} \
-    --plan=vc2-1c-1gb-sc1 --os=477 --ssh-keys=${VULTR_SSH} \
-    --vpc-ids=${VULTR_VPC} --vpc-enable=true --host=$2
+    doctl compute droplet create --image debian-11-x64 \
+    --size s-1vcpu-2gb --region sfo3 \
+    --ssh-keys ${SSH_DOCTL} \
+    oml-$2
     ;;
   --create-docker)
     echo "deploy: $1"
@@ -29,7 +30,7 @@ case $1 in
     --region sfo3
     ;;
   --list)
-     vultr-cli instance list
+    doctl compute droplet list
     ;;
   --dblist)
     doctl database list
