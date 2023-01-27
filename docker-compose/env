@@ -163,6 +163,7 @@ OMLSENTINEL_TAG=latest
 # ------------------------------------------------------------------------------
 OMLRTPENGINE_IMG=omnileads/rtpengine:latest
 RTPENGINE_HOSTNAME=rtpengine
+RTPENGINE_ENV=devenv
 
 #########################################################################################################
 #                                    S3 BUCKET config                                                   #

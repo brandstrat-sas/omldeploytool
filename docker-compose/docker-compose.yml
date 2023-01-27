@@ -216,6 +216,8 @@ services:
     image: ${OMLACD_IMG}
     networks:
       - omnileads
+    expose:
+        - 40000-40999/udp
     ports:
       - ${SIP_EXT_PORT}:5060/udp
     privileged: true
@@ -318,7 +320,7 @@ services:
     dns: 8.8.8.8
     environment:
       - TZ=${TZ}
-      - ENV=devenv
+      - ENV=${RTPENGINE_ENV}
     image: ${OMLRTPENGINE_IMG}
     networks:
       - omnileads

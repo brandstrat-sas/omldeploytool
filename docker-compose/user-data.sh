@@ -17,6 +17,7 @@ git clone https://gitlab.com/omnileads/omldeploytool.git
 cd ./omldeploytool/docker-compose
 git checkout develop
 cp env .env
+sed -i -e "s/RTPENGINE_ENV=devenv/RTPENGINE_ENV=docker-cloud/g" .env
 docker-compose up -d
 
 mc alias set MINIO http://localhost:9000 minio s3minio123
