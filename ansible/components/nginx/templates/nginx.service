@@ -21,6 +21,7 @@ ExecStart=/usr/bin/podman run \
   --name=oml-nginx-server \
   --volume=/etc/omnileads/certs:/etc/omnileads/certs \
   --volume=django_static:/opt/omnileads/static \
+  --volume=django_callrec_zip:/opt/omnileads/asterisk/var/spool/asterisk/monitor \
   --rm  \
   {{ container_image_registry }}/omnileads/nginx:{{ nginx_version }}
 ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id

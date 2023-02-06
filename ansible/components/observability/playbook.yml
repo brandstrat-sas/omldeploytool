@@ -1,0 +1,92 @@
+# Copyright (C) 2022 Freetech Solutions
+
+# This file is part of OMniLeads
+
+# This program is free software: you can nginxtribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see http://www.gnu.org/licenses/.
+#
+
+- name: OBSERVABILITY installation and configuration
+  hosts: omnileads-observability
+  tags:
+    - all_components
+    - observability
+  tasks:
+
+  - name: OBSERVABILITY setting config & variables
+    template:
+      src: "{{ observability_repo_path }}templates/{{ item }}"
+      dest: /etc/default/{{ item }}
+    with_items:
+      - prometheus.yml
+      - alertmanager.yml
+      - postgresql.sh
+      - postgresql.env
+      - homer.env
+      - heplify.env
+      - bootstrap
+      - grafana.env
+      - loki.yml
+    tags:
+      - install
+      - upgrade
+
+  - name: OBSERVABILITY Copy service Systemd files
+    template:
+      src: "{{ observability_repo_path }}templates/{{ item }}"
+      dest: /etc/systemd/system/{{ item }}
+    with_items:
+      - prometheus.service
+      - alertmanager.service
+      - loki.service
+      - postgresql.service
+      - heplify.service
+      - homer.service
+      - grafana.service
+    tags:
+      - install
+      - upgrade
+
+  - name: OBSERVABILITY Pull image
+    command: podman pull --quiet '{{ container_image_registry }}/{{ item }}'
+    register: podman_pull
+    until: podman_pull is success
+    with_items:
+      - prom/prometheus:latest
+      - prom/alertmanager:latest
+      - grafana/loki
+      - postgres:11-alpine
+      - sipcapture/heplify-server
+      - sipcapture/webapp
+      - grafana/grafana:master
+    tags:
+      - install
+      - upgrade
+
+  - name: OBSERVABILITY Enable and start service
+    systemd:
+      name: '{{ item }}.service'
+      state: restarted
+      enabled: yes
+      daemon_reload: yes
+    with_items:
+      - prometheus
+      - alertmanager
+      - loki
+      - postgresql
+      - heplify
+      - homer
+      - grafana
+    tags:
+      - install
+      - upgrade

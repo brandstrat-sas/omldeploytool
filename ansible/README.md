@@ -1,34 +1,59 @@
-# Gestion de OMniLeads basada en Ansible
+#### This project is part of OMniLeads
 
-Esta forma de gestión abarca desde instalaciones de nuevas instancias, manejo de actualizaciones hasta la ejecución de procedimientos de backups & restore,
-utilizando un único script y archivo de configuración.
+![Diagrama deploy tool](./png/omnileads_logo_1.png)
+
+#### 100% Open-Source Contact Center Software
+#### [Community Forum](https://forum.omnileads.net/)
+
+---
+
+# Ansible based OMniLeads management
+
+In this repository you will find an alternative to implement OMniLeads tenant management from an on-premise
+IT management perspective, but also super viable for working in cloud-computing environments.
+
+The idea is to be able to manage several OMniLeads tenants from this ansible based management tool.
+
+This option covers everything, from installing new instances, managing updates to executing backup & restore procedures,
+all that using a single script and configuration file.
+
 
 ![Diagrama deploy tool](./png/deploy-tool-ansible-deploy-instances-multiples.png)
 
 
-## Indice
+## Index
 
 * [Bash, Ansible & System D](#bash-ansible-systemd)
 * [Ansible + Inventory](#ansible-inventory)
 * [Bash Script deploy.sh](#bash-script-deploy)
-* [Deploy de nueva instancia LAN con Backing (Postgres y Object Storage) auto hosteado](#deploy-backing-self-hosted)
-* [Deploy de nueva instancia con Backing (Postgres y Object Storage) como servicio Cloud](#deploy-backing-cloud-service)
-* [Deploy de backup](#deploy-backup)
-* [Deploy de actualizaciones](#deploy-upgrade)
-* [Deploy de rollbacks](#deploy-rollbacks)
+* [Subscriber tracking & TLS certs](#subscriber-traking)
+* [Deploy de nueva instancia LAN con Backing (Postgres y Object Storage) auto hosteado](#onpremise-deploy)
+* [Deploy de nueva instancia con Backing (Postgres y Object Storage) como servicio Cloud](#cloud-deploy)
+* [TLS Certs provisioning](#tls-cert-provisioning)
+* [Deploy a backup](#backups)
+* [Deploy an upgrade](#upgrades)
+* [Deploy a rollback](#rollback)
+* [Observability](#observability)
 
-## Bash, Ansible & System D 📋
 
-La gestión se realiza desde la estación de trabajo del sysadmin a parir de dos archivos; deploy.sh e inventory.yml.
-El primero es a quien se invoca para disparar la acción en concreto (deploy, upgrade, backup, etc.), el segundo
-sirve para ajustar parámetros de configuración a ser implementados sobre la instancia a aplicar el despliegue.
+## Bash, Ansible & System D 📋 <a name="bash-ansible-systemd"></a>
 
-Cada instancia de OMniLeads se materializa a partir de como minimo dos instancias de Linux (aplicacion y voz). Es decir que vamos a contar con un Linux host dedicado a ejecutar los contenedores "de aplicacion" mientras que en el segundo se ejecutan
-los contenedores "de procesamiento de voz".
+The management of multiple instances is done from the administrator's workstation. When preparing a new deployment
+there are three fundamental files that are invoked in a chain, which help to understand how the management is planned
+of the tenants, these are:
 
-![Diagrama deploy tool zoom](./png/deploy-tool-ansible-deploy-instances.png)
+* **deploy.sh**: launch the root ansible playbook invoking the inventory file corresponding to the tenant that you want to manage.
+* **inventory.yml**: configuration parameters of the OMniLeads instance to be deployed.
+* **matrix.yml**: the ansible root playbook
 
-Luego una vez desplegada la aplicación en las instancias (app & voice), la gestión de componentes sera a través de systemd.
+Each instance of OMniLeads is generated on three Linux instances (application, voice, and observability).
+In other words, we are going to have a Linux instance dedicated to executing the containers corresponding to the Application stack, on the second the containers of the voice processing stack are executed and on the third those of the observability stack.
+
+![Diagrama deploy tool](./png/deploy-tool-tenant-a.png)
+
+
+Then, once OMnileads is deployed on the corresponding instances, each container on which a component works
+can be managed as a systemd service.
 
 ```
 systemd start component
@@ -36,64 +61,62 @@ systemd restart component
 systemd stop component
 ```
 
-Esto aplica para los componentes desplegados sobre la instancia app (nginx, websockets, django, kamailio, postgresql, redis y minio)
-así como también sobre la instancia voice (asterisk y rtpengine).
+![Diagrama deploy tool zoom](./png/deploy-tool-ansible-deploy-instances.png)
 
 
-## Ansible + Inventory 🔧
+## Ansible + Inventory 🔧 <a name="ansible-inventory"></a>
 
-El archivo de inventario es la fuente de configuración de la instancia sobre la cual se va a trabajar.
-Allí se ajustan parámetros como las versiones de las imágenes de cada componente o cuestiones de configuración
-de base de datos (usuarios, passwords, etc.)
+The inventory file is the configuration source of the instance on which you are going to work.
+Parameters such as the component image version or configuration issues are adjusted there
+database (users, passwords, etc.).
 
-Respecto a este archivo, vamos a repasar los parámetros principales, es decir los que si o si debo
-ajustar para lograr una instalación exitosa.
+Regarding this file, we are going to review the main parameters, that is, those that do or should I
+adjust for a successful installation.
+
+We start with the data to provide about the three necessary linux instances, there we must
+load the IP addresses corresponding to each linux instance so that Ansible can set the
+connection, in addition to providing the LAN IP address of each instance.
+
+So on the one hand we have the *ansible_host* parameter that implies the IP address over which
+the SSH connection must be established by Ansible, while the *omni_ip_lan* parameter does
+reference to a private address on which OMniLeads raises some services and uses
+to communicate between the three instances. It may happen that both are worth the same (especially
+in a deployment scenario over LAN or VPN)
 
 ```
 all:
   hosts:
     omnileads-voice:
-      ansible_host: 190.19.111.23
-      omni_ip_lan: 10.10.10.3
-      application_host: 10.10.10.4
+      omlvoice: true
+      ansible_host: 190.10.19.200
+      ansible_ssh_port: 22
+      omni_ip_lan: 172.16.101.41
+    omnileads-observability:
+      omlobs: true
+      ansible_host: 190.10.19.201
+      ansible_ssh_port: 22
+      omni_ip_lan: 172.16.101.43
     omnileads-app:
-      ansible_host: 190.19.111.22
-      omni_ip_lan: 10.10.10.4
-      voice_host: 10.10.10.3
+      omlapp: true
+      ansible_host: 190.10.19.202
+      ansible_ssh_port: 22
+      omni_ip_lan: 172.16.101.42
 ```
 
-omnileads-voice refiere a la instancia sobre la cual se van a desplegar los componentes asterisk y rtpengine, se debera especificar
- la direccion utilizada para que ansible se conecte y ejecute las tareas (ansible_host), luego la direccion de red local y
- finalmente la direccion del servidor de aplicacion sobre el cual se va a desplegar los componentes
- (nginx, websockets, django, kamailio, postgresql, redis y minio).
-
-
-Respecto a las variables de deploy, por un lado tenemos variables exclusivas para la instancia de aplicacion, las mismas se encuentran
-dentro del tab omnileads-app, como por ejemplo:
-
-```
-omnileads-app:
-  ansible_host: 234.234.234.234
-  omni_ip_lan: 10.10.10.4
-  voice_host: 10.10.10.3
-  # ---  kamailio shm & pkg memory params
-  shm_size: 64
-  pkg_size: 8
-  # --- is the time in seconds that will last the https session when inactivity
-  SCA: 3600
-  ...
-  ...
-  ...
-  ...
-```
-
-mientras que ademas contamos con las variables de omnileads existentes dentro del tab "hosts" que son parametros
-que heredan ambas instancias (omnileads-app y omnileads-voice).
+Then we count the tenant variables to display, labeled/indented under *vars:*. Here we find
+all the adjustable parameters when invoking a deploy on a group of instances. each one is
+described by a *# --- comment* preceding it.
 
 ```
 vars:
-  # -- version images to deploy
-  django_version: latest
+  # --- IP or hostname that each instance will invoke when locating the other
+  voice_host: 172.16.101.41
+  application_host: 172.16.101.42
+  observability_host: 172.16.101.43
+  # --- ansible user auth connection
+  ansible_user: root
+  # --- version of each image to deploy
+  omnileads_version: latest
   websockets_version: latest
   nginx_version: latest
   kamailio_version: latest
@@ -101,21 +124,18 @@ vars:
   rtpengine_version: latest
   # --- "cloud" instance (access through public IP)
   # --- or "lan" instance (access through private IP)
-  infra_env: cloud # (values: cloud or lan)
-  # --- ansible user & port connection
-  ansible_ssh_port: 22
-  ansible_user: root
-  ....
-  ....
-  ....
-  ....
+  # --- in order to set NAT or Publica ADDR for RTP voice packages
+  infra_env: lan
+  # --- If you have an DNS FQDN resolution, you must to uncomment and set this param
+  # --- otherwise leave commented to work invoking through an IP address
+  #fqdn: fidelio.sephir.tech
+
 ```
 
+## Bash Script deploy.sh 📄 <a name="bash-script-deploy"></a>
 
-## Bash Script deploy.sh 📄
-
-Este script recibe parámetros que comandan la acción a efectuar, esta acción tiene que ver con invocar a la Playbook
-matrix.yml quien a partir del archivo de inventario previamente editado terminara desplegando la acción en concreto sobre las instancias app y voice.
+This script receives parameters that command the action to be carried out, this action has to do with invoking the Playbook
+matrix.yml who, from the previously edited inventory file, will end up deploying the specific action on the app and voice instances.
 
 ```
 ./deploy.sh --help
@@ -124,190 +144,241 @@ matrix.yml quien a partir del archivo de inventario previamente editado terminar
 
 A la hora de una instalación o actualización se deben enviar dos parámetros:
 
-* --action=
-* --component=
-* --tenant=
+* **--action=**
+* **--tenant=**
 
 ```
-./deploy.sh --action=install --component=all --tenant=tenant_name_folder
-
-```
-
-Si quisiéramos enfocarnos en algún componente en particular, por ejemplo:
-
-```
-./deploy.sh --action=install --component=asterisk --tenant=tenant_name_folder
+./deploy.sh --action=install --tenant=tenant_name_folder
 
 ```
 
-## Carpeta de archivos y certificados de cada instancia a mantener
+## Certs and inventory tenant folder :office: <a name="subscriber-traking"></a>
 
-Para poder gestionar multiples instancias de OMniLeads desde esta herramienta de despliegues, se deberá crear
-una carpeta llamadas **instances** en la raíz de este directorio. El nombre reservado para esta carpeta es
-**instances** ya que dicha cadena está dentro del .gitignore del repositorio.
+In order to manage multiple instances of OMniLeads from this deployment tool, you must create
+a folder called **instances** at the root of this directory. The reserved name for this folder is
+**instances** since said string is inside the .gitignore of the repository.
 
-La idea es que la carpeta mencionada se trabaje como un repositorio GIT aparte, dotando así de la posibilidad
-de mantener un respaldo integro a su vez que el departamento de SRE o sistemas se apoye en el uso de GIT.
+The idea is that the mentioned folder works as a separate GIT repository, thus providing the possibility
+to maintain an integral backup in turn that the SRE or systems department is supported in the use of GIT.
 
 ```
 git clone your_tenants_config_repo instances
 ```
 
-Luego por cada *instancia* a gestionar se deberá crear una sub-carpeta dentro de instances.
-Por ejemplo:
+Then, for each *instance* to be managed, a sub-folder must be created within instances.
+For example:
 
 ```
-instances/demo
+instances/Subscriber_A
 ```
 
-Una vez generada la carpeta de tenant, allí deberá ubicar una copia del archivo *inventory.yml* disponible
-en la raíz de este repositorio.
+Once the tenant folder is generated, there you will need to place a copy of the *inventory.yml* file available
+in the root of this repository, in order to customize and tack inside the private GIT repository.
 
 ```
-cp inventory.yml instances/tenant_name_folder
+cp inventory.yml instances/Subscriber_A
+git add instances/Subscriber_A
+git commit 'my new Subscriber A'
+git push origin main
 ```
 
-## Deploy de nueva instancia LAN con Backing (Postgres y Object Storage) auto hosteado 🚀
+## Deploy a new LAN instance with Backend (Postgres and Object Storage) self-hosted 🚀 <a name="onpremise-deploy"></a>
 
-Se debe disponer de dos instancias Linux (Debian 11 o Rocky 8) con salida a internet y su clave publica (ssh) disponible, ya que
-Ansible necesita establecer una conexión SSH para desplegar las acciones.
+You must have two Linux instances (Ubuntu 22.04, Debian 11, Rocky 8 or Alma Linux 8) with Internet access and **your public key (ssh) available**, since
+ansible needs to establish an SSH connection through public key.
 
-Luego se debe trabajar en el archivo inventory.yml
+Then you should work on the inventory.yml file
 
-Respecto a las direcciones y conexiones:
+Regarding addresses and connections:
 
 ```
 omnileads-voice:
-  ansible_host: 10.10.10.3
+  ansible_host: 190.10.19.200
+  ansible_ssh_port: 22
   omni_ip_lan: 10.10.10.3
-  application_host: 10.10.10.4
 omnileads-app:
-  ansible_host: 10.10.10.4
+  ansible_host: 190.10.19.100
+  ansible_ssh_port: 22
   omni_ip_lan: 10.10.10.4
-  voice_host: 10.10.10.3
+omnileads-observability:
+  ansible_host: 190.10.19.300
+  ansible_ssh_port: 22
+  omni_ip_lan: 10.10.10.5
 ```
 
-El parámetro infra_env deberá inicializarse como 'lan'.
+The infra_env parameter should be initialized as 'lan'.
 
 ```
 infra_env: lan
 ```
 
-Y finalmente se deben comentar los parámetros ```bucket_url``` y ```postgres_host```, para que así ambos (PostgreSQL y Object Storage MinIO) sean desplegados dentro de la instancia de aplicación.
+And finally, the *bucket_url* and *postgres_host* parameters must be commented out, so that both (PostgreSQL and Object Storage MinIO) are deployed within the application instance.
 
-El resto de los parámetros se pueden personalizar como sea deseado.
+The rest of the parameters can be customized as desired.
 
-Finalmente se debe ejecutar el deploy.sh.
-
-```
-./deploy.sh --action=install --component=all --tenant=tenant_name_folder
-```
-
-## Deploy de nueva instancia con Backing (Postgres y Object Storage) como servicio administrado del Cloud 🚀
-
-Se debe disponer de dos instancias Linux (Debian 11 o Rocky 8) con salida a internet y su clave publica (ssh) disponible, ya que
-Ansible necesita establecer una conexión SSH para desplegar las acciones.
-
-Ademas bajo este formato se asume que PostgreSQL y Object Storage DB van a ser proporcionados como servicios administrados por el proveedor cloud seleccionado.
-Esto implica que esos dos componentes de OMniLeads, en lugar de ser desplegados por nuestro Ansible, solamente debemos informar en el archivo
-de inventory sus datos de conexión.
-
-De esta manera OMniLeads va a almacenar los datos relacionales (SQL) y las grabaciones & backups sobre (Object Storage) del cloud, obviando
-la instalación de ambos componentes dentro de la instancia Linux donde corre OMniLeads.
-
-Vamos a plantear un inventory de referencia, en donde se supone que el cloud provider nos brinda los datos de conexión a Postgres.
-En el parametro *postgres_host* se debe asignar el string de conexión correspondiente.
-Luego simplemente se trata de ajustar los otros parámetros de conexión, de acuerdo a si vamos a necesitar establecer una conexión SSL, poner el *postgres_ssl: true*.
-Si el servicio de PostgreSQL implica un cluster con mas de un nodo, entonces se puede activar mediante *postgres_ha: true*  y *postgres_ro_host: X.X.X.X*
-para indicar que las queries se impacten sobre el nodo de replica del cluster.
-
-Con respecto al almacenamiento sobre Object Storage, se debe proporcionar el URL en *bucket_url*.
-También los parámetros de autenticación deberán ser proporcionados; *bucket_access_key* & *bucket_secret_key* así como también el *bucket_name*.
-Respecto al bucket_region en caso de no necesitar especificar nada, se debe dejarlo con el valor actual.
-
-Finalmente se lanza el deploy:
+Finally, the deploy.sh should be executed.
 
 ```
-./deploy.sh --action=install --component=all --tenant=tenant_name_folder
+./deploy.sh --action=install --tenant=tenant_name_folder
 ```
 
-## Certificados SSL
+## Deploy a new instance with Backend (Postgres and Object Storage) as a managed Cloud service 🚀 <a name="cloud-deploy"></a>
 
-A partir de la variable de inventory *certs* se puede indicar que hacer con los certificados SSL.
-Las posibles opciones son:
+You must have three Linux instances (Debian 11 or Rocky 8) with Internet access and **your public key (ssh) available**, since
+Ansible needs to establish an SSH connection to deploy the actions.
 
-* **selfsigned**: lo cual va a desplegar los certificados auto firmados (no recomendable para producción).
-* **custom**: si la idea es implementar sus propios certificados. Para ellos luego deberá ubicarlos dentro de instances/tenant_name_folder/ con los nombres: *cert.pem* para  y *key.pem*
-* **certbot**: si la idea es generar certificados utilizando el servicio gratuito de let's & crypt.
+Also under this format it is assumed that PostgreSQL and S3-compatible Object Storage are going to be provided as managed services by the selected cloud provider. This implies that these two OMniLeads components will not be deployed on the application instance as in the previous case.
 
-## Deploy de backup
+We are going to propose a reference inventory, where the cloud provider is supposed to give us the connection data to Postgres.
+The parameter *postgres_host* must be assigned the corresponding connection string.
+Then it is simply a matter of adjusting the other connection parameters, according to whether we are going to need to establish an SSL connection, set the *postgres_ssl: true*.
+If the PostgreSQL service involves a cluster with more than one node, then it can be activated by *postgres_ha: true* and *postgres_ro_host: X.X.X.X*
+to indicate that the queries are impacted on the cluster replica node.
 
-El deploy de un backup implica a los archivos de configuración personalizados de asterisk /etc/asterisk/custom por un lado y la base de datos
-por el otro, utilizando el bucket asociado a la instancia como bitácora de los backups.
+Regarding storage over Object Storage, the URL must be provided in *bucket_url*.
+Also the authentication parameters must be provided; *bucket_access_key* & *bucket_secret_key* as well as the *bucket_name*.
+Regarding the bucket_region, if you do not need to specify anything, you should leave it with the current value.
 
-Para lanzar un backup simplemente se debe invocar el script de deploy.sh:
+Finally the deploy is launched:
 
 ```
-./deploy.sh --action=backup --tenant=tenant_name_folder
+./deploy.sh --action=install --tenant=tenant_name_folder
 ```
 
-## Pasos de post-instalación
+## TLS/SSL certs provisioning :closed_lock_with_key: <a name="tls-cert-provisioning"></a>
 
-Una vez disponible el URL con la App devolviendo la vista de login, se debe correr un comando
-para blanquear la contraseña de admin.
+From the inventory variable *certs* you can indicate what to do with the SSL certificates.
+The possible options are:
+
+* **selfsigned**: which will display the self-signed certificates (not recommended for production).
+* **custom**: if the idea is to implement your own certificates. Then you must place them inside instances/tenant_name_folder/ with the names: *cert.pem* for and *key.pem*
+* **certbot**: comign soon ...
+
+
+## Post-installation steps :beer:
+
+Once the URL is available with the App returning the login view, a command must be run
+to whiten the admin password.
 
 ```
 oml_manage.sh --reset_pass
 ```
 
-A partir de entonces podemos ingresar con el usuario *admin*, contraseña *admin*.
+From then on we can log in with the user *admin*, password *admin*.
 
-## Deploy de actualizaciones
-
-Cada actualización es materializada a través de un "push" a "latest". Es decir la imagen "latest" de cada componente
-va a contar con los últimos cambios. Junto a la publicación de "latest" se sube también una imagen idéntica con un tag
-basado en los 8 primeros caracteres del hash del commit inherente al cambio publicado en el repositorio. Esto ultimo
-nos permite volver sobre una version anterior en caso de ser necesario un procedimiento de rollback.
+It is also possible to generate a test environment by calling:
 
 ```
-face6cfa	Image	an hour ago	3 days ago
-latest	  Image	an hour ago	3 days ago
+oml_manage.sh --init_env
 ```
 
-Para aplicar actualizaciones simplemente debemos indicar a nivel de inventory.yml si es que se desea desplegar
-versiones especificas de los componentes, por el contrario se procede con un "pull" de "latest".
+Where some users, routes, trunks, forms, breaks, etc. are generated.
+
+From then on we can log in with the agent type user *agent*, password *agent1**.
+
+
+## Perform a Backup :floppy_disk: <a name="backups"></a>
+
+Deploying a backup involves the asterisk custom configuration files /etc/asterisk/custom on the one hand and the database
+on the other, using the bucket associated with the instance as a backup log.
+
+To launch a backup, simply call the deploy.sh script:
 
 ```
-django_version: latest
-websockets_version: latest
-nginx_version: latest
-kamailio_version: latest
-asterisk_version: latest
-rtpengine_version: latest
+./deploy.sh --action=backup --tenant=tenant_name_folder
 ```
 
-Luego se debe invocar al script de deploy.sh con el parámetro --upgrade.
+## Upgrades :arrows_counterclockwise:  <a name="upgrades"></a>
+
+The OMniLeads project builds images of all its components to be hosted in docker hub: https://hub.docker.com/repositories/omnileads.
+
+We are going to differentiate the web application repository (https://hub.docker.com/repository/docker/omnileads/omlapp/general) whose
+semantics implies the string RC (release candidates) or stable (able to deploy on production) string, before the dated version.
+
+For example:
+
+```
+RC-230204.01
+stable-230204.01
+```
+
+On the other hand, the rest of the components (asterisk, rtpengine, kamailio, nginx, websockets and postgres) are
+named directly with the release date.
+
+For example:
+
+```
+230204.01
+```
+
+Every time a new Release of the application becomes available as an image in the container registry, it will be impacted.
+the **Releases-Notes.md** file available in the root of this repository, which exposes the mapping between the
+versions of the images of each component for each release.
+
+Therefore to apply updates we must first launch on this repository:
+
+```
+git pull origin main
+```
+
+Then indicate at the inventory.yml level within the corresponding tenant folder, the versions
+desired.
+
+```
+omnileads_version: stable-230204.01
+websockets_version: 230204.01
+nginx_version: 230204.01
+kamailio_version: 230204.01
+asterisk_version: 230204.01
+rtpengine_version: 230204.01
+postgres_version: 230204.01
+```
+
+Then the deploy.sh script must be called with the --upgrade parameter.
 
 ```
 ./deploy.sh --action=upgrade --tenant=tenant_name_folder
 ```
 
-### Rollback
+## Rollback  :leftwards_arrow_with_hook: <a name="rollback"></a>
 
-El uso de contenedores a la hora de ejecutar los componentes de OMniLeads nos permite fácilmente aplicar rollbacks hacia versiones
-históricas congeladas y accesible a través del "tag".
+The use of containers when executing the OMniLeads components allows us to easily apply rollbacks towards versions
+frozen history and accessible through the "tag".
 
 ```
-django_version: latest
-websockets_version: latest
-nginx_version: latest
-kamailio_version: latest
-asterisk_version: ff63617b
-rtpengine_version: face6cfa
+omnileads_version: stable-190112.01
+websockets_version: 190112.01
+nginx_version: 190112.01
+kamailio_version: 190112.01
+asterisk_version: 190112.01
+rtpengine_version: 190112.01
+postgres_version: 190112.01
 ```
 
-Luego se debe invocar al script de deploy.sh con el parámetro --upgrade.
+Then the deploy.sh script must be called with the --upgrade parameter.
 
 ```
 ./deploy.sh --action=upgrade --tenant=tenant_name_folder
 ```
+
+## Observability :mag_right: <a name="observability"></a>
+
+As it was well clarified, the OMniLeads deployment implies a Linux instance destined to officiate as a performance observer
+of productive application. Therefore, on said instance, a stack is deployed based on:
+
+* **Homer SIP Capture**: used to receive the SIP/RTP information sent to it by Asterisk (hep.conf). Homer stores this data and also provides a web interface to view real-time SIP traces.
+* **Prometheus**: used to collect performance metrics from both the hosts (application / voice) and their components (asterisk, redis, postgres, etc.), also collects the metrics reported by SIP Homer Capture itself .
+
+Finally, you will be able to have an instance of Grafana and invoke this Prometheus as a data-source and thus begin to deploy the dashboards.
+
+![Diagrama deploy tool zoom](./png/observability.png)
+
+It is also viable to use a Prometheus Central that collects metrics from each tenant (prometheus) and thus manage a more
+redundant and robust in terms of storage backup.  
+
+![Diagrama deploy tool zoom](./png/observability-central.png)
+
+
+## License & Copyright
+
+This project is released under the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.

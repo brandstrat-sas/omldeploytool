@@ -20,7 +20,7 @@
 - name: NGINX OMniLeads Nginx component deploy
   hosts: omnileads-app
   tags:
-    - aio
+    - all_components
     - app
     - nginx
   vars:
@@ -36,6 +36,7 @@
       owner: "{{ usuario }}"
       group: "{{ usuario }}"
     tags:
+      - install
       - upgrade
 
   - name: NGINX Copy nginx systemd service
@@ -43,6 +44,7 @@
       src: "{{ nginx_repo_path }}templates/nginx.service"
       dest: /etc/systemd/system/nginx.service
     tags:
+      - install
       - upgrade
 
   - name: NGINX Pull oml-nginx image
@@ -50,6 +52,7 @@
     register: podman_pull
     until: podman_pull is success
     tags:
+      - install
       - upgrade
 
   - name: NGINX Enable and start oml nginx service
@@ -59,4 +62,5 @@
       enabled: yes
       daemon_reload: yes
     tags:
+      - install
       - upgrade
