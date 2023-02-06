@@ -21,8 +21,9 @@
 - name: RTPENGINE installation and configuration
   hosts: omnileads-voice
   tags:
-    - aio
+    - all_components
     - voice
+    - rtpengine
   vars:
     img_repo: '{{ container_image_registry }}/omnileads/rtpengine'
   tasks:
@@ -35,6 +36,7 @@
       owner: "{{ usuario }}"
       group: "{{ usuario }}"
     tags:
+      - install
       - upgrade
 
   - name: RTPENGINE Copy Systemd .service file
@@ -42,6 +44,7 @@
       src: "{{ rtpengine_repo_path }}templates/rtpengine.service"
       dest: /etc/systemd/system/rtpengine.service
     tags:
+      - install
       - upgrade
 
   - name: RTPENGINE Pull image
@@ -49,6 +52,7 @@
     register: podman_pull
     until: podman_pull is success
     tags:
+      - install
       - upgrade
 
   - name: RTPENGINE Enable and start service
@@ -58,4 +62,5 @@
       enabled: yes
       daemon_reload: yes
     tags:
+      - install
       - upgrade

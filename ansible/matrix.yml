@@ -33,28 +33,28 @@
   when: bucket_url is not defined
 
 - import_playbook: components/redis/playbook.yml
-  when: application_host is not defined
+  when: omlapp is defined
 
 - import_playbook: components/postgresql/playbook.yml
   when: postgres_host == "localhost"
 
 - import_playbook: components/rtpengine/playbook.yml
-  when: voice_host is not defined
+  when: omlvoice is defined
 
 - import_playbook: components/kamailio/playbook.yml
-  when: application_host is not defined
+  when: omlapp is defined
 
 - import_playbook: components/websockets/playbook.yml
-  when: application_host is not defined
+  when: omlapp is defined
 
 - import_playbook: components/asterisk/playbook.yml
-  when: voice_host is not defined
+  when: omlvoice is defined
 
 - import_playbook: components/django/playbook.yml
-  when: application_host is not defined
+  when: omlapp is defined
 
 - import_playbook: components/nginx/playbook.yml
-  when: application_host is not defined
+  when: omlapp is defined
 
 - import_playbook: components/observability/playbook.yml
-  when: observability_host is not defined
+  when: omlobs is defined

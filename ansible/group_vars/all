@@ -29,6 +29,8 @@ redisgears_version: 1.0.9
 postgres_version: 13
 minio_version: latest
 
+homer_enable: true
+prometheus_enable: true
 
 packages_url: https://fts-public-packages.s3.amazonaws.com
 asterisk_package: "{{ packages_url }}/asterisk/asterisk-{{ asterisk_version }}.x86_64.rpm"

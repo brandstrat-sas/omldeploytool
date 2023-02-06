@@ -20,7 +20,7 @@ ExecStart=/usr/bin/podman run \
   --env-file=/etc/default/daphne.env \
   --name=oml-daphne-server \
   --rm  \
-  {{ container_image_registry }}/omnileads/omlapp:{{ django_version }}
+  {{ container_image_registry }}/omnileads/omlapp:{{ omnileads_version }}
 ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
 ExecStopPost=/usr/bin/podman rm -f --ignore --cidfile=%t/%n.ctr-id
 Type=notify

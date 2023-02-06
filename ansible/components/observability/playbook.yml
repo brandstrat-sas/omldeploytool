@@ -19,7 +19,7 @@
 - name: OBSERVABILITY installation and configuration
   hosts: omnileads-observability
   tags:
-    - aio
+    - all_components
     - observability
   tasks:
 
@@ -37,6 +37,9 @@
       - bootstrap
       - grafana.env
       - loki.yml
+    tags:
+      - install
+      - upgrade
 
   - name: OBSERVABILITY Copy service Systemd files
     template:
@@ -50,6 +53,9 @@
       - heplify.service
       - homer.service
       - grafana.service
+    tags:
+      - install
+      - upgrade
 
   - name: OBSERVABILITY Pull image
     command: podman pull --quiet '{{ container_image_registry }}/{{ item }}'
@@ -63,7 +69,9 @@
       - sipcapture/heplify-server
       - sipcapture/webapp
       - grafana/grafana:master
-
+    tags:
+      - install
+      - upgrade
 
   - name: OBSERVABILITY Enable and start service
     systemd:
@@ -79,3 +87,6 @@
       - heplify
       - homer
       - grafana
+    tags:
+      - install
+      - upgrade

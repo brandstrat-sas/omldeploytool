@@ -32,20 +32,20 @@
       - postgresql-client
     update_cache: yes
     state: latest
-  tags: install
   when: ansible_os_family == "Debian"
+  tags: install
 
 - name: MAIN Enable EPEL Repository on Rocky Linux
   dnf:
     name: epel-release
     state: latest
-  tags: install
   when: (ansible_os_family == "AlmaLinux") or (ansible_os_family == "Rocky")
+  tags: install
 
 - name: MAIN enable postgres dnf module ROCKY
   command: 'dnf -y module enable postgresql:{{ postgres_version }}'
-  tags: install
   when: (ansible_os_family == "AlmaLinux") or (ansible_os_family == "Rocky")
+  tags: install
 
 - name: MAIN Install required Rocky Linux packages
   dnf:
@@ -59,24 +59,23 @@
       - python3-boto3
       - awscli
     state: latest
-  tags: install
   when: (ansible_os_family == "AlmaLinux") or (ansible_os_family == "Rocky")
+  tags: install
 
 - name: MAIN Disable SELinux Rocky Linux
   selinux:
     state: disabled
-  tags: install
   when: (ansible_os_family == "AlmaLinux") or (ansible_os_family == "Rocky")
+  tags: install
 
 - name: MAIN Check if Omnileads has been installed previously
   include: checks.yml
-  tags: always
-
-- name: MAIN First configuration in server or servers
-  include: os_configuration.yml
   tags:
     - install
     - upgrade
+
+- name: MAIN First configuration in server or servers
+  include: os_configuration.yml
 
 - name: MAIN Perform a backup
   include: backup.yml

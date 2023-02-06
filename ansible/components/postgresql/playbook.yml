@@ -20,29 +20,15 @@
 - name: POSTGRESQL component delpoy
   hosts: omnileads-app
   tags:
-    - backing
-    - pgsql
-    - aio
+    - all_components
+    - app
+    - postgres
 
   vars:
     img_repo: '{{ container_image_registry }}/omnileads/postgres'
     img_prometheus_repo: 'docker.io/prometheuscommunity/postgres-exporter'
 
   tasks:
-
-    - name: POSTGRESQL Create of .pgpass files
-      template:
-        src: "{{ pgsql_repo_path }}templates/.pgpass"
-        dest: '{{ item.dest }}/.pgpass'
-        mode: 0600
-        owner: root
-        group: root
-      when: item.when is not defined
-      with_items:
-        - { dest: /root }
-        - { dest: /opt/omnileads, when: postgres_out }
-      tags:
-        - upgrade
 
     - name: POSTGRESQL Set environment variables for this installation
       template:
@@ -52,6 +38,7 @@
         owner: "{{ usuario }}"
         group: "{{ usuario }}"
       tags:
+        - install
         - upgrade
 
     - name: POSTGRESQL Copy systemd file
@@ -59,6 +46,7 @@
         src: "{{ pgsql_repo_path }}templates/postgresql.service"
         dest: /etc/systemd/system/postgresql.service
       tags:
+        - install
         - upgrade
 
     - name: POSTGRESQL Pull image
@@ -66,6 +54,7 @@
       register: podman_pull
       until: podman_pull is success
       tags:
+        - install
         - upgrade
 
     - name: POSTGRESQL Enable and start service
@@ -75,6 +64,7 @@
         enabled: yes
         daemon_reload: yes
       tags:
+        - install
         - upgrade
 
     - name: POSTGRESQL prometheus Set environment variables for this installation
@@ -85,6 +75,7 @@
         owner: "{{ usuario }}"
         group: "{{ usuario }}"
       tags:
+        - install
         - upgrade
 
     - name: POSTGRESQL prometheus Copy systemd file
@@ -92,6 +83,7 @@
         src: "{{ pgsql_repo_path }}templates/prometheus.service"
         dest: /etc/systemd/system/prometheus_postgres.service
       tags:
+        - install
         - upgrade
 
     - name: POSTGRESQL prometheus Pull image
@@ -99,6 +91,7 @@
       register: podman_pull
       until: podman_pull is success
       tags:
+        - install
         - upgrade
 
     - name: POSTGRESQL prometheus Enable and start service
@@ -108,4 +101,5 @@
         enabled: yes
         daemon_reload: yes
       tags:
+        - install
         - upgrade

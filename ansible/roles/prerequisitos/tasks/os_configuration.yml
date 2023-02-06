@@ -24,6 +24,8 @@
     enabled: no
     daemon_reload: yes
   ignore_errors: yes
+  tags:
+    - install
 
 - name: OS_CONF Disable firewallD
   systemd:
@@ -32,6 +34,8 @@
     enabled: no
     daemon_reload: yes
   ignore_errors: yes
+  tags:
+    - install
 
 - name: OS_CONF Ensure group {{ usuario }} exists
   group:
@@ -105,15 +109,15 @@
   tags:
     - install
 
-- name: OS_CONF Copy bashrc for alias
-  copy:
-    src: "templates/bashrc"
-    dest: /root/.bashrc
-    owner: '{{ usuario }}'
-    group: '{{ usuario }}'
-    mode: 0777
-  tags:
-    - install
+# - name: OS_CONF Copy bashrc for alias
+#   copy:
+#     src: "templates/bashrc"
+#     dest: /root/.bashrc
+#     owner: '{{ usuario }}'
+#     group: '{{ usuario }}'
+#     mode: 0777
+#   tags:
+#     - install
 
 - name: OS_CONF Copy selfsigned SSL certs
   copy:
@@ -124,9 +128,7 @@
     mode: 0777
   tags:
     - install
-    - nginx
-    - kamailio
-    - asterisk
+    - upgrade
   when:
     - certs == "selfsigned"
 
@@ -139,9 +141,7 @@
     mode: 0777
   tags:
     - install
-    - nginx
-    - kamailio
-    - asterisk
+    - upgrade
   when:
     - certs == "custom"
 
@@ -153,11 +153,8 @@
     group: "{{ usuario }}"
     mode: 0777
   tags:
-    - app
-    - aio
-    - nginx
-    - kamailio
-    - asterisk
+    - install
+    - upgrade
   when:
     - certs == "selfsigned"
 
@@ -169,11 +166,8 @@
     group: "{{ usuario }}"
     mode: 0777
   tags:
-    - app
-    - aio
-    - nginx
-    - kamailio
-    - asterisk
+    - install
+    - upgrade
   when:
     - certs == "custom"
 
@@ -182,22 +176,33 @@
     src: "templates/oml_manage.sh"
     dest: /usr/local/bin/oml_manage.sh
     mode: 0755
+  tags:
+    - install
+    - upgrade
 
 - name: OS_CONF Set timezone of server
   timezone: name={{ TZ }}
-  tags: install
+  tags:
+    - install
+    - upgrade
 
 - name: OS_CONF Copy Prometheus Node Exporter service
   template:
     src: "templates/prometheus_node_exporter.service"
     dest: /etc/systemd/system/
     mode: 0600
+  tags:
+    - install
+    - upgrade
 
 - name: OS_CONF Copy Prometheus Node Exporter env
   template:
     src: "templates/prometheus_node_exporter.env"
     dest: /etc/default/
     mode: 0600
+  tags:
+    - install
+    - upgrade
 
 - name: OS_CONF Enable and start systemd Prometheus Node Exporter service
   systemd:
@@ -205,3 +210,6 @@
     state: restarted
     enabled: yes
     daemon_reload: yes
+  tags:
+    - install
+    - upgrade

@@ -29,7 +29,7 @@
 # Si no es asi, esta task generara un error esto es para AIO
 - name: CHECKS Check omni_distribution
   fail: msg="omni_distribution con valor {{ ansible_os_family }} es invalida"
-  when: ansible_os_family != "Debian" and ansible_os_family != "Rocky" and ansible_os_family != "AlmaLinux" 
+  when: ansible_os_family != "Debian" and ansible_os_family != "Rocky" and ansible_os_family != "AlmaLinux"
   changed_when: false
   tags: always
 
@@ -37,21 +37,25 @@
   stat:
     path: "/etc/omnileads"
   register: etc_omnileads
+  tags: install
 
 - name: CHECKS Check if exists /var/lib/omnileads
   stat:
     path: "/var/lib/omnileads"
   register: var_lib_omnileads
+  tags: install
 
 - name: CHECKS Check if exists /var/lib/omnileads/minio
   stat:
     path: "/var/lib/omnileads/minio"
   register: var_lib_omnileads_minio
+  tags: install
 
 - name: CHECKS Check if exists /var/lib/omnileads/pgsql
   stat:
     path: "/var/lib/omnileads/pgsql"
   register: var_lib_omnileads_pgsql
+  tags: install
 
 - name: CHECKS Setting postgres_host as localhost
   set_fact:
@@ -60,7 +64,7 @@
   changed_when: false
   when:
     - postgres_host is not defined
-    - application_host is not defined
+    - omlapp is defined
 
 - name: CHECKS Setting minio_host as instance LAN IP
   set_fact:
@@ -69,7 +73,7 @@
   changed_when: false
   when:
     - minio_host is not defined
-    - application_host is not defined
+    - omlapp is defined
 
 - name: CHECKS Setting websockets_host as localhost
   set_fact:
@@ -78,7 +82,7 @@
   changed_when: false
   when:
     - websockets_host is not defined
-    - application_host is not defined
+    - omlapp is defined
 
 - name: CHECKS Setting kamailio_host as localhost
   set_fact:
@@ -87,7 +91,7 @@
   changed_when: false
   when:
     - kamailio_host is not defined
-    - application_host is not defined
+    - omlapp is defined
 
 - name: CHECKS Setting redis_host as localhost
   set_fact:
@@ -96,7 +100,7 @@
   changed_when: false
   when:
     - redis_host is not defined
-    - application_host is not defined
+    - omlapp is defined
 
 - name: CHECKS Setting asterisk_host as voice_host
   set_fact:
@@ -105,7 +109,7 @@
   changed_when: false
   when:
     - asterisk_host is not defined
-    - application_host is not defined
+    - omlapp is defined
 
 - name: CHECKS Setting rtpengine_host as voice_host
   set_fact:
@@ -114,7 +118,7 @@
   changed_when: false
   when:
     - rtpengine_host is not defined
-    - application_host is not defined
+    - omlapp is defined
 
 - name: CHECKS  Setting postgres_host as application_host
   set_fact:
@@ -122,7 +126,7 @@
   changed_when: false
   when:
     - postgres_host is not defined
-    - voice_host is not defined
+    - omlvoice is defined
 
 - name: CHECKS  Setting minio_host as application_host
   set_fact:
@@ -130,7 +134,7 @@
   changed_when: false
   when:
     - minio_host is not defined
-    - voice_host is not defined
+    - omlvoice is defined
 
 - name: CHECKS Setting redis_host as application_host
   set_fact:
@@ -139,7 +143,7 @@
   changed_when: false
   when:
     - redis_host is not defined
-    - voice_host is not defined
+    - omlvoice is defined
 
 - name: CHECKS Setting nginx_host as application_host
   set_fact:
@@ -148,193 +152,11 @@
   changed_when: false
   when:
     - nginx_host is not defined
-    - voice_host is not defined
+    - omlvoice is defined
 
-######################################################################################################
-# Chequeo de variables de entorno:                                                                   #
-# Se hace para que no sea necesario volver a ingresar las variables en el inventory al hacer upgrade #
-# Las tasks que no estan comentadas siguen este patrón                                               #
-# 1. # Chequeo si existe $ENVAR, equivale al parametro del inventory                                 #
-# 2. Si el comando anterior retornó 0, se setea parametro de inventory con el valor de $ENVAR        #
-# 3. Si el comando anterior retorna 1, no hace nada                                                  #
-# 4. Si alguna $ENVAR no está declarada y no se seteó el parametro del inventory quiere decir que    #
-# el usuario olvidó agregar algún parametro y deveolverá un mensaje de error diciendole que variable #
-#  faltó                                                                                             #
-######################################################################################################
 
-- name: CHECKS Check if $TZ was defined previously
-  shell: bash -lc 'if [ -z $TZ ]; then exit 1; else echo $TZ; exit 0; fi'
-  args:
-    executable: /bin/bash
-  changed_when: false
-  failed_when: false
-  register: assert_tz
-  tags: always
-
-- set_fact: TZ="{{ assert_tz.stdout }}"
-  when: assert_tz.rc == 0 and TZ is not defined
-  tags: always
-
-- name: CHECKS Check if $PGUSER was defined previously
-  shell: bash -lc 'if [ -z $PGUSER ]; then exit 1; else echo $PGUSER; exit 0; fi'
-  args:
-    executable: /bin/bash
-  changed_when: false
-  failed_when: false
-  register: assert_pguser
-  tags: always
-
-- set_fact: postgres_user="{{ assert_pguser.stdout }}"
-  when: assert_pguser.rc == 0 and postgres_user is not defined
-  tags: always
-
-- name: CHECKS Check if $PGPASSWORD was defined previously
-  shell: bash -lc 'if [ -z $PGPASSWORD ]; then exit 1; else echo $PGPASSWORD; exit 0; fi'
-  args:
-    executable: /bin/bash
-  changed_when: false
-  failed_when: false
-  register: assert_pgpass
-  tags: always
-
-- set_fact: postgres_password="{{ assert_pgpass.stdout }}"
-  when: assert_pgpass.rc == 0 and postgres_password is not defined
-  tags: always
-
-- name: CHECKS Check if $PGPORT was defined previously
-  shell: bash -lc 'if [ -z $PGPORT ]; then exit 1; else echo $PGPORT; exit 0; fi'
-  args:
-    executable: /bin/bash
-  changed_when: false
-  failed_when: false
-  register: assert_pgport
-  tags: always
-
-- name: CHECKS Setting postgres_port ansible variable
-  set_fact: postgres_port="{{ assert_pgport.stdout }}"
-  when: assert_pgport.rc == 0 and postgres_port is not defined
-  tags: always
-
-- set_fact: postgres_port=5432
-  when: assert_pgport.rc == 1 and postgres_port is not defined
-  tags: always
-
-- name: CHECKS Check if $AMI_USER was defined previously
-  shell: bash -lc 'if [ -z $AMI_USER ]; then exit 1; else echo $AMI_USER; exit 0; fi'
-  args:
-    executable: /bin/bash
-  changed_when: false
-  failed_when: false
-  register: assert_amiuser
-  tags: always
-
-- set_fact: ami_user="{{ assert_amiuser.stdout }}"
-  when: assert_amiuser.rc == 0 and ami_user is not defined
-  tags: always
-
-- name: CHECKS Check if $AMI_PASSWORD was defined previously
-  shell: bash -lc 'if [ -z $AMI_PASSWORD ]; then exit 1; else echo $AMI_PASSWORD; exit 0; fi'
-  args:
-    executable: /bin/bash
-  changed_when: false
-  failed_when: false
-  register: assert_amipass
-  tags: always
-
-- set_fact: ami_password="{{ assert_amipass.stdout }}"
-  when: assert_amipass.rc == 0 and ami_password is not defined
-  tags: always
-
-- name: CHECKS Check if $WOMBAT_USER was defined previously
-  shell: bash -lc 'if [ -z $WOMBAT_USER ]; then exit 1; else echo $WOMBAT_USER; exit 0; fi'
-  args:
-    executable: /bin/bash
-  changed_when: false
-  failed_when: false
-  register: assert_wombatuser
-  tags: always
-
-- set_fact: dialer_user="{{ assert_wombatuser.stdout }}"
-  when: assert_wombatuser.rc == 0 and dialer_user is not defined
-  tags: always
-
-- name: CHECKS Check if $WOMBAT_PASSWORD was defined previously
-  shell: bash -lc 'if [ -z $WOMBAT_PASSWORD ]; then exit 1; else echo $WOMBAT_PASSWORD; exit 0; fi'
-  args:
-    executable: /bin/bash
-  changed_when: false
-  failed_when: false
-  register: assert_wombatpass
-  tags: always
-
-- set_fact: dialer_password="{{ assert_wombatpass.stdout }}"
-  when: assert_wombatpass.rc == 0 and dialer_password is not defined
-  tags: always
-
-- name: CHECKS Check if $SESSION_COOKIE_AGE was defined previously
-  shell: bash -lc 'if [ -z $SESSION_COOKIE_AGE ]; then exit 1; else echo $SESSION_COOKIE_AGE; exit 0; fi'
-  args:
-    executable: /bin/bash
-  changed_when: false
-  failed_when: false
-  register: assert_sca
-  tags: always
-
-- set_fact: SCA="{{ assert_sca.stdout }}"
-  when: assert_sca.rc == 0 and SCA == 3600
-  tags: always
-
-- name: CHECKS Check if $SHM_SIZE was defined previously
-  shell: bash -lc 'if [ -z $SHM_SIZE ]; then exit 1; else echo $SHM_SIZE; exit 0; fi'
-  args:
-    executable: /bin/bash
-  changed_when: false
-  failed_when: false
-  register: assert_shm_size
-  tags: always
-
-- set_fact: shm_size="{{ assert_shm_size.stdout }}"
-  when: assert_shm_size.rc == 0 and shm_size == 64
-  tags: always
-
-- name: CHECKS Check if $PKG_SIZE was defined previously
-  shell: bash -lc 'if [ -z $PKG_SIZE ]; then exit 1; else echo $PKG_SIZE; exit 0; fi'
-  args:
-    executable: /bin/bash
-  changed_when: false
-  failed_when: false
-  register: assert_pkg_size
-  tags: always
-
-- set_fact: pkg_size="{{ assert_pkg_size.stdout }}"
-  when: assert_pkg_size.rc == 0 and pkg_size == 8
-  tags: always
-
-- name: CHECKS Check if $EPHEMERAL_USER_TTL was defined previously
-  shell: bash -lc 'if [ -z $EPHEMERAL_USER_TTL ]; then exit 1; else echo $EPHEMERAL_USER_TTL; exit 0; fi'
-  args:
-    executable: /bin/bash
-  changed_when: false
-  failed_when: false
-  register: assert_ecctl
-  tags: always
-
-- set_fact: ECCTL="{{ assert_ecctl.stdout }}"
-  when: assert_ecctl.rc == 0 and ECCTL == 28800
-  tags: always
-
-- name: CHECKS Check if $MONITORFORMAT was defined previously
-  shell: bash -lc 'if [ -z $MONITORFORMAT ]; then exit 1; else echo $MONITORFORMAT; exit 0; fi'
-  args:
-    executable: /bin/bash
-  changed_when: false
-  failed_when: false
-  register: assert_monitorformat
-  tags: always
-
-- set_fact: MONITORFORMAT="{{ assert_monitorformat.stdout }}"
-  when: assert_monitorformat.rc == 0 and MONITORFORMAT is not defined
-  tags: always
+# --- IMPORTANT: aqui controlo las variables que sean *requisito* para el deploy
+# --- si no está declarada entonces puedo escapar con un fail
 
 - name: CHECKS Check if TimeZone variable is defined
   fail:
@@ -377,6 +199,11 @@
     msg: WD pass undefined, edit dialer_password in inventory file
   when: dialer_password is not defined and assert_dialerpass.rc == 1
   tags: always
+
+
+# --- IMPORTANT: aqui controlo la integridad de algunas variables
+# --- como las dirrecciones IPs
+
 
 # Obtengo IP publica del nodo
 - name: CHECKS Get public IP address of node
