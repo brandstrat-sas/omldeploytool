@@ -17,11 +17,12 @@
 #
 ---
 
-- name: Asterisk installation and configuration
+- name: ASTERISK installation and configuration
   hosts: omnileads-voice
   tags:
-    - aio
+    - all_components
     - voice
+    - asterisk
   vars:
     img_repo: '{{ container_image_registry }}/omnileads/asterisk'
   tasks:
@@ -34,7 +35,8 @@
       owner: '{{ usuario }}'
       group: '{{ usuario }}'
     tags:
-        - upgrade
+      - install
+      - upgrade
 
   # Chequeo si existen ya los archivos custom y override dialplan, para no pisarlos
   - name: ASTERISK Check if custom and override files for dialplan exists
@@ -42,6 +44,8 @@
     changed_when: false
     failed_when: false
     register: ast_custom_exists
+    tags:
+      - install
 
   - name: ASTERISK Create custom conf files folder
     file:
@@ -51,6 +55,8 @@
       group: '{{ usuario }}'
       mode: 0764
     when: ast_custom_exists.rc == 0
+    tags:
+      - install
 
   # Creo archivos custom & override en fresh-install
   - name: ASTERISK Create _custom & _override astconf files
@@ -103,6 +109,8 @@
       - oml_voicemail_custom.conf
       - oml_voicemail_override.conf
     when: ast_custom_exists.rc == 0
+    tags:
+      - install
 
   - name: ASTERISK Copy some _custom.conf files
     copy:
@@ -115,20 +123,24 @@
       - oml_extensions_modules_custom.conf
       - oml_extensions_postcall_custom.conf
       - oml_extensions_precall_custom.conf
+    tags:
+      - install
 
   - name: ASTERISK Copy systemd service
     template:
       src: "{{ asterisk_repo_path }}templates/asterisk.service"
       dest: /etc/systemd/system/asterisk.service
     tags:
-        - upgrade
+      - install
+      - upgrade
 
   - name: ASTERISK Pull image
     command: podman pull --quiet {{ img_repo }}:{{ asterisk_version }}
     register: podman_pull
     until: podman_pull is success
     tags:
-        - upgrade
+      - install
+      - upgrade
 
   - name: ASTERISK Enable and start systemd service
     systemd:
@@ -137,4 +149,5 @@
       enabled: yes
       daemon_reload: yes
     tags:
-        - upgrade
+      - install
+      - upgrade

@@ -21,8 +21,8 @@
 - name: REDIS OMniLeads Redis component deploy
   hosts: omnileads-app
   tags:
-    - aio
-    - backing
+    - all_components
+    - app
     - redis
   vars:
     img_repo: '{{ container_image_registry }}/redislabs/redisgears'
@@ -37,6 +37,7 @@
       owner: '{{ usuario }}'
       group: '{{ usuario }}'
     tags:
+      - install
       - upgrade
 
   - name: REDIS Copy systemd service
@@ -44,6 +45,7 @@
       src: "{{ redis_repo_path }}templates/redis.service"
       dest: /etc/systemd/system/redis.service
     tags:
+      - install
       - upgrade
 
   - name: REDIS Pull image
@@ -51,6 +53,7 @@
     register: podman_pull
     until: podman_pull is success
     tags:
+      - install
       - upgrade
 
   - name: REDIS Enable and start service
@@ -60,6 +63,7 @@
       enabled: yes
       daemon_reload: yes
     tags:
+      - install
       - upgrade
 
   - name: REDIS prometheus Set environment variables for this installation
@@ -70,6 +74,7 @@
       owner: "{{ usuario }}"
       group: "{{ usuario }}"
     tags:
+      - install
       - upgrade
 
   - name: REDIS prometheus Copy systemd file
@@ -77,6 +82,7 @@
       src: "{{ redis_repo_path }}templates/prometheus.service"
       dest: /etc/systemd/system/prometheus_redis.service
     tags:
+      - install
       - upgrade
 
   - name: REDIS prometheus Pull image
@@ -84,6 +90,7 @@
     register: podman_pull
     until: podman_pull is success
     tags:
+      - install
       - upgrade
 
   - name: REDIS prometheus Enable and start service
@@ -93,4 +100,5 @@
       enabled: yes
       daemon_reload: yes
     tags:
+      - install
       - upgrade

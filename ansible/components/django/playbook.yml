@@ -20,7 +20,7 @@
 - name: DJANGO OMniLeads application installation
   hosts: omnileads-app
   tags:
-    - aio
+    - all_components
     - app
     - django
   vars:
@@ -37,6 +37,7 @@
       owner: "{{ usuario }}"
       group: "{{ usuario }}"
     tags:
+      - install
       - upgrade
 
   - name: DJANGO Change file ownership, group and permissions
@@ -45,6 +46,9 @@
       owner: "{{ usuario }}"
       group: "{{ usuario }}"
       mode: '0666'
+    tags:
+      - install
+      - upgrade
 
   - name: DJANGO Channels Daphne environment variables
     template:
@@ -54,6 +58,7 @@
       owner: "{{ usuario }}"
       group: "{{ usuario }}"
     tags:
+      - install
       - upgrade
 
   - name: DJANGO Crones environment variables
@@ -64,9 +69,10 @@
       owner: "{{ usuario }}"
       group: "{{ usuario }}"
     tags:
+      - install
       - upgrade
 
-  - name: Create a new database with name {{ postgres_database }}
+  - name: DJANGO Create a new database with name {{ postgres_database }}
     postgresql_db:
       name: "{{ postgres_database }}"
       login_host: "{{ postgres_host }}"
@@ -75,8 +81,10 @@
       port: "{{ postgres_port }}"
       maintenance_db: "{{ postgres_maintenance_db }}"
       state: present
+    tags:
+      - install
 
-  - name: Adds plperl extension to the database {{ postgres_database }}
+  - name: DJANGO Adds plperl extension to the database {{ postgres_database }}
     postgresql_ext:
       name: plperl
       db: "{{ postgres_database }}"
@@ -84,34 +92,55 @@
       login_password: "{{ postgres_password }}"
       login_user: "{{ postgres_user }}"
       port: "{{ postgres_port }}"
+    tags:
+      - install
+
+  - name: DJANGO Create of .pgpass files
+    template:
+      src: "{{ pgsql_repo_path }}templates/.pgpass"
+      dest: '{{ item.dest }}/.pgpass'
+      mode: 0600
+      owner: root
+      group: root
+    when: item.when is not defined
+    with_items:
+      - { dest: /root }
+      - { dest: /opt/omnileads, when: postgres_out }
+    tags:
+      - install
+      - upgrade
 
   - name: DJANGO Copy systemd service
     template:
       src: "{{ django_repo_path }}templates/django.service"
       dest: /etc/systemd/system/omnileads.service
     tags:
-        - upgrade
+      - install
+      - upgrade
 
   - name: DJANGO Copy Daphne systemd service
     template:
       src: "{{ django_repo_path }}templates/daphne.service"
       dest: /etc/systemd/system/daphne.service
     tags:
-        - upgrade
+      - install
+      - upgrade
 
   - name: DJANGO Copy CRONES systemd service
     template:
       src: "{{ django_repo_path }}templates/cron.service"
       dest: /etc/systemd/system/cron.service
     tags:
-        - upgrade
+      - install
+      - upgrade
 
   - name: DJANGO Pull image
-    command: podman pull --quiet {{ img_repo }}:{{ django_version }}
+    command: podman pull --quiet {{ img_repo }}:{{ omnileads_version }}
     register: podman_pull
     until: podman_pull is success
     tags:
-        - upgrade
+      - install
+      - upgrade
 
   - name: DJANGO Enable and start systemd service
     systemd:
@@ -120,7 +149,8 @@
       enabled: yes
       daemon_reload: yes
     tags:
-        - upgrade
+      - install
+      - upgrade
 
   - name: DJANGO Channels Enable and start Daphne systemd service
     systemd:
@@ -129,7 +159,8 @@
       enabled: yes
       daemon_reload: yes
     tags:
-        - upgrade
+      - install
+      - upgrade
 
   - name: DJANGO Crones Enable and start Daphne systemd service
     systemd:
@@ -138,4 +169,5 @@
       enabled: yes
       daemon_reload: yes
     tags:
-        - upgrade
+      - install
+      - upgrade

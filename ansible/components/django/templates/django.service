@@ -20,8 +20,9 @@ ExecStart=/usr/bin/podman run \
   --env-file=/etc/default/django.env \
   --name=oml-django-server \
   --volume=django_static:/opt/omnileads/static \
+  --volume=django_callrec_zip:/opt/omnileads/asterisk/var/spool/asterisk/monitor \
   --rm  \
-  {{ container_image_registry }}/omnileads/omlapp:{{ django_version }}
+  {{ container_image_registry }}/omnileads/omlapp:{{ omnileads_version }}
 ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
 ExecStopPost=/usr/bin/podman rm -f --ignore --cidfile=%t/%n.ctr-id
 Type=notify

@@ -17,12 +17,6 @@
 #
 ---
 
-# Se instala net-tools necesario para obtener la subnet privada
-# - name: Upgrade all packages on servers
-#   apt:
-#     update: dist
-#
-
 - name: MAIN Install required Debian packages
   apt:
     name:
@@ -38,20 +32,20 @@
       - postgresql-client
     update_cache: yes
     state: latest
+  when: ansible_os_family == "Debian"
   tags: install
-  when: ansible_distribution == "Debian"
 
 - name: MAIN Enable EPEL Repository on Rocky Linux
   dnf:
     name: epel-release
     state: latest
+  when: (ansible_os_family == "AlmaLinux") or (ansible_os_family == "Rocky")
   tags: install
-  when: ansible_distribution == "Rocky"
 
 - name: MAIN enable postgres dnf module ROCKY
   command: 'dnf -y module enable postgresql:{{ postgres_version }}'
+  when: (ansible_os_family == "AlmaLinux") or (ansible_os_family == "Rocky")
   tags: install
-  when: ansible_distribution == "Rocky"
 
 - name: MAIN Install required Rocky Linux packages
   dnf:
@@ -65,24 +59,23 @@
       - python3-boto3
       - awscli
     state: latest
+  when: (ansible_os_family == "AlmaLinux") or (ansible_os_family == "Rocky")
   tags: install
-  when: ansible_distribution == "Rocky"
 
 - name: MAIN Disable SELinux Rocky Linux
   selinux:
     state: disabled
+  when: (ansible_os_family == "AlmaLinux") or (ansible_os_family == "Rocky")
   tags: install
-  when: ansible_distribution == "Rocky"
 
 - name: MAIN Check if Omnileads has been installed previously
   include: checks.yml
-  tags: always
-
-- name: MAIN First configuration in server or servers
-  include: os_configuration.yml
   tags:
     - install
     - upgrade
+
+- name: MAIN First configuration in server or servers
+  include: os_configuration.yml
 
 - name: MAIN Perform a backup
   include: backup.yml

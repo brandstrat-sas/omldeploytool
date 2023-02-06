@@ -29,7 +29,7 @@
     ec2_url: '{{ bucket_url }}'
   when:
     - bucket_url is defined
-    - voice_host is not defined
+    - omlvoice == "true"
 
 - name: BACKUP asterisk custom config files MINIO selfhosted
   s3_sync:
@@ -43,7 +43,7 @@
     ec2_url: 'http://{{ minio_host }}:9000'
   when:
     - bucket_url is not defined
-    - voice_host is not defined
+    - omlvoice == "true"
 
 - name: "BACKUP Set timestamp of the backup"
   set_fact:
@@ -58,7 +58,7 @@
    login_user: '{{ postgres_user }}'
    login_password: '{{ postgres_password }}'
    login_host: '{{ postgres_host }}'
-  when: application_host is not defined
+  when: omlapp is defined
 
 - name: BACKUP upload postgres backup to MINIO selfhosted
   aws_s3:
@@ -74,7 +74,7 @@
     encrypt: no
   when:
     - bucket_url is not defined
-    - application_host is not defined
+    - omlapp == "true"
 
 - name: BACKUP upload postgres backup to cloud BUCKET
   aws_s3:
@@ -89,4 +89,4 @@
     encrypt: no
   when:
     - bucket_url is defined
-    - application_host is not defined
+    - omlapp == "true"

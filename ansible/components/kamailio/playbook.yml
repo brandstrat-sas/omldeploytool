@@ -19,7 +19,7 @@
 - name: KAMAILIO Kamailio installation and configuration
   hosts: omnileads-app
   tags:
-    - aio
+    - all_components
     - app
     - kamailio
   vars:
@@ -34,6 +34,7 @@
         owner: "{{ usuario }}"
         group: "{{ usuario }}"
       tags:
+        - install
         - upgrade
 
     - name: KAMAILIO Copy kamailio.service Systemd file
@@ -41,6 +42,7 @@
         src: "{{ kamailio_repo_path }}templates/kamailio.service"
         dest: /etc/systemd/system/kamailio.service
       tags:
+        - install
         - upgrade
 
     - name: KAMAILIO Pull image
@@ -48,6 +50,7 @@
       register: podman_pull
       until: podman_pull is success
       tags:
+        - install
         - upgrade
 
     - name: KAMAILIO Enable and start service
@@ -57,4 +60,5 @@
         enabled: yes
         daemon_reload: yes
       tags:
+        - install
         - upgrade
