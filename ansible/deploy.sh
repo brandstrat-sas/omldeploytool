@@ -33,62 +33,11 @@ case ${oml_action} in
   ;;
 esac
 
-case ${oml_component} in
-  voice)
-    echo "install omnileads component/s $oml_component"
-  ;;
-  django)
-    echo "install omnileads component/s $oml_component"
-  ;;
-  backing)
-    echo "install omnileads component/s $oml_component"
-  ;;
-  all)
-    echo "install omnileads component/s $oml_component"
-    oml_component=aio
-  ;;
-  observability)
-    echo "install omnileads component/s $oml_component"
-  ;;
-  asterisk)
-    echo "install omnileads component/s $oml_component"
-  ;;
-  redis)
-    echo "install omnileads component/s $oml_component"
-  ;;
-  pgsql)
-    echo "install omnileads component/s $oml_component"
-  ;;
-  minio)
-    echo "install omnileads component/s $oml_component"
-  ;;
-  nginx)
-    echo "install omnileads component/s $oml_component"
-  ;;
-  websockets)
-    echo "install omnileads component/s $oml_component"
-  ;;
-  kamailio)
-    echo "install omnileads component/s $oml_component"
-  ;;
-  rtpengine)
-    echo "install omnileads component/s $oml_component"
-  ;;
-  prometheus)
-    echo "install omnileads component/s $oml_component"
-  ;;
-  *)
-    echo "\e[31m oml_component var is unset #31 \e[0m";
-  ;;
-esac
-
 echo "************************ Exec ANSIBLE matrix *************************"
 echo "************************ Exec ANSIBLE matrix *************************"
 
-sleep 2
-
-
-cp instances/$oml_tenant/inventory.yml inventory.yml
+cp instances/$oml_tenant/inventory.yml .inventory.yml
+sleep 1
 
 ansible-playbook matrix.yml --extra-vars \
   "django_repo_path=$(pwd)/components/django/ \
@@ -105,8 +54,8 @@ ansible-playbook matrix.yml --extra-vars \
   tenant_folder=$oml_tenant \
   commit=ascd \
   build_date=\"$(env LC_hosts=C LC_TIME=C date)\"" \
-  --tags "$oml_action, $oml_component" \
-  -i inventory.yml 
+  --tags "$oml_action" \
+  -i .inventory.yml
 
 ResultadoAnsible=`echo $?`
 
@@ -131,20 +80,18 @@ if [ $ResultadoAnsible == 0 ];then
   @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
   @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
                                           The Open Source Contact Center Solution
-                                           Copyright (C) 2018 Freetech Solutions"
+                                           Copyright (C) 2023 Freetech Solutions"
   echo ""
   echo "#############################################################"
   echo "#         OMniLeads installation ended successfully         #"
   echo "#############################################################"
   echo ""
-  git checkout inventory.yml
 else
   echo ""
   echo "#######################################################################################"
   echo "#         OMniLeads installation failed. Check what happened and try it again         #"
   echo "#######################################################################################"
   echo ""
-  git checkout inventory.yml
 fi
 }
 
@@ -155,10 +102,6 @@ do
   case $i in
     --action=upgrade|--action=install|--action=backup)
       oml_action="${i#*=}"
-      shift
-    ;;
-    --component=aio|--component=app|--component=voice|--component=backing|--component=observability|--component=django|--component=asterisk|--component=kamailio|--component=rtpengine|--component=redis|--component=pgsql|--component=minio|--component=haproxy|--component=websockets|--component=nginx|--component=prometheus|--component=all)
-      oml_component="${i#*=}"
       shift
     ;;
     --tenant=*)
@@ -175,23 +118,6 @@ How to use it:
         install
         upgrade
         backup
---component=
-        aio
-        app
-        backing
-        voice
-        monitoring
-        django
-        asterisk
-        kamailio
-        rtpengine
-        redis
-        pgsql
-        minio
-        haproxy
-        websockets
-        nginx
-        observability
 --tenant=
         Name of tenant instances folder.
 "

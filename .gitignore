@@ -5,3 +5,4 @@ development-env/.env
 docker-compose/.env
 ansible/instances
 ansible/.ssh
+ansible/.inventory.yml

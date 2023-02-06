@@ -22,7 +22,7 @@
     img_repo: '{{ container_image_registry }}/omnileads/websockets'
     network: omnileads
   tags:
-    - aio
+    - all_components
     - app
     - websockets
   tasks:
@@ -35,6 +35,7 @@
       owner: "{{ usuario }}"
       group: "{{ usuario }}"
     tags:
+      - install
       - upgrade
 
   - name: WEBSOCKETS Copy systemd service
@@ -42,6 +43,7 @@
       src: "{{ websockets_repo_path }}templates/websockets.service"
       dest: /etc/systemd/system/websockets.service
     tags:
+      - install
       - upgrade
 
   - name: WEBSOCKETS Pull image
@@ -49,6 +51,7 @@
     register: podman_pull
     until: podman_pull is success
     tags:
+      - install
       - upgrade
 
   - name: WEBSOCKETS Enable and start Websockets service
@@ -58,4 +61,5 @@
       enabled: yes
       daemon_reload: yes
     tags:
+      - install
       - upgrade
