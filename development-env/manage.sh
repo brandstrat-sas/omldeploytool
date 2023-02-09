@@ -11,7 +11,7 @@ case $1 in
   --regenerar_asterisk)
     docker exec -it oml-django python3 /opt/omnileads/ominicontacto/manage.py regenerar_asterisk
     ;;
-  --clean_postgresql_db)
+  --clean_postgres_db)
     echo "echo drop all on PostgreSQL"
     docker stop oml-postgres
     docker stop oml-postgres
@@ -21,7 +21,7 @@ case $1 in
     docker-compose up -d --force-recreate --no-deps app
     until curl -sk --head  --request GET https://localhost |grep "302" > /dev/null; do echo "Environment still initializing , sleeping 10 seconds"; sleep 10; done; echo "Environment is up"
     docker exec -it oml-django python3 /opt/omnileads/ominicontacto/manage.py cambiar_admin_password
-    #docker exec -it oml-django python3 /opt/omnileads/ominicontacto/manage.py inicializar_entorno
+    docker exec -it oml-django python3 /opt/omnileads/ominicontacto/manage.py inicializar_entorno
     ;;
   --clean_redis)
     echo "echo drop all on REDIS"
@@ -43,7 +43,7 @@ case $1 in
     mc admin user add MINIO devenv s3omnileads123
     mc admin policy set MINIO readwrite user=devenv
     ;;
-  --clean_postgresql_tables)
+  --clean_postgres_tables)
     echo "drop calls and agent count tables PostgreSQL"
     docker exec -it oml-django psql -c 'DELETE FROM queue_log'
     docker exec -it oml-django psql -c 'DELETE FROM reportes_app_llamadalog'
@@ -98,7 +98,7 @@ USAGE:
 --reset_pass: reset admin password to admin admin
 --init_env: init some basic configs in order to test it
 --regenerar_asterisk: populate asterisk / redis config
---clean_postgresql_db: delete all PostgreSQL databases
+--clean_postgres_db: delete all PostgreSQL databases
 --clean_redis: delete cache
 --asterisk_CLI: launch asterisk CLI
 --asterisk_terminal: launch asterisk container bash shell
@@ -109,7 +109,7 @@ USAGE:
 --websockets_logs: show container logs
 --nginx_t: print nginx container run config
 --generate_call: generate an ibound call through PSTN-Emulator container
---clean_postgresql_tables: drop calls and agent count tables PostgreSQL
+--clean_postgres_tables: drop calls and agent count tables PostgreSQL
 "
     shift
     exit 1

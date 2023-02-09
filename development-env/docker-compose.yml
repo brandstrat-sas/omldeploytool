@@ -57,7 +57,9 @@ services:
       - OML_LOGGING_SLOWSQL_ENABLED=
       - OML_LOGGING_SLOWSQL_OUTPUT="-"
       - OML_LOGGING_SLOWSQL_DURATION=1
-      - SURVEY_VERSION='develop'
+      #- SURVEY_VERSION=develop
+      #- WALLBOARD_VERSION=develop
+      #- PREMIUM_REPORTS_VERSION=develop
     image: ${OMLAPP_IMG}
     networks:
       - omnileads
@@ -67,9 +69,12 @@ services:
     stop_grace_period: 1m30s
     tty: true
     working_dir: /opt/omnileads/ominicontacto
-    volumes:
-      - ${REPO_PATH}/omlapp/:/opt/omnileads/ominicontacto/
+    volumes:      
       - django_callrec_zip:/opt/omnileads/asterisk/var/spool/asterisk/monitor
+      - ${REPO_PATH}/omlapp/:/opt/omnileads/ominicontacto/
+      #- ${REPO_PATH}/survey_app/:/opt/omnileads/ominicontacto/survey_app
+      #- ${REPO_PATH}/wallboard_app/:/opt/omnileads/ominicontacto/wallboard_app
+      #- ${REPO_PATH}/premium_reports_app/:/opt/omnileads/ominicontacto/premium_reports_app
 
   crones:
     container_name: oml-django-cron
@@ -205,6 +210,7 @@ services:
     stop_grace_period: 1m30s
     volumes:
       - ./certs:/${KAMAILIO_CERTS_LOCATION}
+      - ${REPO_PATH}/omlkamailio/source:/etc/kamailio
 
   nginx:
     build:
@@ -236,7 +242,6 @@ services:
       - django_static:/opt/omnileads/static
       - ${REPO_PATH}/omlnginx/source/conf:/etc/nginx/
       - django_callrec_zip:/opt/omnileads/asterisk/var/spool/asterisk/monitor
-#      - django_zip_callrec:/opt/omnileads/zip_callrec
 
   postgresql:
     build:
@@ -363,7 +368,8 @@ services:
       - omnileads
     volumes:
       - ${REPO_PATH}/omlapp/omnileads_ui/:/home/app/
-      #- ${REPO_PATH}/omlapp/survey_app/:/home/survey/
+      #- ${REPO_PATH}/survey_app/:/home/survey/
+      #- ${REPO_PATH}/wallboard_app/:/home/wallboard/
       - vuejs_persistent:/home/app/supervision/node_modules/
 
   minio:
@@ -399,7 +405,7 @@ services:
     networks:
       - omnileads
     ports:
-      - 6060:6060/udp
+      - 6060:5060/udp
       - 10000-10020:10000-10020/udp
     privileged: true
     restart: on-failure

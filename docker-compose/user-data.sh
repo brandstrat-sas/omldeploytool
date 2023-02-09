@@ -3,7 +3,7 @@
 # values: linux or mac
 OS=linux
 
-apt update && apt install docker-compose -y
+apt update && apt install docker-compose curl -y
 
 if [ "$OS" == "mac" ]; then
   brew install minio/stable/mc
@@ -13,11 +13,15 @@ else
   export PATH=$PATH:$HOME/minio-binaries/
 fi
 
-git clone https://gitlab.com/omnileads/omldeploytool.git
-cd ./omldeploytool/docker-compose
-git checkout develop
+git clone https://gitlab.com/omnileads/omldeploytool.git ~/omldeploytool
+cd ~/omldeploytool/docker-compose
+git checkout oml-229-dev-addons-runable
 cp env .env
-sed -i -e "s/RTPENGINE_ENV=devenv/RTPENGINE_ENV=docker-cloud/g" .env
+
+#if [ "$ENV" == "mac" ]; then
+#sed -i -e "s/RTPENGINE_ENV=devenv/RTPENGINE_ENV=docker-cloud/g" .env
+#fi
+
 docker-compose up -d
 
 mc alias set MINIO http://localhost:9000 minio s3minio123
