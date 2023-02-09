@@ -18,7 +18,7 @@ case $1 in
   --create-docker)
     echo "deploy: $1"
     doctl compute droplet create --image docker-20-04 \
-    --size s-2vcpu-2gb --region sfo3 \
+    --size s-2vcpu-4gb --region sfo3 \
     --ssh-keys ${SSH_DOCTL} \
     --user-data-file ../docker-compose/user-data.sh \
     oml-$2

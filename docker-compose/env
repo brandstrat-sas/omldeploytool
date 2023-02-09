@@ -43,7 +43,6 @@ CALLREC_DEVICE=s3-minio
 #########################################################################################################
 #                                      OMINICONTACTO DJANGO APP                                         #
 #########################################################################################################
-OMLAPP_IMG=omnileads/omlapp:latest
 
 DJANGO_HOSTNAME=app
 DAPHNE_HOSTNAME=channels
@@ -96,7 +95,6 @@ KAMAILIO_CERTS_LOCATION=/etc/omnileads/certs
 #########################################################################################################
 #                                           ASTERISK                                                    #
 #########################################################################################################
-OMLACD_IMG=omnileads/asterisk:latest
 
 ASTERISK_HOSTNAME=acd
 ASTERISK_LOCATION=
@@ -108,7 +106,6 @@ SIP_EXT_PORT=5060
 #########################################################################################################
 #                                           POSTGRESQL                                                  #
 #########################################################################################################
-OMLPGSQL_IMG=omnileads/postgres:latest
 
 PGHOST=postgresql
 PGDATABASE=omnileads
@@ -123,7 +120,6 @@ PGHOSTRO=
 #########################################################################################################
 #                                           WEBSOCKETS                                                  #
 #########################################################################################################
-OMLWS_IMG=omnileads/websockets:latest
 
 WEBSOCKET_HOSTNAME=websockets
 WEBSOCKET_PORT=8000
@@ -142,7 +138,6 @@ WEBSOCKET_REDIS_HOSTNAME=redis://redis:6379
 #########################################################################################################
 #                                           KAMAILIO                                                    #
 #########################################################################################################
-OMLKAM_IMG=omnileads/kamailio:latest
 
 KAMAILIO_HOSTNAME=kamailio
 
@@ -157,7 +152,6 @@ PKG_SIZE=8
 #                                       NGINX - RTPENGINE - REDIS                                       #
 #########################################################################################################
 # -----------------------------------------------------------------------------
-OMLNGINX_IMG=omnileads/nginx:latest
 
 # ******** HIGH AVAILABILITY ******* # # ******** HIGH AVAILABILITY ******* #
 # ******** HIGH AVAILABILITY ******* # # ******** HIGH AVAILABILITY ******* #
@@ -169,7 +163,6 @@ NGINX_EXT_PORT=443
 
 
 # -----------------------------------------------------------------------------
-OMLREDISGEARS_IMG=redislabs/redisgears:1.0.9
 
 # ******** HIGH AVAILABILITY ******* # # ******** HIGH AVAILABILITY ******* #
 # ******** HIGH AVAILABILITY ******* # # ******** HIGH AVAILABILITY ******* #
@@ -180,14 +173,12 @@ OMLSENTINEL_TAG=latest
 
 
 # ------------------------------------------------------------------------------
-OMLRTPENGINE_IMG=omnileads/rtpengine:latest
 RTPENGINE_HOSTNAME=rtpengine
 RTPENGINE_ENV=devenv
 
 #########################################################################################################
 #                                    S3 BUCKET config                                                   #
 #########################################################################################################
-OMLMINIO_IMG=quay.io/minio/minio:latest
 
 # *** True (if CALLREC_DEVICE is s3-devenv) or False (if CALLREC_DEVICE is local or nfs)
 S3_STORAGE_ENABLED=True
@@ -209,9 +200,6 @@ S3_ENDPOINT_MINIO=http://minio:9000
 WOMBAT_USER=demoadmin
 WOMBAT_PASSWORD=demo
 
-OMLPSTNEMULATOR_IMG=omnileads/pstn_emulator:latest
-OMLVUEJS_IMG=freetechsolutions/vue-cli:develop
-
 #########################################################################################################
 #                                          Monitoring                                                   #
 #########################################################################################################
@@ -223,7 +211,6 @@ HOMERPORT=9060
 #########################################################################################################
 #                                    DIALER                                                             #
 #########################################################################################################
-
 
 WOMBAT_USER=demoadmin
 WOMBAT_PASSWORD=demo

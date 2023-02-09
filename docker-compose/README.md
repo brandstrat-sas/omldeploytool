@@ -9,23 +9,19 @@
 
 # OMniLeads Docker Compose
 
-You must have docker installed
+You need docker installed
 
 * [Docker Install documentation](https://docs.docker.com/get-docker/)
 
 ## Setup your environment
 
-You must generate our .env variable file:
-
-```
-$ cp env .env
-```
+You must create a .env variable file from the env file ready here:
 
 Then work on it to indicate if we are going to access it directly from our workstation 
 (https://localhost) or raise the stack on a virtual machine (https://hostname-or-ipaddr).
 
 
-You must indicate this on the parameter, at the end of the file:
+You must indicate this on the parameter, at the end of the .env file:
 
 ```
 S3_ENDPOINT=https://localhost
@@ -40,21 +36,28 @@ $ docker-compose up -d
 Data Mapping: the docker-compose scheme will map container data into docker default path volumes regarding redis, postgresql and minio objects storage.
 On the other hand we have the asterisk files that will be map from the ast_cutsom_conf folder to /etc/asterisk/custom container path.
 
-## Post raise-up config steps:
+## Post docker-compose raise-up config steps:
 
-When the minio object storage DB is first run, and then every time the volume that persists the data is deleted, them the minio_bucket.sh script must be run, in order to create user and bucket.
-
-```
-./minio_bucket.sh
-```
-
-The first time raise up the stack or every time you delete PostgreSQL databases , you must to launch ./manage.sh --reset_pass in order to put admin admin user credentials.
+When the minio object storage DB is first run, and then every time the volume that persists the data is deleted, them the minio_bucket.sh script must be run, in order to download the minio command line tool and then create user (key-access-id & secret-key-access) and bucket for the OMniLeads launched environment.
 
 ```
-./manage.sh --reset_pass
+./minio_bucket.sh --install-linux
+
+or
+
+./minio_bucket.sh --install-mac
 ```
+
 
 ## Log in to the Admin UI
+
+Before first time you login must to exec:
+
+```
+./manage --reset_pass
+```
+
+Then acces the URL with your browser 
 
 https://127.0.0.1 or https://hostname-or-ipaddr 
 
@@ -65,7 +68,7 @@ admin
 admin
 ```
 
-Then you can choice a custom password. 
+Finally  you can choice a custom password. 
 
 ## Create some testing data
 
@@ -135,3 +138,14 @@ When you enter to http://localhost:8082 or http://hostname-or-ipaddr:8082 you go
 Check our official documentation to check this: https://documentacion-omnileads.readthedocs.io/es/stable/maintance.html#configuracion-del-modulo-de-discador-predictivo
 
 Note: when configuring initial mariadb credentials the root pass is admin123, then on the AMI connection, the server address is acd.
+
+
+## Destroy and re-create all PostgreSQL backend
+
+If you want *reset to fresh install* status launch (with the stack operative):
+
+```
+./manage.sh --clean_postgresql_db
+```
+
+Then login with *admin*, *admin* and create a new password. 
