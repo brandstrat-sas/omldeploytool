@@ -11,7 +11,7 @@ case $1 in
   --regenerar_asterisk)
     docker exec -it oml-django python3 /opt/omnileads/ominicontacto/manage.py regenerar_asterisk
     ;;
-  --clean_postgresql_db)
+  --clean_postgres_db)
     echo "echo drop all on PostgreSQL"
     docker stop oml-postgres
     docker stop oml-postgres
@@ -55,7 +55,7 @@ case $1 in
     mc alias set MINIO http://localhost:9000 minio s3minio123
     mc ls --recursive MINIO/omnileads
     ;;
-  --clean_postgresql_tables)
+  --clean_postgres_tables)
     echo "drop calls and agent count tables PostgreSQL"
     docker exec -it oml-django psql -c 'DELETE FROM queue_log'
     docker exec -it oml-django psql -c 'DELETE FROM reportes_app_llamadalog'
@@ -107,7 +107,7 @@ USAGE:
 --reset_pass: reset admin password to admin admin
 --init_env: init some basic configs in order to test it
 --regenerar_asterisk: populate asterisk / redis config
---clean_postgresql_db: clean all PostgreSQL databases
+--clean_postgres_db: clean all PostgreSQL databases
 --clean_redis: clean cache
 --asterisk_CLI: launch asterisk CLI
 --asterisk_terminal: launch asterisk container bash shell
@@ -118,7 +118,7 @@ USAGE:
 --websockets_logs: show container logs
 --nginx_t: print nginx container run config
 --generate_call: generate an ibound call through PSTN-Emulator container
---clean_postgresql_tables: drop calls and agent count tables PostgreSQL
+--clean_postgres_tables: drop calls and agent count tables PostgreSQL
 "
     shift
     exit 1

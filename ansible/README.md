@@ -10,7 +10,7 @@
 # Ansible based OMniLeads management
 
 In this repository you will find an alternative to implement OMniLeads tenant management from an on-premise
-IT management perspective, but also super viable for working in cloud-computing environments.
+IT management perspective, but also completely viable for working in cloud-computing environments.
 
 The idea is to be able to manage several OMniLeads tenants from this ansible based management tool.
 
@@ -27,8 +27,8 @@ all that using a single script and configuration file.
 * [Ansible + Inventory](#ansible-inventory)
 * [Bash Script deploy.sh](#bash-script-deploy)
 * [Subscriber tracking & TLS certs](#subscriber-traking)
-* [Deploy de nueva instancia LAN con Backing (Postgres y Object Storage) auto hosteado](#onpremise-deploy)
-* [Deploy de nueva instancia con Backing (Postgres y Object Storage) como servicio Cloud](#cloud-deploy)
+* [Deploy LAN instance with self-hosted backend (Postgres & Object Storage)](#onpremise-deploy)
+* [Deploy Cloud instance with backend (Postgres y Object Storage) as cloud service](#cloud-deploy)
 * [TLS Certs provisioning](#tls-cert-provisioning)
 * [Deploy a backup](#backups)
 * [Deploy an upgrade](#upgrades)
