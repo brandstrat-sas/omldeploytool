@@ -83,6 +83,7 @@
       state: present
     tags:
       - install
+    when: upgrade_from_oml_1 is not defined  
 
   - name: DJANGO Adds plperl extension to the database {{ postgres_database }}
     postgresql_ext:
@@ -94,6 +95,7 @@
       port: "{{ postgres_port }}"
     tags:
       - install
+    when: upgrade_from_oml_1 is not defined  
 
   - name: DJANGO Create of .pgpass files
     template:
@@ -134,6 +136,15 @@
       - install
       - upgrade
 
+  - name: DJANGO Copy REDIS2POSTGRES systemd service
+    template:
+      src: "{{ django_repo_path }}templates/redis2postgres.service"
+      dest: /etc/systemd/system/redis2postgres.service
+    tags:
+      - install
+      - upgrade
+    when: enterprise_edition is defined
+    
   - name: DJANGO Pull image
     command: podman pull --quiet {{ img_repo }}:{{ omnileads_version }}
     register: podman_pull
@@ -141,6 +152,24 @@
     tags:
       - install
       - upgrade
+
+  - name: DJANGO Enterprise Pull image
+    command: podman pull --quiet {{ img_repo }}:{{ omnileads_version }}-enterprise
+    register: podman_pull
+    until: podman_pull is success
+    tags:
+      - install
+      - upgrade
+    when: enterprise_edition is defined
+
+  - name: DJANGO from REDIS to Postgres Pull image
+    command: podman pull --quiet docker.io/{{ redis2postgres_version }}
+    register: podman_pull
+    until: podman_pull is success
+    tags:
+      - install
+      - upgrade
+    when: enterprise_edition is defined
 
   - name: DJANGO Enable and start systemd service
     systemd:
@@ -171,3 +200,14 @@
     tags:
       - install
       - upgrade
+
+  - name: DJANGO Redis2Postgres Enable and start systemd service
+    systemd:
+      name: redis2postgres.service
+      state: restarted
+      enabled: yes
+      daemon_reload: yes
+    tags:
+      - install
+      - upgrade
+    when: enterprise_edition is defined

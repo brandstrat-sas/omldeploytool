@@ -29,6 +29,9 @@ redisgears_version: 1.0.9
 postgres_version: 13
 minio_version: latest
 
+# temporal ... hay que buildear nueva img, en el repo omnileads y agregar todo al pipeline
+redis2postgres_version: freetechsolutions/omlredis2pgsql:develop
+
 homer_enable: true
 prometheus_enable: true
 
@@ -49,7 +52,6 @@ oml_os: bullseye
 admin_user: admin
 usuario: omnileads
 container_network: omnileads
-postgres_database: omnileads
 postgres_persistent_path: /var/lib/omnileads/pgsql
 django_deploy_path: /opt/omnileads/
 asterisk_location_conf: /etc/asterisk

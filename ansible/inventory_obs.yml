@@ -1,0 +1,52 @@
+---
+
+all:
+  hosts:
+    omnileads-observability:
+      omlobs: true
+      ansible_connection: local
+      ansible_ssh_port: 22
+      omni_ip_lan:
+  vars:    
+    # --- Uncomment parameter in order to activate the OMniLeads Enterprise Edition - with "AAAA" licensed.
+    # --- on the contrary you will deploy OMniLeads OSS Edition with GPLV3 licensed. 
+    #enterprise_edition: true
+    # --- IP or hostname that each instance will invoke when locating the other
+    # --- IP or hostname that each instance will invoke when locating the other
+    voice_host:
+    application_host:
+    observability_host:
+    #redis_host:
+    #rtpengine_host:
+    # --- ansible user auth connection
+    ansible_user: root
+    # --- version of each image to deploy
+    # --- if you want to deploy omnileads_enterprise edition, so you must to put sufix -enterprise (RC-230204.01-enterprise)
+    omnileads_version:
+    websockets_version:
+    nginx_version:
+    kamailio_version:
+    asterisk_version:
+    rtpengine_version:
+    postgres_version:
+    # --- "cloud" instance (access through public IP)
+    # --- or "lan" instance (access through private IP)
+    # --- in order to set NAT or Publica ADDR for RTP voice packages
+    infra_env: cloud
+    # --- If you have an DNS FQDN resolution, you must to uncomment and set this param
+    # --- otherwise leave commented to work invoking through an IP address
+    #fqdn: fidelio.sephir.tech
+    # --- time zone
+    TZ:
+    # --- TLS/SSL Certs configuration (selfsigned, custom or certbot letsencrypt)
+    # --- if you have your own certs, put them into instances/tenant folder and
+    # --- change this to *custom*
+    certs: selfsigned
+    # --- if you object storage service use selfsigned TLS/SSL certs, you mus to put
+    # --- *callrec_device=s3-no-check-cert* in order to don't verify CA.
+    
+    # --- RTPEngine if you have your own instances put here the IP or hostname
+    #rtpengine_host=
+    # --- Wombat Dialer hostname/IP and API user / pass
+    dialer_host: 
+    
