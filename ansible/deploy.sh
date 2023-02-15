@@ -27,6 +27,15 @@ case ${oml_action} in
   backup)
     echo "deploy: $oml_action"
   ;;
+  app)
+    echo "deploy: $oml_action"
+  ;;
+  voice)
+    echo "deploy: $oml_action"
+  ;;
+  observability)
+    echo "deploy: $oml_action"
+  ;;      
   *)
     echo "ERROR oml_action var is unset";
     exit 1
@@ -100,7 +109,7 @@ fi
 for i in "$@"
 do
   case $i in
-    --action=upgrade|--action=install|--action=backup)
+    --action=upgrade|--action=install|--action=backup|--action=voice|--action=app|--action=observability)
       oml_action="${i#*=}"
       shift
     ;;
@@ -118,6 +127,9 @@ How to use it:
         install
         upgrade
         backup
+        voice
+        app
+        observability
 --tenant=
         Name of tenant instances folder.
 "

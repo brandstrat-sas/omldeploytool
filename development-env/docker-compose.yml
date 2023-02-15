@@ -223,6 +223,7 @@ services:
       - websockets
     dns: 8.8.8.8
     environment:
+      - CALLREC_DEVICE=${CALLREC_DEVICE}
       - TZ=${TZ}
       - ENV=devenv
       - DJANGO_HOSTNAME=${DJANGO_HOSTNAME}

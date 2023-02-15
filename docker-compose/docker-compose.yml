@@ -376,6 +376,26 @@ services:
       timeout: 20s
       retries: 3
 
+  cx_survey_redis2pgsql:
+    container_name: oml-redis2pgsql
+    dns: 8.8.8.8
+    environment:
+      - TZ=${TZ}
+      - OMNILEADS_HOSTNAME=${OMNILEADS_HOSTNAME}
+      - REDIS_HOSTNAME=${REDIS_HOSTNAME}
+      - PGHOST=${PGHOST}
+      - PGPORT=${PGPORT}
+      - PGUSER=${PGUSER}
+      - PGDATABASE=${PGDATABASE}
+      - PGPASSWORD=${PGPASSWORD}
+      - INSTALL_PREFIX=${INSTALL_PREFIX}
+    image: ${CX_SURVEY_REDIS2PGSQL_IMG}
+    networks:
+      - omnileads
+    privileged: true
+    restart: on-failure
+    stop_grace_period: 1m30s
+
   mariadb:
     container_name: oml-mariadb
     dns: 8.8.8.8

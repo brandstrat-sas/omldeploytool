@@ -1,5 +1,5 @@
 [Unit]
-Description=Podman django.service
+Description=Podman redis2postgres.service
 Documentation=man:podman-generate-systemd(1)
 Wants=network-online.target
 After=network-online.target
@@ -18,15 +18,9 @@ ExecStart=/usr/bin/podman run \
   --detach \
   --network=host \
   --env-file=/etc/default/django.env \
-  --name=oml-django-server \
-  --volume=django_static:/opt/omnileads/static \
-  --volume=django_callrec_zip:/opt/omnileads/asterisk/var/spool/asterisk/monitor \
+  --name=oml-redis2postgres-server \
   --rm  \
-  {% if enterprise_edition is defined %}
-  {{ container_image_registry }}/omnileads/omlapp:{{ omnileads_version }}-enterprise
-  {% else %}
-  {{ container_image_registry }}/omnileads/omlapp:{{ omnileads_version }}
-  {% endif %}
+  {{ container_image_registry }}/{{ redis2postgres_version }}
 ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
 ExecStopPost=/usr/bin/podman rm -f --ignore --cidfile=%t/%n.ctr-id
 Type=notify
