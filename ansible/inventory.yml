@@ -45,7 +45,7 @@ all:
     # --- otherwise leave commented to work invoking through an IP address
     #fqdn: fidelio.sephir.tech
     # --- time zone
-    TZ: 
+    TZ: America/Argentina/Cordoba
     # --- TLS/SSL Certs configuration (selfsigned, custom or certbot letsencrypt)
     # --- if you have your own certs, put them into instances/tenant folder and
     # --- change this to *custom*
@@ -57,10 +57,10 @@ all:
     # --- set postgres_host if you have your own postgres (standalone host or cloud service)
     # --- otherwise leave commented to deploy PostgreSQL on Application Host instance
     #postgres_host: 
-    postgres_port:
-    postgres_user: 
-    postgres_password: 
-    postgres_database: 
+    postgres_port: 5432
+    postgres_user: omnileads
+    postgres_password: set_your_pass
+    postgres_database: omnileads
     # --- *postgres* or *defaultdb* depend ...
     postgres_maintenance_db: postgres
     postgres_ssl: false
@@ -80,9 +80,9 @@ all:
     #s3_http_admin_user: omnileads
     #s3_http_admin_pass: 098098ZZZ
     # --- bucket params
-    bucket_access_key: 
-    bucket_secret_key: 
-    bucket_name: 
+    bucket_access_key: dslkjklj4kl2j432e
+    bucket_secret_key: dsajkhjkhkj432hjk32h4jk23h4jk2h
+    bucket_name: omnileads
     # --- if your bucket doesn't need region, leave this value (us-east-1)
     bucket_region: us-east-1
     # --- Asterisk Manager Interface (AMI) user & password

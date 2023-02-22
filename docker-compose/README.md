@@ -41,11 +41,11 @@ On the other hand we have the asterisk files that will be map from the ast_cutso
 When the minio object storage DB is first run, and then every time the volume that persists the data is deleted, them the minio_bucket.sh script must be run, in order to download the minio command line tool and then create user (key-access-id & secret-key-access) and bucket for the OMniLeads launched environment.
 
 ```
-./minio_bucket.sh --install-linux
+./minio_bucket.sh install-linux
 
 or
 
-./minio_bucket.sh --install-mac
+./minio_bucket.sh install-mac
 ```
 
 
