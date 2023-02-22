@@ -2,7 +2,7 @@
 Description=Podman daphne.service
 Documentation=man:podman-generate-systemd(1)
 Wants=network-online.target
-After=network-online.target
+After=network-online.target omnileads.service
 RequiresMountsFor=%t/containers
 
 [Service]

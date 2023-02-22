@@ -20,7 +20,7 @@ OMLMINIO_IMG=quay.io/minio/minio
 WOMBAT_IMG=freetechsolutions/omldialer:21.06.2-7
 MARIADB_IMG=bitnami/mariadb:latest
 OMLPSTNEMULATOR_IMG=omnileads/pstn_emulator:latest
-
+CX_SURVEY_REDIS2PGSQL_IMG=freetechsolutions/omlredis2pgsql:develop
 
 #######################################################################################
 # Subnet for the docker bridge network, change it if this subnet conflicts with yours #
