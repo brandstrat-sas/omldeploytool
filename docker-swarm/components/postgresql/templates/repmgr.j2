@@ -1,0 +1,47 @@
+###################################################
+# repmgr sample configuration file
+###################################################
+
+{% if ha_rol == "main" %}
+node_id=1
+node_name='postgres01'
+{% else %}
+node_id=2
+node_name='postgres02'
+{% endif %}
+
+conninfo='host={{ ansible_host }} port=5432 dbname=repmgr user=repmgr'
+
+data_directory='/var/lib/pgsql/11/data'
+pg_bindir='/usr/pgsql-11/bin'
+repmgr_bindir='/usr/pgsql-11/bin'
+ssh_options='-q -o ConnectTimeout=10'	# Options to append to "ssh"
+
+# log info
+log_level=INFO
+log_status_interval=10
+log_file='/var/log/repmgr/repmgrd.log'
+
+# The max length of time (in seconds) to wait
+# for the new primary to become available
+primary_follow_timeout=5
+
+# The max length of time (in seconds) to wait
+# for the standby to connect to the primary
+#standby_follow_timeout=30
+
+failover='automatic'
+#priority=100
+
+#connection_check_type=ping
+
+reconnect_attempts=3
+reconnect_interval=10			
+
+promote_command='/usr/pgsql-11/bin/repmgr standby promote -f /var/lib/pgsql/repmgr.conf'
+
+{% if ha_rol == "main" %}
+follow_command='/usr/pgsql-11/bin/repmgr standby follow -f /var/lib/pgsql/repmgr.conf --upstream-node-id=2'
+{% else %}
+follow_command='/usr/pgsql-11/bin/repmgr standby follow -f /var/lib/pgsql/repmgr.conf --upstream-node-id=1'
+{% endif %}

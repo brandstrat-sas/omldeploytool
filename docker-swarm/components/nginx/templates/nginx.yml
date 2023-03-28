@@ -1,0 +1,45 @@
+version: "3.0"
+
+volumes:
+  django_static:
+  django_callrec_zip:
+
+# networks:
+#   voice:
+#     external:
+#       true
+#   backend:
+#     external:
+#       true
+#   frontend:
+#     external: 
+#       true    
+
+services:
+  nginx:
+    image: omnileads/nginx:230215.01
+    depends_on:
+      - app
+      - channels
+      - websockets
+      - kamailio
+    deploy:
+      placement: 
+        constraints: 
+          - node.role != manager
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+    # networks:
+    #   - frontend
+    #   - backend
+    ports:
+      - 443:443
+    volumes:
+      - django_static:/opt/omnileads/static
+      - django_callrec_zip:/opt/omnileads/asterisk/var/spool/asterisk/monitor  
+    env_file: /etc/default/nginx.env
+    

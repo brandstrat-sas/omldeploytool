@@ -1,0 +1,88 @@
+# Copyright (C) 2018 Freetech Solutions
+
+# This file is part of OMniLeads
+
+# This program is free software: you can nginxtribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see http://www.gnu.org/licenses/.
+#
+---
+
+- name: MINIO OMniLeads Minio component deploy
+  hosts: omnileads-manager
+  tags:
+    - all_components
+    - app
+    - minio
+  vars:
+    img_repo: quay.io/minio/minio
+
+  tasks:
+
+  - name: MINIO set environment variables for this installation
+    template:
+      src: "{{ minio_repo_path }}templates/minio.env"
+      dest: /etc/default/minio.env
+      mode: 664
+      owner: "{{ usuario }}"
+      group: "{{ usuario }}"
+    tags:
+      - install
+      - upgrade
+
+  - name: MINIO Copy systemd service
+    template:
+      src: "{{ minio_repo_path }}templates/minio.service"
+      dest: /etc/systemd/system/minio.service
+    tags:
+      - install
+      - upgrade
+
+  - name: MINIO Pull image
+    command: podman pull --quiet {{ img_repo }}:{{ minio_version }}
+    register: podman_pull
+    until: podman_pull is success
+    tags:
+      - install
+      - upgrade
+
+  - name: MINIO Enable and start oml minio service
+    systemd:
+      name: minio.service
+      state: restarted
+      enabled: yes
+      daemon_reload: yes
+    register: minio_run
+    until: minio_run is success
+    tags:
+      - install
+      - upgrade
+
+  - name: MINIO install command line client
+    get_url:
+      url: https://dl.min.io/client/mc/release/linux-amd64/mc
+      dest: /usr/bin/minio_cmd
+      mode: '0777'
+    tags:
+      - install
+
+  - name: MINIO install MC
+    shell: |
+      /usr/bin/minio_cmd alias set MINIO http://localhost:9000 '{{ s3_http_admin_user }}' '{{ s3_http_admin_pass }}'
+      /usr/bin/minio_cmd mb MINIO/'{{ bucket_name }}'
+      /usr/bin/minio_cmd mb MINIO/'{{ bucket_name }}-backups'
+      /usr/bin/minio_cmd admin user add MINIO '{{ bucket_access_key }}' '{{ bucket_secret_key }}'
+      /usr/bin/minio_cmd admin policy set MINIO readwrite user='{{ bucket_access_key }}'
+    args:
+      executable: /bin/bash
+    tags:
+      - install

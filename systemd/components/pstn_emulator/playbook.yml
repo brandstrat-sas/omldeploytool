@@ -1,0 +1,59 @@
+# Copyright (C) 2022 Freetech Solutions
+
+# This file is part of OMniLeads
+
+# This program is free software: You can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY, without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see http://www.gnu.org/licenses/.
+
+---
+
+- name: PSTN_EMULATOR OMniLeads application installation
+  hosts: omnileads_app
+  tags:
+    - all_components
+    - aio
+    - app
+    - django
+  vars:
+    img_repo: '{{ container_image_registry }}/omnileads/omlapp'
+    INSTALL_PREFIX: "/opt/omnileads"
+
+  tasks:
+
+  - name: PSTN_EMULATOR environment variables for this installation
+    template:
+      src: "{{ pstn_repo_path }}templates/pstn.env"
+      dest: /etc/default/pstn.env
+      mode: 666
+      owner: "{{ usuario }}"
+      group: "{{ usuario }}"
+    tags:
+      - install
+      - upgrade
+
+  - name: PSTN_EMULATOR Copy systemd service
+    template:
+      src: "{{ pstn_repo_path }}templates/pstn.service"
+      dest: /etc/systemd/system/pstn.service
+    tags:
+      - install
+      - upgrade
+    
+  - name: PSTN_EMULATOR Pull image
+    command: podman pull --quiet {{ img_repo }}:{{ omnileads_version }}
+    register: podman_pull
+    until: podman_pull is success
+    tags:
+      - install
+      - upgrade
+    when: enterprise_edition == false

@@ -1,0 +1,65 @@
+# Copyright (C) 2022 Freetech Solutions
+
+# This file is part of OMniLeads
+
+# This program is free software: You can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see http://www.gnu.org/licenses/.
+
+---
+- name: WEBSOCKETS OMniLeads Websocket installation and configuration
+  hosts: omnileads-manager
+  vars:
+    img_repo: '{{ container_image_registry }}/omnileads/websockets'
+    network: omnileads
+  tags:
+    - all_components
+    - app
+    - websockets
+  tasks:
+
+  - name: WEBSOCKETS environment variables for this installation
+    template:
+      src: "{{ websockets_repo_path }}templates/websockets.env"
+      dest: /etc/default/websockets.env
+      mode: 664
+      owner: "{{ usuario }}"
+      group: "{{ usuario }}"
+    tags:
+      - install
+      - upgrade
+
+  - name: WEBSOCKETS Copy systemd service
+    template:
+      src: "{{ websockets_repo_path }}templates/websockets.yml"
+      dest: /opt/omnileads/websockets.yml
+    tags:
+      - install
+      - upgrade
+
+  - name: WEBSOCKETS Pull image
+    command: podman pull --quiet {{ img_repo }}:{{ websockets_version }}
+    register: podman_pull
+    until: podman_pull is success
+    tags:
+      - install
+      - upgrade
+
+  - name: WEBSOCKETS Deploy django stack from a compose file
+    docker_stack:
+      state: present
+      name: '{{ tenant_folder }}'
+      compose:
+        - /opt/omnileads/websockets.yml
+    tags:
+      - install
+      - upgrade    

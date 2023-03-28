@@ -1,0 +1,16 @@
+[Unit]
+Description=PGSQL HA Virtual IP
+After=postgresql-11.service
+
+[Service]
+Type=simple
+User=root
+EnvironmentFile=/etc/profile.d/omnileads_envars.sh
+ExecStart=/var/lib/pgsql/ha_virtual_ip.sh
+WorkingDirectory=/var/lib/pgsql
+PIDFile=/var/lib/pgsql/omlpgsql-vip.pid
+Restart=on-failure
+RestartSec=15
+
+[Install]
+WantedBy=multi-user.target
