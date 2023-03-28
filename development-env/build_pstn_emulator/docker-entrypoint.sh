@@ -20,6 +20,8 @@ if [ "${ASTERISK_UID}" != "" ] && [ "${ASTERISK_GID}" != "" ]; then
   || exit
 fi
 
+#sed -i "s/bindaddr=127.0.0.1/bindaddr=0.0.0.0/g" /etc/asterisk/oml_manager.conf
+
 chown -R ${ASTERISK_USER}: /var/log/asterisk \
                            /var/lib/asterisk \
                            /var/run/asterisk \

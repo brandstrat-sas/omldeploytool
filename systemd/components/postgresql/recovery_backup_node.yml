@@ -1,0 +1,77 @@
+
+# Copyright (C) 2022 Freetech Solutions
+
+# This file is part of OMniLeads
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see http://www.gnu.org/licenses/.
+#
+
+---
+
+- name: POSTGRES HA-Cluster Manager Playbook
+  hosts: sql_2
+  tags:
+    - pgsql_node_recovery_backup
+  
+  vars:
+    repmgr_bin: /usr/local/bin/
+    pg_lib_location_no_version: /var/lib/pgsql
+    pg_lib_location: "{{ pg_lib_location_no_version }}/{{ centos_postgresql_version }}/data"
+  
+  tasks:
+  
+##################### Postgresql Node Main #########################
+
+    - name: Recovery MAIN RW Node standby clone
+      shell: "sudo -u postgres {{ repmgr_bin }}repmgr -h {{ hostvars['sql_1'].omni_ip_lan }} -U repmgr -d repmgr -f {{ pg_lib_location_no_version }}/repmgr.conf standby clone --dry-run"
+      args:
+        executable: /bin/bash
+      register: dry_run
+      when: 
+        - ha_rol == "backup"
+    
+    # - name: CHECKS Check dry_run result
+    #   fail:
+    #     msg: voice_host variable undefined, edit voice_host variable in inventory file
+    #   when: dry_run is assert_dry_run.rc == 1
+    #   tags: always
+
+    - name: Recovery MAIN RW Node
+      shell: "sudo -u postgres {{ repmgr_bin }}repmgr -h {{ hostvars['sql_1'].omni_ip_lan }} -U repmgr -d repmgr -f {{ pg_lib_location_no_version }}/repmgr.conf standby clone -F"
+      args:
+        executable: /bin/bash
+      when: 
+        - ha_rol == "backup"
+
+    - name: Restart postgres service HA
+      service:
+        name: postgresql-11
+        state: started
+      when:
+        - ha_rol == "backup"
+
+    - name: Recovery MAIN RW Node standby register
+      shell: "sudo -u postgres {{ repmgr_bin }}repmgr -f {{ pg_lib_location_no_version }}/repmgr.conf standby register -F"
+      args:
+        executable: /bin/bash
+      when: 
+        - ha_rol == "backup"
+
+    - name: Start repmgr cluster manager
+      service:
+        name: repmgr11
+        state: started
+      when: 
+        - ha_rol == "backup"
+

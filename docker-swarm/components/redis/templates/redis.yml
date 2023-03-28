@@ -1,0 +1,32 @@
+version: "3.0"
+
+# networks:
+#   backend:
+#     external:
+#       true
+
+volumes:
+  redis_data:
+
+services:
+  redis:
+    image: redislabs/redisgears:1.0.9
+    deploy:
+      placement: 
+        constraints: 
+          - node.role != manager
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+    # networks:
+    #   - backend
+    volumes:
+      - redis_data:/data  
+    ports:
+      - 6379:6379  
+    env_file: /etc/default/redis.env
+
+  

@@ -1,0 +1,67 @@
+# Copyright (C) 2018 Freetech Solutions
+
+# This file is part of OMniLeads
+
+# This program is free software: you can nginxtribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see http://www.gnu.org/licenses/.
+#
+---
+
+- name: NGINX OMniLeads Nginx component deploy
+  hosts: omnileads-manager
+  tags:
+    - all_components
+    - app
+    - nginx
+  vars:
+    img_repo: '{{ container_image_registry }}/omnileads/nginx'
+
+  tasks:
+
+  - name: NGINX environment variables for this installation
+    template:
+      src: "{{ nginx_repo_path }}templates/nginx.env"
+      dest: /etc/default/nginx.env
+      mode: 664
+      owner: "{{ usuario }}"
+      group: "{{ usuario }}"
+    tags:
+      - install
+      - upgrade
+
+  - name: NGINX Copy nginx.yml deploy file
+    template:
+      src: "{{ nginx_repo_path }}templates/nginx.yml"
+      dest: /opt/omnileads/nginx.yml
+    tags:
+      - install
+      - upgrade
+
+  - name: NGINX Pull oml-nginx image
+    command: podman pull --quiet {{ img_repo }}:{{ nginx_version }}
+    register: podman_pull
+    until: podman_pull is success
+    tags:
+      - install
+      - upgrade
+
+  - name: NGINX Deploy django stack from a compose file
+    docker_stack:
+      state: present
+      name: '{{ tenant_folder }}'
+      compose:
+        - /opt/omnileads/nginx.yml
+    tags:
+      - install
+      - upgrade
+   

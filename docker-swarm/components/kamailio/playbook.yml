@@ -1,0 +1,83 @@
+# Copyright (C) 2022 Freetech Solutions
+
+# This file is part of OMniLeads
+
+# This program is free software: you can nginxtribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see http://www.gnu.org/licenses/.
+#
+
+- name: KAMAILIO Kamailio installation and configuration
+  hosts: omnileads-voice
+  tags:
+    - all_components
+    - voice
+    - kamailio
+  vars:
+    img_repo: '{{ container_image_registry }}/omnileads/kamailio'
+  tasks:
+
+    - name: KAMAILIO environment variables for this installation
+      template:
+        src: "{{ kamailio_repo_path }}templates/kamailio.env"
+        dest: /etc/default/kamailio.env
+        mode: 664
+        owner: "{{ usuario }}"
+        group: "{{ usuario }}"
+      tags:
+        - install
+        - upgrade
+
+    - name: KAMAILIO Copy kamailio.service Systemd file
+      template:
+        src: "{{ kamailio_repo_path }}templates/kamailio.service"
+        dest: /etc/systemd/system/kamailio.service
+      tags:
+        - install
+        - upgrade
+
+
+    # - name: KAMAILIO Copy kamailio.yml deploy file
+    #   template:
+    #     src: "{{ kamailio_repo_path }}templates/kamailio.yml"
+    #     dest: /opt/omnileads/kamailio.yml
+    #   tags:
+    #     - install
+    #     - upgrade
+
+    - name: KAMAILIO Pull image
+      command: podman pull --quiet {{ img_repo }}:{{ kamailio_version }}
+      register: podman_pull
+      until: podman_pull is success
+      tags:
+        - install
+        - upgrade
+
+    - name: KAMAILIO Enable and start service
+      systemd:
+        name: kamailio.service
+        state: restarted
+        enabled: yes
+        daemon_reload: yes
+      tags:
+        - install
+        - upgrade
+
+    # - name: KAMAILIO Deploy django stack from a compose file
+    #   docker_stack:
+    #     state: present
+    #     name: '{{ tenant_folder }}'
+    #     compose:
+    #       - /opt/omnileads/kamailio.yml
+    #   tags:
+    #     - install
+    #     - upgrade   
