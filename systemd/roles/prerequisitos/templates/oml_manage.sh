@@ -55,9 +55,21 @@ case $1 in
   --rtpengine_logs)
     podman logs -f oml-rtpengine-server
     ;;
-  --websockets_logs)
+  --ws_logs)
     podman logs -f oml-websockets-server
     ;;
+  --redis_logs)
+    podman logs -f oml-redis-server
+    ;;
+  --sentinel_logs)
+    podman logs -f oml-sentinel-server
+    ;;
+  --haproxy_logs)
+    podman logs -f oml-haproxy-server
+    ;;
+  --nginx_logs)
+    podman logs -f oml-nginx-server
+    ;;    
   --rtpengine_conf)
     podman exec -it oml-rtpengine-server cat /etc/rtpengine.conf
     ;;
