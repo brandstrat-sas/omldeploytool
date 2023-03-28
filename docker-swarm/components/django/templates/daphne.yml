@@ -1,0 +1,38 @@
+version: "3.0"
+
+volumes:
+  django_static:
+  django_callrec_zip:
+
+# networks:
+#   voice:
+#     external:
+#       true
+#   backend:
+#     external:
+#       true
+#   frontend:
+#     external: 
+#       true    
+services:
+  asgi:
+    image: omnileads/omlapp:RC-2.0.0-enterprise
+    deploy:
+      placement: 
+        constraints: 
+          - node.role != manager
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+    # networks:
+    #   - frontend
+    #   - backend
+    working_dir: /opt/omnileads/ominicontacto
+    volumes:
+      - django_static:/opt/omnileads/static
+      - django_callrec_zip:/opt/omnileads/asterisk/var/spool/asterisk/monitor
+    env_file: /etc/default/daphne.env
+    

@@ -1,0 +1,142 @@
+# Copyright (C) 2022 Freetech Solutions
+
+# This file is part of OMniLeads
+
+# This program is free software: You can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY, without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see http://www.gnu.org/licenses/.
+
+---
+
+- name: APP OMniLeads application installation
+  hosts: omnileads-manager
+  tags:
+    - all_components
+    - app
+    - django
+  vars:
+    img_repo: '{{ container_image_registry }}/omnileads/omlapp'
+    INSTALL_PREFIX: "/opt/omnileads"
+
+  tasks:
+
+  - name: APP Render environment variables for this installation
+      # Configure the template module to use dynamic values from the loop
+    template:
+        src: '{{ item.src }}'
+        dest: '{{ item.dest }}'
+        mode: 666
+        owner: "{{ usuario }}"
+        group: "{{ usuario }}"
+      # Define a 'list of hashes' for the loop module to iterate over
+      # Each item has a 'src' and a 'dest'
+    loop:
+      - { src: '{{ django_repo_path }}templates/django.env', dest: '/etc/default/django.env' }
+      - { src: '{{ django_repo_path }}templates/cron.env', dest: '/etc/default/cron.env' }
+      - { src: '{{ django_repo_path }}templates/daphne.env', dest: '/etc/default/daphne.env' }
+    tags:
+      - install
+      - upgrade
+
+  - name: APP Render swarm stack for this installation
+    # Configure the template module to use dynamic values from the loop
+    template:
+      src: '{{ item.src }}'
+      dest: '{{ item.dest }}'
+      mode: 666
+      owner: "{{ usuario }}"
+      group: "{{ usuario }}"
+    # Define a 'list of hashes' for the loop module to iterate over
+    # Each item has a 'src' and a 'dest'
+    loop:
+      - { src: '{{ django_repo_path }}templates/django.yml', dest: '/opt/omnileads/django.yml' }
+      - { src: '{{ django_repo_path }}templates/cron.yml', dest: '/opt/omnileads/cron.yml' }
+      - { src: '{{ django_repo_path }}templates/daphne.yml', dest: '/opt/omnileads/daphne.yml' }
+    tags:
+      - install
+      - upgrade
+
+  - name: APP Create a new database with name {{ postgres_database }}
+    postgresql_db:
+      name: "{{ postgres_database }}"
+      login_host: "{{ postgres_host }}"
+      login_password: "{{ postgres_password }}"
+      login_user: "{{ postgres_user }}"
+      port: "{{ postgres_port }}"
+      maintenance_db: "{{ postgres_maintenance_db }}"
+      state: present
+    tags:
+      - install
+    when: 
+      - upgrade_from_oml_1 is not defined  
+      - postgres_ha_centos is defined
+
+  - name: APP Adds plperl extension to the database {{ postgres_database }}
+    postgresql_ext:
+      name: plperl
+      db: "{{ postgres_database }}"
+      login_host: "{{ postgres_host }}"
+      login_password: "{{ postgres_password }}"
+      login_user: "{{ postgres_user }}"
+      port: "{{ postgres_port }}"
+    tags:
+      - install
+    when: 
+      - upgrade_from_oml_1 is not defined  
+      - postgres_ha_centos is defined
+
+  # - name: DJANGO Copy REDIS2POSTGRES deploy yml
+  #   template:
+  #     src: "{{ django_repo_path }}templates/redis2postgres.service"
+  #     dest: /opt/omnileads/redis2postgres.yml
+  #   tags:
+  #     - install
+  #     - upgrade
+  #   when: enterprise_edition is defined
+    
+  - name: APP Pull image
+    command: podman pull --quiet {{ img_repo }}:{{ omnileads_version }}
+    register: podman_pull
+    until: podman_pull is success
+    tags:
+      - install
+      - upgrade
+
+  - name: APP Enterprise Pull image
+    command: podman pull --quiet {{ img_repo }}:{{ omnileads_version }}-enterprise
+    register: podman_pull
+    until: podman_pull is success
+    tags:
+      - install
+      - upgrade
+    when: enterprise_edition is defined
+
+  - name: APP Deploy django stack from a compose file
+    docker_stack:
+      state: present
+      name: '{{ tenant_folder }}'
+      compose:
+        - /opt/omnileads/cron.yml
+        - /opt/omnileads/daphne.yml
+        - /opt/omnileads/django.yml
+    tags:
+      - install
+      - upgrade    
+
+  # - name: DJANGO from REDIS to Postgres Pull image
+  #   command: podman pull --quiet docker.io/{{ redis2postgres_version }}
+  #   register: podman_pull
+  #   until: podman_pull is success
+  #   tags:
+  #     - install
+  #     - upgrade
+  #   when: enterprise_edition is defined

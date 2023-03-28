@@ -1,4 +1,4 @@
-![Diagrama deploy tool](./ansible/png/omnileads_logo_1.png)
+![Diagrama deploy tool](./systemd/png/omnileads_logo_1.png)
 
 ## 100% Open-Source Contact Center Software
 
@@ -8,7 +8,7 @@
 
 This repository provides different methods to run OMniLeads:
 
-#### Ansible :office: :ok:
+#### System-D :office: :ok:
 
 To launch the application using systemd on any modern Linux instance with [Podman](https://docs.podman.io/en/latest/) support.
 This format is very similar to the method used in [OMniLeads 1.X](https://documentacion-omnileads.readthedocs.io/es/develop/install_omlapp.html#about-install-onpremise). 

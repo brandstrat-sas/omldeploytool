@@ -1,13 +1,22 @@
 #!/bin/bash
 
 case $1 in
-  --create-ubuntu)
+  --create-swarm)
     echo "deploy: $1"
     doctl compute droplet create --image ubuntu-22-04-x64 \
     --size s-1vcpu-2gb --region sfo3 \
     --ssh-keys ${SSH_DOCTL} \
-    oml-$2
+    --user-data-file ../docker-swarm/user-data.sh \
+    $2-$3
     ;;
+  --create-swarm-worker)
+    echo "deploy: $1"
+    doctl compute droplet create --image ubuntu-22-04-x64 \
+    --size s-1vcpu-2gb --region sfo3 \
+    --ssh-keys ${SSH_DOCTL} \
+    --user-data-file ../docker-swarm/user-data-worker.sh \
+    $2-$3
+    ;;  
   --create-debian)
     echo "deploy: $1"
     doctl compute droplet create --image debian-11-x64 \
@@ -15,6 +24,37 @@ case $1 in
     --ssh-keys ${SSH_DOCTL} \
     oml-$2
     ;;
+  --create-centos)
+    echo "deploy: $1"
+    doctl compute droplet create --image centos-7-x64 \
+    --size s-1vcpu-1gb --region sfo3 \
+    --ssh-keys ${SSH_DOCTL} \
+    oml-$2
+    ;;
+  --create-rtpengine)
+    echo "deploy: $1"
+    doctl compute droplet create --image debian-11-x64 \
+    --size s-1vcpu-2gb --region sfo3 \
+    --ssh-keys ${SSH_DOCTL} \
+    --user-data-file ./digitalocean/rtpengine.sh \
+    oml-$2
+    ;;  
+  --create-asterisk)
+    echo "deploy: $1"
+    doctl compute droplet create --image debian-11-x64 \
+    --size s-1vcpu-2gb --region sfo3 \
+    --ssh-keys ${SSH_DOCTL} \
+    --user-data-file ./digitalocean/asterisk.sh \
+    oml-$2
+    ;;    
+  --create-redis)
+    echo "deploy: $1"
+    doctl compute droplet create --image debian-11-x64 \
+    --size s-1vcpu-2gb --region sfo3 \
+    --ssh-keys ${SSH_DOCTL} \
+    --user-data-file ./digitalocean/redis.sh \
+    oml-$2
+    ;;      
   --create-docker)
     echo "deploy: $1"
     doctl compute droplet create --image docker-20-04 \

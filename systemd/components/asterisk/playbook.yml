@@ -1,0 +1,157 @@
+# Copyright (C) 2022 Freetech Solutions
+
+# This file is part of OMniLeads
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see http://www.gnu.org/licenses/.
+#
+---
+
+- name: ASTERISK installation and configuration
+  hosts: omnileads_voice
+  tags:
+    - install
+    - voice
+    - asterisk
+  vars:
+    img_repo: '{{ container_image_registry }}/omnileads/asterisk'
+  tasks:
+
+  - name: ASTERISK Set environment variables for this installation
+    template:
+      src: "{{ asterisk_repo_path }}templates/asterisk.env"
+      dest: /etc/default/asterisk.env
+      mode: 664
+      owner: '{{ usuario }}'
+      group: '{{ usuario }}'
+    tags:
+      - install
+      - upgrade
+
+  # Chequeo si existen ya los archivos custom y override dialplan, para no pisarlos
+  - name: ASTERISK Check if custom and override files for dialplan exists
+    shell: "if [ $(ls -l {{ asterisk_location_conf }}/custom/oml_extensions_*_override.conf 2> /dev/null | wc -l) -gt 0 ] && [ $(ls -l {{ asterisk_location_conf }}/custom/oml_extensions_*_custom.conf 2> /dev/null | wc -l) -gt 0 ];then exit 1;else exit 0;fi"
+    changed_when: false
+    failed_when: false
+    register: ast_custom_exists
+    tags:
+      - install
+
+  - name: ASTERISK Create custom conf files folder
+    file:
+      path:  "{{ asterisk_location_conf }}/custom"
+      state: directory
+      owner: '{{ usuario }}'
+      group: '{{ usuario }}'
+      mode: 0764
+    when: ast_custom_exists.rc == 0
+    tags:
+      - install
+
+  # Creo archivos custom & override en fresh-install
+  - name: ASTERISK Create _custom & _override astconf files
+    file:
+      path: "{{ asterisk_location_conf }}/custom/{{ item }}"
+      state: touch
+      mode: 0664
+      owner: '{{ usuario }}'
+      group: '{{ usuario }}'
+    with_items:
+      - oml_amd_custom.conf
+      - oml_dahdi_custom.conf
+      - oml_extensions_custom.conf
+      - oml_extensions_globals_custom.conf
+      - oml_extensions_inr_custom.conf
+      - oml_extensions_ivr_custom.conf
+      - oml_extensions_outr_custom.conf
+      - oml_extensions_tc_custom.conf
+      - oml_func_odbc_custom.conf
+      - oml_http_custom.conf
+      - oml_manager_custom.conf
+      - oml_pjsip_custom.conf
+      - oml_pjsip_wizard_custom.conf
+      - oml_queues_custom.conf
+      - oml_res_odbc_custom.conf
+      - oml_sip_general_custom.conf
+      - oml_sip_registrations_custom.conf
+      - oml_sip_trunks_custom.conf
+      - oml_amd_override.conf
+      - oml_dahdi_override.conf
+      - oml_extensions_override.conf
+      - oml_extensions_bridgecall_override.conf
+      - oml_extensions_commonsub_override.conf
+      - oml_extensions_globals_override.conf
+      - oml_extensions_modules_override.conf
+      - oml_extensions_outr_override.conf
+      - oml_extensions_override.conf
+      - oml_extensions_postcall_override.conf
+      - oml_extensions_precall_override.conf
+      - oml_func_odbc_override.conf
+      - oml_http_override.conf
+      - oml_manager_override.conf
+      - oml_pjsip_override.conf
+      - oml_pjsip_wizard_override.conf
+      - oml_queues_override.conf
+      - oml_res_odbc_override.conf
+      - oml_sip_general_override.conf
+      - oml_sip_registrations_override.conf
+      - oml_sip_trunks_override.conf
+      - oml_voicemail_custom.conf
+      - oml_voicemail_override.conf
+    when: ast_custom_exists.rc == 0
+    tags:
+      - install
+
+  - name: ASTERISK Copy some _custom.conf files
+    copy:
+      src: "{{ asterisk_repo_path }}templates/{{ item }}"
+      dest: /etc/asterisk/custom
+      mode: 0664
+      owner: '{{ usuario }}'
+      group: '{{ usuario }}'
+    loop:
+      - oml_extensions_custom.conf
+      - oml_extensions_bridgecall_custom.conf
+      - oml_extensions_commonsub_custom.conf
+      - oml_extensions_modules_custom.conf
+      - oml_extensions_postcall_custom.conf
+      - oml_extensions_precall_custom.conf
+    tags:
+      - install
+
+  - name: ASTERISK Copy systemd service
+    template:
+      src: "{{ asterisk_repo_path }}templates/asterisk.service"
+      dest: /etc/systemd/system/asterisk.service
+    tags:
+      - install
+      - upgrade
+
+  - name: ASTERISK Pull image
+    command: podman pull --quiet {{ img_repo }}:{{ asterisk_version }}
+    register: podman_pull
+    until: podman_pull is success
+    tags:
+      - install
+      - upgrade
+
+  - name: ASTERISK Enable and start systemd service
+    systemd:
+      name: asterisk.service
+      state: restarted
+      enabled: yes
+      daemon_reload: yes
+    tags:
+      - install
+      - upgrade
+    

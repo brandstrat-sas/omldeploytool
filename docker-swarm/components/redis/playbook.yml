@@ -1,0 +1,91 @@
+# Copyright (C) 2022 Freetech Solutions
+
+# This file is part of OMniLeads
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see http://www.gnu.org/licenses/.
+#
+
+---
+
+- name: REDIS OMniLeads Redis component deploy
+  hosts: omnileads-manager
+  tags:
+    - all_components
+    - app
+    - redis
+  vars:
+    img_repo: '{{ container_image_registry }}/redislabs/redisgears'
+    img_prometheus_repo: 'docker.io/oliver006/redis_exporter'
+  tasks:
+
+    - name: REDIS Render environment variables for this installation
+        # Configure the template module to use dynamic values from the loop
+      template:
+        src: '{{ item.src }}'
+        dest: '{{ item.dest }}'
+        mode: 666
+        owner: "{{ usuario }}"
+        group: "{{ usuario }}"
+      # Define a 'list of hashes' for the loop module to iterate over
+      # Each item has a 'src' and a 'dest'
+      loop:
+        - { src: '{{ redis_repo_path }}templates/redis.env', dest: '/etc/default/redis.env' }
+        - { src: '{{ redis_repo_path }}templates/prometheus.env', dest: '/etc/default/prometheus_redis.env' }
+      tags:
+        - install
+        - upgrade
+
+    - name: REDIS Render swarm stack yml
+        # Configure the template module to use dynamic values from the loop
+      template:
+        src: '{{ item.src }}'
+        dest: '{{ item.dest }}'
+        mode: 666
+        owner: "{{ usuario }}"
+        group: "{{ usuario }}"
+      # Define a 'list of hashes' for the loop module to iterate over
+     # Each item has a 'src' and a 'dest'
+      loop:
+        - { src: '{{ redis_repo_path }}templates/redis.yml', dest: '/opt/omnileads/redis.yml' }
+        #- { src: '{{ redis_repo_path }}templates/prometheus.env', dest: '/etc/default/prometheus_redis.env' }
+      tags:
+        - install
+        - upgrade
+
+    - name: REDIS Pull image
+      command: podman pull --quiet {{ img_repo }}:{{ redisgears_version }}
+      register: podman_pull
+      until: podman_pull is success
+      tags:
+        - install
+        - upgrade 
+
+    - name: REDIS prometheus Pull image
+      command: podman pull --quiet {{ img_prometheus_repo }}
+      register: podman_pull
+      until: podman_pull is success
+      tags:
+        - install
+        - upgrade
+
+    - name: REDIS Deploy redis stack from a compose file
+      docker_stack:
+        state: present
+        name: '{{ tenant_folder }}'
+        compose:
+          - /opt/omnileads/redis.yml
+         #- /opt/omnileads/redis_prometheus.yml
+      tags:
+       - install
+       - upgrade   
