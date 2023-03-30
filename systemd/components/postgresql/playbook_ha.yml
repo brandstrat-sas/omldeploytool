@@ -24,7 +24,6 @@
     - all_components
     - postgres
     - install
-    - upgrade
   
   vars:
     install_prefix: /opt/omnileads
