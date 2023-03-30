@@ -113,3 +113,11 @@ all:
     #email_use_ssl:
     #email_use_tls:
     #upgrade_from_oml_1: true
+
+    # --- Docker Registry repo    
+    omlapp_repo: omnileads
+
+    # --- IP or hostname that each instance will invoke when locating the other    
+    data_host: "{{ hostvars['omnileads_data'].omni_ip_lan }}"
+    voice_host: "{{ hostvars['omnileads_voice'].omni_ip_lan }}"
+    application_host: "{{ hostvars['omnileads_app'].omni_ip_lan }}"
