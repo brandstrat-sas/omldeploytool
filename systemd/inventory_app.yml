@@ -2,7 +2,7 @@
 
 all:
   hosts:
-    omnileads-app:
+    omnileads_app:
       omlapp: true
       ansible_connection: local
       ansible_ssh_port: 22
