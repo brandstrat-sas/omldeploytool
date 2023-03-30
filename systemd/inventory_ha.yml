@@ -74,10 +74,10 @@ omnileads_app:
 all: 
   vars:
     
-    kamailio_version: 230204.01
-    asterisk_version: oml-196
-    rtpengine_version: oml-196
     omnileads_version: 1.26.0
+    kamailio_version: 230204.01
+    asterisk_version: 230328.01
+    rtpengine_version: 230328.01    
     websockets_version: 230204.01
     nginx_version: 230215.01
     postgres_version: 230204.01

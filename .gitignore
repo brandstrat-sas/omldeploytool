@@ -3,6 +3,6 @@ vagrant/redhat/.vagrant
 development-env/omnileads-repos
 development-env/.env
 docker-compose/.env
-ansible/instances
-ansible/.ssh
-ansible/.inventory.yml
+systemd/instances
+systemd/.ssh
+systemd/.inventory.yml
