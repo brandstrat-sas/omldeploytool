@@ -72,9 +72,6 @@
 - import_playbook: components/daphne/playbook.yml
   when: omlapp is defined
 
-- import_playbook: components/addons/playbook.yml
-  when: enterprise_edition == true
-
 - import_playbook: components/django/playbook.yml
   when: 
     - omlapp is defined
@@ -84,7 +81,10 @@
   when: 
     - omlapp is defined
     - omnileads_ha is defined
-     
+
+- import_playbook: components/addons/playbook.yml
+  when: enterprise_edition == true
+
 - import_playbook: components/cron/playbook.yml
   when: omlapp is defined
     
