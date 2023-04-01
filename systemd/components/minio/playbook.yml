@@ -22,6 +22,7 @@
   tags:
     - all_components
     - minio
+    - install
   vars:
     img_repo: quay.io/minio/minio
 
@@ -35,7 +36,6 @@
       owner: "{{ usuario }}"
       group: "{{ usuario }}"
     tags:
-      - install
       - upgrade
 
   - name: MINIO Copy systemd service
@@ -43,7 +43,6 @@
       src: "{{ minio_repo_path }}templates/minio.service"
       dest: /etc/systemd/system/minio.service
     tags:
-      - install
       - upgrade
 
   - name: MINIO Pull image
@@ -51,7 +50,6 @@
     register: podman_pull
     until: podman_pull is success
     tags:
-      - install
       - upgrade
 
   - name: MINIO Enable and start oml minio service
@@ -63,7 +61,6 @@
     register: minio_run
     until: minio_run is success
     tags:
-      - install
       - upgrade
 
   - name: MINIO install command line client
@@ -71,8 +68,6 @@
       url: https://dl.min.io/client/mc/release/linux-amd64/mc
       dest: /usr/bin/minio_cmd
       mode: '0777'
-    tags:
-      - install
 
   - name: MINIO install MC
     shell: |
@@ -83,5 +78,3 @@
       /usr/bin/minio_cmd admin policy attach MINIO readwrite --user '{{ bucket_access_key }}'
     args:
       executable: /bin/bash
-    tags:
-      - install
