@@ -18,6 +18,7 @@ ExecStart=/usr/bin/podman run \
 --detach \
 --network=host \
 --env-file=/etc/default/django.env \
+-e GOOGLE_MAPS_CENTER='{{ google_maps_center }}' \
 --name=oml-django-server \
 --volume=django_static:/opt/omnileads/static \
 --volume=django_callrec_zip:/opt/omnileads/asterisk/var/spool/asterisk/monitor \
