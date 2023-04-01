@@ -2,7 +2,7 @@
 
 all:
   hosts:
-    omnileads-app:
+    omnileads_app:
       omlapp: true
       ansible_connection: local
       ansible_ssh_port: 22
@@ -113,3 +113,6 @@ all:
     #email_use_ssl:
     #email_use_tls:
     #upgrade_from_oml_1: true
+
+    # --- Docker Registry repo    
+    omlapp_repo: omnileads

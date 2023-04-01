@@ -29,19 +29,6 @@
     INSTALL_PREFIX: "/opt/omnileads"
 
   tasks:
-  
-- name: ADDONS OMniLeads application installation
-  hosts: omnileads_app
-  tags:
-    - all_components
-    - addons
-    - app
-    - django
-  vars:
-    img_repo: '{{ container_image_registry }}/omnileads/omlapp'
-    INSTALL_PREFIX: "/opt/omnileads"
-
-  tasks:
 
   - name: ADDON SURVEY from REDIS to Postgres Pull image
     command: podman pull --quiet docker.io/{{ redis2postgres_version }}
@@ -61,13 +48,13 @@
       - upgrade
     when: enterprise_edition == true
 
-  # - name: ADDON SURVEY Redis2Postgres Enable and start systemd service
-  #   systemd:
-  #     name: redis2postgres.service
-  #     state: restarted
-  #     enabled: yes
-  #     daemon_reload: yes
-  #   tags:
-  #     - install
-  #     - upgrade
-  #   when: enterprise_edition == true    
+  - name: ADDON SURVEY Redis2Postgres Enable and start systemd service
+    systemd:
+      name: redis2postgres.service
+      state: restarted
+      enabled: yes
+      daemon_reload: yes
+    tags:
+      - install
+      - upgrade
+    when: enterprise_edition == true    

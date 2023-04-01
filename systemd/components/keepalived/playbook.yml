@@ -21,6 +21,7 @@
   hosts: 
     - omnileads_voice
     - omnileads_haproxy
+    - omnileads_app
   tags:
     - install
     - keepalived
@@ -50,6 +51,8 @@
       dest: /etc/keepalived/keepalived.conf
     when:
       - omlvoice is defined
+    tags:
+      - upgrade
 
   - name: KEEPALIVED check_component.sh script Voice provissioning
     template: 
@@ -58,6 +61,8 @@
       mode: 755
     when:
       - omlvoice is defined
+    tags:
+      - upgrade
 
   - name: KEEPALIVED transition to master script
     template: 
@@ -66,6 +71,8 @@
       mode: 755
     when:
       - omlvoice is defined    
+    tags:
+      - upgrade
 
   - name: KEEPALIVED Keepalived HAProxy config provissioning
     template: 
@@ -73,6 +80,8 @@
       dest: /etc/keepalived/keepalived.conf
     when:
       - omlhaproxy is defined
+    tags:
+      - upgrade
 
   - name: KEEPALIVED check_component.sh script HAProxy provissioning
     template: 
@@ -81,13 +90,35 @@
       mode: 755
     when:
       - omlhaproxy is defined
+    tags:
+      - upgrade
 
-  - name: KEEPALIVED Start Systemd High Availability TOOLs
-    command: systemctl start {{ item }}.service
-    with_items:
-      - keepalived
+  - name: KEEPALIVED Keepalived CRON config provissioning
+    template: 
+      src: "{{ keepalived_repo_path }}templates/keepalived_cron.j2" 
+      dest: /etc/keepalived/keepalived.conf
+    when:
+      - omlapp is defined
+    tags:
+      - upgrade
 
-  - name: KEEPALIVED Enable Systemd  High Availability TOOLs
-    command: systemctl enable {{ item }}.service
-    with_items:
-      - keepalived
+  - name: KEEPALIVED check_component.sh script CRON provissioning
+    template: 
+      src: "{{ keepalived_repo_path }}templates/check_ha_cron.j2"
+      dest: /usr/bin/check_ha.sh
+      mode: 755
+    when:
+      - omlapp is defined
+    tags:
+      - upgrade
+
+  - name: KEEPALIVED Start and enable Systemd High Availability TOOLs
+    systemd:
+      name: keepalived.service
+      state: restarted
+      enabled: yes
+      daemon_reload: yes
+    tags:
+      - install
+      - upgrade
+

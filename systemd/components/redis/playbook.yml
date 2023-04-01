@@ -115,12 +115,12 @@
       - install
       - upgrade
 
-  # - name: REDIS prometheus Enable and start service
-  #   systemd:
-  #     name: prometheus_redis.service
-  #     state: restarted
-  #     enabled: yes
-  #     daemon_reload: yes
-  #   tags:
-  #     - install
-  #     - upgrade
+  - name: REDIS prometheus Enable and start service
+    systemd:
+      name: prometheus_redis.service
+      state: restarted
+      enabled: yes
+      daemon_reload: yes
+    tags:
+      - install
+      - upgrade

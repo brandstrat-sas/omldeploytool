@@ -45,6 +45,9 @@ case ${oml_action} in
   cron)
     echo "deploy: $oml_action"
   ;;
+  redis)
+    echo "deploy: $oml_action"
+  ;;
   keepalived)
     echo "deploy: $oml_action"
   ;;
@@ -189,7 +192,7 @@ fi
 for i in "$@"
 do
   case $i in
-    --action=upgrade|--action=install|--action=backup|--action=voice|--action=app|--action=observability|--action=postgres|--action=haproxy|--action=cron|--action=keepalived|--action=kamailio|--action=rtpengine|--action=asterisk|--action=sentinel|--action=pgsql_node_recovery_main|--action=pgsql_node_takeover_main|--action=redis_node_takeover_main|--action=pgsql_node_recovery_backup)
+    --action=upgrade|--action=install|--action=backup|--action=voice|--action=app|--action=observability|--action=postgres|--action=haproxy|--action=cron|--action=keepalived|--action=kamailio|--action=rtpengine|--action=asterisk|--action=sentinel|--action=redis|--action=pgsql_node_recovery_main|--action=pgsql_node_takeover_main|--action=redis_node_takeover_main|--action=pgsql_node_recovery_backup)
       oml_action="${i#*=}"
       shift
     ;;

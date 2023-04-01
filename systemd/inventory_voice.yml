@@ -2,7 +2,7 @@
 
 all:
   hosts:
-    omnileads-voice:
+    omnileads_voice:
       omlvoice: true
       ansible_connection: local
       ansible_ssh_port: 22
@@ -15,7 +15,6 @@ all:
     # --- IP or hostname that each instance will invoke when locating the other
     voice_host:
     application_host: 
-    observability_host: 
     # --- ansible user auth connection
     ansible_user: root
     # --- version of each image to deploy
