@@ -21,3 +21,5 @@ the application practically without configuration. This format is purely for Lab
 #### development-environment :sunflower: :notes: :dizzy:
 
 To lanunch the OMniLeads development stack and  start coding !  
+
+![Diagrama deploy tool alcance](./systemd/png/deploy-tool-manager.png)
