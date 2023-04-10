@@ -84,6 +84,7 @@ all:
     bucket_name: omnileads
     # --- if your bucket doesn't need region, leave this value (us-east-1)
     bucket_region: us-east-1
+    #bucket_url_ssl_insecure: true
     # --- Asterisk Manager Interface (AMI) user & password
     ami_user: omnileads
     ami_password: C12H17N2O4P_o98o98

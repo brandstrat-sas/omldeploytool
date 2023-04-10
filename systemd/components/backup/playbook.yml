@@ -1,0 +1,119 @@
+# Copyright (C) 2022 Freetech Solutions
+
+# This file is part of OMniLeads
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see http://www.gnu.org/licenses/.
+#
+---
+
+- name: OMniLeads Backup Playbook
+  hosts: 
+    - omnileads_data
+    - omnileads_voice
+  tags:
+    - backup
+
+  tasks:
+
+    - name: BACKUP Set timestamp of the backup
+      set_fact:
+        now: "{{ ansible_date_time.iso8601 }}"
+
+    - name: BACKUP database
+      postgresql_db:
+        state: dump
+        name: '{{ postgres_database }}'
+        target: "/tmp/pgsql-backup-{{ now }}.dump.gz"
+        ssl_mode: disable
+        login_user: '{{ postgres_user }}'
+        login_password: '{{ postgres_password }}'
+        login_host: '{{ data_host }}'
+      when: 
+        - omldata is defined  
+
+    - name: BACKUP upload postgres backup to MINIO selfhosted
+      aws_s3:
+        bucket: '{{ bucket_name }}'
+        object: 'backup/db/pgsql-backup-{{ now }}.dump.gz'
+        src: '/tmp/pgsql-backup-{{ now }}.dump.gz'
+        mode: put
+        validate_certs: no
+        region: '{{ bucket_region }}'
+        aws_access_key: '{{ bucket_access_key }}'
+        aws_secret_key: '{{ bucket_secret_key }}'
+        s3_url: 'http://{{ minio_host }}:9000'
+        encrypt: no
+      when:
+        - bucket_url is not defined
+        - bucket_ssl_insecure is not defined
+        - omldata is defined
+
+    - name: BACKUP upload postgres backup to MINIO selfhosted
+      aws_s3:
+        bucket: '{{ bucket_name }}'
+        object: 'backup/db/pgsql-backup-{{ now }}.dump.gz'
+        src: '/tmp/pgsql-backup-{{ now }}.dump.gz'
+        mode: put
+        validate_certs: no
+        region: '{{ bucket_region }}'
+        aws_access_key: '{{ bucket_access_key }}'
+        aws_secret_key: '{{ bucket_secret_key }}'
+        s3_url: 'http://{{ minio_host }}:9000'
+        encrypt: no
+      when:
+        - bucket_url is not defined
+        - bucket_ssl_insecure is not defined
+        - omldata is defined  
+
+    - name: BACKUP upload postgres backup to insecure SSL BUCKET
+      shell: "export AWS_ACCESS_KEY_ID={{ bucket_access_key }} &&  export AWS_SECRET_ACCESS_KEY={{ bucket_secret_key }} && aws --endpoint {{ bucket_url }} --no-verify-ssl s3 cp /tmp/pgsql-backup-{{ now }}.dump.gz  s3://{{ bucket_name }}/backup/"
+      when:
+        - bucket_ssl_insecure is defined
+        - omldata is defined  
+
+    - name: BACKUP asterisk custom config files
+      s3_sync:
+        bucket: '{{ bucket_name }}'
+        key_prefix: backup/asterisk
+        file_root: '/etc/asterisk/custom/'
+        validate_certs: no
+        region: '{{ bucket_region }}'
+        aws_access_key: '{{ bucket_access_key }}'
+        aws_secret_key: '{{ bucket_secret_key }}'
+        ec2_url: '{{ bucket_url }}'
+      when:
+        - bucket_url is defined
+        - bucket_ssl_insecure is not defined
+        - omlvoice is defined  
+      
+    - name: BACKUP asterisk custom config files MINIO selfhosted
+      s3_sync:
+        bucket: '{{ bucket_name }}'
+        key_prefix: backup/asterisk
+        file_root: '{{ asterisk_location_conf }}/custom/'
+        validate_certs: no
+        region: '{{ bucket_region }}'
+        aws_access_key: '{{ bucket_access_key }}'
+        aws_secret_key: '{{ bucket_secret_key }}'
+        ec2_url: 'http://{{ minio_host }}:9000'
+      when:
+        - bucket_url is not defined
+        - bucket_ssl_insecure is not defined
+        - omlvoice is defined  
+      
+    - name: BACKUP upload asterisk backup to insecure SSL BUCKET
+      shell: "export AWS_ACCESS_KEY_ID={{ bucket_access_key }} &&  export AWS_SECRET_ACCESS_KEY={{ bucket_secret_key }} && aws --endpoint {{ bucket_url }} --no-verify-ssl s3 sync {{ asterisk_location_conf }}/custom/ s3://{{ bucket_name }}/backup/asterisk/{{ now }}/"
+      when:
+        - bucket_ssl_insecure is defined
+        - omlvoice is defined
