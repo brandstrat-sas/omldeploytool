@@ -116,7 +116,7 @@
         - omlapp is defined
         - callrec_device != "s3-no-check-cert"
 
-    - name: RESTORE django media_root from BUCKET
+    - name: RESTORE django media_root from no valid SSL BUCKET
       shell: "podman exec -it oml-django-server aws --endpoint {{ bucket_url }} --no-verify-ssl s3 sync s3://{{ bucket_name }}/media_root {{ INSTALL_PREFIX }}/media_root/"
       when:
         - omlapp is defined
