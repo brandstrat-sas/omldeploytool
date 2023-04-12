@@ -1,0 +1,166 @@
+# Copyright (C) 2022 Freetech Solutions
+
+# This file is part of OMniLeads
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see http://www.gnu.org/licenses/.
+#
+---
+
+- name: OMniLeads RESTORE Playbook
+  hosts: 
+    - omnileads_data
+    - omnileads_voice
+    - omnileads_app
+  tags:
+    - restore
+
+  tasks:
+
+    - name: RESTORE postgres get .sql dump file
+      shell: "export AWS_ACCESS_KEY_ID={{ bucket_access_key }} &&  export AWS_SECRET_ACCESS_KEY={{ bucket_secret_key }} && aws --endpoint {{ bucket_url }} s3 cp s3://{{ bucket_name }}/backup/pgsql-backup-{{ restore_file_timestamp }}.sql /tmp/"
+      register: command_result
+      failed_when: "'FAILED' in command_result.stderr"
+      when:
+        - omlapp is defined
+
+    - name: RESTORE postgres  Stop postgresql service
+      service:
+        name: postgresql
+        state: stopped
+      when:
+        - omldata is defined  
+
+    - name: RESTORE postgres drop database
+      shell: "podman volume rm oml_postgres"
+      when:
+        - omldata is defined  
+      ignore_errors: yes  
+
+    - name: RESTORE postgres Start postgresql service
+      service:
+        name: postgresql
+        state: started
+      when:
+        - omldata is defined
+
+    - name: RESTORE asterisk mv present to bk folder previus restore
+      command: "creates={{ asterisk_location_conf }}/custom_{{ restore_file_timestamp }} mv {{ asterisk_location_conf }}/custom/ {{ asterisk_location_conf }}/custom_{{ restore_file_timestamp }}"
+      when:
+        - omlvoice is defined
+
+    - name: RESTORE asterisk from insecure SSL BUCKET
+      shell: "export AWS_ACCESS_KEY_ID={{ bucket_access_key }} &&  export AWS_SECRET_ACCESS_KEY={{ bucket_secret_key }} && aws --endpoint {{ bucket_url }} --no-verify-ssl s3 sync s3://{{ bucket_name }}/backup/asterisk/{{ restore_file_timestamp }} {{ asterisk_location_conf }}/custom/ --delete"
+      when:
+        - omlvoice is defined
+        - callrec_device == "s3-no-check-cert"
+
+    - name: RESTORE asterisk from insecure SSL BUCKET
+      shell: "export AWS_ACCESS_KEY_ID={{ bucket_access_key }} &&  export AWS_SECRET_ACCESS_KEY={{ bucket_secret_key }} && aws --endpoint {{ bucket_url }} s3 sync s3://{{ bucket_name }}/backup/asterisk/{{ restore_file_timestamp }} {{ asterisk_location_conf }}/custom/"
+      when:
+        - omlvoice is defined
+
+    - name: RESTORE asterisk  Change file ownership /etc/asterisk/custom
+      file:
+        path: '{{ asterisk_location_conf }}/custom'
+        owner: omnileads
+        group: omnileads
+        mode: '0744'
+      when:
+        - omlvoice is defined
+
+    - name: RESTORE asterisk reload config
+      shell: "podman exec -it oml-asterisk-server asterisk -rx 'dialplan reload'"
+      when:
+        - omlvoice is defined
+
+    - name: RESTORE postgres restore dump file
+      shell: "cat /tmp/pgsql-backup-{{ restore_file_timestamp }}.sql | podman exec -i oml-django-server psql"
+      when:
+        - omlapp is defined  
+
+    - name: RESTORE DJANGO Enable and start systemd service
+      systemd:
+        name: omnileads.service
+        state: restarted
+        enabled: yes
+        daemon_reload: yes
+      when:
+        - omlapp is defined
+      
+
+
+
+
+
+
+
+
+
+
+
+#     # - name: RESTORE django from insecure SSL BUCKET
+#     #   shell: "export AWS_ACCESS_KEY_ID={{ bucket_access_key }} &&  export AWS_SECRET_ACCESS_KEY={{ bucket_secret_key }} && aws --endpoint {{ bucket_url }} s3 sync s3://{{ bucket_name }}/media_root {{ asterisk_location_conf }}/media_root/"
+#     #   when:
+#     #     - omlapp is defined
+
+#     # - name: RESTORE regenerar asterisk
+#     #   shell: "oml_manage --regenerar_asterisk"
+#     #   when:
+#     #     - omlapp is defined
+
+# # aws --endpoint ${S3_ENDPOINT} s3 sync /opt/omnileads/media_root s3://${S3_BUCKET_NAME}/media_root
+# # aws --endpoint ${S3_ENDPOINT} s3 sync /opt/omnileads/asterisk/var/spool/asterisk/monitor/ s3://${S3_BUCKET_NAME}
+
+
+
+    # - name: RESTORE asterisk from bucket
+    #   s3_sync:
+    #     bucket: '{{ bucket_name }}'
+    #     key_prefix: 'backup/asterisk/{{ restore_file_timestamp }}'
+    #     file_root: /etc/asterisk/custom/
+    #     region: '{{ bucket_region }}'
+    #     aws_access_key: '{{ bucket_access_key }}'
+    #     aws_secret_key: '{{ bucket_secret_key }}'
+    #     ec2_url: '{{ bucket_url }}'
+    #   when:
+    #     - bucket_url is defined
+    #     - callrec_device != "s3-no-check-cert"
+    #     - omlvoice is defined  
+      
+#     # - name: RESTORE asterisk custom config files MINIO selfhosted
+#     #   s3_sync:
+#     #     bucket: '{{ bucket_name }}'
+#     #     key_prefix: backup/asterisk
+#     #     file_root: '{{ asterisk_location_conf }}/custom/'
+#     #     validate_certs: no
+#     #     region: '{{ bucket_region }}'
+#     #     aws_access_key: '{{ bucket_access_key }}'
+#     #     aws_secret_key: '{{ bucket_secret_key }}'
+#     #     ec2_url: 'http://{{ minio_host }}:9000'
+#     #   when:
+#     #     - bucket_url is not defined
+#     #     - callrec_device != "s3-no-check-cert"
+#     #     - omlvoice is defined  
+
+    # - name: RESTORE postgres dump-file database
+    #   postgresql_db:
+    #     state: restore
+    #     name: '{{ postgres_database }}'
+    #     target: "/tmp/pgsql-backup-{{ restore_file_timestamp }}.sql"
+    #     ssl_mode: disable
+    #     login_user: '{{ postgres_user }}'
+    #     login_password: '{{ postgres_password }}'
+    #     login_host: '{{ data_host }}'
+    #   when: 
+    #     - omldata is defined

@@ -126,3 +126,15 @@ all:
     voice_host: "{{ hostvars['omnileads_voice'].omni_ip_lan }}"
     application_host: "{{ hostvars['omnileads_app'].omni_ip_lan }}"
     
+    # --- Restore id request by restore filename
+    #restore_file_timestamp: 1681215859
+
+    # --- Integrations with external hosts
+    # --- Request by Homer
+    #prometheus_host: 
+    # --- Request by Asterisk 
+    #homer_host: 
+    # --- Request by Web-Video Inbound Calls 
+    #video_host: 
+
+    

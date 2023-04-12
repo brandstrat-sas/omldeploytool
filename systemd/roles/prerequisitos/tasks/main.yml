@@ -117,7 +117,3 @@
 - name: MAIN First configuration in server or servers
   include: os_configuration.yml
 
-- name: MAIN Perform a backup
-  include: backup.yml
-  tags:
-    - backup

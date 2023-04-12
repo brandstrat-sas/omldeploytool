@@ -78,8 +78,6 @@
       state: present
     tags:
       - install
-    when: 
-      - upgrade_from_oml_1 is not defined
 
   - name: POSTGRESQL Adds plperl extension to the database {{ postgres_database }}
     postgresql_ext:
@@ -93,6 +91,18 @@
       - install
     when: 
       - upgrade_from_oml_1 is not defined 
+      - restore_file_timestamp is not defined
+
+  - name: Scalable Tunings; UWSGI Copy custom uwsgi.ini
+    template:
+      src: "{{ django_repo_path }}templates/uwsgi.ini"
+      dest: /etc/omnileads/uwsgi.ini
+      mode: 666
+      owner: "{{ usuario }}"
+      group: "{{ usuario }}"
+    when: 
+      - omlapp is defined
+      - scalable_tunings is defined
 
   - name: DJANGO Enable and start systemd service
     systemd:
