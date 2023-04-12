@@ -57,6 +57,7 @@
     - name: BACKUP upload postgres backup to insecure SSL BUCKET
       shell: "export AWS_ACCESS_KEY_ID={{ bucket_access_key }} &&  export AWS_SECRET_ACCESS_KEY={{ bucket_secret_key }} && aws --endpoint {{ bucket_url }} --no-verify-ssl s3 cp /tmp/pgsql-backup-{{ file_timestamp }}.sql  s3://{{ bucket_name }}/backup/"
       when:
+        - bucket_url is defined
         - callrec_device == "s3-no-check-cert"
         - omldata is defined
 
@@ -73,7 +74,7 @@
         - bucket_url is defined
         - callrec_device != "s3-no-check-cert"
         - omlvoice is defined  
-      
+
     - name: BACKUP upload asterisk backup to insecure SSL BUCKET
       shell: "export AWS_ACCESS_KEY_ID={{ bucket_access_key }} &&  export AWS_SECRET_ACCESS_KEY={{ bucket_secret_key }} && aws --endpoint {{ bucket_url }} --no-verify-ssl s3 sync {{ asterisk_location_conf }}/custom/ s3://{{ bucket_name }}/backup/asterisk/{{ file_timestamp }}/"
       when:

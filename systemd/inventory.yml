@@ -137,4 +137,7 @@ all:
     # --- Request by Web-Video Inbound Calls 
     #video_host: 
 
-    
+    # --- BACKUPs: in case of implementing a separate bucket for backups
+    #backup_bucket: 
+    # --- Restore: in case of implementing a separate bucket for restore
+    #restore_bucket: 

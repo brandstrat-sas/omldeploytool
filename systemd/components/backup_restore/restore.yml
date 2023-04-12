@@ -33,6 +33,15 @@
       failed_when: "'FAILED' in command_result.stderr"
       when:
         - omlapp is defined
+        - callrec_device != "s3-no-check-cert"
+
+    - name: RESTORE postgres get .sql dump file
+      shell: "export AWS_ACCESS_KEY_ID={{ bucket_access_key }} &&  export AWS_SECRET_ACCESS_KEY={{ bucket_secret_key }} && aws --endpoint {{ bucket_url }} --no-verify-ssl s3 cp s3://{{ bucket_name }}/backup/pgsql-backup-{{ restore_file_timestamp }}.sql /tmp/"
+      register: command_result
+      failed_when: "'FAILED' in command_result.stderr"
+      when:
+        - omlapp is defined
+        - callrec_device == "s3-no-check-cert"
 
     - name: RESTORE postgres  Stop postgresql service
       service:
@@ -105,6 +114,13 @@
       shell: "podman exec -it oml-django-server aws --endpoint {{ bucket_url }} s3 sync s3://{{ bucket_name }}/media_root {{ INSTALL_PREFIX }}/media_root/"
       when:
         - omlapp is defined
+        - callrec_device != "s3-no-check-cert"
+
+    - name: RESTORE django media_root from BUCKET
+      shell: "podman exec -it oml-django-server aws --endpoint {{ bucket_url }} --no-verify-ssl s3 sync s3://{{ bucket_name }}/media_root {{ INSTALL_PREFIX }}/media_root/"
+      when:
+        - omlapp is defined
+        - callrec_device == "s3-no-check-cert"
 
     - name: RESTORE DJANGO Restart systemd service
       systemd:
