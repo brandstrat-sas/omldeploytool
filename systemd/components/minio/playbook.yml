@@ -69,12 +69,32 @@
       dest: /usr/bin/minio_cmd
       mode: '0777'
 
-  - name: MINIO install MC
-    shell: |
-      /usr/bin/minio_cmd alias set MINIO http://localhost:9000 '{{ s3_http_admin_user }}' '{{ s3_http_admin_pass }}'
-      /usr/bin/minio_cmd mb MINIO/'{{ bucket_name }}'
-      /usr/bin/minio_cmd mb MINIO/'{{ bucket_name }}-backups'
-      /usr/bin/minio_cmd admin user add MINIO '{{ bucket_access_key }}' '{{ bucket_secret_key }}'
-      /usr/bin/minio_cmd admin policy attach MINIO readwrite --user '{{ bucket_access_key }}'
+  - name: MINIO instance alias minio to manage
+    shell: "/usr/bin/minio_cmd alias set MINIO http://localhost:9000 '{{ s3_http_admin_user }}' '{{ s3_http_admin_pass }}'"
     args:
       executable: /bin/bash
+
+
+  - name: MINIO check if bucket exist
+    shell: "/usr/bin/minio_cmd ls MINIO/{{ bucket_name }}"
+    args:
+      executable: /bin/bash
+    register: bucket_exist
+    ignore_errors: yes
+
+  - name: MINIO create bucket
+    shell: "/usr/bin/minio_cmd mb MINIO/{{ bucket_name }}"
+    args:
+      executable: /bin/bash
+    when: bucket_exist.stdout.find('ERROR') != -1
+
+  - name: MINIO create user and secret access keys
+    shell: "/usr/bin/minio_cmd admin user add MINIO {{ bucket_access_key }} {{ bucket_secret_key }}"
+    args:
+      executable: /bin/bash
+
+  - name: MINIO attach readwrite policy to key-user created
+    shell: "/usr/bin/minio_cmd admin policy attach MINIO readwrite --user {{ bucket_access_key }}"
+    args:
+      executable: /bin/bash
+    ignore_errors: yes

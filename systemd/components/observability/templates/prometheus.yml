@@ -33,9 +33,11 @@ scrape_configs:
     static_configs:
       - targets: ['{{ voice_host }}:9096']
 
+{% if postgres_out != true %}
   - job_name: '{{ tenant_folder }}_postgres'
     static_configs:
       - targets: ['{{ data_host }}:9187']
+{% endif %}
 
   - job_name: '{{ tenant_folder }}_redis'
     static_configs:

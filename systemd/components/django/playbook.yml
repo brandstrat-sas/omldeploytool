@@ -67,6 +67,20 @@
       - upgrade
     when: enterprise_edition == true
 
+  - name: POSTGRESQL Create a new database with name {{ postgres_database }}
+    postgresql_db:
+      name: "{{ postgres_database }}"
+      login_host: "{{ postgres_host }}"
+      login_password: "{{ postgres_password }}"
+      login_user: "{{ postgres_user }}"
+      port: "{{ postgres_port }}"
+      maintenance_db: "{{ postgres_maintenance_db }}"
+      state: present
+    tags:
+      - install
+    when: 
+      - upgrade_from_oml_1 is not defined
+      
   - name: POSTGRESQL Create a new database with name {{ postgres_homer_db }}
     postgresql_db:
       name: "{{ postgres_homer_db }}"
