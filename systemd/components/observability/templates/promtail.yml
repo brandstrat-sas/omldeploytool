@@ -1,0 +1,89 @@
+server:
+  http_listen_port: 9080
+  http_listen_address: {{ omni_ip_lan }}
+
+positions:
+  filename: /tmp/positions.yaml
+
+clients:
+  - url: http://{{ data_host }}:3100/loki/api/v1/push
+
+scrape_configs:
+
+{% if omlapp is defined %}
+- job_name: uwsgi
+  static_configs:
+  - targets:
+      - localhost
+    labels:
+      job: uwsgi
+      __path__: /var/log/django/*.log
+
+- job_name: nginx
+  static_configs:
+  - targets:
+      - localhost
+    labels:
+      job: nginx
+      __path__: /var/log/nginx/*.log
+
+# - job_name: app_syslog
+#   static_configs:
+#   - targets:
+#       - localhost
+#     labels:
+#       job: app_syslog
+#       __path__: /var/log/omlapp/syslog
+
+{% elif omlvoice is defined %}
+- job_name: asterisk
+  static_configs:
+  - targets:
+      - localhost
+    labels:
+      job: asterisk
+      __path__: /var/log/asterisk/*.log
+
+# - job_name: rtpengine
+#   static_configs:
+  # - targets:
+  #     - localhost
+  #   labels:
+  #     job: rtpengine
+  #     __path__: /var/log/rtpengine.log
+
+# - job_name: voice_syslog
+#   static_configs:
+#   - targets:
+#       - localhost
+#     labels:
+#       job: voice_syslog
+#       __path__: /var/log/omlvoice/syslog
+
+{% elif omldata is defined %}
+# - job_name: postgres
+#   static_configs:
+#   - targets:
+#       - localhost
+#     labels:
+#       job: postgres
+#       __path__: /var/log/postgres.log
+
+# - job_name: redis
+#   static_configs:
+#   - targets:
+#       - localhost
+#     labels:
+#       job: redis
+#       __path__: /var/log/redis.log
+
+- job_name: data_syslog
+  static_configs:
+  - targets:
+      - localhost
+    labels:
+      job: data_syslog
+      __path__: /var/log/omldata/syslog
+
+{% else %}
+{% endif %}     

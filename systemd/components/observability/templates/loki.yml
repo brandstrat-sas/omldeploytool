@@ -12,7 +12,7 @@ common:
       rules_directory: /tmp/loki/rules
   replication_factor: 1
   ring:
-    instance_addr: 172.16.101.43
+    instance_addr: {{ data_host }}
     kvstore:
       store: inmemory
 
@@ -25,7 +25,7 @@ query_range:
 
 schema_config:
   configs:
-    - from: 2020-10-24
+    - from: 2023-01-23
       store: boltdb-shipper
       object_store: filesystem
       schema: v11
