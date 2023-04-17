@@ -27,6 +27,9 @@ case ${oml_action} in
   backup)
     echo "deploy: $oml_action"
   ;;
+  restore)
+    echo "deploy: $oml_action"
+  ;;
   app)
     echo "deploy: $oml_action"
   ;;
@@ -43,6 +46,9 @@ case ${oml_action} in
     echo "deploy: $oml_action"
   ;;
   cron)
+    echo "deploy: $oml_action"
+  ;;
+  minio)
     echo "deploy: $oml_action"
   ;;
   redis)
@@ -121,6 +127,22 @@ case ${oml_action} in
     -i .inventory.yml
     Banner `echo $?`
   ;;
+  backup)
+    ansible-playbook ./components/backup_restore/backup.yml --extra-vars \
+    "tenant_folder=$oml_tenant \
+    file_timestamp=$(date +%s) " \
+    --tags $oml_action \
+    -i .inventory.yml
+    Banner `echo $?`
+  ;;
+  restore)
+    ansible-playbook ./components/backup_restore/restore.yml --extra-vars \
+    "tenant_folder=$oml_tenant" \
+    --tags $oml_action \
+    -i .inventory.yml
+    Banner `echo $?`
+  ;;
+  
   *)
     ansible-playbook matrix.yml --extra-vars \
     "django_repo_path=$(pwd)/components/django/ \
@@ -192,7 +214,7 @@ fi
 for i in "$@"
 do
   case $i in
-    --action=upgrade|--action=install|--action=backup|--action=voice|--action=app|--action=observability|--action=postgres|--action=haproxy|--action=cron|--action=keepalived|--action=kamailio|--action=rtpengine|--action=asterisk|--action=sentinel|--action=redis|--action=pgsql_node_recovery_main|--action=pgsql_node_takeover_main|--action=redis_node_takeover_main|--action=pgsql_node_recovery_backup)
+    --action=upgrade|--action=install|--action=backup|--action=restore|--action=voice|--action=app|--action=observability|--action=postgres|--action=haproxy|--action=cron|--action=keepalived|--action=kamailio|--action=rtpengine|--action=asterisk|--action=sentinel|--action=redis|--action=pgsql_node_recovery_main|--action=pgsql_node_takeover_main|--action=redis_node_takeover_main|--action=pgsql_node_recovery_backup|--action=minio)
       oml_action="${i#*=}"
       shift
     ;;

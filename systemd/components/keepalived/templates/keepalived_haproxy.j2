@@ -36,7 +36,7 @@ vrrp_instance haproxy_{{ tenant_folder }} {
         auth_pass 1111
     }
     virtual_ipaddress {
-        {{ ha_vip }}
+        {{ application_host }}
     }
     track_script {
     	check_component

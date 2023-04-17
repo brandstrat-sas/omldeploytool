@@ -19,7 +19,6 @@
 - name: HAPROXY installation and configuration
   hosts: omnileads_haproxy
   tags:
-    - all_components
     - haproxy
   vars:
     img_repo: '{{ container_image_registry }}/haproxy'

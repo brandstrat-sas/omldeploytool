@@ -9,6 +9,10 @@ case $1 in
     echo "init Environment with some data"
     podman exec -it oml-django-server python3 /opt/omnileads/ominicontacto/manage.py inicializar_entorno
     ;;
+  --init_env_devops)
+    echo "init Environment with some data"
+    podman exec -it oml-django-server python3 /opt/omnileads/ominicontacto/manage.py inicializar_entorno --qa-devops
+    ;;
   --regenerar_asterisk)
     echo "regenerate redis asterisk data"
     podman exec -it oml-django-server python3 /opt/omnileads/ominicontacto/manage.py regenerar_asterisk

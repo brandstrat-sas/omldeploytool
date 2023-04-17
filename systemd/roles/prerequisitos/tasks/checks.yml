@@ -88,6 +88,7 @@
     - voice
     - asterisk
     - django
+    - observability
 
 # Set minio_host as {{ data_host }} on App instance when minios_host is not explicitly defined
 - name: CHECKS Setting minio_host
@@ -146,7 +147,7 @@
     - asterisk
 
 # Set prometheus_host as {{ application_host }} on Voice-Homer instance when prometheus_host is not explicitly defined
-- name: CHECKS Setting prometheus_host as localhost
+- name: CHECKS Setting prometheus_host as application_host
   set_fact:
     prometheus_host: "{{ application_host }}"
   changed_when: false
@@ -157,6 +158,7 @@
     - install
     - upgrade
     - asterisk
+    - observability
 
 # Set asterisk_host as {{ voice_host }} on App instance when asterisk_host is not explicitly defined
 - name: CHECKS Setting asterisk_host as voice_host

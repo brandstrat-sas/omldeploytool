@@ -21,7 +21,6 @@
 - name: REDIS OMniLeads Redis component deploy
   hosts: omnileads_app
   tags:
-    - all_components
     - redis
     
   vars:

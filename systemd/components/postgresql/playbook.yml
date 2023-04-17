@@ -22,7 +22,7 @@
   hosts: omnileads_data
   tags:
     - all_components
-    - app
+    - data
     - postgres
 
   vars:

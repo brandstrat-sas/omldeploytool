@@ -54,7 +54,7 @@ or
 Before first time you login must to exec:
 
 ```
-./manage --reset_pass
+./manage.sh --reset_pass
 ```
 
 Then acces the URL with your browser 
@@ -73,7 +73,7 @@ Finally  you can choice a custom password.
 ## Create some testing data
 
 ```
-./manage --init_env
+./manage.sh --init_env
 ```
 
 Default Agent User & Pass:
@@ -102,7 +102,7 @@ as well as generate calls from the command line to OMniLeads inbound routes.
 ##### Generate inbound calls to omnileads stack:
 
 ```
-./manage --generate_call
+./manage.sh --generate_call
 ```
 
 This actions will make an inbound call to the default inbound campaign created from testing data. 
@@ -126,7 +126,7 @@ Then you can send calls to DID 01177660010, an also send calls from an agent to 
 This is used to launch some administration actions like, read containers logs, delete postgres logs tables and more. 
 
 ```
-./manage.sh --help
+./manage.sh.sh --help
 ```
 
 ## Configuring wombat dialer
@@ -145,7 +145,7 @@ Note: when configuring initial mariadb credentials the root pass is admin123, th
 If you want *reset to fresh install* status launch (with the stack operative):
 
 ```
-./manage.sh --clean_postgresql_db
+./manage.sh.sh --clean_postgresql_db
 ```
 
 Then login with *admin*, *admin* and create a new password. 

@@ -15,15 +15,15 @@ rule_files:
 scrape_configs:
   - job_name: '{{ tenant_folder }}_app_host'
     static_configs:
-      - targets: ['{{ hostvars['omnileads_app'].omni_ip_lan }}:9100']
+      - targets: ['{{ application_host }}:9100']
 
   - job_name: '{{ tenant_folder }}_voice_host'
     static_configs:
-      - targets: ['{{ hostvars['omnileads_voice'].omni_ip_lan }}:9100']
+      - targets: ['{{ voice_host }}:9100']
 
   - job_name: '{{ tenant_folder }}_data_host'
     static_configs:
-      - targets: ['{{ hostvars['omnileads_data'].omni_ip_lan }}:9100']
+      - targets: ['{{ data_host }}:9100']
 
   - job_name: prometheus
     static_configs:
@@ -31,19 +31,21 @@ scrape_configs:
 
   - job_name: '{{ tenant_folder }}_heplify-server'
     static_configs:
-      - targets: ['{{ hostvars['omnileads_voice'].omni_ip_lan }}:9096']
+      - targets: ['{{ voice_host }}:9096']
 
+{% if postgres_out != true %}
   - job_name: '{{ tenant_folder }}_postgres'
     static_configs:
-      - targets: ['{{ hostvars['omnileads_data'].omni_ip_lan }}:9187']
+      - targets: ['{{ data_host }}:9187']
+{% endif %}
 
   - job_name: '{{ tenant_folder }}_redis'
     static_configs:
-      - targets: ['{{ hostvars['omnileads_data'].omni_ip_lan }}:9121']
+      - targets: ['{{ data_host }}:9121']
 
   - job_name: '{{ tenant_folder }}_asterisk'
     static_configs:
-      - targets: ['{{ hostvars['omnileads_voice'].omni_ip_lan }}:7088']
+      - targets: ['{{ voice_host }}:7088']
 
 alerting:
   alertmanagers:

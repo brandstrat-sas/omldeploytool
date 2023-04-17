@@ -7,11 +7,11 @@ COMPOSE_PROJECT_NAME=prodenv
 #               Components image version                    #
 #############################################################
 
-OMLAPP_IMG=omnileads/omlapp:RC-230204.01
+OMLAPP_IMG=omnileads/omlapp:1.27.0
 OMLWS_IMG=omnileads/websockets:230204.01
 OMLPGSQL_IMG=omnileads/postgres:230204.01
-OMLACD_IMG=omnileads/asterisk:230204.01
-OMLNGINX_IMG=omnileads/nginx:230204.01
+OMLACD_IMG=omnileads/asterisk:230417.01
+OMLNGINX_IMG=omnileads/nginx:230215.01
 OMLKAM_IMG=omnileads/kamailio:230204.01
 OMLRTPENGINE_IMG=omnileads/rtpengine:230204.01
 

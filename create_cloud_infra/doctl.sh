@@ -77,6 +77,11 @@ case $1 in
     --engine pg \
     --region sfo3
     ;;
+  --add-firewall)
+    echo "deploy PGSQL: $2"
+    doctl compute firewall add-droplets $1 $2
+    --region sfo3
+    ;;    
   --list)
     doctl compute droplet list
     ;;
