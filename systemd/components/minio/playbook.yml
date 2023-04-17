@@ -74,7 +74,6 @@
     args:
       executable: /bin/bash
 
-
   - name: MINIO check if bucket exist
     shell: "/usr/bin/minio_cmd ls MINIO/{{ bucket_name }}"
     args:
@@ -86,8 +85,8 @@
     shell: "/usr/bin/minio_cmd mb MINIO/{{ bucket_name }}"
     args:
       executable: /bin/bash
-    when: bucket_exist.stdout.find('ERROR') != -1
-
+    when: bucket_exist.rc != 0
+    
   - name: MINIO create user and secret access keys
     shell: "/usr/bin/minio_cmd admin user add MINIO {{ bucket_access_key }} {{ bucket_secret_key }}"
     args:

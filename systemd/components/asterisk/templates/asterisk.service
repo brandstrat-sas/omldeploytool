@@ -20,6 +20,7 @@ ExecStart=/usr/bin/podman run \
   --network=host \
   --env-file=/etc/default/asterisk.env \
   --volume=/etc/asterisk/custom/:/etc/asterisk/custom \
+  --volume=asterisk_logs:/var/log/asterisk:rw \
   --name=oml-asterisk-server \
   --rm  \
   {{ container_image_registry }}/omnileads/asterisk:{{ asterisk_version }}
