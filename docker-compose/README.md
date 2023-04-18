@@ -1,6 +1,6 @@
 #### This project is part of OMniLeads
 
-![Diagrama deploy tool](../ansible/png/omnileads_logo_1.png)
+![Diagrama deploy tool](../systemd/png/omnileads_logo_1.png)
 
 #### 100% Open-Source Contact Center Software
 #### [Community Forum](https://forum.omnileads.net/)

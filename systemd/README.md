@@ -7,7 +7,7 @@
 
 ---
 
-# Ansible System-D based OMniLeads management
+## Ansible System-D based OMniLeads management
 
 In this repository you will find an alternative to implement OMniLeads tenant management from an on-premise
 IT management perspective, but also completely viable for working in cloud-computing environments.
@@ -31,9 +31,11 @@ all that using a single script and configuration file.
 * [Deploy Cloud instance with backend (Postgres y Object Storage) as cloud service](#cloud-deploy)
 * [Deploy High Availability OMniLeads on premise instance](#onpremise-deploy)
 * [TLS Certs provisioning](#tls-cert-provisioning)
-* [Deploy a backup](#backups)
 * [Deploy an upgrade](#upgrades)
 * [Deploy a rollback](#rollback)
+* [Deploy a backup](#backups)
+* [Deploy a restore](#restore)
+* [Deploy an upgrade from CentOS7](#upgrade_from_centos7)
 * [Observability](#observability)
 
 
@@ -48,10 +50,10 @@ of the tenants, these are:
 * **matrix.yml**: the ansible root playbook
 
 Each instance of OMniLeads is generated on three Linux instances (application, voice, and data).
-In other words, we are going to have a Linux instance dedicated to executing the containers corresponding to the Application stack, on the second the containers of the voice processing stack are executed and on the third those of the data stack.
+In other words, we are going to have a Linux instance dedicated to executing the containers corresponding to the Application stack, 
+on the second the containers of the voice processing stack are executed and on the third those of the data stack.
 
 ![Diagrama deploy tool](./png/deploy-tool-tenant-a.png)
-
 
 Then, once OMnileads is deployed on the corresponding instances, each container on which a component works
 can be managed as a systemd service.
@@ -63,7 +65,6 @@ systemd stop component
 ```
 
 ![Diagrama deploy tool zoom](./png/deploy-tool-ansible-deploy-instances.png)
-
 
 ## Ansible + Inventory 🔧 <a name="ansible-inventory"></a>
 
@@ -193,21 +194,26 @@ ansible needs to establish an SSH connection through public key.
 
 Then you should work on the inventory.yml file
 
-Regarding addresses and connections:
+Regarding addresses and connections. The parameter *omni_ip_lan* refers to the private IP (LAN) that will be used when opening certain ports for components, as well as when they connect with each other.
 
 ```
-omnileads-voice:
-  ansible_host: 190.10.19.200
-  ansible_ssh_port: 22
-  omni_ip_lan: 10.10.10.3
-omnileads-app:
-  ansible_host: 190.10.19.100
-  ansible_ssh_port: 22
-  omni_ip_lan: 10.10.10.4
-omnileads-observability:
-  ansible_host: 190.10.19.300
-  ansible_ssh_port: 22
-  omni_ip_lan: 10.10.10.5
+all:
+  hosts:
+    omnileads_data:
+      omldata: true
+      ansible_host: 10.10.10.2 
+      omni_ip_lan: 10.10.10.2
+      ansible_ssh_port: 22      
+    omnileads_voice: 
+      omlvoice: true
+      ansible_host: 10.10.10.3
+      omni_ip_lan: 10.10.10.3
+      ansible_ssh_port: 22      
+    omnileads_app:
+      omlapp: true
+      ansible_host: 10.10.10.4
+      omni_ip_lan: 10.10.10.4
+      ansible_ssh_port: 22  
 ```
 
 The infra_env parameter should be initialized as 'lan'.
@@ -216,7 +222,7 @@ The infra_env parameter should be initialized as 'lan'.
 infra_env: lan
 ```
 
-And finally, the *bucket_url* and *postgres_host* parameters must be commented out, so that both (PostgreSQL and Object Storage MinIO) are deployed within the application instance.
+And finally, the *bucket_url* and *postgres_host* parameters must be commented out, so that both (PostgreSQL and Object Storage MinIO) are deployed within the data instance.
 
 The rest of the parameters can be customized as desired.
 
@@ -231,7 +237,7 @@ Finally, the deploy.sh should be executed.
 You must have three Linux instances (Debian 11 or Rocky 8) with Internet access and **your public key (ssh) available**, since
 Ansible needs to establish an SSH connection to deploy the actions.
 
-Also under this format it is assumed that PostgreSQL and S3-compatible Object Storage are going to be provided as managed services by the selected cloud provider. This implies that these two OMniLeads components will not be deployed on the application instance as in the previous case.
+Also under this format it is assumed that PostgreSQL and S3-compatible Object Storage are going to be provided as managed services by the selected cloud provider. This implies that these two OMniLeads components will not be deployed on the data instance as in the previous case.
 
 ![Diagrama deploy cloud services](./png/deploy-tool-tenant-cloud-services.png)
 
@@ -252,6 +258,7 @@ Finally the deploy is launched:
 ```
 
 ## Deploy High Availability onpremise instance 🚀 <a name="cloud-deploy"></a>
+
 
 Se dispone de un archivo de inventario capaz de materializar un cluster de alta disponibilidad sobre 2 servidores físicos. 
 El cluster es basicamente una replicación (en Standby) de los componente de OMniLeads.
@@ -304,6 +311,10 @@ VIP voice_host: 172.16.101.203
 VIP haproxy_host: 172.16.101.204
 ```
 
+Es necesario contar con el acceso a un bucket Object Storage externo. Es decir que la instalación de OMniLeads
+en HA no contempla por ahora el deploy de MinIO Object Storage, por lo que es necesario para continuar con un despliegue 
+de la App en alta disponibilidad que se cuente con el bucket y sus claves de acceso.
+
 Entonces como ejemplo seguiremos con las IPs planteadas a la hora de plantear el archivo de inventory.
 
 ```
@@ -312,80 +323,94 @@ Entonces como ejemplo seguiremos con las IPs planteadas a la hora de plantear el
 omnileads_data:
   hosts:
     sql_1:  
-      ansible_host: 189.22.40.15
+      ansible_host: 172.16.101.101      
       omni_ip_lan: 172.16.101.101
       ansible_ssh_port: 22
       ha_rol: main
     sql_2:  
-      ansible_host: 189.22.20.11
+      ansible_host: 172.16.101.102
       omni_ip_lan: 172.16.101.102
       ansible_ssh_port: 22  
       ha_rol: backup
   vars:
     postgres_host_ha: true
     ha_vip_nic: eth0
-    ha_vip_main: 172.16.101.201
-    ha_vip_ro: 172.16.101.202
     netaddr: 172.16.101.0/16
     netprefix: 24
 ############################################
 omnileads_voice:
   hosts:
     voice_1:  
-      ansible_host: 200.203.1001.44
+      ansible_host: 172.16.101.103
       omni_ip_lan: 172.16.101.103
       ansible_ssh_port: 22
       ha_rol: main
     voice_2:
-      ansible_host: 200.203.1001.12
+      ansible_host: 172.16.101.104
       omni_ip_lan: 172.16.101.104
       ansible_ssh_port: 22
       ha_rol: backup
   vars:
     omlvoice: true
-    ha_vip_nic: ens18
-    ha_vip: 172.16.101.203    
+    ha_vip_nic: ens18    
 ############################################
 omnileads_haproxy:
   hosts:
     haproxy_1:
-      ansible_host: 201.100.201.44
+      ansible_host: 172.16.101.108
       omni_ip_lan: 172.16.101.108
       ansible_ssh_port: 22
       ha_rol: main
     haproxy_2:  
-      ansible_host: 201.100.201.2
+      ansible_host: 172.16.101.109
       omni_ip_lan: 172.16.101.109
       ansible_ssh_port: 22  
       ha_rol: backup
   vars:
     omlhaproxy: true
     ha_vip_nic: ens18
-    ha_vip: 172.16.101.204
     app_port: 443
 ############################################
 omnileads_app:
   hosts:
     app_1:  
-      ansible_host: 190.10.100.102
+      ansible_host: 172.16.101.105
+      ansible_ssh_port: 22
       omni_ip_lan: 172.16.101.105
-      ansible_ssh_port: 22      
       ha_rol: main
     app_2:
-      ansible_host: 190.10.100.101
+      ansible_host: 172.16.101.106
+      ansible_ssh_port: 22
       omni_ip_lan: 172.16.101.106
-      ansible_ssh_port: 22      
       ha_rol: backup
   vars:
+    ha_vip_nic: ens18
     omlapp: true
 ############################################
 
 all: 
   vars:
-    
+    # --- ansible user auth connection
+    ansible_user: root
+
+    # -- Cluster Redis IP (Haproxy VIP)
+    redis_host: 172.16.101.204
+    # --  Cluster redis Main node
+    redis_ip_main: 172.16.101.104
+    # --  Cluster postgres RW IP
+    postgres_host: 172.16.101.201
+    # --  Cluster postgres RO IP
+    postgres_ro_host: 172.16.101.201
+    # --  Cluster Voice (Asterisk + RTPengine) IP
+    voice_host: 172.16.101.203
+    # -- Cluster HTTP Web App (HAProxy VIP)
+    application_host: 172.16.101.204
+    # -- Cluster public NAT IP
+    omni_ip_wan: 190.19.150.8
+
     kamailio_version: 230204.01
-    asterisk_version: oml-196
-    rtpengine_version: oml-196
+    asterisk_version: 230328.01
+    rtpengine_version: 230204.01
     omnileads_version: 1.26.0
     websockets_version: 230204.01
     nginx_version: 230215.01
@@ -403,10 +428,8 @@ all:
     # --  Cluster redis IP
     # --  Use in case of run RTPEngine out of this deploy
     # rtpengine_host: 172.16.101.203
-    # -- Cluster HAProxy IP
-    observability_host: 172.16.101.204
     # -- Dialer host
-    dialer_host: 10.10.10.10
+    # dialer_host: 10.10.10.10
     # -- Bucket URL for Django & Asterisk
     bucket_url: https://172.16.101.3:9000
     # --- ansible user auth connection
@@ -419,29 +442,67 @@ all:
     # --- If you have an DNS FQDN resolution, you must to uncomment and set this param
     # --- otherwise leave commented to work invoking through an IP address
     #fqdn: fabis.sefirot.cloud
+    ...
+    ...
+    ...
+    ...
 ```
 
-Aclarar:
+Recordemos que todas las VM deben poseer la clave ssh de nuestro deployer (ssh-copy-id root@....). 
 
-#fqdn: fabis.sefirot.cloud
-bucket_url:
-
-Recordemos que todas las VM deben poseer la clave ssh de nuestro deployer. 
 Una vez ajustado el archivo de inventario, se ejecuta el script de deploy.sh.
 
 ```
 ./deploy.sh --action=install --tenant=tenant_name_folder
 ```
 
-La disposicion de los componentes contempla la ejecucion tanto del nodo RW de postgres como del nodo activo de redis sobre el hypervisor A, mientras que 
-el nodo Main de Asterisk y Haproxy sobre el hypervisor B.
+La disposicion de los componentes contempla la ejecucion tanto del nodo RW de postgres y redis sobre el hypervisor A, 
+mientras que el nodo activo de Asterisk y Haproxy sobre el hypervisor B.
 
 ![Diagrama deploy](./png/HA_hypervisors_and_vm.png)
 
-Por lo tanto tenemos un failover si llega a caer el Hypervisor-A entonces los componentes Postgres-RW y App/Redis-Main hacen un failover
-sobre el Hypervisor-B. Mientras que si cae el Hypervisot-B los componentes Haproxy-Main y Asterisk-Main ejecutan un failover sobre el Hypervisor-A.
+Por lo tanto tenemos un failover si llega a caer el Hypervisor-A entonces los componentes Postgres-RW y Redis-RW hacen un failover
+sobre el Hypervisor-B. Mientras que si cae el Hypervisor-B los componentes Haproxy-activo y Asterisk-activo ejecutan 
+un failover sobre el Hypervisor-A.
+
+### Recovery Postgres main node
+
+Cuando se produce un Failove desde Postgres Main sobre Postgres Backup entonces el nodo Backup toma la IP flotante del cluster y queda 
+como unico nodo RW/RO con sus IPs correspondientes. 
+
+Para volver Postgres al estado inicial se deben llevar a cabo dos acciones:
+
+```
+./deploy.sh --action=pgsql_node_recovery_backup --tenant=tenant_name_folder
+```
+
+Este comando se encarga de volver a unir el nodo Postgres Main al cluster. Pero si solo ejecutamos esta acción entonces 
+el Cluster quedará invertido, es decir Postgres B como main y Postgres A como backup.
+
+### Takeover Postgres main node
+
+
+Este comando implica que antes se haya ejecutado un Recovery como se expone en el paso anterior. 
+
+```
+./deploy.sh --action=pgsql_node_takeover_main --tenant=tenant_name_folder
+```
+
+Luego de la ejecución del takeover tendremos el cluster en el estado inicial, es decir Postgres A como Main y Postgres B como backup.
+
+### Takeover Redis main node
+
+
+Una ultima accion a concretar tiene que ver con el takeover del nodo Redis, de manera tal que dejemos el cluster de Redis en el estado inicial, 
+es decir Redis A como main y Redis B como backup.
+
+```
+./deploy.sh --action=redis_node_takeover_main --tenant=tenant_name_folder
+```
+
 
 ## TLS/SSL certs provisioning :closed_lock_with_key: <a name="tls-cert-provisioning"></a>
+
 
 From the inventory variable *certs* you can indicate what to do with the SSL certificates.
 The possible options are:
@@ -452,6 +513,7 @@ The possible options are:
 
 
 ## Post-installation steps :beer:
+
 
 Once the URL is available with the App returning the login view,  we can log in with the user *admin*, password *admin*.
 
@@ -468,6 +530,7 @@ From then on we can log in with the agent type user *agent*, password *agent1**.
 
 ## Perform a Backup :floppy_disk: <a name="backups"></a>
 
+
 Deploying a backup involves the asterisk custom configuration files /etc/asterisk/custom on the one hand and the database
 on the other, using the bucket associated with the instance as a backup log.
 
@@ -476,6 +539,12 @@ To launch a backup, simply call the deploy.sh script:
 ```
 ./deploy.sh --action=backup --tenant=tenant_name_folder
 ```
+
+El backup lo deposita en el bucket, quedando bajo la carpeta backup por un lado un archivo .sql con el timestamp y por otro lado
+se genera otro directorio con la fecha timestamp y alli dentro van los archivos custom y override de asterisk.
+
+
+FOTO
 
 ## Upgrades :arrows_counterclockwise:  <a name="upgrades"></a>
 
@@ -487,7 +556,7 @@ semantics implies the string RC (release candidates) or stable (able to deploy o
 For example:
 
 ```
-RC-1.27.0
+pre-release-1.27.0
 1.27.0
 ```
 
@@ -531,6 +600,7 @@ Then the deploy.sh script must be called with the --upgrade parameter.
 
 ## Rollback  :leftwards_arrow_with_hook: <a name="rollback"></a>
 
+
 The use of containers when executing the OMniLeads components allows us to easily apply rollbacks towards versions
 frozen history and accessible through the "tag".
 
@@ -550,29 +620,133 @@ Then the deploy.sh script must be called with the --upgrade parameter.
 ./deploy.sh --action=upgrade --tenant=tenant_name_folder
 ```
 
+## Restore :mag_right: <a name="restore"></a>
+
+
+Se puede proceder con un restore tanto sobre una instalación fresca asi como también sobre una instancia productiva. 
+
+Aplicar restore sobre la nueva instancia:Se debe descomentar los dos parametros finales del inventory.yml. Por un lado para indicar que el bucket no tiene certificados confiables y el segundo es para indicar el restore que queremos ejecutar.
+
+```
+restore_file_timestamp: 1681215859 
+```
+
+Ejecutar el deploy del restore:
+
+```
+./deploy.sh --action=restore --tenant=digitalocean_deb
+```
+
+Comprobar que todo se haya recuperado.
+
+
+## Upgrade from CentOS-7 OMniLeads instance <a name="upgrade_from_centos7"></a>
+
+
+Se debe desplegar una instancia de OMniLeads "all in three" asegurandose de que las variables del inventory.yml planteadas
+a continuación deberán valer igual que sus homónimas en la instancia de CentOS 7 desde donde se desea migrar. 
+
+* ami_user
+* ami_password
+* postgres_password
+* postgres_database
+* postgres_user
+* dialer_user
+* dialer_password
+
+Sobre la instancia de OMniLeads 1.2X CentOS-7 ejecutar los siguientes comandos para generar un backup de postgres por un lado 
+y luego subir al Bucket Object Storage de la nueva versión de OMniLeads las grabaciones, audios de telefonía, las personalizaciones 
+(en caso de haberlas) de Asterisk _custom.conf & _override_conf y también el propio backup de Postgres. 
+
+```
+export NOMBRE_BACKUP: algun_nombre
+pg_dump omnileads > /tmp/pgsql-backup-$NOMBRE_BACKUP.sql
+export AWS_ACCESS_KEY_ID=uLZTnLB0aURXI6NB
+export AWS_SECRET_ACCESS_KEY=VSlMrqEWS7aWtgrn7G2zs949W6jdFleY
+export S3_ENDPOINT=https://172.16.101.3:9000
+export S3_BUCKET_NAME=tenant1 # nombre del bucket del inventory.yml env 2.0
+aws --endpoint ${S3_ENDPOINT} --no-verify-ssl s3 sync /opt/omnileads/media_root s3://${S3_BUCKET_NAME}/media_root
+aws --endpoint ${S3_ENDPOINT} --no-verify-ssl s3 sync /opt/omnileads/asterisk/var/spool/asterisk/monitor/ s3://${S3_BUCKET_NAME}
+aws --endpoint ${S3_ENDPOINT} --no-verify-ssl s3 cp /tmp/pgsql-backup-$NOMBRE_BACKUP.sql  s3://${S3_BUCKET_NAME}/backup/
+mkdir /opt/omnileads/asterisk/etc/asterisk/custom
+cd /opt/omnileads/asterisk/etc/asterisk
+cp *_custom* ./custom
+cp *_override* ./custom
+aws --endpoint ${S3_ENDPOINT} --no-verify-ssl s3 sync /etc/asterisk/custom/ s3://${S3_BUCKET_NAME}/backup/asterisk/$NOMBRE_BACKUP/
+```
+
+A partir del hecho de contar con todo lo necesario para restituir el servicio sobre la nueva infraestructura en el Bucket de la misma, 
+se puede proceder con el deploy de este proceso de restauración. 
+
+Hacia el final del archivo se encuentra la variable *restore_file_timestamp* la cual debe contener el nombre nombre utilizado en
+el paso anterior para referir a los backups tomados. 
+
+```
+restore_file_timestamp: NOMBRE_BACKUP
+```
+
+Ejecutar el deploy del restore sobre le tenant en cuestión:
+
+```
+./deploy.sh --action=restore --tenant=tenant1
+```
+
+
 ## Observability :mag_right: <a name="observability"></a>
 
+
 Inside each subscriber linux instance the deployer put some containers in order to implementar la observabilidad de todo el stack. Para no solo poder 
-observar metricas a nivel sistema operativo sino que ademas poder obtener metricas especificas de componentes como redis, postgres o asterisk. 
+observar metricas a nivel sistema operativo sino que ademas poder obtener metricas especificas de componentes como redis, postgres o asterisk, así como
+también levantar los logs del sistema operativo y de los componentes y enviarlos al stack de observabilidad. 
 
-Esto es posible gracias al planteo de Prometheus y sus exporters. 
+Esto nos permite plantear un centro de observabilidad multi instancias. Sobre el cual es posible centralizar el monitoreo de métricas
+del OS y de la aplicación y sus componentes, así como también centralizar el análisis de logs.
 
-
+Esto es posible gracias al planteo de Prometheus junto a sus exporters para el monitoreo de métricas por un lado 
+mientras que Loki y Promtail implementan la centralización de los logs. 
 
 * **Homer SIP Capture**: used to receive the SIP/RTP information sent to it by Asterisk (hep.conf). Homer stores this data and also provides a web interface to view real-time SIP traces.
 * **Prometheus**: used to collect performance metrics from both the hosts (application / voice) and their components (asterisk, redis, postgres, etc.), also collects the metrics reported by SIP Homer Capture itself .
-
-Finally, you will be able to have an instance of Grafana and invoke this Prometheus as a data-source and thus begin to deploy the dashboards.
+* **Loki**: used to storage file logs generated by OMniLeads components like django, nginx, kamailio, etc.
+* **Promtail**: used to parse logs file on Linux VM nd send this to Loki DB.
 
 ![Diagrama deploy tool zoom](./png/observability_boxes.png)
 
-
-It is also viable to use a Prometheus Central that collects metrics from each tenant (prometheus) and thus manage a more
-redundant and robust in terms of storage backup.
-
+Finally, you will be able to have an instance of Grafana and Prometheus that invoke this Prometheus deployed on tenat like data-source in order
+to them build dashboards, on the other hand Grafana must to invoke the Loki deployed on tenant like data-source for logs analisys.
 
 ![Diagrama deploy tool zoom](./png/observability_MT.png)
 
+
+## Seguridad
+
+OMniLeads es una aplicación que conjuga las tecnologías Web, WebRTC y VoIP. Esto implica cierta complejidad y recaudos 
+al momento de desplegar la misma en producción bajo un esquema de acceso directo a través de Internet. 
+
+Lo ideal es que se utiliza un Proxy o Balanceador de carga expuesto a internet y que éste reenvíe las solicitudes 
+al Nginx del stack de OMniLeads, así como también al momento de conectar con la PSTN a través de SIP/RTP resulta ideal 
+operar detrás de un SBC expuesto a Internet.
+
+En caso de operar en proveedores cloud que ofrecen VPS expuestos a Internet, se debe utilizar un Cloud Firewall para 
+asegurar las instancias Linux (data, voz y web) que componen OMniLeads. A continuación se indican las reglas de Firewall
+que deberán ser aplicadas sobre cada instancia.
+
+### Data
+
+* 3100/TCP Loki: por aqui se procesan las conexiones provenientes del centro de monitoreo, mas precisamente desde Grafana. Se puede 
+abrir este puerto restringiendo por origen en la IP del centro de monitoreo.
+
+### Voice
+
+* 5060/UDP Asterisk: por aqui se procesan las solicitudes SIP de llamadas entrantes provenientes desde el o los ITSP. Se debe abrir este puerto restringiendo por origen en la IP o IPs de o los proveedores de terminación PSTN SIP.
+
+* 20000/50000 UDO Asterisk & RTP engine: este rango de puertos se puede abrir a todo Internet.
+
+### Web
+
+* 443/tcp Nginx: por aquí se procesan las peticiones Web/WebRTC que llegan hacia Nginx. Se puede abrir el puerto 443 a todo Internet.
+
+* 9190/tcp Prometheus: por aqui se procesan las conexiones provenientes del centro de monitoreo, mas precisamente desde Prometheus. Se puede abrir este  puerto restringiendo por origen en la IP del centro de monitoreo.
 
 ## License & Copyright
 

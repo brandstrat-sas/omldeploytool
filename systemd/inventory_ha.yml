@@ -186,3 +186,18 @@ all:
     # --- High Availability flag
     omnileads_ha: true
 
+    # --- Restore id request by restore filename
+    #restore_file_timestamp: 1681215859
+
+    # --- Integrations with external hosts
+    # --- Request by Homer
+    #prometheus_host: 
+    # --- Request by Asterisk 
+    #homer_host: 
+    # --- Request by Web-Video Inbound Calls 
+    #video_host: 
+
+    # --- BACKUPs: in case of implementing a separate bucket for backups
+    #backup_bucket: 
+    # --- Restore: in case of implementing a separate bucket for restore
+    #restore_bucket: 
