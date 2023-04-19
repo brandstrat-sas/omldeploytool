@@ -260,22 +260,22 @@ Finally the deploy is launched:
 ## Deploy High Availability onpremise instance 🚀 <a name="cloud-deploy"></a>
 
 
-Se dispone de un archivo de inventario capaz de materializar un cluster de alta disponibilidad sobre 2 servidores físicos. 
-El cluster es basicamente una replicación (en Standby) de los componente de OMniLeads.
+We have an inventory file capable of materializing a high availability cluster on 2 Hypervisors (physical servers).  
+
+The cluster essentially replicates all OMniLeads components in such a way that if one of the servers goes down, it can continue to operate by moving the services to the node that is still on.
 
 ![Diagrama deploy cloud services](./png/HA_box_deploy.png)
 
-Hilando más fino el cluster puede ser visto en catro partes (o 4 miniclusters).
+The postgres, redis, asterisk, rtpengine, haproxy and CRON components are deployed in an Active-Passive scheme, i.e. there is one node that processes requests while the other remains in standby or Read Only state (in the case of Postgres, asterisk, rtpengine, haproxy and CRON). 
+node that processes the requests while the other remains in standby or Read Only state (for Postgres).
 
-* Data
-* Voice
-* App
-* Load Balancer
+In this deployment format, OMniLeads needs a load balancing stage to receive the Web requests.
+and distribute them under some algorithm on the two instances (one VM on each hypervisor node) of the application that are executed.
 
-En este formato de deploy, OMniLeads necesita de una etapa de balanceo de carga para que recepcione las solicitudes Web.
-y las distribuya bajo algún algoritmo sobre las dos instancias (una VM sobre cada nodo hypervisor) de aplicación que son ejecutadas.
+On the side of the Web components (uwsgi, websockets, nginx, kamailio and daphne) they are arranged in an Active-Active format being 
+Haproxy does the HTTP request balancing on both Active instances. 
 
-Se debe disponer de 8 Maquinas virtuales siendo las mismas distribuidas bajo el siguiente esquema:
+There should be 8 virtual machines distributed under the following scheme:
 
 * **Hypervisor A:** App + Redis Main, Postgres Main, Voice Backup
 * **Hypervisor B:** App + Redis Backup, Postgres Backup, Voice Main
@@ -283,17 +283,22 @@ Se debe disponer de 8 Maquinas virtuales siendo las mismas distribuidas bajo el 
 ![Diagrama deploy cloud services](./png/HA_box.png)
 
 
-* Redis: se utiliza Sentinel, que es el director del cluster. Quien promociona en base a una logica el rol de cada Redis.
-* Postgres: se utiliza repmgr, que es el directori del cluster. Quien promociona en base a una logica el rol de cada Postgres.
-* Asterisk: se utiliza Keepalived con el fin de supervisar al nodo activo y en caso de una caída del mismo, levantar la IP Virtual (VIP) sobre el nodo de Failover.
-* HAProxy: se utiliza Keepalived con el fin de supervisar al nodo activo y en caso de una caída del mismo, levantar la IP Virtual (VIP) sobre el nodo de Failover.
-* Aplicación Web: estos nodos corren como Activo-Activo, es decir hay dos instancias de App corriendo y que atienden peticiones en base al balanceo que en una etapa anterior, lleva a cabo Haproxy. 
+* Redis: Sentinel, who is the cluster manager, is used. He promotes on the basis of a logic the role of each Redis.
+* Postgres: repmgr is used, which is the cluster director. Who promotes on a logical basis the role of each Postgres.
+* Asterisk: Keepalived is used in order to supervise the active node and in case of a fall of the same one, to raise the Virtual IP (VIP) on the Failover node.
+* HAProxy: Keepalived is used in order to monitor the active node and in case of node downtime, raise the Virtual IP (VIP) on the Failover node.
+* Web Application: these nodes run as Active-Active, i.e. there are two instances of App running and attending requests based on the balancing that Haproxy carries out in a previous stage. 
 
-Manos a la obra !
 
-Para desplegar nuestro cluster debemos contar con 2 VM con CentOS7 (para el cluster de Postgres) por un lado y 6 VM con Debian11 (o ubuntu-22.04 o rocky linux 8) para confeccionar los clusters de App, Voice y Load balancer. 
+>  Note: Access to an external Object Storage bucket is required. That is to say that the installation of OMniLeads
+>in HA does not contemplate the deployment of MinIO Object Storage for now, so it is necessary to have the bucket and its access keys in order to continue with a high >availability deployment of the of the App in high availability, it is necessary to have the bucket and its access keys.
 
-Supongamos la siguiente distribución de componentes sobre las VM y configuración de IPs:
+
+### Let's deploy !
+
+To deploy our cluster we must have 2 VMs with CentOS7 (for the Postgres cluster) on one side and 6 VMs with Debian11 (or ubuntu-22.04 or rocky linux 8) to build the App, Voice and Load balancer clusters. 
+
+Let's assume the following distribution of components on the VMs and IP configuration:
 
 ```
 VM data RW: 172.16.101.101 (Hypervisor A)
@@ -311,11 +316,7 @@ VIP voice_host: 172.16.101.203
 VIP haproxy_host: 172.16.101.204
 ```
 
-Es necesario contar con el acceso a un bucket Object Storage externo. Es decir que la instalación de OMniLeads
-en HA no contempla por ahora el deploy de MinIO Object Storage, por lo que es necesario para continuar con un despliegue 
-de la App en alta disponibilidad que se cuente con el bucket y sus claves de acceso.
-
-Entonces como ejemplo seguiremos con las IPs planteadas a la hora de plantear el archivo de inventory.
+Then, as an example, we will continue with the IPs proposed at the time of creating the inventory file.
 
 ```
 ---
@@ -448,56 +449,64 @@ all:
     ...
 ```
 
-Recordemos que todas las VM deben poseer la clave ssh de nuestro deployer (ssh-copy-id root@....). 
+> Note: Remember that all VMs must have the ssh key of our deployer: **ssh-copy-id root@....**.
 
-Una vez ajustado el archivo de inventario, se ejecuta el script de deploy.sh.
+Finallly:
 
 ```
 ./deploy.sh --action=install --tenant=tenant_name_folder
 ```
 
-La disposicion de los componentes contempla la ejecucion tanto del nodo RW de postgres y redis sobre el hypervisor A, 
-mientras que el nodo activo de Asterisk y Haproxy sobre el hypervisor B.
+The layout of the components contemplates the execution of both the RW node of postgres and redis on the hypervisor A, 
+while the active node of Asterisk and Haproxy on hypervisor B.
 
 ![Diagrama deploy](./png/HA_hypervisors_and_vm.png)
 
-Por lo tanto tenemos un failover si llega a caer el Hypervisor-A entonces los componentes Postgres-RW y Redis-RW hacen un failover
-sobre el Hypervisor-B. Mientras que si cae el Hypervisor-B los componentes Haproxy-activo y Asterisk-activo ejecutan 
-un failover sobre el Hypervisor-A.
+Therefore we have a failover if the Hypervisor-A crashes then the Postgres-RW and Redis-RW components fail over to Hypervisor-B.
+on Hypervisor-B. While if Hypervisor-B goes down the Haproxy-active and Asterisk-active components execute a failover on Hypervisor-A. 
+failover to Hypervisor-A.
 
 ### Recovery Postgres main node
 
-Cuando se produce un Failove desde Postgres Main sobre Postgres Backup entonces el nodo Backup toma la IP flotante del cluster y queda 
-como unico nodo RW/RO con sus IPs correspondientes. 
+When a Failover from Postgres Main to Postgres Backup occurs, then the Backup node takes the floating IP of the cluster and remains as the only RW/RO node with its corresponding IPs. 
+as the only RW/RO node with its corresponding IPs. 
 
-Para volver Postgres al estado inicial se deben llevar a cabo dos acciones:
+To return Postgres to the initial state two actions must be carried out:
 
 ```
-./deploy.sh --action=pgsql_node_recovery_backup --tenant=tenant_name_folder
+./deploy.sh --action=pgsql_node_recovery_main --tenant=tenant_name_folder
 ```
 
-Este comando se encarga de volver a unir el nodo Postgres Main al cluster. Pero si solo ejecutamos esta acción entonces 
-el Cluster quedará invertido, es decir Postgres B como main y Postgres A como backup.
+This command is in charge of rejoining the Postgres Main node to the cluster. But if we only execute this action then 
+the Cluster will be inverted, i.e. Postgres B as main and Postgres A as backup.
 
 ### Takeover Postgres main node
 
 
-Este comando implica que antes se haya ejecutado un Recovery como se expone en el paso anterior. 
+This command implies that a Recovery has been previously executed as described in the previous step.
 
 ```
 ./deploy.sh --action=pgsql_node_takeover_main --tenant=tenant_name_folder
 ```
 
-Luego de la ejecución del takeover tendremos el cluster en el estado inicial, es decir Postgres A como Main y Postgres B como backup.
+After the execution of the takeover we will have the cluster in the initial state, i.e. Postgres A as Main and Postgres B as backup.
 
 ### Takeover Redis main node
 
 
-Una ultima accion a concretar tiene que ver con el takeover del nodo Redis, de manera tal que dejemos el cluster de Redis en el estado inicial, 
-es decir Redis A como main y Redis B como backup.
+A last action to be taken has to do with the takeover of the Redis node, in such a way that we leave the Redis cluster in the initial state, i.e. Redis A as main and Redis B as backup, that is to say Redis A as main and Redis B as backup.
 
 ```
 ./deploy.sh --action=redis_node_takeover_main --tenant=tenant_name_folder
+```
+
+### Recovery Postgres backup node
+
+When the VM hosting the Postgres Backup node shuts down, the Main node takes the floating RO IP of the cluster and remains as the only RW/RO node with its corresponding IPs. as the only RW/RO node with its corresponding IPs. To rejoin the backup node to the cluster and in this way recover the RO's VIP, it is necessary to run a
+the RO VIP, a recovery deploy of the postgres backup node must be executed.
+
+```
+./deploy.sh --action=pgsql_node_recovery_backup --tenant=tenant_name_folder
 ```
 
 
@@ -540,11 +549,10 @@ To launch a backup, simply call the deploy.sh script:
 ./deploy.sh --action=backup --tenant=tenant_name_folder
 ```
 
-El backup lo deposita en el bucket, quedando bajo la carpeta backup por un lado un archivo .sql con el timestamp y por otro lado
-se genera otro directorio con la fecha timestamp y alli dentro van los archivos custom y override de asterisk.
+The backup is deposited in the bucket, being under the backup folder on one side a .sql file with the timestamp and on the other side another directory is generated with the timestamp date and there are the custom and override asterisk files.
+another directory is generated with the timestamp date and there inside are the asterisk custom and override files.
 
-
-FOTO
+![Diagrama deploy backup](./png/deploy-backup.png)
 
 ## Upgrades :arrows_counterclockwise:  <a name="upgrades"></a>
 
@@ -623,28 +631,25 @@ Then the deploy.sh script must be called with the --upgrade parameter.
 ## Restore :mag_right: <a name="restore"></a>
 
 
-Se puede proceder con un restore tanto sobre una instalación fresca asi como también sobre una instancia productiva. 
+You can proceed with a restore on a fresh installation as well as on a productive instance. 
 
-Aplicar restore sobre la nueva instancia:Se debe descomentar los dos parametros finales del inventory.yml. Por un lado para indicar que el bucket no tiene certificados confiables y el segundo es para indicar el restore que queremos ejecutar.
-
+Apply restore on the new instance: The two final parameters of the inventory.yml must be uncommented. On the one hand to indicate that the bucket does not have trusted certificates and the second one is to indicate the restore that we want to execute.
 ```
 restore_file_timestamp: 1681215859 
 ```
 
-Ejecutar el deploy del restore:
+Run restore deploy:
 
 ```
 ./deploy.sh --action=restore --tenant=digitalocean_deb
 ```
 
-Comprobar que todo se haya recuperado.
-
 
 ## Upgrade from CentOS-7 OMniLeads instance <a name="upgrade_from_centos7"></a>
 
 
-Se debe desplegar una instancia de OMniLeads "all in three" asegurandose de que las variables del inventory.yml planteadas
-a continuación deberán valer igual que sus homónimas en la instancia de CentOS 7 desde donde se desea migrar. 
+You must deploy an "all in three" instance of OMniLeads making sure that the inventory.yml variables listed below should be the same as their 
+counterparts in the CentOS 7 instance from which you want to migrate. below should be the same as their counterparts in the CentOS 7 instance from which you want to migrate.
 
 * ami_user
 * ami_password
@@ -654,9 +659,9 @@ a continuación deberán valer igual que sus homónimas en la instancia de CentO
 * dialer_user
 * dialer_password
 
-Sobre la instancia de OMniLeads 1.2X CentOS-7 ejecutar los siguientes comandos para generar un backup de postgres por un lado 
-y luego subir al Bucket Object Storage de la nueva versión de OMniLeads las grabaciones, audios de telefonía, las personalizaciones 
-(en caso de haberlas) de Asterisk _custom.conf & _override_conf y también el propio backup de Postgres. 
+On the OMniLeads 1.2X CentOS-7 instance run the following commands to generate a postgres backup on the one hand 
+and then upload to the Bucket Object Storage of the new OMniLeads version the recordings, telephony audios, Asterisk customizations (if any) _custom.conf & _override.conf. 
+(if any) Asterisk _custom.conf & _override_conf customizations and also the Postgres backup itself.
 
 ```
 export NOMBRE_BACKUP: algun_nombre
@@ -675,17 +680,17 @@ cp *_override* ./custom
 aws --endpoint ${S3_ENDPOINT} --no-verify-ssl s3 sync /etc/asterisk/custom/ s3://${S3_BUCKET_NAME}/backup/asterisk/$NOMBRE_BACKUP/
 ```
 
-A partir del hecho de contar con todo lo necesario para restituir el servicio sobre la nueva infraestructura en el Bucket de la misma, 
-se puede proceder con el deploy de este proceso de restauración. 
+From the fact of having everything necessary to restore the service on the new infrastructure in the Bucket of the same one, 
+you can proceed with the deploy of this restoration process. 
 
-Hacia el final del archivo se encuentra la variable *restore_file_timestamp* la cual debe contener el nombre nombre utilizado en
-el paso anterior para referir a los backups tomados. 
+At the end of the file there is the variable *restore_file_timestamp* which must contain the name used in the previous step to refer to the backups.
+previous step to refer to the backups taken.
 
 ```
 restore_file_timestamp: NOMBRE_BACKUP
 ```
 
-Ejecutar el deploy del restore sobre le tenant en cuestión:
+Execute the restore deploy on the tenant in question:
 
 ```
 ./deploy.sh --action=restore --tenant=tenant1
@@ -695,15 +700,15 @@ Ejecutar el deploy del restore sobre le tenant en cuestión:
 ## Observability :mag_right: <a name="observability"></a>
 
 
-Inside each subscriber linux instance the deployer put some containers in order to implementar la observabilidad de todo el stack. Para no solo poder 
-observar metricas a nivel sistema operativo sino que ademas poder obtener metricas especificas de componentes como redis, postgres o asterisk, así como
-también levantar los logs del sistema operativo y de los componentes y enviarlos al stack de observabilidad. 
+Inside each subscriber linux instance the deployer put some containers in order to apply the stack observability. In order to not only be able to 
+to observe metrics at the operating system level but also to obtain specific metrics of components such as redis, postgres or asterisk, 
+as well as to get the logs of the operating system and the also to get the logs of the operating system and the components and send them to the observability stack.
 
-Esto nos permite plantear un centro de observabilidad multi instancias. Sobre el cual es posible centralizar el monitoreo de métricas
-del OS y de la aplicación y sus componentes, así como también centralizar el análisis de logs.
+This allows us to propose a multi-instance observability center. On which it is possible to centralize the monitoring of OS and application metrics
+of the OS and the application and its components, as well as centralizing log analysis.
 
-Esto es posible gracias al planteo de Prometheus junto a sus exporters para el monitoreo de métricas por un lado 
-mientras que Loki y Promtail implementan la centralización de los logs. 
+This is possible thanks to the Prometheus approach together with its exporters for metrics monitoring on the one hand, and Loki and Promtail on the other. 
+while Loki and Promtail implement the centralization of logs.
 
 * **Homer SIP Capture**: used to receive the SIP/RTP information sent to it by Asterisk (hep.conf). Homer stores this data and also provides a web interface to view real-time SIP traces.
 * **Prometheus**: used to collect performance metrics from both the hosts (application / voice) and their components (asterisk, redis, postgres, etc.), also collects the metrics reported by SIP Homer Capture itself .
@@ -718,35 +723,37 @@ to them build dashboards, on the other hand Grafana must to invoke the Loki depl
 ![Diagrama deploy tool zoom](./png/observability_MT.png)
 
 
-## Seguridad
+## Security 
 
-OMniLeads es una aplicación que conjuga las tecnologías Web, WebRTC y VoIP. Esto implica cierta complejidad y recaudos 
-al momento de desplegar la misma en producción bajo un esquema de acceso directo a través de Internet. 
+OMniLeads is an application that combines Web (https), WebRTC (wss & sRTP) and VoIP (SIP & RTP) technologies. This implies a certain complexity and 
+when deploying it in production under an Internet exposure scenario. 
 
-Lo ideal es que se utiliza un Proxy o Balanceador de carga expuesto a internet y que éste reenvíe las solicitudes 
-al Nginx del stack de OMniLeads, así como también al momento de conectar con la PSTN a través de SIP/RTP resulta ideal 
-operar detrás de un SBC expuesto a Internet.
+On the Web side of the things the ideal is to implement a Reverse Proxy or Load Balancer ahead of OMnileads, i.e. exposed to the Internet (TCP 443) 
+and that it forwards the requests to the Nginx of the OMniLeads stack. On the VoIP side, when connecting to the PSTN via VoIP it is ideal to 
+operate behind an SBC (Session Border Controller) exposed to the Internet.
 
-En caso de operar en proveedores cloud que ofrecen VPS expuestos a Internet, se debe utilizar un Cloud Firewall para 
-asegurar las instancias Linux (data, voz y web) que componen OMniLeads. A continuación se indican las reglas de Firewall
-que deberán ser aplicadas sobre cada instancia.
+However, we can intelligently use the **Cloud Firewall** technology when operating over VPS exposed to the Internet.
+This way we can perfectly secure the Linux instances (data, voice and web) that make up OMniLeads. 
+
+Below are the Firewall rules to be applied on each instance:
+
+Translated with www.DeepL.com/Translator (free version)
 
 ### Data
 
-* 3100/TCP Loki: por aqui se procesan las conexiones provenientes del centro de monitoreo, mas precisamente desde Grafana. Se puede 
-abrir este puerto restringiendo por origen en la IP del centro de monitoreo.
+* 3100/TCP Loki: this is where the connections coming from the monitoring center are processed, more precisely from Grafana, are processed. This port can be opened by restricting by origin on the IP of the monitoring center.
 
 ### Voice
 
-* 5060/UDP Asterisk: por aqui se procesan las solicitudes SIP de llamadas entrantes provenientes desde el o los ITSP. Se debe abrir este puerto restringiendo por origen en la IP o IPs de o los proveedores de terminación PSTN SIP.
+* 5060/UDP Asterisk: This is where SIP requests for incoming calls from the ITSP(s) are processed. This port must be opened by restricting by origin on the IP(s) of the PSTN SIP termination provider(s).
 
-* 20000/50000 UDO Asterisk & RTP engine: este rango de puertos se puede abrir a todo Internet.
+* 20000/50000 UDP Asterisk & RTPengine: this port range can be opened to the entire Internet.
 
 ### Web
 
-* 443/tcp Nginx: por aquí se procesan las peticiones Web/WebRTC que llegan hacia Nginx. Se puede abrir el puerto 443 a todo Internet.
+* 443/tcp Nginx: This is where Web/WebRTC requests to Nginx are processed. Port 443 can be opened to the entire Internet.
 
-* 9190/tcp Prometheus: por aqui se procesan las conexiones provenientes del centro de monitoreo, mas precisamente desde Prometheus. Se puede abrir este  puerto restringiendo por origen en la IP del centro de monitoreo.
+* 9190/tcp Prometheus: This is where the connections coming from the monitoring center, more precisely from Prometheus, are processed. This port can be opened by restricting by origin in the IP of the monitoring center.
 
 ## License & Copyright
 

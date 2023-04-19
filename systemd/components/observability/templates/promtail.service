@@ -23,7 +23,6 @@ ExecStart=/usr/bin/podman run \
   --volume=oml_promtail:/tmp \
   --volume=django_logs:/var/log/django/:ro \
   --volume=nginx_logs:/var/log/nginx:ro \
-  --volume=/var/log/syslog:/var/log/system/omlapp/syslog:ro \
   --name=promtail-server \
   --rm  \
   {{ container_image_registry }}/grafana/promtail -config.file=/etc/promtail/promtail.yml -config.expand-env=true
@@ -39,7 +38,6 @@ ExecStart=/usr/bin/podman run \
   --volume=oml_promtail:/tmp \
   --volume=asterisk_logs:/var/log/asterisk/:ro \
   --volume=rtpengine_logs:/var/log/rtpengine:ro \
-  --volume=/var/log/syslog:/var/log/system/omlvoice/syslog:ro \
   --name=promtail-server \
   --rm  \
   {{ container_image_registry }}/grafana/promtail -config.file=/etc/promtail/promtail.yml -config.expand-env=true
@@ -56,7 +54,6 @@ ExecStart=/usr/bin/podman run \
   --volume=postgres_logs:/var/log/postgres/:ro \
   --volume=redis_logs:/var/log/redis:ro \
   --volume=loki_logs:/var/log/loki:ro \
-  --volume=/var/log/syslog:/var/log/omldata/syslog:ro \
   --name=promtail-server \
   --rm  \
   {{ container_image_registry }}/grafana/promtail -config.file=/etc/promtail/promtail.yml -config.expand-env=true
