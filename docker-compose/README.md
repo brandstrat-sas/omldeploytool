@@ -15,19 +15,7 @@ You need docker installed
 
 ## Setup your environment
 
-You must create a .env variable file from the env file ready here:
-
-Then work on it to indicate if we are going to access it directly from our workstation 
-(https://localhost) or raise the stack on a virtual machine (https://hostname-or-ipaddr).
-
-
-You must indicate this on the parameter, at the end of the .env file:
-
-```
-S3_ENDPOINT=https://localhost
-```
-
-Then bring up your stack by running:
+You must create a .env variable file from the env file ready here and then bring up your stack by running:
 
 ```
 $ docker-compose up -d
@@ -35,18 +23,6 @@ $ docker-compose up -d
 
 Data Mapping: the docker-compose scheme will map container data into docker default path volumes regarding redis, postgresql and minio objects storage.
 On the other hand we have the asterisk files that will be map from the ast_cutsom_conf folder to /etc/asterisk/custom container path.
-
-## Post docker-compose raise-up config steps:
-
-When the minio object storage DB is first run, and then every time the volume that persists the data is deleted, them the minio_bucket.sh script must be run, in order to download the minio command line tool and then create user (key-access-id & secret-key-access) and bucket for the OMniLeads launched environment.
-
-```
-./minio_bucket.sh install-linux
-
-or
-
-./minio_bucket.sh install-mac
-```
 
 
 ## Log in to the Admin UI

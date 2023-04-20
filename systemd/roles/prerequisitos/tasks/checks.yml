@@ -90,6 +90,21 @@
     - django
     - observability
 
+# Set loki_host as {{ data_host }} on instances when loki_host is not explicitly defined
+- name: CHECKS Setting loki_host
+  set_fact:
+    loki_host: "{{ data_host }}"
+  changed_when: false
+  when:
+    - loki_host is not defined
+    - (omlapp is defined) or (omlvoice is defined) or (omldata is defined)
+  tags: 
+    - install
+    - upgrade
+    - app
+    - voice
+    - observability
+
 # Set minio_host as {{ data_host }} on App instance when minios_host is not explicitly defined
 - name: CHECKS Setting minio_host
   set_fact:

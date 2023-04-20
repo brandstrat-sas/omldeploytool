@@ -129,6 +129,8 @@ all:
     # --- Restore id request by restore filename
     #restore_file_timestamp: 1681215859
 
+    #scalable_tunings: true
+    
     # --- Integrations with external hosts
     # --- Request by Homer
     #prometheus_host: 
