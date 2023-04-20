@@ -30,7 +30,7 @@ On the other hand we have the asterisk files that will be map from the ast_cutso
 Before first time you login must to exec:
 
 ```
-./manage.sh --reset_pass
+./oml_manage --reset_pass
 ```
 
 Then acces the URL with your browser 
@@ -49,7 +49,7 @@ Finally  you can choice a custom password.
 ## Create some testing data
 
 ```
-./manage.sh --init_env
+./oml_manage --init_env
 ```
 
 Default Agent User & Pass:
@@ -78,7 +78,7 @@ as well as generate calls from the command line to OMniLeads inbound routes.
 ##### Generate inbound calls to omnileads stack:
 
 ```
-./manage.sh --generate_call
+./oml_manage --generate_call
 ```
 
 This actions will make an inbound call to the default inbound campaign created from testing data. 
@@ -97,12 +97,12 @@ domain: YOUR_HOSTNAME
 
 Then you can send calls to DID 01177660010, an also send calls from an agent to this SIP account phone calling 1234567.
 
-## The manage.sh script
+## The oml_manage script
 
 This is used to launch some administration actions like, read containers logs, delete postgres logs tables and more. 
 
 ```
-./manage.sh.sh --help
+./oml_oml_manage --help
 ```
 
 ## Configuring wombat dialer
@@ -121,7 +121,7 @@ Note: when configuring initial mariadb credentials the root pass is admin123, th
 If you want *reset to fresh install* status launch (with the stack operative):
 
 ```
-./manage.sh.sh --clean_postgresql_db
+./oml_oml_manage --clean_postgresql_db
 ```
 
 Then login with *admin*, *admin* and create a new password. 
