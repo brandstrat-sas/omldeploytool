@@ -88,13 +88,13 @@ all:
     # -- Cluster public NAT IP
     omni_ip_wan: 190.19.150.8
 
-    kamailio_version: 230204.01
-    asterisk_version: 230328.01
-    rtpengine_version: 230204.01
-    omnileads_version: 1.26.0
-    websockets_version: 230204.01
-    nginx_version: 230215.01
-    postgres_version: 230204.01
+    kamailio_version:
+    asterisk_version:
+    rtpengine_version:
+    omnileads_version:
+    websockets_version:
+    nginx_version: 
+    postgres_version: 
     centos_postgresql_version: 11
 
     # --- Activate the OMniLeads Enterprise Edition - with "AAAA" licensed.

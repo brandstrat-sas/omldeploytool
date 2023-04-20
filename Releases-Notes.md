@@ -1,33 +1,10 @@
-# Nuevo Release: RC-230204.01
+# Compatibility versions table
 
-Matriz de compatibilidad de versiones inter-componentes:
+* omnileads:  1.27.0
+* asterisk:   230417.01
+* nginx:      230215.01
+* kamailio:   230204.01
+* websockets: 230204.01
+* rtpengine:  230204.01
+* postgres:   230204.01
 
-* omnileads:  RC-230204.01
-* asterisk:   230204.01    
-* nginx:      230204.01    
-* kamailio:   230204.01    
-* websockets: 230204.01    
-* rtpengine:  230204.01    
-* postgres:   230204.01    
-
-### RELEASES NOTES
-
-# OMniLeads:
-
-*
-*
-
-# ANSIBLE:
-
-*
-*
-
-### DOCKER COMPOSE
-
-*
-*
-
-### DEVELOPMENT ENVIRONEMENT
-
-*
-*

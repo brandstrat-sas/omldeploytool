@@ -35,7 +35,7 @@ Before first time you login must to exec:
 
 Then acces the URL with your browser 
 
-https://127.0.0.1 or https://hostname-or-ipaddr 
+https://localhost or https://hostname-or-ipaddr 
 
 Default Admin User & Pass:
 

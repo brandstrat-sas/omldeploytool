@@ -243,13 +243,48 @@ Also under this format it is assumed that PostgreSQL and S3-compatible Object St
 
 We are going to propose a reference inventory, where the cloud provider is supposed to give us the connection data to Postgres.
 The parameter *postgres_host* must be assigned the corresponding connection string.
-Then it is simply a matter of adjusting the other connection parameters, according to whether we are going to need to establish an SSL connection, set the *postgres_ssl: true*.
+Then it is simply a matter of adjusting the other connection parameters, according to whether we are going to need to establish an SSL connection, set the *postgres_ssl: true* and don't forget to set *postgres_out: true*
 If the PostgreSQL service involves a cluster with more than one node, then it can be activated by *postgres_ha: true* and *postgres_ro_host: X.X.X.X*
 to indicate that the queries are impacted on the cluster replica node.
 
 Regarding storage over Object Storage, the URL must be provided in *bucket_url*.
 Also the authentication parameters must be provided; *bucket_access_key* & *bucket_secret_key* as well as the *bucket_name*.
 Regarding the bucket_region, if you do not need to specify anything, you should leave it with the current value.
+
+Some cloud providers example:
+
+* Vultr example:
+
+```
+postgres_host: vultr-prod-04b0caa5-03fc-402d-95db-de5fb0bbeb1c-vultr-prod-a539.vultrdb.com
+bucket_url: https://sjc1.vultrobjects.com
+
+# --- PostgreSQL    
+postgres_out: true
+postgres_port: 16751
+postgres_user: vultradmin
+# --- *postgres* or *defaultdb* depend ...
+postgres_maintenance_db: defaultdb
+postgres_ssl: true
+```
+
+* Digital Ocean example:
+
+
+```
+postgres_host: private-oml-pgsql-do-user-6023066-0.b.db.ondigitalocean.com
+bucket_url: https://sfo3.digitaloceanspaces.com
+
+# --- PostgreSQL    
+postgres_out: true
+postgres_port: 25060
+postgres_user: doadmin
+postgres_password: AVNS_nQepH0Igjf23gj1f312gjfhjGHJGHJG
+postgres_database: omnileads
+# --- *postgres* or *defaultdb* depend ...
+postgres_maintenance_db: defaultdb
+postgres_ssl: true
+```
 
 Finally the deploy is launched:
 
