@@ -31,11 +31,11 @@ all that using a single script and configuration file.
 * [Deploy Cloud instance with backend (Postgres y Object Storage) as cloud service](#cloud-deploy)
 * [Deploy High Availability OMniLeads on premise instance](#onpremise-deploy)
 * [TLS Certs provisioning](#tls-cert-provisioning)
+* [Deploy an upgrade from CentOS7](#upgrade_from_centos7)
 * [Deploy an upgrade](#upgrades)
 * [Deploy a rollback](#rollback)
 * [Deploy a backup](#backups)
 * [Deploy a restore](#restore)
-* [Deploy an upgrade from CentOS7](#upgrade_from_centos7)
 * [Observability](#observability)
 
 
@@ -242,6 +242,13 @@ Finally, the deploy.sh should be executed.
 ./deploy.sh --action=install --tenant=tenant_name_folder
 ```
 
+On OML App linux terminal, you must run reset_pass in order to perform a first login in the App.
+Once the URL is available with the App returning the login view,  we can log in with the user *admin*, password *admin*.
+
+```
+oml_manage --reset_pass
+```
+
 # Deploy a new instance with Backend (Postgres and Object Storage) as a managed Cloud service 🚀 <a name="cloud-deploy"></a>
 
 You must have three Linux instances (Debian 11 or Rocky 8) with Internet access and **your public key (ssh) available**, since
@@ -298,6 +305,13 @@ Finally the deploy is launched:
 
 ```
 ./deploy.sh --action=install --tenant=tenant_name_folder
+```
+
+On OML App linux terminal, you must run reset_pass in order to perform a first login in the App.
+Once the URL is available with the App returning the login view,  we can log in with the user *admin*, password *admin*.
+
+```
+oml_manage --reset_pass
 ```
 
 # Deploy High Availability onpremise instance 🚀 <a name="cloud-deploy"></a>
@@ -509,6 +523,14 @@ Therefore we have a failover if the Hypervisor-A crashes then the Postgres-RW an
 on Hypervisor-B. While if Hypervisor-B goes down the Haproxy-active and Asterisk-active components execute a failover on Hypervisor-A. 
 failover to Hypervisor-A.
 
+On OML App linux terminal, you must run reset_pass in order to perform a first login in the App.
+Once the URL is available with the App returning the login view,  we can log in with the user *admin*, password *admin*.
+
+```
+oml_manage --reset_pass
+```
+
+
 ### **Recovery Postgres main node**
 
 When a Failover from Postgres Main to Postgres Backup occurs, then the Backup node takes the floating IP of the cluster and remains as the only RW/RO node with its corresponding IPs. 
@@ -555,14 +577,10 @@ the RO VIP, a recovery deploy of the postgres backup node must be executed.
 
 # Post-installation steps :beer:
 
-
-Once the URL is available with the App returning the login view,  we can log in with the user *admin*, password *admin*.
-
 It is also possible to generate a test environment by calling:
 
 ```
-oml_manage.sh --reset_pass
-oml_manage.sh --init_env
+oml_manage --init_env
 ```
 
 Where some users, routes, trunks, forms, breaks, etc. are generated.
