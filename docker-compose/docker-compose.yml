@@ -273,6 +273,7 @@ services:
       - KAMAILIO_HOSTNAME=${KAMAILIO_HOSTNAME}
       - WEBSOCKETS_HOSTNAME=${WEBSOCKET_HOSTNAME}
       - S3_ENDPOINT=${S3_ENDPOINT_MINIO}
+      - CALLREC_DEVICE=${CALLREC_DEVICE}
     image: ${OMLNGINX_IMG}
     networks:
       - omnileads
@@ -376,26 +377,24 @@ services:
       timeout: 20s
       retries: 3
 
-  cx_survey_redis2pgsql:
-    container_name: oml-redis2pgsql
-    dns: 8.8.8.8
-    environment:
-      - TZ=${TZ}
-      - OMNILEADS_HOSTNAME=${OMNILEADS_HOSTNAME}
-      - REDIS_HOSTNAME=${REDIS_HOSTNAME}
-      - PGHOST=${PGHOST}
-      - PGPORT=${PGPORT}
-      - PGUSER=${PGUSER}
-      - PGDATABASE=${PGDATABASE}
-      - PGPASSWORD=${PGPASSWORD}
-      - INSTALL_PREFIX=${INSTALL_PREFIX}
-    image: ${CX_SURVEY_REDIS2PGSQL_IMG}
+  createbuckets:  
+    tty: true
+    image: minio/mc
+    container_name: oml-initminio
+    depends_on:
+      - minio
     networks:
       - omnileads
-    privileged: true
-    restart: on-failure
-    stop_grace_period: 1m30s
-
+    entrypoint: >
+      /bin/sh -c "
+      /usr/bin/mc config host rm local;
+      /usr/bin/mc config host add --quiet --api s3v4 local http://minio:9000 minio s3minio123;
+      /usr/bin/mc mb --quiet local/omnileads/;
+      /usr/bin/mc admin user add local omlminio s3omnileads123;
+      /usr/bin/mc admin policy attach local readwrite --user omlminio;
+      exit 0;
+      "
+      
   mariadb:
     container_name: oml-mariadb
     dns: 8.8.8.8
@@ -434,29 +433,6 @@ services:
     privileged: true
     restart: on-failure
     stop_grace_period: 1m30s
-
-  ptheus_postgres_exp:
-    container_name: oml-pg-ptheus
-    image: prometheuscommunity/postgres-exporter
-    networks:
-      - omnileads
-    ports:
-      - 9187:9187
-    environment:
-      DATA_SOURCE_NAME: "postgresql://omnileads:admin123@postgresql:5432/omnileads?sslmode=disable"
-
-  ptheus_redis_exp:
-      container_name: oml-redis-ptheus
-      image: oliver006/redis_exporter
-      networks:
-        - omnileads
-      ports:
-        - 9121:9121
-      restart: unless-stopped
-      environment:
-        REDIS_ADDR: "redis:6379"
-        REDIS_USER: null
-        REDIS_PASSWORD: null
 
   pbxemulator:
     container_name: oml-pstn-emulator

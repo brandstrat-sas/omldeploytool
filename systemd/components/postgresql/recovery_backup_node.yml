@@ -31,9 +31,9 @@
   
   tasks:
   
-##################### Postgresql Node Main #########################
+##################### Postgresql Node Backup #########################
 
-    - name: Recovery MAIN RW Node standby clone
+    - name: Recovery BACKUP RW Node standby clone
       shell: "sudo -u postgres {{ repmgr_bin }}repmgr -h {{ hostvars['sql_1'].omni_ip_lan }} -U repmgr -d repmgr -f {{ pg_lib_location_no_version }}/repmgr.conf standby clone --dry-run"
       args:
         executable: /bin/bash
@@ -41,13 +41,7 @@
       when: 
         - ha_rol == "backup"
     
-    # - name: CHECKS Check dry_run result
-    #   fail:
-    #     msg: voice_host variable undefined, edit voice_host variable in inventory file
-    #   when: dry_run is assert_dry_run.rc == 1
-    #   tags: always
-
-    - name: Recovery MAIN RW Node
+    - name: Recovery BACKUP RW Node
       shell: "sudo -u postgres {{ repmgr_bin }}repmgr -h {{ hostvars['sql_1'].omni_ip_lan }} -U repmgr -d repmgr -f {{ pg_lib_location_no_version }}/repmgr.conf standby clone -F"
       args:
         executable: /bin/bash
@@ -61,7 +55,7 @@
       when:
         - ha_rol == "backup"
 
-    - name: Recovery MAIN RW Node standby register
+    - name: Recovery BACKUP RW Node standby register
       shell: "sudo -u postgres {{ repmgr_bin }}repmgr -f {{ pg_lib_location_no_version }}/repmgr.conf standby register -F"
       args:
         executable: /bin/bash

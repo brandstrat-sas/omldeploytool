@@ -109,5 +109,3 @@
     - omnileads_ha is not defined
 
 - import_playbook: components/observability/promtail.yml
-  when: 
-    - omnileads_ha is not defined    
