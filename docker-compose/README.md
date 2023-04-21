@@ -1,6 +1,6 @@
 #### This project is part of OMniLeads
 
-![Diagrama deploy tool](../ansible/png/omnileads_logo_1.png)
+![Diagrama deploy tool](../systemd/png/omnileads_logo_1.png)
 
 #### 100% Open-Source Contact Center Software
 #### [Community Forum](https://forum.omnileads.net/)
@@ -15,19 +15,7 @@ You need docker installed
 
 ## Setup your environment
 
-You must create a .env variable file from the env file ready here:
-
-Then work on it to indicate if we are going to access it directly from our workstation 
-(https://localhost) or raise the stack on a virtual machine (https://hostname-or-ipaddr).
-
-
-You must indicate this on the parameter, at the end of the .env file:
-
-```
-S3_ENDPOINT=https://localhost
-```
-
-Then bring up your stack by running:
+You must create a .env variable file from the env file ready here and then bring up your stack by running:
 
 ```
 $ docker-compose up -d
@@ -36,30 +24,18 @@ $ docker-compose up -d
 Data Mapping: the docker-compose scheme will map container data into docker default path volumes regarding redis, postgresql and minio objects storage.
 On the other hand we have the asterisk files that will be map from the ast_cutsom_conf folder to /etc/asterisk/custom container path.
 
-## Post docker-compose raise-up config steps:
-
-When the minio object storage DB is first run, and then every time the volume that persists the data is deleted, them the minio_bucket.sh script must be run, in order to download the minio command line tool and then create user (key-access-id & secret-key-access) and bucket for the OMniLeads launched environment.
-
-```
-./minio_bucket.sh install-linux
-
-or
-
-./minio_bucket.sh install-mac
-```
-
 
 ## Log in to the Admin UI
 
 Before first time you login must to exec:
 
 ```
-./manage.sh --reset_pass
+./oml_manage --reset_pass
 ```
 
 Then acces the URL with your browser 
 
-https://127.0.0.1 or https://hostname-or-ipaddr 
+https://localhost or https://hostname-or-ipaddr 
 
 Default Admin User & Pass:
 
@@ -73,7 +49,7 @@ Finally  you can choice a custom password.
 ## Create some testing data
 
 ```
-./manage.sh --init_env
+./oml_manage --init_env
 ```
 
 Default Agent User & Pass:
@@ -102,7 +78,7 @@ as well as generate calls from the command line to OMniLeads inbound routes.
 ##### Generate inbound calls to omnileads stack:
 
 ```
-./manage.sh --generate_call
+./oml_manage --generate_call
 ```
 
 This actions will make an inbound call to the default inbound campaign created from testing data. 
@@ -121,12 +97,12 @@ domain: YOUR_HOSTNAME
 
 Then you can send calls to DID 01177660010, an also send calls from an agent to this SIP account phone calling 1234567.
 
-## The manage.sh script
+## The oml_manage script
 
 This is used to launch some administration actions like, read containers logs, delete postgres logs tables and more. 
 
 ```
-./manage.sh.sh --help
+./oml_oml_manage --help
 ```
 
 ## Configuring wombat dialer
@@ -145,7 +121,7 @@ Note: when configuring initial mariadb credentials the root pass is admin123, th
 If you want *reset to fresh install* status launch (with the stack operative):
 
 ```
-./manage.sh.sh --clean_postgresql_db
+./oml_oml_manage --clean_postgresql_db
 ```
 
 Then login with *admin*, *admin* and create a new password. 

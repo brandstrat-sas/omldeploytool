@@ -72,6 +72,9 @@ case ${oml_action} in
   pgsql_node_recovery_main)
     echo "deploy: $oml_action"
   ;;
+  pgsql_node_recovery_backup)
+    echo "deploy: $oml_action"
+  ;;
   pgsql_node_takeover_main)
     echo "deploy: $oml_action"
   ;;
@@ -110,7 +113,7 @@ case ${oml_action} in
     Banner `echo $?`
   ;;
   pgsql_node_recovery_backup)
-    ansible-playbook ./components/postgresql/recovery_main_node.yml --extra-vars \
+    ansible-playbook ./components/postgresql/recovery_backup_node.yml --extra-vars \
     "pgsql_repo_path=$(pwd)/components/postgresql/
     tenant_folder=$oml_tenant \
     commit=ascd " \

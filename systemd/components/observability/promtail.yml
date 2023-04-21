@@ -46,7 +46,6 @@
     tags:
       - install
       - upgrade
-    when: omnileads_ha is not defined
 
   - name: OBSERVABILITY Promtail Pull image
     command: podman pull --quiet '{{ container_image_registry }}/{{ item }}'
