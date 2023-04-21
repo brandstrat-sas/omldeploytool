@@ -7,7 +7,7 @@
 
 ---
 
-## Ansible System-D based OMniLeads management
+# Ansible System-D based OMniLeads management
 
 In this repository you will find an alternative to implement OMniLeads tenant management from an on-premise
 IT management perspective, but also completely viable for working in cloud-computing environments.
@@ -21,7 +21,7 @@ all that using a single script and configuration file.
 ![Diagrama deploy tool](./png/deploy-tool-ansible-deploy-instances-multiples.png)
 
 
-## Index
+# Index
 
 * [Bash, Ansible & System D](#bash-ansible-systemd)
 * [Ansible + Inventory](#ansible-inventory)
@@ -39,7 +39,7 @@ all that using a single script and configuration file.
 * [Observability](#observability)
 
 
-## Bash, Ansible & System D 📋 <a name="bash-ansible-systemd"></a>
+# Bash, Ansible & System D 📋 <a name="bash-ansible-systemd"></a>
 
 The management of multiple instances is done from the administrator's workstation. When preparing a new deployment
 there are three fundamental files that are invoked in a chain, which help to understand how the management is planned
@@ -66,7 +66,7 @@ systemd stop component
 
 ![Diagrama deploy tool zoom](./png/deploy-tool-ansible-deploy-instances.png)
 
-## Ansible + Inventory 🔧 <a name="ansible-inventory"></a>
+# Ansible + Inventory 🔧 <a name="ansible-inventory"></a>
 
 The inventory file is the configuration source of the instance on which you are going to work.
 Parameters such as the component image version or configuration issues are adjusted there
@@ -135,7 +135,7 @@ vars:
 
 ```
 
-## Bash Script deploy.sh 📄 <a name="bash-script-deploy"></a>
+# Bash Script deploy.sh 📄 <a name="bash-script-deploy"></a>
 
 This script receives parameters that command the action to be carried out, this action has to do with invoking the Playbook
 matrix.yml who, from the previously edited inventory file, will end up deploying the specific action on the app and voice instances.
@@ -155,7 +155,7 @@ To run an installation or updates deployment, two parameters must be called.
 
 ```
 
-## Certs and inventory tenant folder :office: <a name="subscriber-traking"></a>
+# Inventory tenant folder :office: <a name="subscriber-traking"></a>
 
 In order to manage multiple instances of OMniLeads from this deployment tool, you must create
 a folder called **instances** at the root of this directory. The reserved name for this folder is
@@ -185,7 +185,17 @@ git commit 'my new Subscriber A'
 git push origin main
 ```
 
-## Deploy a new LAN instance with Backend (Postgres and Object Storage) self-hosted 🚀 <a name="onpremise-deploy"></a>
+# TLS/SSL certs provisioning :closed_lock_with_key: <a name="tls-cert-provisioning"></a>
+
+
+From the inventory variable *certs* you can indicate what to do with the SSL certificates.
+The possible options are:
+
+* **selfsigned**: which will display the self-signed certificates (not recommended for production).
+* **custom**: if the idea is to implement your own certificates. Then you must place them inside instances/tenant_name_folder/ with the names: *cert.pem* for and *key.pem*
+* **certbot**: comign soon ...
+
+# Deploy a new LAN instance with Backend (Postgres and Object Storage) self-hosted 🚀 <a name="onpremise-deploy"></a>
 
 You must have two Linux instances (Ubuntu 22.04, Debian 11, Rocky 8 or Alma Linux 8) with Internet access and **your public key (ssh) available**, since
 ansible needs to establish an SSH connection through public key.
@@ -232,7 +242,7 @@ Finally, the deploy.sh should be executed.
 ./deploy.sh --action=install --tenant=tenant_name_folder
 ```
 
-## Deploy a new instance with Backend (Postgres and Object Storage) as a managed Cloud service 🚀 <a name="cloud-deploy"></a>
+# Deploy a new instance with Backend (Postgres and Object Storage) as a managed Cloud service 🚀 <a name="cloud-deploy"></a>
 
 You must have three Linux instances (Debian 11 or Rocky 8) with Internet access and **your public key (ssh) available**, since
 Ansible needs to establish an SSH connection to deploy the actions.
@@ -251,7 +261,7 @@ Regarding storage over Object Storage, the URL must be provided in *bucket_url*.
 Also the authentication parameters must be provided; *bucket_access_key* & *bucket_secret_key* as well as the *bucket_name*.
 Regarding the bucket_region, if you do not need to specify anything, you should leave it with the current value.
 
-Some cloud providers example:
+Some cloud providers custom parameters:
 
 * Vultr example:
 
@@ -279,8 +289,6 @@ bucket_url: https://sfo3.digitaloceanspaces.com
 postgres_out: true
 postgres_port: 25060
 postgres_user: doadmin
-postgres_password: AVNS_nQepH0Igjf23gj1f312gjfhjGHJGHJG
-postgres_database: omnileads
 # --- *postgres* or *defaultdb* depend ...
 postgres_maintenance_db: defaultdb
 postgres_ssl: true
@@ -292,7 +300,7 @@ Finally the deploy is launched:
 ./deploy.sh --action=install --tenant=tenant_name_folder
 ```
 
-## Deploy High Availability onpremise instance 🚀 <a name="cloud-deploy"></a>
+# Deploy High Availability onpremise instance 🚀 <a name="cloud-deploy"></a>
 
 
 We have an inventory file capable of materializing a high availability cluster on 2 Hypervisors (physical servers).  
@@ -501,7 +509,7 @@ Therefore we have a failover if the Hypervisor-A crashes then the Postgres-RW an
 on Hypervisor-B. While if Hypervisor-B goes down the Haproxy-active and Asterisk-active components execute a failover on Hypervisor-A. 
 failover to Hypervisor-A.
 
-### Recovery Postgres main node
+### **Recovery Postgres main node**
 
 When a Failover from Postgres Main to Postgres Backup occurs, then the Backup node takes the floating IP of the cluster and remains as the only RW/RO node with its corresponding IPs. 
 as the only RW/RO node with its corresponding IPs. 
@@ -515,7 +523,7 @@ To return Postgres to the initial state two actions must be carried out:
 This command is in charge of rejoining the Postgres Main node to the cluster. But if we only execute this action then 
 the Cluster will be inverted, i.e. Postgres B as main and Postgres A as backup.
 
-### Takeover Postgres main node
+### **Takeover Postgres main node**
 
 
 This command implies that a Recovery has been previously executed as described in the previous step.
@@ -526,7 +534,7 @@ This command implies that a Recovery has been previously executed as described i
 
 After the execution of the takeover we will have the cluster in the initial state, i.e. Postgres A as Main and Postgres B as backup.
 
-### Takeover Redis main node
+### **Takeover Redis main node**
 
 
 A last action to be taken has to do with the takeover of the Redis node, in such a way that we leave the Redis cluster in the initial state, i.e. Redis A as main and Redis B as backup, that is to say Redis A as main and Redis B as backup.
@@ -535,7 +543,7 @@ A last action to be taken has to do with the takeover of the Redis node, in such
 ./deploy.sh --action=redis_node_takeover_main --tenant=tenant_name_folder
 ```
 
-### Recovery Postgres backup node
+### **Recovery Postgres backup node**
 
 When the VM hosting the Postgres Backup node shuts down, the Main node takes the floating RO IP of the cluster and remains as the only RW/RO node with its corresponding IPs. as the only RW/RO node with its corresponding IPs. To rejoin the backup node to the cluster and in this way recover the RO's VIP, it is necessary to run a
 the RO VIP, a recovery deploy of the postgres backup node must be executed.
@@ -545,18 +553,7 @@ the RO VIP, a recovery deploy of the postgres backup node must be executed.
 ```
 
 
-## TLS/SSL certs provisioning :closed_lock_with_key: <a name="tls-cert-provisioning"></a>
-
-
-From the inventory variable *certs* you can indicate what to do with the SSL certificates.
-The possible options are:
-
-* **selfsigned**: which will display the self-signed certificates (not recommended for production).
-* **custom**: if the idea is to implement your own certificates. Then you must place them inside instances/tenant_name_folder/ with the names: *cert.pem* for and *key.pem*
-* **certbot**: comign soon ...
-
-
-## Post-installation steps :beer:
+# Post-installation steps :beer:
 
 
 Once the URL is available with the App returning the login view,  we can log in with the user *admin*, password *admin*.
@@ -564,6 +561,7 @@ Once the URL is available with the App returning the login view,  we can log in 
 It is also possible to generate a test environment by calling:
 
 ```
+oml_manage.sh --reset_pass
 oml_manage.sh --init_env
 ```
 
@@ -571,8 +569,58 @@ Where some users, routes, trunks, forms, breaks, etc. are generated.
 
 From then on we can log in with the agent type user *agent*, password *agent1**.
 
+# Upgrade from CentOS-7 OMniLeads instance :arrows_counterclockwise: <a name="upgrade_from_centos7"></a>
 
-## Perform a Backup :floppy_disk: <a name="backups"></a>
+
+You must deploy an "all in three" instance of OMniLeads making sure that the inventory.yml variables listed below should be the same as their 
+counterparts in the CentOS 7 instance from which you want to migrate. below should be the same as their counterparts in the CentOS 7 instance from which you want to migrate.
+
+* ami_user
+* ami_password
+* postgres_password
+* postgres_database
+* postgres_user
+* dialer_user
+* dialer_password
+
+On the OMniLeads 1.2X CentOS-7 instance run the following commands to generate a postgres backup on the one hand 
+and then upload to the Bucket Object Storage of the new OMniLeads version the recordings, telephony audios, Asterisk customizations (if any) _custom.conf & _override.conf. 
+(if any) Asterisk _custom.conf & _override_conf customizations and also the Postgres backup itself.
+
+```
+export NOMBRE_BACKUP: algun_nombre
+pg_dump omnileads > /tmp/pgsql-backup-$NOMBRE_BACKUP.sql
+export AWS_ACCESS_KEY_ID=uLZTnLB0aURXI6NB
+export AWS_SECRET_ACCESS_KEY=VSlMrqEWS7aWtgrn7G2zs949W6jdFleY
+export S3_ENDPOINT=https://172.16.101.3:9000
+export S3_BUCKET_NAME=tenant1 # nombre del bucket del inventory.yml env 2.0
+aws --endpoint ${S3_ENDPOINT} --no-verify-ssl s3 sync /opt/omnileads/media_root s3://${S3_BUCKET_NAME}/media_root
+aws --endpoint ${S3_ENDPOINT} --no-verify-ssl s3 sync /opt/omnileads/asterisk/var/spool/asterisk/monitor/ s3://${S3_BUCKET_NAME}
+aws --endpoint ${S3_ENDPOINT} --no-verify-ssl s3 cp /tmp/pgsql-backup-$NOMBRE_BACKUP.sql  s3://${S3_BUCKET_NAME}/backup/
+mkdir /opt/omnileads/asterisk/etc/asterisk/custom
+cd /opt/omnileads/asterisk/etc/asterisk
+cp *_custom* ./custom
+cp *_override* ./custom
+aws --endpoint ${S3_ENDPOINT} --no-verify-ssl s3 sync /etc/asterisk/custom/ s3://${S3_BUCKET_NAME}/backup/asterisk/$NOMBRE_BACKUP/
+```
+
+From the fact of having everything necessary to restore the service on the new infrastructure in the Bucket of the same one, 
+you can proceed with the deploy of this restoration process. 
+
+At the end of the file there is the variable *restore_file_timestamp* which must contain the name used in the previous step to refer to the backups.
+previous step to refer to the backups taken.
+
+```
+restore_file_timestamp: NOMBRE_BACKUP
+```
+
+Execute the restore deploy on the tenant in question:
+
+```
+./deploy.sh --action=restore --tenant=tenant1
+```
+
+# Perform a Backup :floppy_disk: <a name="backups"></a>
 
 
 Deploying a backup involves the asterisk custom configuration files /etc/asterisk/custom on the one hand and the database
@@ -589,7 +637,7 @@ another directory is generated with the timestamp date and there inside are the 
 
 ![Diagrama deploy backup](./png/deploy-backup.png)
 
-## Upgrades :arrows_counterclockwise:  <a name="upgrades"></a>
+# Upgrades :arrows_counterclockwise:  <a name="upgrades"></a>
 
 The OMniLeads project builds images of all its components to be hosted in docker hub: https://hub.docker.com/repositories/omnileads.
 
@@ -641,7 +689,7 @@ Then the deploy.sh script must be called with the --upgrade parameter.
 ./deploy.sh --action=upgrade --tenant=tenant_name_folder
 ```
 
-## Rollback  :leftwards_arrow_with_hook: <a name="rollback"></a>
+# Rollback  :leftwards_arrow_with_hook: <a name="rollback"></a>
 
 
 The use of containers when executing the OMniLeads components allows us to easily apply rollbacks towards versions
@@ -663,7 +711,7 @@ Then the deploy.sh script must be called with the --upgrade parameter.
 ./deploy.sh --action=upgrade --tenant=tenant_name_folder
 ```
 
-## Restore :mag_right: <a name="restore"></a>
+# Restore :leftwards_arrow_with_hook: <a name="restore"></a>
 
 
 You can proceed with a restore on a fresh installation as well as on a productive instance. 
@@ -679,60 +727,7 @@ Run restore deploy:
 ./deploy.sh --action=restore --tenant=digitalocean_deb
 ```
 
-
-## Upgrade from CentOS-7 OMniLeads instance <a name="upgrade_from_centos7"></a>
-
-
-You must deploy an "all in three" instance of OMniLeads making sure that the inventory.yml variables listed below should be the same as their 
-counterparts in the CentOS 7 instance from which you want to migrate. below should be the same as their counterparts in the CentOS 7 instance from which you want to migrate.
-
-* ami_user
-* ami_password
-* postgres_password
-* postgres_database
-* postgres_user
-* dialer_user
-* dialer_password
-
-On the OMniLeads 1.2X CentOS-7 instance run the following commands to generate a postgres backup on the one hand 
-and then upload to the Bucket Object Storage of the new OMniLeads version the recordings, telephony audios, Asterisk customizations (if any) _custom.conf & _override.conf. 
-(if any) Asterisk _custom.conf & _override_conf customizations and also the Postgres backup itself.
-
-```
-export NOMBRE_BACKUP: algun_nombre
-pg_dump omnileads > /tmp/pgsql-backup-$NOMBRE_BACKUP.sql
-export AWS_ACCESS_KEY_ID=uLZTnLB0aURXI6NB
-export AWS_SECRET_ACCESS_KEY=VSlMrqEWS7aWtgrn7G2zs949W6jdFleY
-export S3_ENDPOINT=https://172.16.101.3:9000
-export S3_BUCKET_NAME=tenant1 # nombre del bucket del inventory.yml env 2.0
-aws --endpoint ${S3_ENDPOINT} --no-verify-ssl s3 sync /opt/omnileads/media_root s3://${S3_BUCKET_NAME}/media_root
-aws --endpoint ${S3_ENDPOINT} --no-verify-ssl s3 sync /opt/omnileads/asterisk/var/spool/asterisk/monitor/ s3://${S3_BUCKET_NAME}
-aws --endpoint ${S3_ENDPOINT} --no-verify-ssl s3 cp /tmp/pgsql-backup-$NOMBRE_BACKUP.sql  s3://${S3_BUCKET_NAME}/backup/
-mkdir /opt/omnileads/asterisk/etc/asterisk/custom
-cd /opt/omnileads/asterisk/etc/asterisk
-cp *_custom* ./custom
-cp *_override* ./custom
-aws --endpoint ${S3_ENDPOINT} --no-verify-ssl s3 sync /etc/asterisk/custom/ s3://${S3_BUCKET_NAME}/backup/asterisk/$NOMBRE_BACKUP/
-```
-
-From the fact of having everything necessary to restore the service on the new infrastructure in the Bucket of the same one, 
-you can proceed with the deploy of this restoration process. 
-
-At the end of the file there is the variable *restore_file_timestamp* which must contain the name used in the previous step to refer to the backups.
-previous step to refer to the backups taken.
-
-```
-restore_file_timestamp: NOMBRE_BACKUP
-```
-
-Execute the restore deploy on the tenant in question:
-
-```
-./deploy.sh --action=restore --tenant=tenant1
-```
-
-
-## Observability :mag_right: <a name="observability"></a>
+# Observability :mag_right: <a name="observability"></a>
 
 
 Inside each subscriber linux instance the deployer put some containers in order to apply the stack observability. In order to not only be able to 
@@ -758,7 +753,7 @@ to them build dashboards, on the other hand Grafana must to invoke the Loki depl
 ![Diagrama deploy tool zoom](./png/observability_MT.png)
 
 
-## Security 
+# Security 
 
 OMniLeads is an application that combines Web (https), WebRTC (wss & sRTP) and VoIP (SIP & RTP) technologies. This implies a certain complexity and 
 when deploying it in production under an Internet exposure scenario. 
@@ -770,9 +765,9 @@ operate behind an SBC (Session Border Controller) exposed to the Internet.
 However, we can intelligently use the **Cloud Firewall** technology when operating over VPS exposed to the Internet.
 This way we can perfectly secure the Linux instances (data, voice and web) that make up OMniLeads. 
 
-Below are the Firewall rules to be applied on each instance:
+![Diagrama security](./png/security.png)
 
-Translated with www.DeepL.com/Translator (free version)
+Below are the Firewall rules to be applied on each instance:
 
 ### Data
 
@@ -790,6 +785,6 @@ Translated with www.DeepL.com/Translator (free version)
 
 * 9190/tcp Prometheus: This is where the connections coming from the monitoring center, more precisely from Prometheus, are processed. This port can be opened by restricting by origin in the IP of the monitoring center.
 
-## License & Copyright
+# License & Copyright
 
 This project is released under the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.

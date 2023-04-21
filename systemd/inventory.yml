@@ -48,6 +48,7 @@ all:
     # --- if you have your own bucket (standalone host or cloud service) put here the URL
     # --- example VULTR: https://ewr1.vultrobjects.com
     # --- example Digital Ocean: https://sfo3.digitaloceanspaces.com
+    # --- example Linode: https://us-east-1.linodeobjects.com
     # --- example onpremise: https://192.168.100.10
     # --- if you want to deploy MinIO objects storage on application_host, you must to put '#' before
     #bucket_url:
