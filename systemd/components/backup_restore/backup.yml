@@ -35,8 +35,10 @@
         login_user: '{{ postgres_user }}'
         login_password: '{{ postgres_password }}'
         login_host: '{{ data_host }}'
+        port: '{{ postgres_port }}'
       when: 
-        - omldata is defined  
+        - omldata is defined
+        - postgres_out is not true
 
     - name: BACKUP upload postgres backup to Bucket
       aws_s3:
@@ -52,7 +54,8 @@
       when:
         - bucket_url is defined
         - callrec_device != "s3-no-check-cert"
-        - omldata is defined  
+        - omldata is defined
+        - postgres_out is not true
 
     - name: BACKUP upload postgres backup to insecure SSL BUCKET
       shell: "export AWS_ACCESS_KEY_ID={{ bucket_access_key }} &&  export AWS_SECRET_ACCESS_KEY={{ bucket_secret_key }} && aws --endpoint {{ bucket_url }} --no-verify-ssl s3 cp /tmp/pgsql-backup-{{ file_timestamp }}.sql  s3://{{ bucket_name }}/backup/"
@@ -60,6 +63,7 @@
         - bucket_url is defined
         - callrec_device == "s3-no-check-cert"
         - omldata is defined
+        - postgres_out is not true
 
     - name: BACKUP asterisk custom config files
       s3_sync:
