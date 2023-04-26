@@ -2,6 +2,7 @@
 #   Name of the project     #
 #############################
 COMPOSE_PROJECT_NAME=prodenv
+#PROD_AIO_IP=
 
 #############################################################
 #               Components image version                    #
