@@ -4,7 +4,7 @@
 COMPOSE_PROJECT_NAME=oml
 
 # --- cloud, lan or devenv
-ENV=cloud
+ENV=devenv
 
 #############################################################
 #               Components image version                    #
@@ -177,7 +177,6 @@ OMLSENTINEL_TAG=latest
 
 # ------------------------------------------------------------------------------
 RTPENGINE_HOSTNAME=rtpengine
-RTPENGINE_ENV=devenv
 
 #########################################################################################################
 #                                    S3 BUCKET config                                                   #

@@ -6,24 +6,104 @@
 #### [Community Forum](https://forum.omnileads.net/)
 
 ---
-
-# OMniLeads Docker Compose
-
 You need docker installed
 
 * [Docker Install documentation](https://docs.docker.com/get-docker/)
 
+# OMniLeads Docker Compose
+
+In this folder, we will find three Docker Compose files.
+
+* **docker-compose.yml**: is used to launch the stack on the workstation with Docker Desktop.
+* **docker-compose_aio.yml**: is used to launch the stack on a VPS or VM."
+* **docker-compose_aio_ext_bucket.yml**: is used to launch the stack on a VPS or VM and using an external bucket
+
 ## Setup your environment
 
-You must create a .env variable file from the env file ready here and then bring up your stack by running:
+You need to create a .env file by using the environment file provided here
+
+### **Workstation Docker-Desktop deploy**
+
+You don't need to work with the variables file, you can simply proceed with the instance execution through the command:
 
 ```
 $ docker-compose up -d
 ```
 
-Data Mapping: the docker-compose scheme will map container data into docker default path volumes regarding redis, postgresql and minio objects storage.
-On the other hand we have the asterisk files that will be map from the ast_cutsom_conf folder to /etc/asterisk/custom container path.
+### **Onpremise Virtual Machine and VPS Cloud deploy with internal bucket**
 
+You can use docker-compose to run an instance of OMniLeads on a Virtual Machine or VPS (cloud). However, some configuration work with the .env file may be necessary.
+
+* To begin with, it's important to specify the scenario we'll be working with, which will be cloud if we're working on a VPS, and lan if we're using an on-premise Virtual Machine.
+
+```
+ENV=cloud
+```
+or
+
+```
+ENV=lan
+```
+
+* The hostname of each component must be modified
+
+```
+DJANGO_HOSTNAME=10.10.10.2
+DAPHNE_HOSTNAME=10.10.10.2
+ASTERISK_HOSTNAME=10.10.10.2
+WEBSOCKET_HOSTNAME=10.10.10.2s
+WEBSOCKET_REDIS_HOSTNAME=redis://10.10.10.2:6379
+PGHOST=10.10.10.2
+OMNILEADS_HOSTNAME=10.10.10.2
+RTPENGINE_HOSTNAME=10.10.10.2
+REDIS_HOSTNAME=10.10.10.2
+KAMAILIO_HOSTNAME=localhost
+```
+
+* Finally, we must indicate to the App the URL to invoke the internal bucket, using an fqdn or an IP. If an IP is used, and we are deploying on a cloud environment, a Public IP should be used, while if the environment is LAN, a Private IP should be used.
+
+LAN:
+```
+S3_ENDPOINT=https://10.10.10.2
+S3_ENDPOINT_MINIO=http://localhost:9000
+```
+
+Cloud:
+```
+S3_ENDPOINT=https://190.19.122.2
+S3_ENDPOINT_MINIO=http://localhost:9000
+```
+
+Now, let's proceed to launch the stack:
+
+```
+$ docker-compose -f docker-compose_aio.yml up -d
+```
+
+### **Onpremise Virtual Machine and VPS Cloud deploy with external bucket**
+
+For this scenario, we consider all the modifications executed in the previous item, except that here we need to take into account some issues regarding the bucket variables.
+
+* The variable must be modified so that it becomes:
+
+```
+CALLREC_DEVICE=s3
+```
+
+* The endpoint URL and access parameters must be specified. For example:
+
+```
+S3_ENDPOINT=https://sfo3.digitaloceanspaces.com
+S3_BUCKET_NAME=omnileads
+AWS_ACCESS_KEY_ID=ojkghjkhjkh4jk23h4jk23hjk4
+AWS_SECRET_ACCESS_KEY=HJGGH675675hjghjgHJGHJg67567HJHVHJGdsaddadakjhjk
+```
+
+Now, let's proceed to launch the stack:
+
+```
+$ docker-compose -f docker-compose_aio_ext_bucket.yml up -d
+```
 
 ## Log in to the Admin UI
 
@@ -35,7 +115,7 @@ Before first time you login must to exec:
 
 Then acces the URL with your browser 
 
-https://localhost or https://hostname-or-ipaddr 
+https://localhost or https://your_VM_VPS
 
 Default Admin User & Pass:
 
@@ -59,7 +139,7 @@ agent
 agent1*
 ```
 
-## Simulate calls from/to PSTN
+## Simulate calls from/to PSTN (Only on Docker-Desktop scenary)
 
 Adittionally with omnileads container is the pstn-emulator, this an emulation of a PSTN provider,
 so you can make calls via Omnileads and have different results of the call based on what you dialed
