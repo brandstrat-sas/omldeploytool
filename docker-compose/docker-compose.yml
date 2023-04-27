@@ -324,7 +324,7 @@ services:
     dns: 8.8.8.8
     environment:
       - TZ=${TZ}
-      - ENV=${RTPENGINE_ENV}
+      - ENV=docker-compose-${ENV}
     image: ${OMLRTPENGINE_IMG}
     networks:
       - omnileads

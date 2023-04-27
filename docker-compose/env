@@ -1,8 +1,10 @@
 #############################
 #   Name of the project     #
 #############################
-COMPOSE_PROJECT_NAME=prodenv
-#PROD_AIO_IP=
+COMPOSE_PROJECT_NAME=oml
+
+# --- cloud, lan or devenv
+ENV=cloud
 
 #############################################################
 #               Components image version                    #
@@ -11,10 +13,10 @@ COMPOSE_PROJECT_NAME=prodenv
 OMLAPP_IMG=omnileads/omlapp:1.27.0
 OMLWS_IMG=omnileads/websockets:230204.01
 OMLPGSQL_IMG=omnileads/postgres:230204.01
-OMLACD_IMG=omnileads/asterisk:230417.01
+OMLACD_IMG=omnileads/asterisk:230425.01
 OMLNGINX_IMG=omnileads/nginx:230215.01
 OMLKAM_IMG=omnileads/kamailio:230204.01
-OMLRTPENGINE_IMG=omnileads/rtpengine:230204.01
+OMLRTPENGINE_IMG=omnileads/rtpengine:230426.01
 
 OMLREDISGEARS_IMG=redislabs/redisgears:1.0.9
 OMLMINIO_IMG=quay.io/minio/minio
