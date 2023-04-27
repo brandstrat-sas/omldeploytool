@@ -206,7 +206,7 @@ WOMBAT_PASSWORD=demo
 #                                          Monitoring                                                   #
 #########################################################################################################
 
-HOMER_ENABLE=True
+HOMER_ENABLE=false
 HOMERHOST=heplify-server
 HOMERPORT=9060
 
