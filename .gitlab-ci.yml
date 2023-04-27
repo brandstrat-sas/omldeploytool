@@ -62,7 +62,7 @@ deploy-aio-digitalocean:
     - doctl compute droplet delete -f cicd-aio.$CI_JOB_ID
     - rm -rf omldeploytool
   tags:
-    - deploy-aio
+    - tests
   only:
     - /.*pipeline-aio.*$/
     - /.*pipeline-all.*$/
