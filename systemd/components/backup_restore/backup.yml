@@ -27,15 +27,7 @@
   tasks:
 
     - name: BACKUP database
-      postgresql_db:
-        state: dump
-        name: '{{ postgres_database }}'
-        target: "/tmp/pgsql-backup-{{ file_timestamp }}.sql"
-        ssl_mode: disable
-        login_user: '{{ postgres_user }}'
-        login_password: '{{ postgres_password }}'
-        login_host: '{{ data_host }}'
-        port: '{{ postgres_port }}'
+      shell: "podman exec -it oml-postgresql-server bash -c 'PGPASSWORD=\"{{ postgres_password }}\" pg_dump --dbname={{ postgres_database }} --host={{ data_host }} --port={{ postgres_port }} --username={{ postgres_user }}' > /tmp/pgsql-backup-{{ file_timestamp }}.sql"
       when: 
         - omldata is defined
         - postgres_out is not true

@@ -71,7 +71,7 @@
     - name: RESTORE asterisk from insecure SSL BUCKET
       shell: "export AWS_ACCESS_KEY_ID={{ bucket_access_key }} &&  export AWS_SECRET_ACCESS_KEY={{ bucket_secret_key }} && aws --endpoint {{ bucket_url }} --no-verify-ssl s3 sync s3://{{ bucket_name }}/backup/asterisk/{{ restore_file_timestamp }} {{ asterisk_location_conf }}/custom/ --delete"
       when:
-        - bucket_url is not defined
+#        - bucket_url is not defined
         - omlvoice is defined
         - callrec_device == "s3-no-check-cert"
 
@@ -106,7 +106,7 @@
         - omlvoice is defined
 
     - name: RESTORE postgres dump file from omlapp Pod
-      shell: "cat /tmp/pgsql-backup-{{ restore_file_timestamp }}.sql | podman exec -i oml-django-server psql"
+      shell: "cat /tmp/pgsql-backup-{{ restore_file_timestamp }}.sql | podman exec -it oml-django-server psql"
       when:
         - omlapp is defined  
 
