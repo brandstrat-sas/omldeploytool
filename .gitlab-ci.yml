@@ -1,5 +1,6 @@
 stages:
   - deploy
+  - tests
 
 # deploy-backing-cloud-digitalocean:
 #   stage: deploy
