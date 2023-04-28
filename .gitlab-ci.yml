@@ -31,7 +31,7 @@ deploy-systemd-digitalocean:
   stage: deploy
   environment: DOCTL_DIGITALOCEAN_SYSTEMD
   script:
-    - doctl compute droplet create --image ${DIGITALOCEAN_DROPLET_IMG} --size ${DIGITALOCEAN_DROPLET_SIZE_SYSTEMD} --region ${DIGITALOCEAN_REGION} --ssh-keys ${DIGITALOCEAN_SSH_KEY} cicd-data.${CI_JOB_ID}
+    - bash doctl compute droplet create --image ${DIGITALOCEAN_DROPLET_IMG} --size ${DIGITALOCEAN_DROPLET_SIZE_SYSTEMD} --region ${DIGITALOCEAN_REGION} --ssh-keys ${DIGITALOCEAN_SSH_KEY} cicd-data.${CI_JOB_ID}
     - doctl compute droplet create --image ${DIGITALOCEAN_DROPLET_IMG} --size ${DIGITALOCEAN_DROPLET_SIZE_SYSTEMD} --region ${DIGITALOCEAN_REGION} --ssh-keys ${DIGITALOCEAN_SSH_KEY} cicd-voice.${CI_JOB_ID}
     - doctl compute droplet create --image ${DIGITALOCEAN_DROPLET_IMG} --size ${DIGITALOCEAN_DROPLET_SIZE_SYSTEMD} --region ${DIGITALOCEAN_REGION} --ssh-keys ${DIGITALOCEAN_SSH_KEY} cicd-app.${CI_JOB_ID}
     - sleep 120
@@ -55,8 +55,6 @@ deploy-systemd-digitalocean:
     - doctl compute droplet delete -f cicd-app.${CI_JOB_ID}
     - doctl compute droplet delete -f cicd-data.${CI_JOB_ID}
     - doctl compute droplet delete -f cicd-voice.${CI_JOB_ID}
-  tags:
-    - systemd  
   only:
     - /.*pipeline-systemd.*$/
     - /.*pipeline-all.*$/
