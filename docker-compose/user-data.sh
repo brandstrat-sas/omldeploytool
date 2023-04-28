@@ -7,11 +7,8 @@ PUBLIC_IPV4=$(curl ifconfig.co)
 
 apt update && apt install git curl
 
-curl -fsSL https://get.docker.com -o get-docker.sh
-sh get-docker.sh
-
-echo "alias docker-compose='/usr/libexec/docker/cli-plugins/docker-compose'" >> ~/.bashrc
-source ~/.bashrc
+curl -fsSL https://get.docker.com -o ~/get-docker.sh
+bash ~/get-docker.sh
 
 git clone https://gitlab.com/omnileads/omldeploytool.git ~/omldeploytool
 cd ~/omldeploytool/docker-compose
