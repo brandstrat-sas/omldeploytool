@@ -55,6 +55,8 @@ deploy-systemd-digitalocean:
     - doctl compute droplet delete -f cicd-app.${CI_JOB_ID}
     - doctl compute droplet delete -f cicd-data.${CI_JOB_ID}
     - doctl compute droplet delete -f cicd-voice.${CI_JOB_ID}
+  tags:
+    systemd  
   only:
     - /.*pipeline-systemd.*$/
     - /.*pipeline-all.*$/
