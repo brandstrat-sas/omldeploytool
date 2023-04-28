@@ -29,6 +29,7 @@ deploy-aio-digitalocean:
 
 deploy-systemd-digitalocean:
   stage: deploy
+  environment: DOCTL_DIGITALOCEAN_SYSTEMD
   script:
     - $DOCTL compute droplet create --image ${DIGITALOCEAN_DROPLET_IMG} --size ${DIGITALOCEAN_DROPLET_SIZE_SYSTEMD} --region ${DIGITALOCEAN_REGION} --ssh-keys ${DIGITALOCEAN_SSH_KEY} cicd-data.${CI_JOB_ID}
     - $DOCTL compute droplet create --image ${DIGITALOCEAN_DROPLET_IMG} --size ${DIGITALOCEAN_DROPLET_SIZE_SYSTEMD} --region ${DIGITALOCEAN_REGION} --ssh-keys ${DIGITALOCEAN_SSH_KEY} cicd-voice.${CI_JOB_ID}
