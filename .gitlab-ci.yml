@@ -5,8 +5,8 @@ stages:
 deploy-aio-digitalocean:
   stage: deploy
   image: omnileads/doctl:230427.01
-  # variables: 
-     DIGITALOCEAN_ACCESS_TOKEN: $DIGITALOCEAN_ACCESS_TOKEN    
+  variables: 
+    - DIGITALOCEAN_ACCESS_TOKEN: $DIGITALOCEAN_ACCESS_TOKEN    
   script:
     - doctl auth init --access-token ${DIGITALOCEAN_ACCESS_TOKEN}
     - git clone --branch $CI_COMMIT_BRANCH https://gitlab.com/omnileads/omldeploytool.git ~/omldeploytool    
