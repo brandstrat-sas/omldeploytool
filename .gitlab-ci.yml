@@ -49,9 +49,6 @@ deploy-systemd-digitalocean:
     - sed -i "s/X.X.X._VOICEPRIV/$OML_IPADDR_VOICEPRIV/g" ./instances/gitlab/inventory.yml
     - sed -i "s/X.X.X._APP/$OML_IPADDR_APP/g" ./instances/gitlab/inventory.yml
     - sed -i "s/X.X.X._APPPRIV/$OML_IPADDR_APPPRIV/g" ./instances/gitlab/inventory.yml
-    - sed -i "s%\TZ:%TZ: $OML_TZ%g" ./instances/gitlab/inventory.yml
-    - sed -i "s/callrec_device: s3/callrec_device: s3-no-check-cert/g" ./instances/gitlab/inventory.yml  
-    - sed -i "s/dialer_host: /dialer_host: 10.10.10.10/g" ./instances/gitlab/inventory.yml
     - bash -x deploy.sh --action=install --tenant=gitlab
     - until curl -sk --head --request GET https://$OML_IPADDR_APP |grep "302" > /dev/null; do echo "Environment still being installed, sleeping 60 seconds"; sleep 60; done; echo "Environment is up"
     - sleep 360

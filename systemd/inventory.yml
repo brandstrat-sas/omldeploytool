@@ -40,7 +40,7 @@ all:
     # --- otherwise leave commented to work invoking through an IP address
     #fqdn: fidelio.sephir.tech
     # --- Set dialer_host
-    dialer_host: 
+    dialer_host: 10.10.10.10
     # --- set postgres_host if you have your own postgres (standalone host or cloud service)
     # --- otherwise leave commented to deploy PostgreSQL on Application Host instance
     #postgres_host: 
@@ -56,14 +56,14 @@ all:
     # --- RTPEngine if you have your own instances put here the IP or hostname
     #rtpengine_host:
     # --- time zone (for example: America/Argentina/Cordoba)
-    TZ: 
+    TZ: America/Argentina/Cordoba
     # --- TLS/SSL Certs configuration (selfsigned, custom or certbot letsencrypt)
     # --- if you have your own certs, put them into instances/tenant folder and
     # --- change this to *custom*
     certs: selfsigned
     # --- if you object storage service use selfsigned TLS/SSL certs, you mus to put
     # --- *callrec_device=s3-no-check-cert* in order to don't verify CA.
-    callrec_device: s3
+    callrec_device: s3-no-check-cert
     # --- PostgreSQL    
     postgres_out: false
     postgres_port: 5432
