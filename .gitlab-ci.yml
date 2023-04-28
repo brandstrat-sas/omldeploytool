@@ -18,8 +18,6 @@ deploy-aio-digitalocean:
     - sleep 360
     - doctl compute droplet delete -f cicd-aio.$CI_JOB_ID
     - rm -rf omldeploytool
-  tags:
-    - tests
   only:
     - /.*pipeline-aio.*$/
     - /.*pipeline-all.*$/
