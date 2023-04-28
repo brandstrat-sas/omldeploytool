@@ -18,7 +18,7 @@ deploy-aio-digitalocean:
     - sleep 60
     - OML_IPADDR=$(doctl compute droplet list |grep cicd-aio.${CI_JOB_ID} |awk '{print $3}') && echo "$OML_IPADDR to run tests"
     - until curl -sk --head --request GET https://$OML_IPADDR |grep "302" > /dev/null; do echo "Environment still being installed, sleeping 60 seconds"; sleep 60; done; echo "Environment is up"
-    - sleep 360
+    - sleep 60
     - doctl compute droplet delete -f cicd-aio.${CI_JOB_ID}
     - rm -rf omldeploytool
   only:
@@ -30,7 +30,6 @@ deploy-aio-digitalocean:
 deploy-systemd-digitalocean:
   stage: deploy
   script:
-    - doctl auth init -t $DIGITALOCEAN_ACCESS_TOKEN
     - doctl compute droplet create --image ${DIGITALOCEAN_DROPLET_IMG} --size ${DIGITALOCEAN_DROPLET_SIZE_SYSTEMD} --region ${DIGITALOCEAN_REGION} --ssh-keys ${DIGITALOCEAN_SSH_KEY} cicd-data.${CI_JOB_ID}
     - doctl compute droplet create --image ${DIGITALOCEAN_DROPLET_IMG} --size ${DIGITALOCEAN_DROPLET_SIZE_SYSTEMD} --region ${DIGITALOCEAN_REGION} --ssh-keys ${DIGITALOCEAN_SSH_KEY} cicd-voice.${CI_JOB_ID}
     - doctl compute droplet create --image ${DIGITALOCEAN_DROPLET_IMG} --size ${DIGITALOCEAN_DROPLET_SIZE_SYSTEMD} --region ${DIGITALOCEAN_REGION} --ssh-keys ${DIGITALOCEAN_SSH_KEY} cicd-app.${CI_JOB_ID}
@@ -51,7 +50,7 @@ deploy-systemd-digitalocean:
     - sed -i "s/X.X.X._APPPRIV/$OML_IPADDR_APPPRIV/g" ./instances/gitlab/inventory.yml
     - bash -x deploy.sh --action=install --tenant=gitlab
     - until curl -sk --head --request GET https://$OML_IPADDR_APP |grep "302" > /dev/null; do echo "Environment still being installed, sleeping 60 seconds"; sleep 60; done; echo "Environment is up"
-    - sleep 360
+    - sleep 60
     - doctl compute droplet delete -f cicd-app.${CI_JOB_ID}
     - doctl compute droplet delete -f cicd-data.${CI_JOB_ID}
     - doctl compute droplet delete -f cicd-voice.${CI_JOB_ID}
