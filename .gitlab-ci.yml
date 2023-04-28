@@ -4,7 +4,7 @@ stages:
 
 deploy-aio-digitalocean:
   stage: deploy
-  image: freetechsolutions/doctl:latest
+  image: omnileads/doctl:latest
   variables: 
     DIGITALOCEAN_ACCESS_TOKEN: $DIGITALOCEAN_ACCESS_TOKEN    
   script:
