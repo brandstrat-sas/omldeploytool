@@ -45,7 +45,7 @@ deploy-systemd-digitalocean:
     - git clone --branch $CI_COMMIT_BRANCH https://gitlab.com/omnileads/omldeploytool.git ~/omldeploytool
     - mkdir -p ~/omldeploytool/systemd/instances/gitlab
     - cd ~/omldeploytool/systemd 
-    - cp inventory.yml instances/gitlab
+    - cp inventory.yml instances/gitlab/
     - sed -i "s/X.X.X.DATA/$OML_IPADDR_DATA/g" ./instances/gitlab/inventory.yml
     - sed -i "s/X.X.X.DATAPRIV/$OML_IPADDR_DATAPRIV/g" ./instances/gitlab/inventory.yml
     - sed -i "s/X.X.X._VOICE/$OML_IPADDR_VOICE/g" ./instances/gitlab/inventory.yml
