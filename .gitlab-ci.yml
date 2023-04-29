@@ -52,10 +52,6 @@ deploy-systemd-digitalocean:
     - sed -i "12 s/Z.Z.Z.Z/$OML_IPADDR_VOICELAN/g" ./instances/gitlab/inventory.yml
     - sed -i "16 s/X.X.X.X/$OML_IPADDR_APP/g" ./instances/gitlab/inventory.yml
     - sed -i "17 s/Z.Z.Z.Z/$OML_IPADDR_APPLAN/g" ./instances/gitlab/inventory.yml
-    - sed -i "8 s/22/5701/g" ./instances/gitlab/inventory.yml
-    - sed -i "13 s/22/5702/g" ./instances/gitlab/inventory.yml
-    - sed -i "18 s/22/5703/g" ./instances/gitlab/inventory.yml
-    - sed -i "38 s/cloud/lan/g" ./instances/gitlab/inventory.yml
     - bash -x deploy.sh --action=install --tenant=gitlab
     - until curl -sk --head --request GET https://$OML_IPADDR_APP |grep "302" > /dev/null; do echo "Environment still being installed, sleeping 60 seconds"; sleep 60; done; echo "Environment is up"
     - sleep 60
@@ -85,6 +81,9 @@ deploy-systemd-lan:
     - sed -i "12 s/Z.Z.Z.Z/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
     - sed -i "16 s/X.X.X.X/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
     - sed -i "17 s/Z.Z.Z.Z/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
+    - sed -i "8 s/22/5701/g" ./instances/gitlab/inventory.yml
+    - sed -i "13 s/22/5702/g" ./instances/gitlab/inventory.yml
+    - sed -i "18 s/22/5703/g" ./instances/gitlab/inventory.yml
     - sed -i "38 s/cloud/lan/g" ./instances/gitlab/inventory.yml
     - bash -x deploy.sh --action=install --tenant=gitlab
     - until curl -sk --head --request GET https://$PROXMOX_ADDR:5704|grep "302" > /dev/null; do echo "Environment still being installed, sleeping 60 seconds"; sleep 60; done; echo "Environment is up"
