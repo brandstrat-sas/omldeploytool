@@ -46,12 +46,12 @@ deploy-systemd-digitalocean:
     - mkdir -p ~/omldeploytool/systemd/instances/gitlab
     - cd ~/omldeploytool/systemd 
     - cp inventory.yml instances/gitlab/
-    - sed -i "6 s/ansible_host:/ansible_host :$OML_IPADDR_DATA/g" ./instances/gitlab/inventory.yml
-    - sed -i "7 s/omni_ip_lan:/omni_ip_lan :$OML_IPADDR_DATALAN/g" ./instances/gitlab/inventory.yml
-    - sed -i "11 s/ansible_host:/ansible_host :$OML_IPADDR_VOICE/g" ./instances/gitlab/inventory.yml
-    - sed -i "12 s/omni_ip_lan:/omni_ip_lan :$OML_IPADDR_VOICELAN/g" ./instances/gitlab/inventory.yml
-    - sed -i "16 s/ansible_host:/ansible_host :$OML_IPADDR_APP/g" ./instances/gitlab/inventory.yml
-    - sed -i "17 s/omni_ip_lan:/omni_ip_lan :$OML_IPADDR_APPLAN/g" ./instances/gitlab/inventory.yml
+    - sed -i "6 s/X.X.X.X/$OML_IPADDR_DATA/g" ./instances/gitlab/inventory.yml
+    - sed -i "7 s/Z.Z.Z.Z/$OML_IPADDR_DATALAN/g" ./instances/gitlab/inventory.yml
+    - sed -i "11 s/X.X.X.X/$OML_IPADDR_VOICE/g" ./instances/gitlab/inventory.yml
+    - sed -i "12 s/Z.Z.Z.Z/$OML_IPADDR_VOICELAN/g" ./instances/gitlab/inventory.yml
+    - sed -i "16 s/X.X.X.X/$OML_IPADDR_APP/g" ./instances/gitlab/inventory.yml
+    - sed -i "17 s/Z.Z.Z.Z/$OML_IPADDR_APPLAN/g" ./instances/gitlab/inventory.yml
     - bash -x deploy.sh --action=install --tenant=gitlab
     - until curl -sk --head --request GET https://$OML_IPADDR_APP |grep "302" > /dev/null; do echo "Environment still being installed, sleeping 60 seconds"; sleep 60; done; echo "Environment is up"
     - sleep 60

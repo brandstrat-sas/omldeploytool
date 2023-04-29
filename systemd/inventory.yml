@@ -3,18 +3,18 @@ all:
   hosts:
     omnileads_data:
       omldata: true
-      ansible_host:
-      omni_ip_lan:
+      ansible_host: X.X.X.X
+      omni_ip_lan: Z.Z.Z.Z
       ansible_ssh_port: 22
     omnileads_voice:
       omlvoice: true
-      ansible_host:
-      omni_ip_lan:
+      ansible_host: X.X.X.X
+      omni_ip_lan: Z.Z.Z.Z
       ansible_ssh_port: 22
     omnileads_app:
       omlapp: true
-      ansible_host:
-      omni_ip_lan:
+      ansible_host: X.X.X.X
+      omni_ip_lan: Z.Z.Z.Z
       ansible_ssh_port: 22
   vars:
     # --- ansible user auth connection
@@ -40,7 +40,7 @@ all:
     # --- otherwise leave commented to work invoking through an IP address
     #fqdn: fidelio.sephir.tech
     # --- Set dialer_host
-    dialer_host: 
+    dialer_host: X.X.X.X
     # --- set postgres_host if you have your own postgres (standalone host or cloud service)
     # --- otherwise leave commented to deploy PostgreSQL on Application Host instance
     #postgres_host: 
