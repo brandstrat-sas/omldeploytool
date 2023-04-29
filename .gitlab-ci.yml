@@ -25,7 +25,7 @@ deploy-aio-digitalocean:
     - /.*pipeline-aio.*$/
     - /.*pipeline-all.*$/
     - schedules
-    - web
+#    - web
 
 deploy-systemd-digitalocean:
   stage: deploy
@@ -70,7 +70,7 @@ deploy-systemd-digitalocean:
     - schedules
 #    - web
 
-deploy-systemd-digitalocean:
+deploy-systemd-lan:
   stage: deploy
   environment: DOCTL_DIGITALOCEAN_SYSTEMD
   script:
