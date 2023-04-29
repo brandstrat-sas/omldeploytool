@@ -76,11 +76,11 @@ deploy-systemd-lan:
     - cd ~/omldeploytool/systemd
     - cp inventory.yml instances/gitlab/
     - sed -i "6 s/X.X.X.X/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
-    - sed -i "7 s/Z.Z.Z.Z/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
+    - sed -i "7 s/Z.Z.Z.Z/$PROXMOX_ADDR_VM_DATA/g" ./instances/gitlab/inventory.yml
     - sed -i "11 s/X.X.X.X/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
-    - sed -i "12 s/Z.Z.Z.Z/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
+    - sed -i "12 s/Z.Z.Z.Z/$PROXMOX_ADDR_VM_VOICE/g" ./instances/gitlab/inventory.yml
     - sed -i "16 s/X.X.X.X/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
-    - sed -i "17 s/Z.Z.Z.Z/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
+    - sed -i "17 s/Z.Z.Z.Z/$PROXMOX_ADDR_VM_APP/g" ./instances/gitlab/inventory.yml
     - sed -i "8 s/22/5701/g" ./instances/gitlab/inventory.yml
     - sed -i "13 s/22/5702/g" ./instances/gitlab/inventory.yml
     - sed -i "18 s/22/5703/g" ./instances/gitlab/inventory.yml
