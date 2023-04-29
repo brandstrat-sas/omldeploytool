@@ -40,8 +40,8 @@ deploy-systemd-digitalocean:
     - OML_IPADDR_APP=$(doctl compute droplet list |grep cicd-app.${CI_JOB_ID} |awk '{print $3}') && echo "$OML_IPADDR to run tests" 
     - rm -rf ~/omldeploytool
     - git clone --branch $CI_COMMIT_BRANCH https://gitlab.com/omnileads/omldeploytool.git ~/omldeploytool
-    - cd omldeploytool/systemd 
-    - mkdir instances/gitlab
+    - mkdir -p ~/omldeploytool/systemd/instances/gitlab
+    - cd ~/omldeploytool/systemd 
     - cp inventory.yml instances/gitlab
     - sed -i "s/X.X.X.DATA/$OML_IPADDR_DATA/g" ./instances/gitlab/inventory.yml
     - sed -i "s/X.X.X.DATAPRIV/$OML_IPADDR_DATAPRIV/g" ./instances/gitlab/inventory.yml
