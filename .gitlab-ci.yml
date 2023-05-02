@@ -110,7 +110,7 @@ deploy-aio-lan:
     - sed -i "8 s/22/5705/g" ./instances/gitlab/inventory.yml
     - sed -i "27 s/cloud/lan/g" ./instances/gitlab/inventory.yml
     - bash -x deploy.sh --action=install --tenant=gitlab
-    - until curl -sk --head --request GET https://$PROXMOX_ADDR:5704|grep "302" > /dev/null; do echo "Environment still being installed, sleeping 60 seconds"; sleep 60; done; echo "Environment is up"
+    - until curl -sk --head --request GET https://$PROXMOX_ADDR:5706|grep "302" > /dev/null; do echo "Environment still being installed, sleeping 60 seconds"; sleep 60; done; echo "Environment is up"
   tags:
     - deploy
   only:
