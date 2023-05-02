@@ -7,16 +7,16 @@
 
 ---
 
-# Ansible, System-D and Podman based OMniLeads management
+# OMniLeads deploy (Ansible, Systemd and Podman containers based)
 
-En esta sección vamos a encontrar una herramienta para la gestión de OMniLeads que nos permitirá realizar despliegues 
-de nuevas instancias, actualizaciones, rollbacks, backup & restore. Pudiendo gestionar cientos de instancias de la App
-bajo la premisa de los inventarios de Ansible.
+In this section, we will find a tool for the management of OMniLeads that will allow us to carry out deployments of new instances, updates, rollbacks, backup & restore. It is possible to manage hundreds of instances of the app under the premise of Ansible inventories.
 
 ![Diagrama deploy tool](./png/deploy-tool-ansible-deploy-instances-multiples.png)
 
-Luego sobre cada instancia en ejecución una colección de componentes invocados como servicios systemd implementan las funcionalidades de OMniLeads sobre la instancia linux (o conjunto de ellas). Finalmente cabe aclarar que cada uno 
-de estos componentes detrás de los servicios systemd son contenedores basados en Podman. 
+Then, for each running instance, a collection of components invoked as systemd services implement OMniLeads functionalities on the Linux instance (or set of instances). Finally, it should be noted that each of these components behind the systemd services are containers based on Podman.
+
+Each OMniLeads instance involves the following collection of components that are run on a Pod. 
+It is possible to group these Pods on a single Linux instance or cluster them horizontally in a configuration.
 
 ![Diagrama component Pods](./png/oml-pods.png)
 
@@ -44,7 +44,7 @@ de estos componentes detrás de los servicios systemd son contenedores basados e
 
 A través de un script bash (deploy.sh) y una serie de archivos Ansible (Playbooks + Templates) es que podemos desplegar una instancia de OMniLeads (Systemd + Podman). 
 
-# Bash Script deploy.sh 📄 <a name="bash-script-deploy"></a>
+## Bash Script deploy.sh 📄 <a name="bash-script-deploy"></a>
 
 Este script ejecutable dispara las acciones de deploy. Se encarga de recibir los parámetros acción a ejecutar y tenant sobre el cual desplegar la acción en cuestión.
 Si entramos en detalles, el script invoca el archivo de inventario perteneciente al tenant sobre el cual hay que operar y luego invoca la playbook raíz de Ansible
@@ -65,7 +65,7 @@ for example:
 ./deploy.sh --action=install --tenant=tenant_folder_name
 ```
 
-# Ansible 🔧 <a name="ansible-inventory"></a>
+## Ansible 🔧 <a name="ansible-inventory"></a>
 
 La estructura implicada en Ansible se basa sobre un archivo de inventario, una playbook raiz (matrix.yml) y una serie de playbooks que implementan acciones de base sobre la VM o conjunto de ellas asi como también tareas específicas que despliegan cada uno de los componentes de OMniLeads.
 
@@ -131,7 +131,7 @@ vars:
     #fqdn: fidelio.sephir.tech
 ```
 
-# Systemd & Podman 🔧 <a name="ansible-inventory"></a>
+## Systemd & Podman 🔧 <a name="ansible-inventory"></a>
 
 Then, once OMnileads is deployed on the corresponding instance/s, each container on which a component works
 can be managed as a systemd service.
@@ -244,14 +244,21 @@ The possible options are:
 * **selfsigned**: which will display the self-signed certificates (not recommended for production).
 * **custom**: if the idea is to implement your own certificates. Then you must place them inside instances/tenant_name_folder/ with the names: *cert.pem* for and *key.pem*
 
-# Deploy a new LAN AIO instance 🚀 <a name="onpremise-deploy"></a>
+# Deploy OMniLeads AIO instance 🚀 <a name="onpremise-deploy"></a>
 
-You must have two Linux instances (Ubuntu 22.04, Debian 11, Rocky 8 or Alma Linux 8) with Internet access and **your public key (ssh) available**, since
-ansible needs to establish an SSH connection through public key.
+You must have a Linux instance (Ubuntu 22.04, Debian 11, Rocky 8 or Alma Linux 8) with internet access and your public SSH key available, as Ansible needs to establish an SSH connection using the public key.
 
 ![Diagrama deploy](./png/deploy-tool-tenant-components-aio.png)
 
-Then you should work on the inventory.yml file
+You must to generate the tenant folder and put here an inventory.yml file, for example:
+
+```
+mkdir instances/my_subscriber_001
+cp inventory_aio.yml instances/my_subscriber_001/inventory.yml
+```
+(don't forget to generate the inventory.yml file from the appropriate template for the type of installation you want to deploy: _aio or _ait, or _ha)
+
+Then you should work on the inventory.yml tenant file.
 
 Regarding addresses and connections. The parameter *omni_ip_lan* refers to the private IP (LAN) that will be used when opening certain ports for components, as well as when they connect with each other.
 
@@ -265,13 +272,11 @@ all:
       ansible_ssh_port: 22      
 ```
 
-The infra_env parameter should be initialized as 'lan'.
+The infra_env variable can be initialized as "lan" or "cloud", depending on whether the OMniLeads instance will be accessible via WAN access (IPADDR or FQDN) or via LAN access (IP or FQDN).
 
-```
-infra_env: lan
-```
+Regarding the variable that is commented out by default, #fqdn should be used (uncommented and initialized) as soon as the instance is accessed via a hostname or FQDN.
 
-And finally, the *bucket_url* and *postgres_host* parameters must be commented out, so that both (PostgreSQL and Object Storage MinIO) are deployed within the data instance.
+And finally, the *bucket_url* and *postgres_host* parameters must be commented out, so that both (PostgreSQL and Object Storage MinIO) are deployed within the AIO instance.
 The rest of the parameters can be customized as desired.
 Finally, the deploy.sh should be executed.
 
@@ -286,14 +291,72 @@ Once the URL is available with the App returning the login view,  we can log in 
 oml_manage --reset_pass
 ```
 
-# Deploy a new instance with Backend (Postgres and Object Storage) as a managed Cloud service 🚀 <a name="cloud-deploy"></a>
+
+# Deploy an OMniLeads Cluster AIT (All In Three) instance. 🚀 <a name="onpremise-deploy"></a>
 
 You must have three Linux instances (Debian 11 or Rocky 8) with Internet access and **your public key (ssh) available**, since
 Ansible needs to establish an SSH connection to deploy the actions.
 
-Also under this format it is assumed that PostgreSQL and S3-compatible Object Storage are going to be provided as managed services by the selected cloud provider. This implies that these two OMniLeads components will not be deployed on the data instance as in the previous case.
+![Diagrama deploy cloud services](./png/deploy-tool-tenant-components-ait.png)
 
-![Diagrama deploy cloud services](./png/deploy-tool-tenant-cloud-services.png)
+You must to generate the tenant folder and put here an inventory.yml file, for example:
+
+```
+mkdir instances/my_subscriber_002
+cp inventory_ait.yml instances/my_subscriber_001/inventory.yml
+```
+(don't forget to generate the inventory.yml file from the appropriate template for the type of installation you want to deploy: _aio or _ait, or _ha)
+
+Then you should work on the inventory.yml tenant file.
+
+Regarding addresses and connections. The parameter *omni_ip_lan* refers to the private IP (LAN) that will be used when opening certain ports for components, as well as when they connect with each other.
+
+```
+all:
+  hosts:
+    omnileads_data:
+      omldata: true
+      ansible_host: 24.199.100.87
+      omni_ip_lan: 10.10.10.2
+      ansible_ssh_port: 22      
+    omnileads_voice:
+      omlvoice: true
+      ansible_host: 144.126.221.171
+      omni_ip_lan: 10.10.10.3
+      ansible_ssh_port: 22      
+    omnileads_app:
+      omlapp: true
+      ansible_host: 143.198.49.244
+      omni_ip_lan: 10.10.10.4
+      ansible_ssh_port: 22  
+```
+
+The infra_env variable can be initialized as "lan" or "cloud", depending on whether the OMniLeads instance will be accessible via WAN access (IPADDR or FQDN) or via LAN access (IP or FQDN).
+
+Regarding the variable that is commented out by default, #fqdn should be used (uncommented and initialized) as soon as the instance is accessed via a hostname or FQDN.
+
+And finally, the *bucket_url* and *postgres_host* parameters must be commented out, so that both (PostgreSQL and Object Storage MinIO) are deployed within the AIO instance.
+The rest of the parameters can be customized as desired.
+Finally, the deploy.sh should be executed.
+
+```
+./deploy.sh --action=install --tenant=tenant_name_folder
+```
+
+On OML App linux terminal, you must run reset_pass in order to perform a first login in the App.
+Once the URL is available with the App returning the login view,  we can log in with the user *admin*, password *admin*.
+
+```
+oml_manage --reset_pass
+```
+
+# Deploy an OMniLeads AIO or AIT instance with Postgres DB and Bucket Object Storage as the cloud provider service. 🚀 <a name="onpremise-deploy"></a>
+
+It is possible to deploy the application using external cloud services for both Postgres and Bucket. The majority of cloud infrastructure providers offer the possibility of requesting an instance with Postgres installed in addition to the Linux instances (VPS). Similarly, object storage can be requested as a service, generating a bucket for our deployment. This approach is very interesting because we consider the OMniLeads instance to be stateless, ephemeral, and fully viable within the perspective of immutable infrastructure.
+
+So, You must have a Linux instance , as Ansible needs to establish an SSH connection using the public key. Additionally, you will need to have access to the object storage bucket and its access keys, as well as the connection details for the PostgreSQL database instances.
+
+![Diagrama deploy](./png/deploy-tool-tenant-components-cloud-aio.png)
 
 We are going to propose a reference inventory, where the cloud provider is supposed to give us the connection data to Postgres.
 The parameter *postgres_host* must be assigned the corresponding connection string.
@@ -390,6 +453,14 @@ There should be 8 virtual machines distributed under the following scheme:
 
 ### Let's deploy !
 
+You must to generate the tenant folder and put here an inventory.yml file, for example:
+
+```
+mkdir instances/my_subscriber_003
+cp inventory_ha.yml instances/my_subscriber_003/inventory.yml
+```
+(don't forget to generate the inventory.yml file from the appropriate template for the type of installation you want to deploy: _aio or _ait, or _ha)
+
 To deploy our cluster we must have 2 VMs with CentOS7 (for the Postgres cluster) on one side and 6 VMs with Debian11 (or ubuntu-22.04 or rocky linux 8) to build the App, Voice and Load balancer clusters. 
 
 Let's assume the following distribution of components on the VMs and IP configuration:
@@ -412,7 +483,71 @@ VIP haproxy_host: 172.16.101.204
 
 Then, as an example, we will continue with the IPs proposed at the time of creating the inventory file.
 
-
+```
+---
+omnileads_data:
+  hosts:
+    sql_1:  
+      ansible_host: 172.16.101.101      
+      omni_ip_lan: 172.16.101.101
+      ansible_ssh_port: 22
+      ha_rol: main
+    sql_2:  
+      ansible_host: 172.16.101.102
+      omni_ip_lan: 172.16.101.102
+      ansible_ssh_port: 22  
+      ha_rol: backup
+  vars:
+    postgres_host_ha: true
+    ha_vip_nic: eth0
+    netaddr: 172.16.101.0/16
+    netprefix: 24
+omnileads_voice:
+  hosts:
+    voice_1:  
+      ansible_host: 172.16.101.103
+      omni_ip_lan: 172.16.101.103
+      ansible_ssh_port: 22
+      ha_rol: main
+    voice_2:
+      ansible_host: 172.16.101.104
+      omni_ip_lan: 172.16.101.104
+      ansible_ssh_port: 22
+      ha_rol: backup
+  vars:
+    omlvoice: true
+    ha_vip_nic: ens18    
+omnileads_haproxy:
+  hosts:
+    haproxy_1:
+      ansible_host: 172.16.101.108
+      omni_ip_lan: 172.16.101.108
+      ansible_ssh_port: 22
+      ha_rol: main
+    haproxy_2:  
+      ansible_host: 172.16.101.109
+      omni_ip_lan: 172.16.101.109
+      ansible_ssh_port: 22  
+      ha_rol: backup
+  vars:
+    omlhaproxy: true
+    ha_vip_nic: ens18
+    app_port: 443
+omnileads_app:
+  hosts:
+    app_1:  
+      ansible_host: 172.16.101.105
+      ansible_ssh_port: 22
+      omni_ip_lan: 172.16.101.105
+      ha_rol: main
+    app_2:
+      ansible_host: 172.16.101.106
+      ansible_ssh_port: 22
+      omni_ip_lan: 172.16.101.106
+      ha_rol: backup
+  vars:
+    ha_vip_nic: ens18
+    omlapp: true
 
 all: 
   vars:
@@ -426,7 +561,7 @@ all:
     # --  Cluster postgres RW IP
     postgres_host: 172.16.101.201
     # --  Cluster postgres RO IP
-    postgres_ro_host: 172.16.101.201
+    postgres_ro_host: 172.16.101.202
     # --  Cluster Voice (Asterisk + RTPengine) IP
     voice_host: 172.16.101.203
     # -- Cluster HTTP Web App (HAProxy VIP)
@@ -435,39 +570,13 @@ all:
     omni_ip_wan: 190.19.150.8
 
     kamailio_version: 230204.01
-    asterisk_version: 230328.01
+    asterisk_version: 230417.01
     rtpengine_version: 230204.01
-    omnileads_version: 1.26.0
+    omnileads_version: 1.27.0
     websockets_version: 230204.01
     nginx_version: 230215.01
     postgres_version: 230204.01
     centos_postgresql_version: 11
-
-    # --- Activate the OMniLeads Enterprise Edition - with "AAAA" licensed.
-    # --- on the contrary you will deploy OMniLeads OSS Edition with GPLV3 licensed. 
-    enterprise_edition: true
-    omnileads_ha: true
-    ha_notification_email: fabian.pignataro@freetechsolutions.com.ar
-
-    # -- Cluster public NAT IP
-    omni_ip_wan: 190.19.150.8
-    # --  Cluster redis IP
-    # --  Use in case of run RTPEngine out of this deploy
-    # rtpengine_host: 172.16.101.203
-    # -- Dialer host
-    # dialer_host: 10.10.10.10
-    # -- Bucket URL for Django & Asterisk
-    bucket_url: https://172.16.101.3:9000
-    # --- ansible user auth connection
-    ansible_user: root
-    # --- version of each image to deploy
-    # --- "cloud" instance (access through public IP)
-    # --- or "lan" instance (access through private IP)
-    # --- in order to set NAT or Publica ADDR for RTP voice packages
-    infra_env: lan
-    # --- If you have an DNS FQDN resolution, you must to uncomment and set this param
-    # --- otherwise leave commented to work invoking through an IP address
-    #fqdn: fabis.sefirot.cloud
     ...
     ...
     ...
