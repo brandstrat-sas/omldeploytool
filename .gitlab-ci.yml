@@ -27,7 +27,8 @@ deploy-aio-digitalocean:
     - schedules
 #    - web
 
-deploy-systemd-digitalocean:
+
+deploy-ait-digitalocean:
   stage: deploy
   environment: DOCTL_DIGITALOCEAN_SYSTEMD
   script:
@@ -45,7 +46,7 @@ deploy-systemd-digitalocean:
     - git clone --branch $CI_COMMIT_BRANCH https://gitlab.com/omnileads/omldeploytool.git ~/omldeploytool
     - mkdir -p ~/omldeploytool/systemd/instances/gitlab
     - cd ~/omldeploytool/systemd 
-    - cp inventory.yml instances/gitlab/
+    - cp inventory_ait.yml instances/gitlab/inventory.yml
     - sed -i "6 s/X.X.X.X/$OML_IPADDR_DATA/g" ./instances/gitlab/inventory.yml
     - sed -i "7 s/Z.Z.Z.Z/$OML_IPADDR_DATALAN/g" ./instances/gitlab/inventory.yml
     - sed -i "11 s/X.X.X.X/$OML_IPADDR_VOICE/g" ./instances/gitlab/inventory.yml
@@ -66,7 +67,7 @@ deploy-systemd-digitalocean:
     - schedules
 #    - web
 
-deploy-systemd-lan:
+deploy-ait-lan:
   stage: deploy
   environment: DOCTL_DIGITALOCEAN_SYSTEMD
   script:
@@ -74,7 +75,7 @@ deploy-systemd-lan:
     - git clone --branch $CI_COMMIT_BRANCH https://gitlab.com/omnileads/omldeploytool.git ~/omldeploytool
     - mkdir -p ~/omldeploytool/systemd/instances/gitlab
     - cd ~/omldeploytool/systemd
-    - cp inventory.yml instances/gitlab/
+    - cp inventory_ait.yml instances/gitlab/inventory.yml
     - sed -i "6 s/X.X.X.X/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
     - sed -i "7 s/Z.Z.Z.Z/$PROXMOX_ADDR_VM_DATA/g" ./instances/gitlab/inventory.yml
     - sed -i "11 s/X.X.X.X/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
@@ -85,6 +86,29 @@ deploy-systemd-lan:
     - sed -i "13 s/22/5702/g" ./instances/gitlab/inventory.yml
     - sed -i "18 s/22/5703/g" ./instances/gitlab/inventory.yml
     - sed -i "38 s/cloud/lan/g" ./instances/gitlab/inventory.yml
+    - bash -x deploy.sh --action=install --tenant=gitlab
+    - until curl -sk --head --request GET https://$PROXMOX_ADDR:5704|grep "302" > /dev/null; do echo "Environment still being installed, sleeping 60 seconds"; sleep 60; done; echo "Environment is up"
+  tags:
+    - deploy
+  only:
+    - /.*pipeline-systemd.*$/
+    - /.*pipeline-all.*$/
+    - schedules
+    - web
+
+deploy-aio-lan:
+  stage: deploy
+  environment: DOCTL_DIGITALOCEAN_SYSTEMD
+  script:
+    - rm -rf ~/omldeploytool
+    - git clone --branch $CI_COMMIT_BRANCH https://gitlab.com/omnileads/omldeploytool.git ~/omldeploytool
+    - mkdir -p ~/omldeploytool/systemd/instances/gitlab
+    - cd ~/omldeploytool/systemd
+    - cp inventory_aio.yml instances/gitlab/inventory.yml
+    - sed -i "s/X.X.X.X/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
+    - sed -i "s/Z.Z.Z.Z/$PROXMOX_ADDR_VM_AIO/g" ./instances/gitlab/inventory.yml
+    - sed -i "8 s/22/5705/g" ./instances/gitlab/inventory.yml
+    - sed -i "27 s/cloud/lan/g" ./instances/gitlab/inventory.yml
     - bash -x deploy.sh --action=install --tenant=gitlab
     - until curl -sk --head --request GET https://$PROXMOX_ADDR:5704|grep "302" > /dev/null; do echo "Environment still being installed, sleeping 60 seconds"; sleep 60; done; echo "Environment is up"
   tags:

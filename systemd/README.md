@@ -7,29 +7,30 @@
 
 ---
 
-# Ansible System-D based OMniLeads management
+# Ansible, System-D and Podman based OMniLeads management
 
-In this repository you will find an alternative to implement OMniLeads tenant management from an on-premise
-IT management perspective, but also completely viable for working in cloud-computing environments.
-
-The idea is to be able to manage several OMniLeads tenants from this ansible based management tool.
-
-This option covers everything, from installing new instances, managing updates to executing backup & restore procedures,
-all that using a single script and configuration file.
-
+En esta sección vamos a encontrar una herramienta para la gestión de OMniLeads que nos permitirá realizar despliegues 
+de nuevas instancias, actualizaciones, rollbacks, backup & restore. Pudiendo gestionar cientos de instancias de la App
+bajo la premisa de los inventarios de Ansible.
 
 ![Diagrama deploy tool](./png/deploy-tool-ansible-deploy-instances-multiples.png)
 
+Luego sobre cada instancia en ejecución una colección de componentes invocados como servicios systemd implementan las funcionalidades de OMniLeads sobre la instancia linux (o conjunto de ellas). Finalmente cabe aclarar que cada uno 
+de estos componentes detrás de los servicios systemd son contenedores basados en Podman. 
+
+![Diagrama component Pods](./png/oml-pods.png)
 
 # Index
 
-* [Bash, Ansible & System D](#bash-ansible-systemd)
+* [Bash, Ansible, Systemd & Podman](#bash-ansible-systemd)
 * [Ansible + Inventory](#ansible-inventory)
 * [Bash Script deploy.sh](#bash-script-deploy)
+* [OMniLeads Podman containers](#podman)
 * [Subscriber tracking & TLS certs](#subscriber-traking)
-* [Deploy LAN instance with self-hosted backend (Postgres & Object Storage)](#onpremise-deploy)
+* [Deploy all in one (AIO) instance)](#aio-deploy)
+* [Deploy all in three (AIT) instance)](#onpremise-deploy)
 * [Deploy Cloud instance with backend (Postgres y Object Storage) as cloud service](#cloud-deploy)
-* [Deploy High Availability OMniLeads on premise instance](#onpremise-deploy)
+* [Deploy High Availability on-premise instance](#onpremise-deploy)
 * [TLS Certs provisioning](#tls-cert-provisioning)
 * [Deploy an upgrade from CentOS7](#upgrade_from_centos7)
 * [Deploy an upgrade](#upgrades)
@@ -39,74 +40,70 @@ all that using a single script and configuration file.
 * [Observability](#observability)
 
 
-# Bash, Ansible & System D 📋 <a name="bash-ansible-systemd"></a>
+# Bash + Ansible = Systemd + Podman 📋 <a name="bash-ansible-systemd"></a>
 
-The management of multiple instances is done from the administrator's workstation. When preparing a new deployment
-there are three fundamental files that are invoked in a chain, which help to understand how the management is planned
-of the tenants, these are:
+A través de un script bash (deploy.sh) y una serie de archivos Ansible (Playbooks + Templates) es que podemos desplegar una instancia de OMniLeads (Systemd + Podman). 
 
-* **deploy.sh**: launch the root ansible playbook invoking the inventory file corresponding to the tenant that you want to manage.
-* **inventory.yml**: configuration parameters of the OMniLeads instance to be deployed.
-* **matrix.yml**: the ansible root playbook
+# Bash Script deploy.sh 📄 <a name="bash-script-deploy"></a>
 
-Each instance of OMniLeads is generated on three Linux instances (application, voice, and data).
-In other words, we are going to have a Linux instance dedicated to executing the containers corresponding to the Application stack, 
-on the second the containers of the voice processing stack are executed and on the third those of the data stack.
-
-![Diagrama deploy tool](./png/deploy-tool-tenant-a.png)
-
-Then, once OMnileads is deployed on the corresponding instances, each container on which a component works
-can be managed as a systemd service.
+Este script ejecutable dispara las acciones de deploy. Se encarga de recibir los parámetros acción a ejecutar y tenant sobre el cual desplegar la acción en cuestión.
+Si entramos en detalles, el script invoca el archivo de inventario perteneciente al tenant sobre el cual hay que operar y luego invoca la playbook raíz de Ansible
+matrix.yml mediante *ansible-playbook* junto  a los tags correspondientes y así responder a la solicitud realizada. 
 
 ```
-systemd start component
-systemd restart component
-systemd stop component
+./deploy.sh --help
 ```
 
-![Diagrama deploy tool zoom](./png/deploy-tool-ansible-deploy-instances.png)
+To run an installation or updates deployment, two parameters must be called.
 
-# Ansible + Inventory 🔧 <a name="ansible-inventory"></a>
+* **--action=**
+* **--tenant=**
 
-The inventory file is the configuration source of the instance on which you are going to work.
-Parameters such as the component image version or configuration issues are adjusted there
-database (users, passwords, etc.).
-
-Regarding this file, we are going to review the main parameters, that is, those that do or should I
-adjust for a successful installation.
-
-We start with the data to provide about the three necessary linux instances, there we must
-load the IP addresses corresponding to each linux instance so that Ansible can set the
-connection, in addition to providing the LAN IP address of each instance.
-
-So on the one hand we have the *ansible_host* parameter that implies the IP address over which
-the SSH connection must be established by Ansible, while the *omni_ip_lan* parameter does
-reference to a private address on which OMniLeads raises some services and uses
-to communicate between the three instances. It may happen that both are worth the same (especially
-in a deployment scenario over LAN or VPN)
+for example: 
 
 ```
+./deploy.sh --action=install --tenant=tenant_folder_name
+```
+
+# Ansible 🔧 <a name="ansible-inventory"></a>
+
+La estructura implicada en Ansible se basa sobre un archivo de inventario, una playbook raiz (matrix.yml) y una serie de playbooks que implementan acciones de base sobre la VM o conjunto de ellas asi como también tareas específicas que despliegan cada uno de los componentes de OMniLeads.
+
+El archivo de inventario es donde se almacena el tipo de OMniLeads a generar (all in one, all in three or high availability) junto a los parámetros de configuración como datos de conexión para postgres, asterisk, redis, object storage, etc. 
+
+Existen tres tipos de archivos inventario para Ansible:
+
+* **inventory_aio.yml**: debe ser invocado cuando se desea desplegar OMniLeads all in one. Es decir, al momento de desplegar sobre una unica instancia Linux todos los componentes de la App.
+
+![Diagrama deploy tool](./png/deploy-tool-tenant-aio.png)
+
+
+* **inventory_ait.yml**: debe ser invocado cuando se desea desplegar OMniLeads all in three. Es decir, al momento de desplegar sobre un cluster de tres instancias Linux (data, voice & web) todos los componentes de la App.
+
+![Diagrama deploy tool](./png/deploy-tool-tenant-ait.png)
+
+
+* **inventory_ha.yml**: debe ser invocado cuando se desea desplegar OMniLeads bajo un esquema de Alta Disponibilidad Onpremise, basado en dos servidores físicos (hypervisores) con 8 VMs sobre las cuales se distribuyen los componentes.
+
+![Diagrama deploy tool](./png/deploy-tool-tenant-ha.png)
+
+Cada archivo esta conformado por la sección donde se declaran los hosts sobre los cuales se va a operar junto a sus variables locales. Dependiendo del formato a desplegar (AIO, AIOT or HA) podrá ser uno o varios host.
+
+For example:
+
+```
+---
 all:
   hosts:
-    omnileads_data:
-      omldata: true
-      ansible_host: 172.16.101.41
-      omni_ip_lan: 172.16.101.41
-      ansible_ssh_port: 22      
-    omnileads_voice:
-      omlvoice: true
-      ansible_host: 172.16.101.42
-      omni_ip_lan: 172.16.101.42
-      ansible_ssh_port: 22      
-    omnileads_app:
-      omlapp: true
-      ansible_host: 172.16.101.43
-      omni_ip_lan: 172.16.101.43
-      ansible_ssh_port: 22   
+    omnileads_aio:
+      omlaio: true
+      ansible_host: X.X.X.X
+      omni_ip_lan: Z.Z.Z.Z
+      ansible_ssh_port: 22
 ```
 
 Then we count the tenant variables to display, labeled/indented under *vars:*. Here we find
-all the adjustable parameters when invoking a deploy on a group of instances. each one is
+all the adjustable parameters when invoking a deploy instance. each one is
 described by a *# --- comment* preceding it.
 
 ```
@@ -132,28 +129,75 @@ vars:
     # --- If you have an DNS FQDN resolution, you must to uncomment and set this param
     # --- otherwise leave commented to work invoking through an IP address
     #fqdn: fidelio.sephir.tech
-
 ```
 
-# Bash Script deploy.sh 📄 <a name="bash-script-deploy"></a>
+# Systemd & Podman 🔧 <a name="ansible-inventory"></a>
 
-This script receives parameters that command the action to be carried out, this action has to do with invoking the Playbook
-matrix.yml who, from the previously edited inventory file, will end up deploying the specific action on the app and voice instances.
-
-```
-./deploy.sh --help
+Then, once OMnileads is deployed on the corresponding instance/s, each container on which a component works
+can be managed as a systemd service.
 
 ```
+systemd start component
+systemd restart component
+systemd stop component
+```
 
-To run an installation or updates deployment, two parameters must be called.
+Detrás de cada acción disparada por el comando systemctl tenemos en realidad un contenedor Podman que es lanzado, finalizado o reiniciado. 
+Dicho contenedor es la resultante de la imagen invocada junto a las variables de entorno. 
 
-* **--action=**
-* **--tenant=**
+Por ejemplo si observamos el archivo de systemd del componente Nginx:
 
 ```
-./deploy.sh --action=install --tenant=tenant_name_folder
+[Unit]
+Description=Podman container-oml-nginx-server.service
+Documentation=man:podman-generate-systemd(1)
+Wants=network-online.target
+After=network-online.target
+RequiresMountsFor=%t/containers
+
+[Service]
+Environment=PODMAN_SYSTEMD_UNIT=%n
+Restart=on-failure
+TimeoutStopSec=70
+ExecStartPre=/bin/rm -f %t/%n.ctr-id
+ExecStart=/usr/bin/podman run \
+  --cidfile=%t/%n.ctr-id \
+  --cgroups=no-conmon \
+  --sdnotify=conmon \
+  --replace \
+  --detach \
+  --network=host \
+  --env-file=/etc/default/nginx.env \
+  --name=oml-nginx-server \
+  --volume=/etc/omnileads/certs:/etc/omnileads/certs \
+  --volume=django_static:/opt/omnileads/static \
+  --volume=django_callrec_zip:/opt/omnileads/asterisk/var/spool/asterisk/monitor \
+  --volume=nginx_logs:/var/log/nginx/ \
+  --rm  \
+  docker.io/omnileads/nginx:230215.01
+ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
+ExecStopPost=/usr/bin/podman rm -f --ignore --cidfile=%t/%n.ctr-id
+Type=notify
+NotifyAccess=all
+
+[Install]
+WantedBy=default.target
+```
+
+Se puede observar como el ExecStart invoca un lanzamiento de un contenedor podman y que más alla de las varias opciones involucradas hay una que es *--env-file=/etc/default/nginx.env*, sobre dicho archivo se genera la configuración necesaria para que el componente pueda hacer su trabajo. Por ejemplo:
 
 ```
+DJANGO_HOSTNAME=172.16.101.221
+DAPHNE_HOSTNAME=172.16.101.221
+
+KAMAILIO_HOSTNAME=localhost
+WEBSOCKETS_HOSTNAME=172.16.101.221
+ENV=prodenv
+
+S3_ENDPOINT=http://172.16.101.221:9000
+```
+
+Tanto el archivo systemd como el de variables de entorno son generados a partir del render de templates de Ansible. 
 
 # Inventory tenant folder :office: <a name="subscriber-traking"></a>
 
@@ -162,9 +206,10 @@ a folder called **instances** at the root of this directory. The reserved name f
 **instances** since said string is inside the .gitignore of the repository.
 
 The idea is that the mentioned folder works as a separate GIT repository, thus providing the possibility
-to maintain an integral backup in turn that the SRE or systems department is supported in the use of GIT.
+to maintain an integral backup in turn that the SRE or IT people is supported in the use of GIT.
 
 ```
+cd omldeploytool/systemd
 git clone your_tenants_config_repo instances
 ```
 
@@ -172,30 +217,34 @@ Then, for each *instance* to be managed, a sub-folder must be created within ins
 For example:
 
 ```
-instances/Subscriber_A
+mkdir instances/Subscriber_A
 ```
 
 Once the tenant folder is generated, there you will need to place a copy of the *inventory.yml* file available
 in the root of this repository, in order to customize and tack inside the private GIT repository.
 
 ```
-cp inventory.yml instances/Subscriber_A
+cp inventory_aio.yml instances/Subscriber_A/inventory.yml
 git add instances/Subscriber_A
 git commit 'my new Subscriber A'
 git push origin main
 ```
 
-# TLS/SSL certs provisioning :closed_lock_with_key: <a name="tls-cert-provisioning"></a>
+Luego una vez que dejamos ajustado el archivo inventory.yml dentro de la carpeta del tenant, entonces podemos disparar el deploy del mismo:
 
+```
+./deploy.sh --action=install --tenant=Subscriber_A
+```
+
+# TLS/SSL certs provisioning :closed_lock_with_key: <a name="tls-cert-provisioning"></a>
 
 From the inventory variable *certs* you can indicate what to do with the SSL certificates.
 The possible options are:
 
 * **selfsigned**: which will display the self-signed certificates (not recommended for production).
 * **custom**: if the idea is to implement your own certificates. Then you must place them inside instances/tenant_name_folder/ with the names: *cert.pem* for and *key.pem*
-* **certbot**: comign soon ...
 
-# Deploy a new LAN instance with Backend (Postgres and Object Storage) self-hosted 🚀 <a name="onpremise-deploy"></a>
+# Deploy a new LAN AIO instance 🚀 <a name="onpremise-deploy"></a>
 
 You must have two Linux instances (Ubuntu 22.04, Debian 11, Rocky 8 or Alma Linux 8) with Internet access and **your public key (ssh) available**, since
 ansible needs to establish an SSH connection through public key.
@@ -375,76 +424,7 @@ VIP haproxy_host: 172.16.101.204
 
 Then, as an example, we will continue with the IPs proposed at the time of creating the inventory file.
 
-```
----
-############################################
-omnileads_data:
-  hosts:
-    sql_1:  
-      ansible_host: 172.16.101.101      
-      omni_ip_lan: 172.16.101.101
-      ansible_ssh_port: 22
-      ha_rol: main
-    sql_2:  
-      ansible_host: 172.16.101.102
-      omni_ip_lan: 172.16.101.102
-      ansible_ssh_port: 22  
-      ha_rol: backup
-  vars:
-    postgres_host_ha: true
-    ha_vip_nic: eth0
-    netaddr: 172.16.101.0/16
-    netprefix: 24
-############################################
-omnileads_voice:
-  hosts:
-    voice_1:  
-      ansible_host: 172.16.101.103
-      omni_ip_lan: 172.16.101.103
-      ansible_ssh_port: 22
-      ha_rol: main
-    voice_2:
-      ansible_host: 172.16.101.104
-      omni_ip_lan: 172.16.101.104
-      ansible_ssh_port: 22
-      ha_rol: backup
-  vars:
-    omlvoice: true
-    ha_vip_nic: ens18    
-############################################
-omnileads_haproxy:
-  hosts:
-    haproxy_1:
-      ansible_host: 172.16.101.108
-      omni_ip_lan: 172.16.101.108
-      ansible_ssh_port: 22
-      ha_rol: main
-    haproxy_2:  
-      ansible_host: 172.16.101.109
-      omni_ip_lan: 172.16.101.109
-      ansible_ssh_port: 22  
-      ha_rol: backup
-  vars:
-    omlhaproxy: true
-    ha_vip_nic: ens18
-    app_port: 443
-############################################
-omnileads_app:
-  hosts:
-    app_1:  
-      ansible_host: 172.16.101.105
-      ansible_ssh_port: 22
-      omni_ip_lan: 172.16.101.105
-      ha_rol: main
-    app_2:
-      ansible_host: 172.16.101.106
-      ansible_ssh_port: 22
-      omni_ip_lan: 172.16.101.106
-      ha_rol: backup
-  vars:
-    ha_vip_nic: ens18
-    omlapp: true
-############################################
+
 
 all: 
   vars:

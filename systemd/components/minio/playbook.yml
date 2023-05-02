@@ -18,7 +18,9 @@
 ---
 
 - name: MINIO OMniLeads Minio component deploy
-  hosts: omnileads_data
+  hosts: 
+    - omnileads_data
+    - omnileads_aio
   tags:
     - all_components
     - minio

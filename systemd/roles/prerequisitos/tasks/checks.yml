@@ -73,6 +73,9 @@
     - voice
     - app
 
+###################### HOST Set ########################### ###################### HOST Set ###########################
+###################### HOST Set ########################### ###################### HOST Set ###########################
+
 # Set postgres_host as {{ data_host }} on App instance when postgres_host is not explicitly defined
 - name: CHECKS Setting postgres_host
   set_fact:
@@ -81,6 +84,23 @@
   when:
     - postgres_host is not defined
     - (omlapp is defined) or (omlvoice is defined)
+  tags: 
+    - install
+    - upgrade
+    - app
+    - voice
+    - asterisk
+    - django
+    - observability
+
+# Set postgres_host as localhost on AIO instance when postgres_host is not explicitly defined
+- name: CHECKS Setting postgres_host
+  set_fact:
+    postgres_host: localhost
+  changed_when: false
+  when:
+    - postgres_host is not defined
+    - omlaio is defined
   tags: 
     - install
     - upgrade
@@ -112,7 +132,7 @@
   changed_when: false
   when:
     - bucket_url is not defined
-    - (omlapp is defined) or (omlvoice is defined)
+    - (omlapp is defined) or (omlvoice is defined) or (omlaio is defined)
   tags: 
     - install
     - upgrade
@@ -128,7 +148,7 @@
   changed_when: false
   when:
     - websockets_host is not defined
-    - omlapp is defined
+    - (omlapp is defined)  or (omlaio is defined)
   tags: 
     - install
     - upgrade
@@ -147,6 +167,19 @@
     - upgrade
     - app
 
+# Set kamailio_host as localhost on AIO instance when kamailio_host is not explicitly defined
+- name: CHECKS Setting kamailio_host as localhost
+  set_fact:
+    kamailio_host: localhost
+  changed_when: false
+  when:
+    - kamailio_host is not defined
+    - omlaio is defined
+  tags: 
+    - install
+    - upgrade
+    - app
+
 # Set redis_host as {{ redis_host }} on App instance when redis_host is not explicitly defined
 - name: CHECKS Setting redis_host as localhost
   set_fact:
@@ -155,6 +188,20 @@
   when:
     - redis_host is not defined
     - (omlapp is defined) or (omlvoice is defined)
+  tags: 
+    - install
+    - upgrade
+    - app
+    - asterisk
+
+# Set redis_host as localhost on AIO instance when redis_host is not explicitly defined
+- name: CHECKS Setting redis_host as localhost
+  set_fact:
+    redis_host: localhost
+  changed_when: false
+  when:
+    - redis_host is not defined
+    - omlaio is defined
   tags: 
     - install
     - upgrade
@@ -182,7 +229,7 @@
   changed_when: false
   when:
     - asterisk_host is not defined
-    - omlapp is defined
+    - (omlapp is defined) or (omlaio is defined)
   tags: 
     - install
     - upgrade
@@ -195,7 +242,7 @@
   changed_when: false
   when:
     - rtpengine_host is not defined
-    - omlapp is defined
+    - (omlapp is defined) or (omlaio is defined)
   tags: 
     - install
     - upgrade
@@ -208,7 +255,7 @@
   changed_when: false
   when:
     - nginx_host is not defined
-    - omlvoice is defined
+    - (omlvoice is defined)  or (omlaio is defined)
   tags: 
     - install
     - upgrade
