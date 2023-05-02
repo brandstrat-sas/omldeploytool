@@ -42,7 +42,7 @@ all:
     dialer_host: 10.10.10.43
     # --- set postgres_host if you have your own postgres (standalone host or cloud service)
     # --- otherwise leave commented to deploy PostgreSQL on Application Host instance
-    #postgres_host: private-oml-fabi-do-user-6023066-0.b.db.ondigitalocean.com
+    #postgres_host: 
     # --- Read Only connection host address
     postgres_ro_host: 
     # --- if you have your own bucket (standalone host or cloud service) put here the URL
@@ -52,7 +52,7 @@ all:
     # --- if you want to deploy MinIO objects storage on application_host, you must to put '#' before
     #bucket_url: https://sfo3.digitaloceanspaces.com
     # --- RTPEngine if you have your own instances put here the IP or hostname
-    #rtpengine_host=
+    #rtpengine_host: 
     # --- time zone
     TZ: America/Argentina/Cordoba
     # --- TLS/SSL Certs configuration (selfsigned, custom or certbot letsencrypt)

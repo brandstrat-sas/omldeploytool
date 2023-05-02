@@ -244,7 +244,7 @@ The possible options are:
 * **selfsigned**: which will display the self-signed certificates (not recommended for production).
 * **custom**: if the idea is to implement your own certificates. Then you must place them inside instances/tenant_name_folder/ with the names: *cert.pem* for and *key.pem*
 
-# Deploy OMniLeads AIO instance 🚀 <a name="onpremise-deploy"></a>
+# Install on Linux instance 🚀 <a name="onpremise-deploy"></a>
 
 You must have a Linux instance (Ubuntu 22.04, Debian 11, Rocky 8 or Alma Linux 8) with internet access and your public SSH key available, as Ansible needs to establish an SSH connection using the public key.
 
@@ -260,8 +260,6 @@ cp inventory_aio.yml instances/my_subscriber_001/inventory.yml
 
 Then you should work on the inventory.yml tenant file.
 
-Regarding addresses and connections. The parameter *omni_ip_lan* refers to the private IP (LAN) that will be used when opening certain ports for components, as well as when they connect with each other.
-
 ```
 all:
   hosts:
@@ -270,15 +268,21 @@ all:
       ansible_host: 172.16.101.43 
       omni_ip_lan: 172.16.101.43
       ansible_ssh_port: 22      
+  vars:
+    # --- ansible user auth connection
+    ansible_user: root
 ```
 
-The infra_env variable can be initialized as "lan" or "cloud", depending on whether the OMniLeads instance will be accessible via WAN access (IPADDR or FQDN) or via LAN access (IP or FQDN).
+The parameter ansible_host refers to the IP or FQDN used to establish an SSH connection. The omni_ip_lan parameter refers to the private IP (LAN) that will be used when opening certain ports for components and when they connect with each other.
 
-Regarding the variable that is commented out by default, #fqdn should be used (uncommented and initialized) as soon as the instance is accessed via a hostname or FQDN.
+The ***infra_env*** variable can be initialized as "lan" or "cloud", depending on whether the instance will be accessible via WAN access (IPADDR or FQDN) or via LAN access (IP or FQDN).
 
-And finally, the *bucket_url* and *postgres_host* parameters must be commented out, so that both (PostgreSQL and Object Storage MinIO) are deployed within the AIO instance.
-The rest of the parameters can be customized as desired.
-Finally, the deploy.sh should be executed.
+Regarding the variable that is commented out by default, ***#fqdn:*** should be used (uncommented and initialized) as soon as the instance is accessed via a fqdn.
+
+The rest of the variables are documented as comments within the file.
+
+
+Let's run the bash scrip:
 
 ```
 ./deploy.sh --action=install --tenant=tenant_name_folder
@@ -291,10 +295,9 @@ Once the URL is available with the App returning the login view,  we can log in 
 oml_manage --reset_pass
 ```
 
+# Install on three (Data, Voice & Web) cluster instances. 🚀 <a name="onpremise-deploy"></a>
 
-# Deploy an OMniLeads Cluster AIT (All In Three) instance. 🚀 <a name="onpremise-deploy"></a>
-
-You must have three Linux instances (Debian 11 or Rocky 8) with Internet access and **your public key (ssh) available**, since
+You must have three Linux instances (Debian 11, Ubuntu 22.04 or Rocky Linux 8) with Internet access and **your public key (ssh) available**, since
 Ansible needs to establish an SSH connection to deploy the actions.
 
 ![Diagrama deploy cloud services](./png/deploy-tool-tenant-components-ait.png)
@@ -303,13 +306,11 @@ You must to generate the tenant folder and put here an inventory.yml file, for e
 
 ```
 mkdir instances/my_subscriber_002
-cp inventory_ait.yml instances/my_subscriber_001/inventory.yml
+cp inventory_ait.yml instances/my_subscriber_002/inventory.yml
 ```
 (don't forget to generate the inventory.yml file from the appropriate template for the type of installation you want to deploy: _aio or _ait, or _ha)
 
 Then you should work on the inventory.yml tenant file.
-
-Regarding addresses and connections. The parameter *omni_ip_lan* refers to the private IP (LAN) that will be used when opening certain ports for components, as well as when they connect with each other.
 
 ```
 all:
@@ -330,6 +331,8 @@ all:
       omni_ip_lan: 10.10.10.4
       ansible_ssh_port: 22  
 ```
+
+The parameter ansible_host refers to the IP or FQDN used to establish an SSH connection. The omni_ip_lan parameter refers to the private IP (LAN) that will be used when opening certain ports for components and when they connect with each other.
 
 The infra_env variable can be initialized as "lan" or "cloud", depending on whether the OMniLeads instance will be accessible via WAN access (IPADDR or FQDN) or via LAN access (IP or FQDN).
 
