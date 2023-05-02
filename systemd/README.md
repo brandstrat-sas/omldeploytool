@@ -249,7 +249,7 @@ The possible options are:
 You must have two Linux instances (Ubuntu 22.04, Debian 11, Rocky 8 or Alma Linux 8) with Internet access and **your public key (ssh) available**, since
 ansible needs to establish an SSH connection through public key.
 
-![Diagrama deploy](./png/deploy-tool-tenant.png)
+![Diagrama deploy](./png/deploy-tool-tenant-components-aio.png)
 
 Then you should work on the inventory.yml file
 
@@ -258,21 +258,11 @@ Regarding addresses and connections. The parameter *omni_ip_lan* refers to the p
 ```
 all:
   hosts:
-    omnileads_data:
+    omnileads_aio:
       omldata: true
-      ansible_host: 10.10.10.2 
-      omni_ip_lan: 10.10.10.2
+      ansible_host: 172.16.101.43 
+      omni_ip_lan: 172.16.101.43
       ansible_ssh_port: 22      
-    omnileads_voice: 
-      omlvoice: true
-      ansible_host: 10.10.10.3
-      omni_ip_lan: 10.10.10.3
-      ansible_ssh_port: 22      
-    omnileads_app:
-      omlapp: true
-      ansible_host: 10.10.10.4
-      omni_ip_lan: 10.10.10.4
-      ansible_ssh_port: 22  
 ```
 
 The infra_env parameter should be initialized as 'lan'.
@@ -282,9 +272,7 @@ infra_env: lan
 ```
 
 And finally, the *bucket_url* and *postgres_host* parameters must be commented out, so that both (PostgreSQL and Object Storage MinIO) are deployed within the data instance.
-
 The rest of the parameters can be customized as desired.
-
 Finally, the deploy.sh should be executed.
 
 ```

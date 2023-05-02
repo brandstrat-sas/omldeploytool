@@ -24,13 +24,13 @@ all:
     enterprise_edition: false
     # --- versions of each image to deploy
     # --- versions of each image to deploy
-    omnileads_version: 1.27.0
+    omnileads_version: 1.27.0 
     websockets_version: 230204.01
     nginx_version: 230215.01
     kamailio_version: 230204.01
     asterisk_version: 230425.01
-    rtpengine_version: 230226.01
-    postgres_version: 230204.01    
+    rtpengine_version: 230426.01
+    postgres_version: 230204.01  
     # --- "cloud" instance (access through public IP)
     # --- or "lan" instance (access through private IP)
     # --- in order to set NAT or Publica ADDR for RTP voice packages
