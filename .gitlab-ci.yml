@@ -1,7 +1,7 @@
 stages:
   - deploy
 
-deploy-aio-digitalocean:
+deploy-docker-digitalocean:
   stage: deploy
   image: omnileads/doctl:230427.01
   variables: 

@@ -17,13 +17,12 @@ all:
       omni_ip_lan: Z.Z.Z.Z
       ansible_ssh_port: 22  
   vars:
-    # --- ansible user auth connection
+    # --- ansible user ssh connection
     ansible_user: root
-    # --- Activate the OMniLeads Enterprise Edition - with "AAAA" licensed.
-    # --- on the contrary you will deploy OMniLeads OSS Edition with GPLV3 licensed. 
+    # --- Activate the OMniLeads Enterprise Edition
+    # --- on the contrary you will deploy OMniLeads OSS Edition with GPLV3 licensed
     enterprise_edition: false
-    # --- versions of each image to deploy
-    # --- versions of each image to deploy
+    # --- image versions 
     omnileads_version: 1.27.0 
     websockets_version: 230204.01
     nginx_version: 230215.01
@@ -33,18 +32,18 @@ all:
     postgres_version: 230204.01  
     # --- "cloud" instance (access through public IP)
     # --- or "lan" instance (access through private IP)
-    # --- in order to set NAT or Publica ADDR for RTP voice packages
     infra_env: cloud
     # --- If you have an DNS FQDN resolution, you must to uncomment and set this param
     # --- otherwise leave commented to work invoking through an IP address
     #fqdn: fts.sefirot.cloud
-    # --- Set dialer_host
-    dialer_host: 10.10.10.43
+    # --- If you want to work with Dialer, then you must install Wombat Dialer on a separate host 
+    # --- and indicate the IP address or FQDN of that host here (uncomment and set this param):
+    #dialer_host: 
     # --- set postgres_host if you have your own postgres (standalone host or cloud service)
     # --- otherwise leave commented to deploy PostgreSQL on Application Host instance
     #postgres_host: 
-    # --- Read Only connection host address
-    postgres_ro_host: 
+    # --- Read Only connection host address (in case of RW/RO postgres cluster):
+    #postgres_ro_host: 
     # --- if you have your own bucket (standalone host or cloud service) put here the URL
     # --- example VULTR: https://ewr1.vultrobjects.com
     # --- example Digital Ocean: https://sfo3.digitaloceanspaces.com
@@ -62,8 +61,7 @@ all:
     # --- if you object storage service use selfsigned TLS/SSL certs, you mus to put
     # --- *callrec_device=s3-no-check-cert* in order to don't verify CA.
     callrec_device: s3
-    # --- PostgreSQL    
-    postgres_out: false
+    # --- PostgreSQL params   
     postgres_port: 5432
     postgres_user: omnileads
     postgres_password: AVNS_cmtcZm6LCDa199YpWtS
@@ -75,19 +73,19 @@ all:
     # --- in order to split INSERT (RW node) & QUERIES (RO node)
     postgres_ha: false
     # --- OBJECT STORAGE
-    # --- minio auth API params
+    # --- minio auth Web and Console admin params
     s3_http_admin_user: omnileads
-    s3_http_admin_pass: 098098ZZZ
+    s3_http_admin_pass: hjg523jhg523786786dsa
     # --- bucket params
     bucket_access_key: DO00KBCD2UCZ3FTA2YK9
     bucket_secret_key: nMXtRJUrzvbuD+SPIIIubuWcUR8WA1CrHIELTCgfcb8
     bucket_name: omnileads
     # --- if your bucket doesn't need region, leave this value (us-east-1)
     bucket_region: us-east-1
-    # --- Asterisk Manager Interface (AMI) user & password
+    # --- Asterisk Manager Interface (AMI) user & pass
     ami_user: omnileads
     ami_password: C12H17N2O4P_o98o98
-    # --- Wombat Dialer hostname/IP and API user / pass
+    # --- Wombat Dialer API user & pass
     dialer_user: demoadmin
     dialer_password: 765765F1d3l10*
     # ---  kamailio shm & pkg memory params
@@ -117,7 +115,7 @@ all:
     #email_use_ssl:
     #email_use_tls:
 
-    # --- Docker Registry repo    
+    # --- IMG Container Registry repo    
     omlapp_repo: omnileads
 
     # --- IP or hostname that each instance will invoke when locating the other    
@@ -127,6 +125,9 @@ all:
     
     #restore_file_timestamp: 1681319391
     
+    # --- The settings for scaling involve a series of parameters 
+    # --- for uwsgi, redis, asterisk, and nginx. If you want 
+    # --- to run an instance with more than 150 concurrent users, it is recommended to activate this flag.
     #scalable_tunings: true
 
     # --- Integrations with external hosts

@@ -9,7 +9,13 @@
 
 # OMniLeads deploy (Ansible, Systemd and Podman containers based)
 
-In this section, we will find a tool for the management of OMniLeads that will allow us to carry out deployments of new instances, updates, rollbacks, backup & restore. It is possible to manage hundreds of instances of the app under the premise of Ansible inventories.
+In this section, we will find a tool manager for OMniLeads that will allow us to carry out deployments:
+
+* new instances
+* upgrades & rollbacks
+* backup & restore
+
+It is possible to manage hundreds of OMniLeads instances with Ansible inventories.
 
 ![Diagrama deploy tool](./png/deploy-tool-ansible-deploy-instances-multiples.png)
 
@@ -42,19 +48,19 @@ It is possible to group these Pods on a single Linux instance or cluster them ho
 
 # Bash + Ansible = Systemd + Podman 📋 <a name="bash-ansible-systemd"></a>
 
-A través de un script bash (deploy.sh) y una serie de archivos Ansible (Playbooks + Templates) es que podemos desplegar una instancia de OMniLeads (Systemd + Podman). 
+By running a bash script (deploy.sh) with its input parameters and a set of Ansible files (Playbooks + Templates) that are invoked by the first one, an instance of OMniLeads is launched on a Linux server (Systemd + Podman).
 
 ## Bash Script deploy.sh 📄 <a name="bash-script-deploy"></a>
 
-Este script ejecutable dispara las acciones de deploy. Se encarga de recibir los parámetros acción a ejecutar y tenant sobre el cual desplegar la acción en cuestión.
-Si entramos en detalles, el script invoca el archivo de inventario perteneciente al tenant sobre el cual hay que operar y luego invoca la playbook raíz de Ansible
-matrix.yml mediante *ansible-playbook* junto  a los tags correspondientes y así responder a la solicitud realizada. 
+This executable script triggers the deploy actions. It is responsible for receiving the action parameters to execute and the tenant on which to deploy the action.
+
+The script searches for the inventory file of the tenant on which it needs to operate and then launches the root Ansible playbook (matrix.yml) through ansible-playbook with the corresponding tags to respond to the request made. 
 
 ```
 ./deploy.sh --help
 ```
 
-To run an installation or updates deployment, two parameters must be called.
+To run an installation, upgrades, backup or restore deployment, two parameters must be called.
 
 * **--action=**
 * **--tenant=**
@@ -65,30 +71,30 @@ for example:
 ./deploy.sh --action=install --tenant=tenant_folder_name
 ```
 
+
 ## Ansible 🔧 <a name="ansible-inventory"></a>
 
-La estructura implicada en Ansible se basa sobre un archivo de inventario, una playbook raiz (matrix.yml) y una serie de playbooks que implementan acciones de base sobre la VM o conjunto de ellas asi como también tareas específicas que despliegan cada uno de los componentes de OMniLeads.
+Ansible is structured in an inventory file, a root playbook (matrix.yml), and a series of playbooks that implement base actions on the VM or group of VMs, as well as specific tasks that deploy each of the OMniLeads components.
 
-El archivo de inventario es donde se almacena el tipo de OMniLeads a generar (all in one, all in three or high availability) junto a los parámetros de configuración como datos de conexión para postgres, asterisk, redis, object storage, etc. 
+The inventory file is where the type of OMniLeads to generate (all in one, all in three, or high availability) is stored, along with configuration parameters such as connection data for postgres, asterisk, redis, object storage, etc.
 
-Existen tres tipos de archivos inventario para Ansible:
+There are three types of inventory files for Ansible:
 
-* **inventory_aio.yml**: debe ser invocado cuando se desea desplegar OMniLeads all in one. Es decir, al momento de desplegar sobre una unica instancia Linux todos los componentes de la App.
+* **inventory_aio.yml**: It should be invoked when deploying OMniLeads all in one. That is, when deploying all App components on a single Linux instance.
 
 ![Diagrama deploy tool](./png/deploy-tool-tenant-aio.png)
 
 
-* **inventory_ait.yml**: debe ser invocado cuando se desea desplegar OMniLeads all in three. Es decir, al momento de desplegar sobre un cluster de tres instancias Linux (data, voice & web) todos los componentes de la App.
+* **inventory_ait.yml**: It should be invoked when deploying OMniLeads all in three, that is, when deploying all App components on a cluster of three Linux instances (data, voice, & web).
 
 ![Diagrama deploy tool](./png/deploy-tool-tenant-ait.png)
 
 
-* **inventory_ha.yml**: debe ser invocado cuando se desea desplegar OMniLeads bajo un esquema de Alta Disponibilidad Onpremise, basado en dos servidores físicos (hypervisores) con 8 VMs sobre las cuales se distribuyen los componentes.
+* **inventory_ha.yml**: It should be invoked when deploying OMniLeads under an On-Premise High Availability scheme, based on two physical servers (hypervisors) with 8 VMs on which the components are distributed.
 
 ![Diagrama deploy tool](./png/deploy-tool-tenant-ha.png)
 
-Cada archivo esta conformado por la sección donde se declaran los hosts sobre los cuales se va a operar junto a sus variables locales. Dependiendo del formato a desplegar (AIO, AIOT or HA) podrá ser uno o varios host.
-
+Each file is composed of a section where the hosts to operate on are declared along with their local variables. Depending on the format to be deployed (AIO, AIT or HA), it can be one or several hosts.
 For example:
 
 ```
@@ -142,10 +148,11 @@ systemd restart component
 systemd stop component
 ```
 
-Detrás de cada acción disparada por el comando systemctl tenemos en realidad un contenedor Podman que es lanzado, finalizado o reiniciado. 
-Dicho contenedor es la resultante de la imagen invocada junto a las variables de entorno. 
+Behind every action triggered by the systemctl command, there is actually a Podman container that is launched, stopped, or restarted. This container is the result of the image invoked along with the environment variables.
 
-Por ejemplo si observamos el archivo de systemd del componente Nginx:
+For example, if we look at the systemd file of the Nginx component.
+
+/etc/systemd/system/nginx.service looks like:
 
 ```
 [Unit]
@@ -184,7 +191,7 @@ NotifyAccess=all
 WantedBy=default.target
 ```
 
-Se puede observar como el ExecStart invoca un lanzamiento de un contenedor podman y que más alla de las varias opciones involucradas hay una que es *--env-file=/etc/default/nginx.env*, sobre dicho archivo se genera la configuración necesaria para que el componente pueda hacer su trabajo. Por ejemplo:
+/etc/default/nginx.env looks like:
 
 ```
 DJANGO_HOSTNAME=172.16.101.221
@@ -197,7 +204,7 @@ ENV=prodenv
 S3_ENDPOINT=http://172.16.101.221:9000
 ```
 
-Tanto el archivo systemd como el de variables de entorno son generados a partir del render de templates de Ansible. 
+This is the standard for all components.
 
 # Inventory tenant folder :office: <a name="subscriber-traking"></a>
 
@@ -230,7 +237,7 @@ git commit 'my new Subscriber A'
 git push origin main
 ```
 
-Luego una vez que dejamos ajustado el archivo inventory.yml dentro de la carpeta del tenant, entonces podemos disparar el deploy del mismo:
+Then, once we have adjusted the inventory.yml file inside the tenant's folder, we can trigger its deployment.
 
 ```
 ./deploy.sh --action=install --tenant=Subscriber_A
@@ -256,7 +263,8 @@ You must to generate the tenant folder and put here an inventory.yml file, for e
 mkdir instances/my_subscriber_001
 cp inventory_aio.yml instances/my_subscriber_001/inventory.yml
 ```
-(don't forget to generate the inventory.yml file from the appropriate template for the type of installation you want to deploy: _aio or _ait, or _ha)
+
+> Note: don't forget to generate the inventory.yml file from the appropriate template for the type of installation you want to deploy: _aio or _ait, or _ha.
 
 Then you should work on the inventory.yml tenant file.
 
@@ -308,7 +316,8 @@ You must to generate the tenant folder and put here an inventory.yml file, for e
 mkdir instances/my_subscriber_002
 cp inventory_ait.yml instances/my_subscriber_002/inventory.yml
 ```
-(don't forget to generate the inventory.yml file from the appropriate template for the type of installation you want to deploy: _aio or _ait, or _ha)
+
+> Note: don't forget to generate the inventory.yml file from the appropriate template for the type of installation you want to deploy: _aio or _ait, or _ha.
 
 Then you should work on the inventory.yml tenant file.
 
@@ -363,7 +372,7 @@ So, You must have a Linux instance , as Ansible needs to establish an SSH connec
 
 We are going to propose a reference inventory, where the cloud provider is supposed to give us the connection data to Postgres.
 The parameter *postgres_host* must be assigned the corresponding connection string.
-Then it is simply a matter of adjusting the other connection parameters, according to whether we are going to need to establish an SSL connection, set the *postgres_ssl: true* and don't forget to set *postgres_out: true*
+Then it is simply a matter of adjusting the other connection parameters, according to whether we are going to need to establish an SSL connection, set the *postgres_ssl: true*
 If the PostgreSQL service involves a cluster with more than one node, then it can be activated by *postgres_ha: true* and *postgres_ro_host: X.X.X.X*
 to indicate that the queries are impacted on the cluster replica node.
 
@@ -380,7 +389,6 @@ postgres_host: vultr-prod-04b0caa5-03fc-402d-95db-de5fb0bbeb1c-vultr-prod-a539.v
 bucket_url: https://sjc1.vultrobjects.com
 
 # --- PostgreSQL    
-postgres_out: true
 postgres_port: 16751
 postgres_user: vultradmin
 # --- *postgres* or *defaultdb* depend ...
@@ -396,7 +404,6 @@ postgres_host: private-oml-pgsql-do-user-6023066-0.b.db.ondigitalocean.com
 bucket_url: https://sfo3.digitaloceanspaces.com
 
 # --- PostgreSQL    
-postgres_out: true
 postgres_port: 25060
 postgres_user: doadmin
 # --- *postgres* or *defaultdb* depend ...
@@ -827,8 +834,7 @@ Run restore deploy:
 
 # Observability :mag_right: <a name="observability"></a>
 
-
-Inside each subscriber linux instance the deployer put some containers in order to apply the stack observability. In order to not only be able to 
+Inside each subscriber linux instance the deployer put some containers in order to not only be able to 
 to observe metrics at the operating system level but also to obtain specific metrics of components such as redis, postgres or asterisk, 
 as well as to get the logs of the operating system and the also to get the logs of the operating system and the components and send them to the observability stack.
 
@@ -838,8 +844,6 @@ of the OS and the application and its components, as well as centralizing log an
 This is possible thanks to the Prometheus approach together with its exporters for metrics monitoring on the one hand, and Loki and Promtail on the other. 
 while Loki and Promtail implement the centralization of logs.
 
-* **Homer SIP Capture**: used to receive the SIP/RTP information sent to it by Asterisk (hep.conf). Homer stores this data and also provides a web interface to view real-time SIP traces.
-* **Prometheus**: used to collect performance metrics from both the hosts (application / voice) and their components (asterisk, redis, postgres, etc.), also collects the metrics reported by SIP Homer Capture itself .
 * **Loki**: used to storage file logs generated by OMniLeads components like django, nginx, kamailio, etc.
 * **Promtail**: used to parse logs file on Linux VM nd send this to Loki DB.
 
@@ -861,27 +865,27 @@ and that it forwards the requests to the Nginx of the OMniLeads stack. On the Vo
 operate behind an SBC (Session Border Controller) exposed to the Internet.
 
 However, we can intelligently use the **Cloud Firewall** technology when operating over VPS exposed to the Internet.
-This way we can perfectly secure the Linux instances (data, voice and web) that make up OMniLeads. 
 
 ![Diagrama security](./png/security.png)
 
-Below are the Firewall rules to be applied on each instance:
-
-### Data
-
-* 3100/TCP Loki: this is where the connections coming from the monitoring center are processed, more precisely from Grafana, are processed. This port can be opened by restricting by origin on the IP of the monitoring center.
-
-### Voice
-
-* 5060/UDP Asterisk: This is where SIP requests for incoming calls from the ITSP(s) are processed. This port must be opened by restricting by origin on the IP(s) of the PSTN SIP termination provider(s).
-
-* 20000/50000 UDP Asterisk & RTPengine: this port range can be opened to the entire Internet.
-
-### Web
+Below are the Firewall rules to be applied on All In One instance:
 
 * 443/tcp Nginx: This is where Web/WebRTC requests to Nginx are processed. Port 443 can be opened to the entire Internet.
 
-* 9190/tcp Prometheus: This is where the connections coming from the monitoring center, more precisely from Prometheus, are processed. This port can be opened by restricting by origin in the IP of the monitoring center.
+* 40000/50000 UDP: WebRTC sRTP RTPengine: this port range can be opened to the entire Internet.
+
+* 5060/UDP Asterisk: This is where SIP requests for incoming calls from the ITSP(s) are processed. This port must be opened by restricting by origin on the IP(s) of the PSTN SIP termination provider(s).
+
+* 20000/30000 UDP VoIP RTP Asterisk: this port range can be opened to the entire Internet.
+
+* 9100/tcp Prometheus node exporter : This is where the connections coming from the monitoring center, more precisely from Prometheus, are processed. This port can be opened by restricting by origin in the IP of the monitoring center.
+
+* 9187/tcp Prometheus postgres exporter: This is where the connections coming from the monitoring center, more precisely from Prometheus, are processed. This port can be opened by restricting by origin in the IP of the monitoring center.
+
+* 9127/tcp Prometheus redis exporter: This is where the connections coming from the monitoring center, more precisely from Prometheus, are processed. This port can be opened by restricting by origin in the IP of the monitoring center.
+
+* 3100/TCP Loki: this is where the connections coming from the monitoring center are processed, more precisely from Grafana, are processed. This port can be opened by restricting by origin on the IP of the monitoring center.
+
 
 # License & Copyright
 
