@@ -345,7 +345,7 @@ services:
     environment:
       - MINIO_ROOT_USER=${S3_HTTP_ADMIN_USER}
       - MINIO_ROOT_PASSWORD=${S3_HTTP_ADMIN_PASS}
-      - MINIO_SERVER_URL=${S3_ENDPOINT}
+      - MINIO_SERVER_URL=${S3_ENDPOINT_MINIO}
       - MINIO_PROMETHEUS_AUTH_TYPE="public"
     network_mode: host
     volumes:
