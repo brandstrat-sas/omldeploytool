@@ -25,7 +25,7 @@ deploy-docker-digitalocean:
     - /.*pipeline-aio.*$/
     - /.*pipeline-all.*$/
     - schedules
-#    - web
+    - web
 
 
 deploy-ait-digitalocean:
@@ -65,7 +65,7 @@ deploy-ait-digitalocean:
     - /.*pipeline-systemd.*$/
     - /.*pipeline-all.*$/
     - schedules
-#    - web
+    - web
 
 deploy-ait-lan:
   stage: deploy
