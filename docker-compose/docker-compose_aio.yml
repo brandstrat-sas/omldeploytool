@@ -405,20 +405,6 @@ services:
     - /sys:/sys:ro
     - /var/lib/docker/:/var/lib/docker:ro
 
-  prometheus:
-    image: prom/prometheus:latest
-    container_name: prometheus
-    restart: unless-stopped
-    volumes:
-    - ./obs/prometheus.yml:/etc/prometheus/prometheus.yml
-    - prometheus-data:/prometheus
-    network_mode: host
-    command:
-    - '--config.file=/etc/prometheus/prometheus.yml'
-    - '--storage.tsdb.path=/prometheus'
-    - '--storage.tsdb.retention.time=1y'
-    - '--web.enable-lifecycle'
-
 volumes:
   postgresql_data:
   redis_data:
