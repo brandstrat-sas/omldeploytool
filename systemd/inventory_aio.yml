@@ -91,6 +91,7 @@ all:
     ECCTL: 28800
     # --- is the attempts a user has to enter an incorrect password in login
     LOGIN_FAILURE_LIMIT: 10
+    # --- google maps integration credentials
     google_maps_api_key: NULL
     google_maps_center: '{ "lat": -31.416668, "lng": -64.183334 }'
     # --- SMTP server params, if you want to use your own SMTP, put true and

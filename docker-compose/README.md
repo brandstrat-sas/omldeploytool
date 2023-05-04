@@ -6,11 +6,16 @@
 #### [Community Forum](https://forum.omnileads.net/)
 
 ---
-You need docker installed
+You need docker installed and this reposotory cloned
 
 * [Docker Install documentation](https://docs.docker.com/get-docker/)
 
-# OMniLeads Docker Compose
+```
+git clone https://gitlab.com/omnileads/omldeploytool.git
+cd omldeploytool/docker-compose
+```
+
+# OMniLeads & Docker Compose
 
 In this folder, we will find three Docker Compose files.
 
@@ -20,7 +25,7 @@ In this folder, we will find three Docker Compose files.
 
 ## Setup your environment
 
-You need to create a .env file by using the environment file provided here
+You need to create a .env file by using (cp) the environment file provided here.
 
 ### **Workstation Docker-Desktop deploy**
 

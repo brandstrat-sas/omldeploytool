@@ -12,7 +12,7 @@ bash ~/get-docker.sh
 
 git clone https://gitlab.com/omnileads/omldeploytool.git ~/omldeploytool
 cd ~/omldeploytool/docker-compose
-git checkout develop
+git checkout oml-289-dev-aio-compose-observability
 cp env .env
 
 sed -i "s/ENV=devenv/ENV=cloud/g" .env

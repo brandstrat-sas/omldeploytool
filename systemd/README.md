@@ -9,6 +9,11 @@
 
 # OMniLeads deploy (Ansible, Systemd and Podman containers based)
 
+```
+git clone https://gitlab.com/omnileads/omldeploytool.git
+cd omldeploytool/systemd
+```
+
 In this section, we will find a tool manager for OMniLeads that will allow us to carry out deployments:
 
 * new instances
@@ -34,8 +39,8 @@ It is possible to group these Pods on a single Linux instance or cluster them ho
 * [OMniLeads Podman containers](#podman)
 * [Subscriber tracking & TLS certs](#subscriber-traking)
 * [Deploy all in one (AIO) instance)](#aio-deploy)
-* [Deploy all in three (AIT) instance)](#onpremise-deploy)
-* [Deploy Cloud instance with backend (Postgres y Object Storage) as cloud service](#cloud-deploy)
+* [Deploy Cluster all in three (AIT) instance)](#ait-deploy)
+* [Deploy with backend (Postgres y Object Storage) as cloud services](#cloud-deploy)
 * [Deploy High Availability on-premise instance](#onpremise-deploy)
 * [TLS Certs provisioning](#tls-cert-provisioning)
 * [Deploy an upgrade from CentOS7](#upgrade_from_centos7)
@@ -48,7 +53,7 @@ It is possible to group these Pods on a single Linux instance or cluster them ho
 
 # Bash + Ansible = Systemd + Podman 📋 <a name="bash-ansible-systemd"></a>
 
-By running a bash script (deploy.sh) with its input parameters and a set of Ansible files (Playbooks + Templates) that are invoked by the first one, an instance of OMniLeads is launched on a Linux server (Systemd + Podman).
+An instance of OMniLeads is launched on a Linux server (using Systemd and Podman) by running a bash script (deploy.sh) along with its input parameters and a set of Ansible files (Playbooks + Templates) that are invoked by the script.
 
 ## Bash Script deploy.sh 📄 <a name="bash-script-deploy"></a>
 
@@ -251,7 +256,7 @@ The possible options are:
 * **selfsigned**: which will display the self-signed certificates (not recommended for production).
 * **custom**: if the idea is to implement your own certificates. Then you must place them inside instances/tenant_name_folder/ with the names: *cert.pem* for and *key.pem*
 
-# Install on Linux instance 🚀 <a name="onpremise-deploy"></a>
+# Install on Linux instance 🚀 <a name="aio-deploy"></a>
 
 You must have a Linux instance (Ubuntu 22.04, Debian 11, Rocky 8 or Alma Linux 8) with internet access and your public SSH key available, as Ansible needs to establish an SSH connection using the public key.
 
@@ -303,7 +308,7 @@ Once the URL is available with the App returning the login view,  we can log in 
 oml_manage --reset_pass
 ```
 
-# Install on three (Data, Voice & Web) cluster instances. 🚀 <a name="onpremise-deploy"></a>
+# Install on three (Data, Voice & Web) cluster instances. 🚀 <a name="ait-deploy"></a>
 
 You must have three Linux instances (Debian 11, Ubuntu 22.04 or Rocky Linux 8) with Internet access and **your public key (ssh) available**, since
 Ansible needs to establish an SSH connection to deploy the actions.
