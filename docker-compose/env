@@ -198,8 +198,7 @@ WOMBAT_PASSWORD=demo
 #                                          Monitoring                                                   #
 #########################################################################################################
 
-# --- IP or hostname that each instance will invoke when locating the other    
-HOMER_ENABLE=${HOMER_ENABLE}
+HOMER_ENABLE=false
 
 # --- IP or hostname that each instance will invoke when locating the other    
 HOMERHOST=heplify-server
