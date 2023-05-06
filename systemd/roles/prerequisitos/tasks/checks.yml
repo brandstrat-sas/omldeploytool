@@ -93,6 +93,23 @@
     - django
     - observability
 
+# Set postgres_out as true when postgres_host is defined on inventory
+- name: CHECKS Setting postgres_host
+  set_fact:
+    postgres_out: false
+  changed_when: false
+  when:
+    - postgres_host is not defined
+    - omlaio is defined or omlapp is defined or omldata is defined
+  tags: 
+    - install
+    - upgrade
+    - app
+    - voice
+    - asterisk
+    - django
+    - observability
+
 # Set dialer_host as localhost on App instance when dialer_host is not explicitly defined
 - name: CHECKS Setting postgres_host
   set_fact:
