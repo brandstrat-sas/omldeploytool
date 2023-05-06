@@ -35,6 +35,9 @@ You don't need to work with the variables file, you can simply proceed with the 
 $ docker-compose up -d
 ```
 
+![Diagrama deploy tool](../systemd/png/deploy-tool-tenant-compose-localhost.png)
+
+
 ### **Onpremise Virtual Machine and VPS Cloud deploy with internal bucket**
 
 You can use docker-compose to run an instance of OMniLeads on a Virtual Machine or VPS (cloud). However, some configuration work with the .env file may be necessary.
@@ -85,6 +88,8 @@ Now, let's proceed to launch the stack:
 $ docker-compose -f docker-compose_aio.yml up -d
 ```
 
+![Diagrama deploy tool](../systemd/png/deploy-tool-tenant-compose-vps.png)
+
 ### **Onpremise Virtual Machine and VPS Cloud deploy with external bucket**
 
 For this scenario, we consider all the modifications executed in the previous item, except that here we need to take into account some issues regarding the bucket variables.
@@ -109,6 +114,8 @@ Now, let's proceed to launch the stack:
 ```
 $ docker-compose -f docker-compose_aio_ext_bucket.yml up -d
 ```
+
+![Diagrama deploy tool](../systemd/png/deploy-tool-tenant-compose-vps-external.png)
 
 ## Log in to the Admin UI
 

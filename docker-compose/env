@@ -191,8 +191,6 @@ S3_ENDPOINT=https://localhost
 # https://docs.min.io/docs/how-to-use-aws-sdk-for-python-with-minio-server.html
 S3_ENDPOINT_MINIO=http://minio:9000
 
-WOMBAT_USER=demoadmin
-WOMBAT_PASSWORD=demo
 
 #########################################################################################################
 #                                          Monitoring                                                   #
@@ -209,12 +207,11 @@ HOMERPORT=9060
 #                                    DIALER                                                             #
 #########################################################################################################
 
-# --- 
-WOMBAT_USER=demoadmin
-WOMBAT_PASSWORD=demo
-
 # --- Wombat Dialer hostname/IP and API user / pass
 WOMBAT_HOSTNAME=wombat
+
+WOMBAT_USER=demoadmin
+WOMBAT_PASSWORD=demo
 
 # --- Wombat Dialer mysql params
 WOMBAT_DB=wombat
