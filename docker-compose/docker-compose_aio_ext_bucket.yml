@@ -207,7 +207,7 @@ services:
       - S3_BUCKET_NAME=${S3_BUCKET_NAME}
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
-      - S3_ENDPOINT=${S3_ENDPOINT_MINIO}
+      - S3_ENDPOINT=${S3_ENDPOINT}
       - AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION}
       - HOMERHOST=${HOMERHOST}
       - HOMERPORT=${HOMERPORT}
@@ -283,6 +283,7 @@ services:
       - POSTGRES_PASSWORD=${PGPASSWORD}
       - POSTGRES_DB=${PGDATABASE}
     image: ${OMLPGSQL_IMG}
+    command: postgres -c listen_addresses=${PGHOST}
     network_mode: host
     privileged: true
     restart: on-failure
@@ -295,8 +296,10 @@ services:
     dns: 8.8.8.8
     environment:
       - TZ=${TZ}
+      - BIND_IP=${REDIS_HOSTNAME}
     network_mode: host
-    image: ${OMLREDISGEARS_IMG}
+    image: ${OMLREDIS_IMG}
+    command: redis-server --bind ${REDIS_HOSTNAME}
     privileged: true
     restart: on-failure
     stop_grace_period: 1m30s

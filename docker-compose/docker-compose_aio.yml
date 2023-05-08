@@ -11,6 +11,7 @@ services:
     environment:
       - CRON_ENABLE=false
       - TZ=${TZ}
+      - DJANGO_HOSTNAME=${DJANGO_HOSTNAME}
       - ASTERISK_HOSTNAME=${ASTERISK_HOSTNAME}
       - AMI_USER=${AMI_USER}
       - AMI_PASSWORD=${AMI_PASSWORD}
@@ -75,6 +76,7 @@ services:
     environment:
       - DAPHNE_ENABLE=True
       - TZ=${TZ}
+      - DJANGO_HOSTNAME=${DJANGO_HOSTNAME}
       - ASTERISK_HOSTNAME=${ASTERISK_HOSTNAME}
       - AMI_USER=${AMI_USER}
       - AMI_PASSWORD=${AMI_PASSWORD}
@@ -135,6 +137,7 @@ services:
       - ASTERISK_HOSTNAME=${ASTERISK_HOSTNAME}
       - AMI_USER=${AMI_USER}
       - AMI_PASSWORD=${AMI_PASSWORD}
+      - DJANGO_HOSTNAME=${DJANGO_HOSTNAME}
       - KAMAILIO_HOSTNAME=${KAMAILIO_HOSTNAME}
       - PGHOST=${PGHOST}
       - PGDATABASE=${PGDATABASE}
@@ -285,6 +288,7 @@ services:
       - POSTGRES_PASSWORD=${PGPASSWORD}
       - POSTGRES_DB=${PGDATABASE}
     image: ${OMLPGSQL_IMG}
+    command: postgres -c listen_addresses=${PGHOST}
     network_mode: host
     privileged: true
     restart: on-failure
@@ -297,8 +301,10 @@ services:
     dns: 8.8.8.8
     environment:
       - TZ=${TZ}
+      - BIND_IP=${REDIS_HOSTNAME}
     network_mode: host
-    image: ${OMLREDISGEARS_IMG}
+    image: ${OMLREDIS_IMG}
+    command: redis-server --bind ${REDIS_HOSTNAME}
     privileged: true
     restart: on-failure
     stop_grace_period: 1m30s
@@ -325,7 +331,7 @@ services:
     depends_on:
       - redis
     environment:
-      - BIND_ADDRESS=0.0.0.0:8000
+      - BIND_ADDRESS=${WEBSOCKET_HOSTNAME}:8000
       - EVENT_LOOP=uvloop
       - LOGGERS=${WEBSOCKET_LOGGER}
       - REDIS_HOST=${WEBSOCKET_REDIS_HOSTNAME}

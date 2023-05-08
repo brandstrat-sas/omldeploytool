@@ -38,9 +38,11 @@ $ docker-compose up -d
 ![Diagrama deploy tool](../systemd/png/deploy-tool-tenant-compose-localhost.png)
 
 
-### **Onpremise Virtual Machine and VPS Cloud deploy with internal bucket**
+### **Onpremise Virtual Machine or Cloud VPS**
 
 You can use docker-compose to run an instance of OMniLeads on a Virtual Machine or VPS (cloud). However, some configuration work with the .env file may be necessary.
+
+>  Note: If working on a VPS with a public IP address, it is a mandatory requirement that it also has a network interface with the ability to associate a private IP address.
 
 * To begin with, it's important to specify the scenario we'll be working with, which will be cloud if we're working on a VPS, and lan if we're using an on-premise Virtual Machine.
 
@@ -56,15 +58,15 @@ ENV=lan
 * The hostname of each component must be modified
 
 ```
-DJANGO_HOSTNAME=10.10.10.2
-DAPHNE_HOSTNAME=10.10.10.2
+DJANGO_HOSTNAME=localhost
+DAPHNE_HOSTNAME=localhost
 ASTERISK_HOSTNAME=10.10.10.2
-WEBSOCKET_HOSTNAME=10.10.10.2s
-WEBSOCKET_REDIS_HOSTNAME=redis://10.10.10.2:6379
-PGHOST=10.10.10.2
+WEBSOCKET_HOSTNAME=localhosts
+WEBSOCKET_REDIS_HOSTNAME=redis://localhost:6379
+PGHOST=localhost
 OMNILEADS_HOSTNAME=10.10.10.2
 RTPENGINE_HOSTNAME=10.10.10.2
-REDIS_HOSTNAME=10.10.10.2
+REDIS_HOSTNAME=localhost
 KAMAILIO_HOSTNAME=localhost
 ```
 
@@ -93,6 +95,8 @@ $ docker-compose -f docker-compose_aio.yml up -d
 ### **Onpremise Virtual Machine and VPS Cloud deploy with external bucket**
 
 For this scenario, we consider all the modifications executed in the previous item, except that here we need to take into account some issues regarding the bucket variables.
+
+>  Note: If working on a VPS with a public IP address, it is a mandatory requirement that it also has a network interface with the ability to associate a private IP address.
 
 * The variable must be modified so that it becomes:
 
@@ -206,6 +210,34 @@ When you enter to http://localhost:8082 or http://hostname-or-ipaddr:8082 you go
 Check our official documentation to check this: https://documentacion-omnileads.readthedocs.io/es/stable/maintance.html#configuracion-del-modulo-de-discador-predictivo
 
 Note: when configuring initial mariadb credentials the root pass is admin123, then on the AMI connection, the server address is acd.
+
+
+# Security 
+
+OMniLeads is an application that combines Web (https), WebRTC (wss & sRTP) and VoIP (SIP & RTP) technologies. This implies a certain complexity and 
+when deploying it in production under an Internet exposure scenario. 
+
+On the Web side of the things the ideal is to implement a Reverse Proxy or Load Balancer ahead of OMnileads, i.e. exposed to the Internet (TCP 443) 
+and that it forwards the requests to the Nginx of the OMniLeads stack. On the VoIP side, when connecting to the PSTN via VoIP it is ideal to 
+operate behind an SBC (Session Border Controller) exposed to the Internet.
+
+However, we can intelligently use the **Cloud Firewall** technology when operating over VPS exposed to the Internet.
+
+![Diagrama security](../systemd/png/security.png)
+
+Below are the Firewall rules to be applied on All In One instance:
+
+* 443/tcp Nginx: This is where Web/WebRTC requests to Nginx are processed. Port 443 can be opened to the entire Internet.
+
+* 40000/50000 UDP: WebRTC sRTP RTPengine: this port range can be opened to the entire Internet.
+
+* 5060/UDP Asterisk: This is where SIP requests for incoming calls from the ITSP(s) are processed. This port must be opened by restricting by origin on the IP(s) of the PSTN SIP termination provider(s).
+
+* 20000/30000 UDP VoIP RTP Asterisk: this port range can be opened to the entire Internet.
+
+* 9100/tcp Prometheus node exporter : This is where the connections coming from the monitoring center, more precisely from Prometheus, are processed. This port can be opened by restricting by origin in the IP of the monitoring center.
+
+* 3100/TCP Loki: this is where the connections coming from the monitoring center are processed, more precisely from Grafana, are processed. This port can be opened by restricting by origin on the IP of the monitoring center.
 
 
 ## Destroy and re-create all PostgreSQL backend

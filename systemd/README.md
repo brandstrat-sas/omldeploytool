@@ -29,6 +29,8 @@ Then, for each running instance, a collection of components invoked as systemd s
 Each OMniLeads instance involves the following collection of components that are run on a Pod. 
 It is possible to group these Pods on a single Linux instance or cluster them horizontally in a configuration.
 
+>  Note: If working on a VPS with a public IP address, it is a mandatory requirement that it also has a network interface with the ability to associate a private IP address.
+
 ![Diagrama component Pods](./png/oml-pods.png)
 
 # Index
