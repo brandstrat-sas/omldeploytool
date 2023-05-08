@@ -6,7 +6,19 @@
 #### [Community Forum](https://forum.omnileads.net/)
 
 ---
-You need docker installed and this reposotory cloned
+# Index
+
+* [Requirements](#requirements)
+* [Docker Desktop](#docker_desktop)
+* [Cloud VPS or Onpremise VM](#vps_vm)
+* [First login](#post_install)
+* [Simulate calls](#pstn_emulator)
+* [Predictive dialer](#wombat_dialer)
+* [Security](#security)
+
+
+
+You need docker installed and this reposotory cloned <a name="requirements"></a>
 
 * [Docker Install documentation](https://docs.docker.com/get-docker/)
 
@@ -15,7 +27,7 @@ git clone https://gitlab.com/omnileads/omldeploytool.git
 cd omldeploytool/docker-compose
 ```
 
-# OMniLeads & Docker Compose
+# OMniLeads & Docker Compose 
 
 In this folder, we will find three Docker Compose files.
 
@@ -27,7 +39,7 @@ In this folder, we will find three Docker Compose files.
 
 You need to create a .env file by using (cp) the environment file provided here.
 
-### **Workstation Docker-Desktop deploy**
+### **Workstation Docker-Desktop deploy** <a name="docker_desktop"></a>
 
 You don't need to work with the variables file, you can simply proceed with the instance execution through the command:
 
@@ -38,7 +50,7 @@ $ docker-compose up -d
 ![Diagrama deploy tool](../systemd/png/deploy-tool-tenant-compose-localhost.png)
 
 
-### **Onpremise Virtual Machine or Cloud VPS**
+### **Onpremise Virtual Machine or Cloud VPS** <a name="vps_vm"></a>
 
 You can use docker-compose to run an instance of OMniLeads on a Virtual Machine or VPS (cloud). However, some configuration work with the .env file may be necessary.
 
@@ -121,7 +133,7 @@ $ docker-compose -f docker-compose_aio_ext_bucket.yml up -d
 
 ![Diagrama deploy tool](../systemd/png/deploy-tool-tenant-compose-vps-external.png)
 
-## Log in to the Admin UI
+## Log in to the Admin UI <a name="post_install"></a>
 
 Before first time you login must to exec:
 
@@ -142,6 +154,14 @@ admin
 
 Finally  you can choice a custom password. 
 
+## The oml_manage script
+
+This is used to launch some administration actions like, read containers logs, delete postgres logs tables and more. 
+
+```
+./oml_oml_manage --help
+```
+
 ## Create some testing data
 
 ```
@@ -155,12 +175,11 @@ agent
 agent1*
 ```
 
-## Simulate calls from/to PSTN (Only on Docker-Desktop scenary)
+## Simulate calls from/to PSTN (Only on Docker-Desktop scenary) <a name="pstn_emulator"></a>
 
 Adittionally with omnileads container is the pstn-emulator, this an emulation of a PSTN provider,
 so you can make calls via Omnileads and have different results of the call based on what you dialed
 as well as generate calls from the command line to OMniLeads inbound routes.
-
 
 ##### Dialplan outbound rules:
 
@@ -193,15 +212,7 @@ domain: YOUR_HOSTNAME
 
 Then you can send calls to DID 01177660010, an also send calls from an agent to this SIP account phone calling 1234567.
 
-## The oml_manage script
-
-This is used to launch some administration actions like, read containers logs, delete postgres logs tables and more. 
-
-```
-./oml_oml_manage --help
-```
-
-## Configuring wombat dialer
+## Configuring wombat dialer <a name="wombat_dialer"></a>
 
 You only need to do this if you are going to work with Predictive Dialer campaigns.
 
@@ -215,7 +226,7 @@ Check our official documentation to check this: https://documentacion-omnileads.
 
 Note: when configuring initial mariadb credentials the root pass is ***admin123***, then on the AMI connection, the server address is ***acd***.
 
-# Security 
+# Security  <a name="security"></a>
 
 OMniLeads is an application that combines Web (https), WebRTC (wss & sRTP) and VoIP (SIP & RTP) technologies. This implies a certain complexity and 
 when deploying it in production under an Internet exposure scenario. 
@@ -242,13 +253,3 @@ Below are the Firewall rules to be applied on All In One instance:
 
 * 3100/TCP Loki: this is where the connections coming from the monitoring center are processed, more precisely from Grafana, are processed. This port can be opened by restricting by origin on the IP of the monitoring center.
 
-
-## Destroy and re-create all PostgreSQL backend
-
-If you want *reset to fresh install* status launch (with the stack operative):
-
-```
-./oml_oml_manage --clean_postgresql_db
-```
-
-Then login with *admin*, *admin* and create a new password. 
