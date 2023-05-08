@@ -21,7 +21,7 @@ ExecStart=/usr/bin/podman run \
   --name=oml-minio-server \
   --volume=oml_minio:/data \
   --rm  \
-  quay.io/minio/minio:{{ minio_version }} server /data --console-address ":9090"
+  quay.io/minio/minio:{{ minio_version }} server /data --console-address "{{ minio_host }}:9090"
 ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
 ExecStopPost=/usr/bin/podman rm -f --ignore --cidfile=%t/%n.ctr-id
 Type=notify

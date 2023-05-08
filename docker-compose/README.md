@@ -203,14 +203,17 @@ This is used to launch some administration actions like, read containers logs, d
 
 ## Configuring wombat dialer
 
-You only need to do this if you are going to work with Predictive Dialer campaigns
+You only need to do this if you are going to work with Predictive Dialer campaigns.
 
-When you enter to http://localhost:8082 or http://hostname-or-ipaddr:8082 you go to Wombat Dialer to begin its configuration. 
+Wombat Dialer is a third-party software and not part of the FLOSS stack of OMniLeads. However, it is a valid option for implementing predictive dialing campaign logic.
+
+The docker-compose.yml includes the Wombat Dialer & MariaDB service (its SQL backend), so it is simply available for configuration and integration by accessing https://localhost:8082.
+
+The other scenarios do not implement Wombat Dialer by default, so if you want to implement Wombat Dialer in production, you will need to have a VM/VPS to install the dialer there and then configure it to work with OMniLeads.
 
 Check our official documentation to check this: https://documentacion-omnileads.readthedocs.io/es/stable/maintance.html#configuracion-del-modulo-de-discador-predictivo
 
-Note: when configuring initial mariadb credentials the root pass is admin123, then on the AMI connection, the server address is acd.
-
+Note: when configuring initial mariadb credentials the root pass is ***admin123***, then on the AMI connection, the server address is ***acd***.
 
 # Security 
 

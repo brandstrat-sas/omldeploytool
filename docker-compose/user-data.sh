@@ -15,8 +15,7 @@ cd ~/omldeploytool/docker-compose
 git checkout oml-289-dev-aio-compose-observability
 cp env .env
 
-sed -i "s/ENV=devenv/ENV=cloud/g" .env
-#sed -i "s/CALLREC_DEVICE=s3-minio/CALLREC_DEVICE=s3/g" .env
+sed -i "s/ENV=devenv/ENV=lan/g" .env
 sed -i "s/DJANGO_HOSTNAME=app/DJANGO_HOSTNAME=localhost/g" .env
 sed -i "s/DAPHNE_HOSTNAME=channels/DAPHNE_HOSTNAME=localhost/g" .env
 sed -i "s/ASTERISK_HOSTNAME=acd/ASTERISK_HOSTNAME=$PRIVATE_IPV4/g" .env

@@ -21,7 +21,7 @@ ExecStart=/usr/bin/podman run \
   --name=oml-postgresql-server \
   --volume=oml_postgres:/var/lib/postgresql/data \
   --rm  \
-  {{ container_image_registry }}/omnileads/postgres:{{ postgres_version }}
+  {{ container_image_registry }}/omnileads/postgres:{{ postgres_version }} postgres -c listen_addresses={{ postgres_host }} 
 ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
 ExecStopPost=/usr/bin/podman rm -f --ignore --cidfile=%t/%n.ctr-id
 Type=notify
