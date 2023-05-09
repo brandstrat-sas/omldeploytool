@@ -6,11 +6,14 @@ services:
       - postgresql
       - redis
       - acd
+      - minio
     dns: 8.8.8.8
     environment:
       - CRON_ENABLE=false
       - TZ=${TZ}
-      - ASTERISK_HOSTNAME=${ASTERISK_HOSTNAME}
+      - DJANGO_HOSTNAME=${DJANGO_HOSTNAME}
+      - UWSGI_PORT=8099
+      - ASTERISK_HOSTNAME=localhost
       - AMI_USER=${AMI_USER}
       - AMI_PASSWORD=${AMI_PASSWORD}
       - KAMAILIO_HOSTNAME=${KAMAILIO_HOSTNAME}
@@ -33,7 +36,7 @@ services:
       - PYTHONPATH=${PYTHONPATH}
       - SESSION_COOKIE_AGE=${SESSION_COOKIE_AGE}
       - CALLREC_DEVICE=${CALLREC_DEVICE}
-      - MONITORFORMAT=${MONITORFORMAT}
+      - MONITORFORMAT=mp3
       - S3_STORAGE_ENABLED=true
       - S3_BUCKET_NAME=${S3_BUCKET_NAME}
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
@@ -47,7 +50,7 @@ services:
       - OML_BRANCH=${OML_BRANCH}
       - OML_COMMIT=${OML_COMMIT}
       - OML_BUILD_DATE=${OML_BUILD_DATE}
-      - WOMBAT_HOSTNAME=wombat
+      - WOMBAT_HOSTNAME=${WOMBAT_HOSTNAME}
       - WOMBAT_USER=${WOMBAT_USER}
       - WOMBAT_PASSWORD=${WOMBAT_PASSWORD}
       - OML_LOGGING_SLOWSQL_ENABLED=
@@ -74,7 +77,9 @@ services:
     environment:
       - DAPHNE_ENABLE=True
       - TZ=${TZ}
-      - ASTERISK_HOSTNAME=${ASTERISK_HOSTNAME}
+      - DJANGO_HOSTNAME=${DJANGO_HOSTNAME}
+      - DAPHNE_PORT=8098
+      - ASTERISK_HOSTNAME=localhost
       - AMI_USER=${AMI_USER}
       - AMI_PASSWORD=${AMI_PASSWORD}
       - KAMAILIO_HOSTNAME=${KAMAILIO_HOSTNAME}
@@ -97,7 +102,7 @@ services:
       - PYTHONPATH=${PYTHONPATH}
       - SESSION_COOKIE_AGE=${SESSION_COOKIE_AGE}
       - CALLREC_DEVICE=${CALLREC_DEVICE}
-      - MONITORFORMAT=${MONITORFORMAT}
+      - MONITORFORMAT=mp3
       - S3_STORAGE_ENABLED=true
       - S3_BUCKET_NAME=${S3_BUCKET_NAME}
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
@@ -131,9 +136,11 @@ services:
     dns: 8.8.8.8
     environment:
       - TZ=${TZ}
-      - ASTERISK_HOSTNAME=${ASTERISK_HOSTNAME}
+      - ASTERISK_HOSTNAME=localhost
       - AMI_USER=${AMI_USER}
       - AMI_PASSWORD=${AMI_PASSWORD}
+      - DJANGO_HOSTNAME=${DJANGO_HOSTNAME}
+      - UWSGI_PORT=8097
       - KAMAILIO_HOSTNAME=${KAMAILIO_HOSTNAME}
       - PGHOST=${PGHOST}
       - PGDATABASE=${PGDATABASE}
@@ -154,7 +161,7 @@ services:
       - PYTHONPATH=${PYTHONPATH}
       - SESSION_COOKIE_AGE=${SESSION_COOKIE_AGE}
       - CALLREC_DEVICE=${CALLREC_DEVICE}
-      - MONITORFORMAT=${MONITORFORMAT}
+      - MONITORFORMAT=mp3
       - S3_STORAGE_ENABLED=true
       - S3_BUCKET_NAME=${S3_BUCKET_NAME}
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
@@ -187,12 +194,13 @@ services:
     depends_on:
       - postgresql
       - redis
-      - websockets      
+      - websockets
+      - minio
     dns: 8.8.8.8
     environment:
       - ENV=docker-compose-${ENV}
       - TZ=${TZ}
-      - ASTERISK_LOCATION=${ASTERISK_LOCATION}
+      - ASTERISK_LOCATION=
       - AMI_USER=${AMI_USER}
       - AMI_PASSWORD=${AMI_PASSWORD}
       - OMNILEADS_HOSTNAME=${OMNILEADS_HOSTNAME}
@@ -262,7 +270,7 @@ services:
       - DAPHNE_HOSTNAME=${DAPHNE_HOSTNAME}
       - KAMAILIO_HOSTNAME=${KAMAILIO_HOSTNAME}
       - WEBSOCKETS_HOSTNAME=${WEBSOCKET_HOSTNAME}
-      - S3_ENDPOINT=${S3_ENDPOINT}
+      - S3_ENDPOINT=${S3_ENDPOINT_MINIO}
       - CALLREC_DEVICE=${CALLREC_DEVICE}
     image: ${OMLNGINX_IMG}
     network_mode: host
@@ -283,6 +291,7 @@ services:
       - POSTGRES_PASSWORD=${PGPASSWORD}
       - POSTGRES_DB=${PGDATABASE}
     image: ${OMLPGSQL_IMG}
+    command: postgres -c listen_addresses=${PGHOST}
     network_mode: host
     privileged: true
     restart: on-failure
@@ -295,8 +304,10 @@ services:
     dns: 8.8.8.8
     environment:
       - TZ=${TZ}
+      - BIND_IP=${REDIS_HOSTNAME}
     network_mode: host
-    image: ${OMLREDISGEARS_IMG}
+    image: ${OMLREDIS_IMG}
+    command: redis-server --bind ${REDIS_HOSTNAME}
     privileged: true
     restart: on-failure
     stop_grace_period: 1m30s
@@ -323,7 +334,7 @@ services:
     depends_on:
       - redis
     environment:
-      - BIND_ADDRESS=0.0.0.0:8000
+      - BIND_ADDRESS=${WEBSOCKET_HOSTNAME}:8000
       - EVENT_LOOP=uvloop
       - LOGGERS=${WEBSOCKET_LOGGER}
       - REDIS_HOST=${WEBSOCKET_REDIS_HOSTNAME}
@@ -335,9 +346,42 @@ services:
       timeout: 10s
       retries: 10
   
+  nodeexporter:
+    image: prom/node-exporter:latest
+    container_name: nodeexporter
+    user: root
+    privileged: true
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)'
+    restart: unless-stopped
+    network_mode: host
+    labels:
+      org.label-schema.group: "monitoring"
+    logging:
+      options:
+        max-size: "50m"
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: cadvisor
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+    - /:/rootfs:ro
+    - /var/run:/var/run:rw
+    - /sys:/sys:ro
+    - /var/lib/docker/:/var/lib/docker:ro
+
 volumes:
   postgresql_data:
   redis_data:
+  minio_data:
   django_static:
   django_callrec_zip:
   mariadb_data:

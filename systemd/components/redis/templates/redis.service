@@ -21,11 +21,7 @@ ExecStart=/usr/bin/podman run \
   --name=oml-redis-server \
   --volume=oml_redis:/data \
   --rm \
-  {% if omnileads_ha is defined %}
   docker.io/omnileads/redis:{{ redis_ha_version }}
-  {% else %}
-  docker.io/redislabs/redisgears:{{ redisgears_version }}
-  {% endif %}
 ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
 ExecStopPost=/usr/bin/podman rm -f --ignore --cidfile=%t/%n.ctr-id
 Type=notify

@@ -21,6 +21,7 @@
   hosts: 
     - omnileads_data
     - omnileads_voice
+    - omnileads_aio
   tags:
     - backup
 

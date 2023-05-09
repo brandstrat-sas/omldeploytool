@@ -18,7 +18,9 @@
 ---
 
 - name: DJANGO OMniLeads application installation
-  hosts: omnileads_app
+  hosts: 
+    - omnileads_app
+    - omnileads_aio
   tags:
     - all_components
     - aio
