@@ -14,7 +14,7 @@ all:
     enterprise_edition: false
     # --- versions of each image to deploy
     # --- versions of each image to deploy
-    omnileads_version: 1.27.0 
+    omnileads_version: 1.27.1
     websockets_version: 230204.01
     nginx_version: 230215.01
     kamailio_version: 230204.01

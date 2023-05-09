@@ -1,6 +1,6 @@
 # Compatibility versions table
 
-* omnileads:  1.27.0
+* omnileads:  1.27.1
 * asterisk:   230508.01
 * nginx:      230215.01
 * kamailio:   230204.01
