@@ -260,7 +260,8 @@ The possible options are:
 
 # Install on Linux instance 🚀 <a name="aio-deploy"></a>
 
-You must have a Linux instance (Ubuntu 22.04, Debian 11, Rocky 8 or Alma Linux 8) with internet access and your public SSH key available, as Ansible needs to establish an SSH connection using the public key.
+You must have a generic Linux instance (Redhat or Debian based) with with internet access and your public SSH key available, as Ansible needs to establish an SSH connection using the public key.
+The important thing is that the selected distribution has a version of Podman (3.0.0 or higher) available in its repositories. Something that we know Debian, Ubuntu, Rocky, or Alma Linux have.
 
 ![Diagrama deploy](./png/deploy-tool-tenant-components-aio.png)
 

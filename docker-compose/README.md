@@ -17,8 +17,7 @@
 * [Security](#security)
 
 
-
-You need docker installed and this reposotory cloned <a name="requirements"></a>
+You need docker installed (on Linux, Mac or Windows) and this reposotory cloned <a name="requirements"></a>
 
 * [Docker Install documentation](https://docs.docker.com/get-docker/)
 
