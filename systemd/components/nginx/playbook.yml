@@ -18,7 +18,9 @@
 ---
 
 - name: NGINX OMniLeads Nginx component deploy
-  hosts: omnileads_app
+  hosts: 
+    - omnileads_app
+    - omnileads_aio
   tags:
     - all_components
     - app
