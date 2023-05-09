@@ -19,7 +19,9 @@
 
 
 - name: POSTGRESQL component delpoy
-  hosts: omnileads_data
+  hosts: 
+    - omnileads_data
+    - omnileads_aio
   tags:
     - all_components
     - data

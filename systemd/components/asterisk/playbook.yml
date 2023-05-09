@@ -18,7 +18,9 @@
 ---
 
 - name: ASTERISK installation and configuration
-  hosts: omnileads_voice
+  hosts: 
+    - omnileads_voice
+    - omnileads_aio
   tags:
     - install
     - voice

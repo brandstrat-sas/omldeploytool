@@ -20,6 +20,7 @@
 - name: CRON OMniLeads application installation
   hosts: 
     - omnileads_app
+    - omnileads_aio
   tags:
     - cron
     - app

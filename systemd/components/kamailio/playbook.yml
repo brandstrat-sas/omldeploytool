@@ -17,7 +17,9 @@
 #
 
 - name: KAMAILIO Kamailio installation and configuration
-  hosts: omnileads_app
+  hosts: 
+    - omnileads_app
+    - omnileads_aio
   tags:
     - all_components
     - kamailio

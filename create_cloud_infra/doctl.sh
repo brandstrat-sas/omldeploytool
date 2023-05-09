@@ -56,9 +56,9 @@ case $1 in
     oml-$2
     ;;      
   --create-docker)
-    echo "deploy: $1"
-    doctl compute droplet create --image docker-20-04 \
-    --size s-2vcpu-4gb --region sfo3 \
+    echo "deploy: $1 nic: $2"
+    doctl compute droplet create --image debian-11-x64 \
+    --size s-4vcpu-8gb --region sfo3 \
     --ssh-keys ${SSH_DOCTL} \
     --user-data-file ../docker-compose/user-data.sh \
     oml-$2

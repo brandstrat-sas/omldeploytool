@@ -13,7 +13,7 @@ services:
       - TZ=${TZ}
       - DJANGO_HOSTNAME=${DJANGO_HOSTNAME}
       - UWSGI_PORT=8099
-      - ASTERISK_HOSTNAME=${ASTERISK_HOSTNAME}
+      - ASTERISK_HOSTNAME=localhost
       - AMI_USER=${AMI_USER}
       - AMI_PASSWORD=${AMI_PASSWORD}
       - KAMAILIO_HOSTNAME=${KAMAILIO_HOSTNAME}
@@ -60,8 +60,7 @@ services:
       #- WALLBOARD_VERSION=develop
       #- PREMIUM_REPORTS_VERSION=develop
     image: ${OMLAPP_IMG}
-    networks:
-      - omnileads
+    network_mode: host
     privileged: true
     restart: on-failure
     stdin_open: true
@@ -80,7 +79,7 @@ services:
       - TZ=${TZ}
       - DJANGO_HOSTNAME=${DJANGO_HOSTNAME}
       - DAPHNE_PORT=8098
-      - ASTERISK_HOSTNAME=${ASTERISK_HOSTNAME}
+      - ASTERISK_HOSTNAME=localhost
       - AMI_USER=${AMI_USER}
       - AMI_PASSWORD=${AMI_PASSWORD}
       - KAMAILIO_HOSTNAME=${KAMAILIO_HOSTNAME}
@@ -124,8 +123,7 @@ services:
       - OML_LOGGING_SLOWSQL_OUTPUT="-"
       - OML_LOGGING_SLOWSQL_DURATION=1
     image: ${OMLAPP_IMG}
-    networks:
-      - omnileads
+    network_mode: host
     privileged: true
     restart: on-failure
     stdin_open: true
@@ -138,7 +136,7 @@ services:
     dns: 8.8.8.8
     environment:
       - TZ=${TZ}
-      - ASTERISK_HOSTNAME=${ASTERISK_HOSTNAME}
+      - ASTERISK_HOSTNAME=localhost
       - AMI_USER=${AMI_USER}
       - AMI_PASSWORD=${AMI_PASSWORD}
       - DJANGO_HOSTNAME=${DJANGO_HOSTNAME}
@@ -183,8 +181,7 @@ services:
       - OML_LOGGING_SLOWSQL_OUTPUT="-"
       - OML_LOGGING_SLOWSQL_DURATION=1
     image: ${OMLAPP_IMG}
-    networks:
-      - omnileads
+    network_mode: host
     privileged: true
     restart: on-failure
     stdin_open: true
@@ -207,6 +204,7 @@ services:
       - AMI_USER=${AMI_USER}
       - AMI_PASSWORD=${AMI_PASSWORD}
       - OMNILEADS_HOSTNAME=${OMNILEADS_HOSTNAME}
+      - ASTERISK_HOSTNAME=${ASTERISK_HOSTNAME}
       - REDIS_HOSTNAME=${REDIS_HOSTNAME}
       - PGHOST=${PGHOST}
       - PGPORT=${PGPORT}
@@ -221,15 +219,9 @@ services:
       - AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION}
       - HOMERHOST=${HOMERHOST}
       - HOMERPORT=${HOMERPORT}
-      - HOMER_ENABLE=${HOMER_ENABLE}
-      - NETWORK_MODE=bridge
+      - HOMER_ENABLE=False
     image: ${OMLACD_IMG}
-    networks:
-      - omnileads
-    expose:
-        - 40000-40999/udp
-    ports:
-      - ${SIP_EXT_PORT}:5060/udp
+    network_mode: host
     privileged: true
     restart: on-failure
     stop_grace_period: 1m30s
@@ -244,7 +236,7 @@ services:
     depends_on:
       - redis
       - acd
-      - rtpengine
+      - rtpengine 
     dns: 8.8.8.8
     environment:
       - TZ=${TZ}
@@ -257,8 +249,7 @@ services:
       - PKG_SIZE=${PKG_SIZE}
       - KAMAILIO_CERTS_LOCATION=${KAMAILIO_CERTS_LOCATION}
     image: ${OMLKAM_IMG}
-    networks:
-      - omnileads
+    network_mode: host
     privileged: true
     restart: on-failure
     stop_grace_period: 1m30s
@@ -282,16 +273,14 @@ services:
       - S3_ENDPOINT=${S3_ENDPOINT_MINIO}
       - CALLREC_DEVICE=${CALLREC_DEVICE}
     image: ${OMLNGINX_IMG}
-    networks:
-      - omnileads
+    network_mode: host
     privileged: true
-    ports:
-      - ${NGINX_EXT_PORT}:443/tcp
     restart: on-failure
     stop_grace_period: 1m30s
     volumes:
       - django_static:/opt/omnileads/static
       - django_callrec_zip:/opt/omnileads/asterisk/var/spool/asterisk/monitor
+      - ./certs:/etc/omnileads/certs
 
   postgresql:
     container_name: oml-postgres
@@ -302,10 +291,8 @@ services:
       - POSTGRES_PASSWORD=${PGPASSWORD}
       - POSTGRES_DB=${PGDATABASE}
     image: ${OMLPGSQL_IMG}
-    networks:
-      - omnileads
-    ports:
-      - ${PG_EXT_PORT}:5432/tcp
+    command: postgres -c listen_addresses=${PGHOST}
+    network_mode: host
     privileged: true
     restart: on-failure
     stop_grace_period: 1m30s
@@ -317,9 +304,10 @@ services:
     dns: 8.8.8.8
     environment:
       - TZ=${TZ}
-    networks:
-      - omnileads
-    image: ${OMLREDISGEARS_IMG}
+      - BIND_IP=${REDIS_HOSTNAME}
+    network_mode: host
+    image: ${OMLREDIS_IMG}
+    command: redis-server --bind ${REDIS_HOSTNAME}
     privileged: true
     restart: on-failure
     stop_grace_period: 1m30s
@@ -332,13 +320,13 @@ services:
     environment:
       - TZ=${TZ}
       - ENV=docker-compose-${ENV}
+      - RTPENGINE_HOSTNAME=${RTPENGINE_HOSTNAME}
     image: ${OMLRTPENGINE_IMG}
-    networks:
-      - omnileads
+    network_mode: host
     privileged: true
     restart: on-failure
     stop_grace_period: 1m30s
-
+        
   websockets:
     tty: true
     container_name: oml-websockets
@@ -346,21 +334,18 @@ services:
     depends_on:
       - redis
     environment:
-      - BIND_ADDRESS=0.0.0.0:8000
+      - BIND_ADDRESS=${WEBSOCKET_HOSTNAME}:8000
       - EVENT_LOOP=uvloop
       - LOGGERS=${WEBSOCKET_LOGGER}
       - REDIS_HOST=${WEBSOCKET_REDIS_HOSTNAME}
       - PYTHONUNBUFFERED=1
-    ports:
-      - "${WEBSOCKET_EXT_PORT}:8000"
-    networks:
-      - omnileads
+    network_mode: host
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health-checks"]
       interval: 1s
       timeout: 10s
       retries: 10
-
+  
   minio:
     tty: true
     container_name: oml-minio
@@ -369,13 +354,9 @@ services:
     environment:
       - MINIO_ROOT_USER=${S3_HTTP_ADMIN_USER}
       - MINIO_ROOT_PASSWORD=${S3_HTTP_ADMIN_PASS}
-      - MINIO_SERVER_URL=${S3_ENDPOINT}
+      - MINIO_SERVER_URL=${S3_ENDPOINT_MINIO}
       - MINIO_PROMETHEUS_AUTH_TYPE="public"
-    networks:
-      - omnileads
-    ports:
-      - 9001:9001
-      - 9000:9000
+    network_mode: host
     volumes:
       - minio_data:/data
     healthcheck:
@@ -390,81 +371,48 @@ services:
     container_name: oml-initminio
     depends_on:
       - minio
-    networks:
-      - omnileads
+    network_mode: host
     entrypoint: >
       /bin/sh -c "
       /usr/bin/mc config host rm local;
-      /usr/bin/mc config host add --quiet --api s3v4 local http://minio:9000 minio s3minio123;
+      /usr/bin/mc config host add --quiet --api s3v4 local http://localhost:9000 minio s3minio123;
       /usr/bin/mc mb --quiet local/omnileads/;
       /usr/bin/mc admin user add local omlminio s3omnileads123;
       /usr/bin/mc admin policy attach local readwrite --user omlminio;
       exit 0;
       "
-      
-  mariadb:
-    container_name: oml-mariadb
-    dns: 8.8.8.8
-    environment:
-      - ALLOW_EMPTY_PASSWORD=yes
-      - TZ=${TZ}
-      - MARIADB_ROOT_PASSWORD=${MYSQL_ROOT_PASS}
-      - MARIADB_DATABASE=${WOMBAT_DB}
-      - MARIADB_USER=${WOMBAT_DB_USER}
-      - MARIADB_PASSWORD=${WOMBAT_DB_PASS}
-    image: ${MARIADB_IMG}
-    networks:
-      - omnileads
+
+  nodeexporter:
+    image: prom/node-exporter:latest
+    container_name: nodeexporter
+    user: root
     privileged: true
-    restart: on-failure
-    stop_grace_period: 1m30s
     volumes:
-      - mariadb_data:/bitnami
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)'
+    restart: unless-stopped
+    network_mode: host
+    labels:
+      org.label-schema.group: "monitoring"
+    logging:
+      options:
+        max-size: "50m"
 
-  wombat:
-    command: >
-      bash -c "sed -i '/JDBC_URL/c\JDBC_URL=jdbc:mariadb:\/\/${MYSQL_HOST}\/${WOMBAT_DB}?user=${WOMBAT_DB_USER}&password=${WOMBAT_DB_PASS}&autoReconnect=true' /usr/local/tomcat/webapps/wombat/WEB-INF/tpf.properties && catalina.sh run"
-    container_name: oml-wombat
-    depends_on:
-      - mariadb
-      - acd
-    dns: 8.8.8.8
-    environment:
-      - TZ=${TZ}
-      - MYSQL_PWD=${MYSQL_ROOT_PASS}
-    image: ${WOMBAT_IMG}
-    networks:
-      - omnileads
-    ports:
-      - 8082:8080/tcp
-    privileged: true
-    restart: on-failure
-    stop_grace_period: 1m30s
-
-  pbxemulator:
-    container_name: oml-pstn-emulator
-    hostname: pbxemulator
-    dns: 8.8.8.8
-    environment:
-      - TZ=${TZ}
-    image: ${OMLPSTNEMULATOR_IMG}
-    networks:
-      - omnileads
-    ports:
-      - 6060:6060/udp
-      - 10000-10020:10000-10020/udp
-    privileged: true
-    restart: on-failure
-    stdin_open: true
-    stop_grace_period: 1m30s
-    tty: true
-
-networks:
-  omnileads:
-    ipam:
-      driver: default
-      config:
-        - subnet: "${SUBNET}"
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: cadvisor
+    restart: unless-stopped
+    network_mode: host
+    volumes:
+    - /:/rootfs:ro
+    - /var/run:/var/run:rw
+    - /sys:/sys:ro
+    - /var/lib/docker/:/var/lib/docker:ro
 
 volumes:
   postgresql_data:
@@ -473,3 +421,4 @@ volumes:
   django_static:
   django_callrec_zip:
   mariadb_data:
+
