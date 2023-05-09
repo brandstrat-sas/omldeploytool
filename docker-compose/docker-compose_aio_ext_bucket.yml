@@ -6,11 +6,14 @@ services:
       - postgresql
       - redis
       - acd
+      - minio
     dns: 8.8.8.8
     environment:
       - CRON_ENABLE=false
       - TZ=${TZ}
-      - ASTERISK_HOSTNAME=${ASTERISK_HOSTNAME}
+      - DJANGO_HOSTNAME=${DJANGO_HOSTNAME}
+      - UWSGI_PORT=8099
+      - ASTERISK_HOSTNAME=localhost
       - AMI_USER=${AMI_USER}
       - AMI_PASSWORD=${AMI_PASSWORD}
       - KAMAILIO_HOSTNAME=${KAMAILIO_HOSTNAME}
@@ -74,7 +77,9 @@ services:
     environment:
       - DAPHNE_ENABLE=True
       - TZ=${TZ}
-      - ASTERISK_HOSTNAME=${ASTERISK_HOSTNAME}
+      - DJANGO_HOSTNAME=${DJANGO_HOSTNAME}
+      - DAPHNE_PORT=8098
+      - ASTERISK_HOSTNAME=localhost
       - AMI_USER=${AMI_USER}
       - AMI_PASSWORD=${AMI_PASSWORD}
       - KAMAILIO_HOSTNAME=${KAMAILIO_HOSTNAME}
@@ -131,9 +136,11 @@ services:
     dns: 8.8.8.8
     environment:
       - TZ=${TZ}
-      - ASTERISK_HOSTNAME=${ASTERISK_HOSTNAME}
+      - ASTERISK_HOSTNAME=localhost
       - AMI_USER=${AMI_USER}
       - AMI_PASSWORD=${AMI_PASSWORD}
+      - DJANGO_HOSTNAME=${DJANGO_HOSTNAME}
+      - UWSGI_PORT=8097
       - KAMAILIO_HOSTNAME=${KAMAILIO_HOSTNAME}
       - PGHOST=${PGHOST}
       - PGDATABASE=${PGDATABASE}
@@ -187,7 +194,8 @@ services:
     depends_on:
       - postgresql
       - redis
-      - websockets      
+      - websockets
+      - minio
     dns: 8.8.8.8
     environment:
       - ENV=docker-compose-${ENV}
@@ -207,7 +215,7 @@ services:
       - S3_BUCKET_NAME=${S3_BUCKET_NAME}
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
-      - S3_ENDPOINT=${S3_ENDPOINT}
+      - S3_ENDPOINT=${S3_ENDPOINT_MINIO}
       - AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION}
       - HOMERHOST=${HOMERHOST}
       - HOMERPORT=${HOMERPORT}
@@ -262,7 +270,7 @@ services:
       - DAPHNE_HOSTNAME=${DAPHNE_HOSTNAME}
       - KAMAILIO_HOSTNAME=${KAMAILIO_HOSTNAME}
       - WEBSOCKETS_HOSTNAME=${WEBSOCKET_HOSTNAME}
-      - S3_ENDPOINT=${S3_ENDPOINT}
+      - S3_ENDPOINT=${S3_ENDPOINT_MINIO}
       - CALLREC_DEVICE=${CALLREC_DEVICE}
     image: ${OMLNGINX_IMG}
     network_mode: host
@@ -326,7 +334,7 @@ services:
     depends_on:
       - redis
     environment:
-      - BIND_ADDRESS=0.0.0.0:8000
+      - BIND_ADDRESS=${WEBSOCKET_HOSTNAME}:8000
       - EVENT_LOOP=uvloop
       - LOGGERS=${WEBSOCKET_LOGGER}
       - REDIS_HOST=${WEBSOCKET_REDIS_HOSTNAME}
@@ -373,6 +381,7 @@ services:
 volumes:
   postgresql_data:
   redis_data:
+  minio_data:
   django_static:
   django_callrec_zip:
   mariadb_data:
