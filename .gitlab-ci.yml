@@ -18,14 +18,15 @@ deploy-docker-digitalocean:
     - sleep 60
     - OML_IPADDR=$(doctl compute droplet list |grep cicd-aio.${CI_JOB_ID} |awk '{print $3}') && echo "$OML_IPADDR to run tests"
     - until curl -sk --head --request GET https://$OML_IPADDR |grep "302" > /dev/null; do echo "Environment still being installed, sleeping 60 seconds"; sleep 60; done; echo "Environment is up"
-    #- sleep 60
-    #- doctl compute droplet delete -f cicd-aio.${CI_JOB_ID}
+    - sleep 120
+    - doctl compute droplet delete -f cicd-aio.${CI_JOB_ID}
     - rm -rf omldeploytool
   only:
     - /.*pipeline-aio.*$/
     - /.*pipeline-all.*$/
     - schedules
     - web
+    - merge_request
 
 
 deploy-ait-digitalocean:
@@ -55,10 +56,10 @@ deploy-ait-digitalocean:
     - sed -i "17 s/Z.Z.Z.Z/$OML_IPADDR_APPLAN/g" ./instances/gitlab/inventory.yml
     - bash -x deploy.sh --action=install --tenant=gitlab
     - until curl -sk --head --request GET https://$OML_IPADDR_APP |grep "302" > /dev/null; do echo "Environment still being installed, sleeping 60 seconds"; sleep 60; done; echo "Environment is up"
-    #- sleep 60
-    # - doctl compute droplet delete -f cicd-app.${CI_JOB_ID}
-    # - doctl compute droplet delete -f cicd-data.${CI_JOB_ID}
-    # - doctl compute droplet delete -f cicd-voice.${CI_JOB_ID}
+    - sleep 120
+    - doctl compute droplet delete -f cicd-app.${CI_JOB_ID}
+    - doctl compute droplet delete -f cicd-data.${CI_JOB_ID}
+    - doctl compute droplet delete -f cicd-voice.${CI_JOB_ID}
   tags:
     - deploy
   only:
@@ -66,6 +67,7 @@ deploy-ait-digitalocean:
     - /.*pipeline-all.*$/
     - schedules
     - web
+    - merge_request
 
 # deploy-ait-lan:
 #   stage: deploy
