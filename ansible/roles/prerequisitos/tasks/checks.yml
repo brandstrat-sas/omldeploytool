@@ -77,13 +77,13 @@
 ###################### HOST Set ########################### ###################### HOST Set ###########################
 
 # Set postgres_out as true when postgres_host is defined on inventory
-- name: CHECKS Setting postgres_host
+- name: CHECKS Setting postgres_host & set postgres_out true
   set_fact:
     postgres_out: true
   changed_when: false
   when:
     - postgres_host is defined
-    - omlaio is defined or omlapp is defined or omldata is defined
+    - omlaio is defined or omlapp is defined or omldata is defined or docker_compose is defined
   tags: 
     - install
     - upgrade
@@ -94,13 +94,13 @@
     - observability
 
 # Set postgres_out as false when postgres_host is not defined on inventory
-- name: CHECKS Setting postgres_host
+- name: CHECKS Setting postgres_host & set postgres_out false
   set_fact:
     postgres_out: false
   changed_when: false
   when:
     - postgres_host is not defined
-    - omlaio is defined or omlapp is defined or omldata is defined
+    - omlaio is defined or omlapp is defined or omldata is defined or docker_compose is defined
   tags: 
     - install
     - upgrade
@@ -117,7 +117,7 @@
   changed_when: false
   when:
     - dialer_host is not defined
-    - omlaio is defined or omlapp is defined or omldata is defined
+    - omlaio is defined or omlapp is defined or docker_compose is defined
   tags: 
     - install
     - upgrade
@@ -152,7 +152,7 @@
   changed_when: false
   when:
     - postgres_host is not defined
-    - omlaio is defined
+    - omlaio is defined  or docker_compose is defined
   tags: 
     - install
     - upgrade
@@ -184,6 +184,23 @@
   changed_when: false
   when:
     - bucket_url is not defined
+    - (omlapp is defined) or (omlvoice is defined)
+  tags: 
+    - install
+    - upgrade
+    - app
+    - voice
+    - asterisk
+    - django
+
+# Set minio_host as localhost on App instance when minios_host is not explicitly defined
+- name: CHECKS Setting minio_host
+  set_fact:
+    minio_host: http://localhost:9000
+  changed_when: false
+  when:
+    - bucket_url is not defined
+    - omlaio is defined or docker_compose is defined
   tags: 
     - install
     - upgrade
@@ -200,6 +217,19 @@
   when:
     - websockets_host is not defined
     - (omlapp is defined)  or (omlaio is defined)
+  tags: 
+    - install
+    - upgrade
+    - app
+
+# Set websockets_host as localhost on App instance when websockets_host is not explicitly defined
+- name: CHECKS Setting websockets_host as localhost
+  set_fact:
+    websockets_host: localhost
+  changed_when: false
+  when:
+    - websockets_host is not defined
+    - omlaio is defined  or docker_compose is defined
   tags: 
     - install
     - upgrade
@@ -225,7 +255,7 @@
   changed_when: false
   when:
     - kamailio_host is not defined
-    - omlaio is defined
+    - omlaio is defined  or docker_compose is defined
   tags: 
     - install
     - upgrade
@@ -252,7 +282,7 @@
   changed_when: false
   when:
     - redis_host is not defined
-    - omlaio is defined
+    - omlaio is defined  or docker_compose is defined
   tags: 
     - install
     - upgrade
@@ -280,7 +310,7 @@
   changed_when: false
   when:
     - asterisk_host is not defined
-    - (omlapp is defined) or (omlaio is defined)
+    - (omlapp is defined) or (omlaio is defined) or (docker_compose is defined)
   tags: 
     - install
     - upgrade
@@ -293,7 +323,7 @@
   changed_when: false
   when:
     - rtpengine_host is not defined
-    - (omlapp is defined) or (omlaio is defined)
+    - (omlapp is defined) or (omlaio is defined) or (docker_compose is defined)
   tags: 
     - install
     - upgrade
@@ -306,7 +336,7 @@
   changed_when: false
   when:
     - nginx_host is not defined
-    - (omlvoice is defined)  or (omlaio is defined)
+    - (omlvoice is defined)  or (omlaio is defined) or (docker_compose is defined)
   tags: 
     - install
     - upgrade

@@ -153,6 +153,7 @@ case ${oml_action} in
     pgsql_repo_path=$(pwd)/components/postgresql/ \
     kamailio_repo_path=$(pwd)/components/kamailio/ \
     asterisk_repo_path=$(pwd)/components/asterisk/ \
+    docker_compose_repo_path=$(pwd)/components/docker_compose/ \
     rtpengine_repo_path=$(pwd)/components/rtpengine/ \
     websockets_repo_path=$(pwd)/components/websockets/ \
     nginx_repo_path=$(pwd)/components/nginx/ \

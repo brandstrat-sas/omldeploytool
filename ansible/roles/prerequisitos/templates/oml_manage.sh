@@ -1,6 +1,89 @@
 #!/bin/bash
 
+
 case $1 in
+
+{% if docker_compose is defined %}
+  --reset_pass)
+    echo "reset django admin password"
+    docker exec -it oml-django-server python3 /opt/omnileads/ominicontacto/manage.py cambiar_admin_password
+    ;;
+  --init_env)
+    echo "init Environment with some data"
+    docker exec -it oml-django-server python3 /opt/omnileads/ominicontacto/manage.py inicializar_entorno
+    ;;
+  --init_env_devops)
+    echo "init Environment with some data"
+    docker exec -it oml-django-server python3 /opt/omnileads/ominicontacto/manage.py inicializar_entorno --qa-devops
+    ;;
+  --regenerar_asterisk)
+    echo "regenerate redis asterisk data"
+    docker exec -it oml-django-server python3 /opt/omnileads/ominicontacto/manage.py regenerar_asterisk
+    ;;
+  --clean_redis)
+    echo "drop all on REDIS"
+    systemctl stop oml-redis-server
+    sleep 2
+    docker rm oml-redis-server
+    docker volume rm oml_redis
+    sleep 2
+    systemctl start oml-redis-server
+    sleep 5
+    docker exec -it oml-django-server python3 /opt/omnileads/ominicontacto/manage.py regenerar_asterisk
+    ;;
+  --generate_call)
+    echo "generate an ibound call through PSTN-Emulator container"
+    docker exec -it oml-pstn-server sipp -sn uac 127.0.0.1:5060 -s stress -m 1 -r 1 -d 60000 -l 1
+    ;;
+  --show_bucket)
+    docker exec -it oml-django-server aws --endpoint-url ${S3_ENDPOINT} s3 ls --recursive s3://${S3_BUCKET_NAME}
+    ;;
+  --asterisk_cli)
+    docker exec -it oml-asterisk-server asterisk -rvvvv
+    ;;
+  --psql)
+    docker exec -it oml-django-server psql
+    ;;
+  --redis_cli)
+    docker run -it --name oml-redis-cli docker.io/redis redis-cli -h $(cat /etc/default/django.env |grep REDIS | awk -F= '{print $2}')
+    ;;
+  --asterisk_terminal)
+    docker exec -it oml-asterisk-server bash
+    ;;
+  --asterisk_logs)
+    docker logs -f oml-asterisk-server
+    ;;
+  --kamailio_logs)
+    docker logs -f oml-kamailio-server
+    ;;
+  --django_logs)
+    docker logs -f oml-django-server
+    ;;
+  --rtpengine_logs)
+    docker logs -f oml-rtpengine-server
+    ;;
+  --ws_logs)
+    docker logs -f oml-websockets-server
+    ;;
+  --redis_logs)
+    docker logs -f oml-redis-server
+    ;;
+  --sentinel_logs)
+    docker logs -f oml-sentinel-server
+    ;;
+  --haproxy_logs)
+    docker logs -f oml-haproxy-server
+    ;;
+  --nginx_logs)
+    docker logs -f oml-nginx-server
+    ;;    
+  --rtpengine_conf)
+    docker exec -it oml-rtpengine-server cat /etc/rtpengine.conf
+    ;;
+  --nginx_t)
+    docker exec -it oml-nginx-server nginx -T
+    ;;
+{% else %}
   --reset_pass)
     echo "reset django admin password"
     podman exec -it oml-django-server python3 /opt/omnileads/ominicontacto/manage.py cambiar_admin_password
@@ -80,8 +163,10 @@ case $1 in
   --nginx_t)
     podman exec -it oml-nginx-server nginx -T
     ;;
+{% endif %}    
   --help)
     echo "
+
 NAME:
 OMniLeads cmd tool
 

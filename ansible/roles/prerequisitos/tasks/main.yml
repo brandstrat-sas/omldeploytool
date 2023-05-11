@@ -22,7 +22,6 @@
     name:
       - curl
       - net-tools
-      - podman
       - wget
       - jq
       - sngrep
@@ -53,22 +52,11 @@
     - observability
     - asterisk
 
-# - name: MAIN enable postgres dnf module ROCKY
-#   command: 'dnf -y module enable postgresql:{{ postgres_version }}'
-#   when: ansible_facts['distribution'] == "Rocky" 
-#   tags: 
-#     - install
-#     - voice
-#     - app
-#     - observability
-#     - asterisk
-
 - name: MAIN Install required Rocky Linux packages
   dnf:
     name:
       - python3
       - python3-pip
-      - podman
       - jq
       - postgresql
       - python3-psycopg2
@@ -111,9 +99,89 @@
     - observability
     - asterisk
 
+# --- install DOCKER
+- name: MAIN Descargar el script de instalación de Docker
+  get_url:
+    url: https://get.docker.com/
+    dest: /tmp/get-docker.sh
+  tags:
+    - install
+  when:
+    - docker_compose is defined   
+
+- name: MAIN Ejecutar el script de instalación de Docker
+  command: sh /tmp/get-docker.sh
+  tags:
+    - install
+  when:
+    - docker_compose is defined   
+
+- name: MAIN Agregar el usuario al grupo de Docker
+  user:
+    name: '{{ usuario }}'
+    groups: docker
+  tags:
+    - install
+    - upgrade
+  when:
+    - docker_compose is defined   
+
+- name: MAIN Reiniciar el servicio de Docker
+  systemd:
+    name: docker
+    state: restarted
+  tags:
+    - install  
+  when:
+    - docker_compose is defined   
+
+- name: MAIN docker-compose link bin
+  file: 
+    src: /usr/libexec/docker/cli-plugins/docker-compose
+    dest: /usr/local/bin/docker-compose
+    state: link 
+  tags:
+    - install  
+  when:
+    - docker_compose is defined   
+
+# --- install PODMAN
+- name: MAIN Install PODMAN
+  apt:
+    name:
+      - podman
+    update_cache: yes
+    state: latest
+  when: 
+     - ansible_os_family == "Debian"
+     - docker_compose is not defined
+  tags: 
+    - install
+    - voice
+    - asterisk
+    - app
+    - observability
+
+- name: MAIN Install PODMAN
+  dnf:
+    name:
+      - podman
+    state: latest
+  when: 
+    - ansible_facts['distribution'] == "Rocky" 
+    - docker_compose is not defined
+  tags: 
+    - install
+    - postgres
+    - voice
+    - app
+    - observability
+    - asterisk
+
 - name: MAIN Check if Omnileads has been installed previously
   include: checks.yml
   
 - name: MAIN First configuration in server or servers
   include: os_configuration.yml
+
 
