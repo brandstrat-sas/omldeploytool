@@ -7,7 +7,7 @@
 
 ---
 
-# OMniLeads deploy (Ansible, Systemd and Podman containers based)
+# OMniLeads automation your subscribers deploys with Ansible
 
 ```
 git clone https://gitlab.com/omnileads/omldeploytool.git
@@ -24,10 +24,10 @@ It is possible to manage hundreds of OMniLeads instances with Ansible inventorie
 
 ![Diagrama deploy tool](./png/deploy-tool-ansible-deploy-instances-multiples.png)
 
-Then, for each running instance, a collection of components invoked as systemd services implement OMniLeads functionalities on the Linux instance (or set of instances). Finally, it should be noted that each of these components behind the systemd services are containers based on Podman.
+Then, for each running instance, a collection of components invoked as systemd services or docker-compose implement OMniLeads functionalities on the Linux instance (or set of instances).
 
-Each OMniLeads instance involves the following collection of components that are run on a Pod. 
-It is possible to group these Pods on a single Linux instance or cluster them horizontally in a configuration.
+Each OMniLeads instance involves the following collection of components that are run on a container. 
+It is possible to group these containers on a single Linux instance or cluster them horizontally in a configuration.
 
 >  Note: If working on a VPS with a public IP address, it is a mandatory requirement that it also has a network interface with the ability to associate a private IP address.
 

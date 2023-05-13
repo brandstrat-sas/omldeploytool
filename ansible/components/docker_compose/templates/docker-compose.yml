@@ -13,7 +13,7 @@ services:
       - TZ=${TZ}
       - DJANGO_HOSTNAME=${DJANGO_HOSTNAME}
       - UWSGI_PORT=8099
-      - ASTERISK_HOSTNAME=localhost
+      - ASTERISK_HOSTNAME=${ASTERISK_HOSTNAME}
       - AMI_USER=${AMI_USER}
       - AMI_PASSWORD=${AMI_PASSWORD}
       - KAMAILIO_HOSTNAME=${KAMAILIO_HOSTNAME}
@@ -42,7 +42,7 @@ services:
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
       - S3_ENDPOINT=${S3_ENDPOINT}
-      - S3_ENDPOINT_MINIO={{ minio_host }}
+      - S3_ENDPOINT_MINIO=${S3_ENDPOINT}
       - AWS_DEFAULT_REGION=us-east-1
       - GOOGLE_MAPS_API_KEY=${GOOGLE_MAPS_API_KEY}
       - GOOGLE_MAPS_CENTER='${GOOGLE_MAPS_CENTER}'
@@ -79,7 +79,7 @@ services:
       - TZ=${TZ}
       - DJANGO_HOSTNAME=${DJANGO_HOSTNAME}
       - DAPHNE_PORT=8098
-      - ASTERISK_HOSTNAME=localhost
+      - ASTERISK_HOSTNAME=${ASTERISK_HOSTNAME}
       - AMI_USER=${AMI_USER}
       - AMI_PASSWORD=${AMI_PASSWORD}
       - KAMAILIO_HOSTNAME=${KAMAILIO_HOSTNAME}
@@ -135,7 +135,7 @@ services:
     dns: 8.8.8.8
     environment:
       - TZ=${TZ}
-      - ASTERISK_HOSTNAME=localhost
+      - ASTERISK_HOSTNAME=${ASTERISK_HOSTNAME}
       - AMI_USER=${AMI_USER}
       - AMI_PASSWORD=${AMI_PASSWORD}
       - DJANGO_HOSTNAME=${DJANGO_HOSTNAME}
@@ -214,7 +214,7 @@ services:
       - S3_BUCKET_NAME=${S3_BUCKET_NAME}
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
-      - S3_ENDPOINT={{ minio_host }}
+      - S3_ENDPOINT=${S3_ENDPOINT}
       - AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION}
       - HOMERHOST=${HOMERHOST}
       - HOMERPORT=${HOMERPORT}
@@ -269,7 +269,7 @@ services:
       - DAPHNE_HOSTNAME=${DAPHNE_HOSTNAME}
       - KAMAILIO_HOSTNAME=${KAMAILIO_HOSTNAME}
       - WEBSOCKETS_HOSTNAME=${WEBSOCKET_HOSTNAME}
-      - S3_ENDPOINT={{ minio_host }}
+      - S3_ENDPOINT=${S3_ENDPOINT}
       - CALLREC_DEVICE=${CALLREC_DEVICE}
     image: ${OMLNGINX_IMG}
     network_mode: host
@@ -353,7 +353,7 @@ services:
     environment:
       - MINIO_ROOT_USER=${S3_HTTP_ADMIN_USER}
       - MINIO_ROOT_PASSWORD=${S3_HTTP_ADMIN_PASS}
-      - MINIO_SERVER_URL={{ minio_host }}
+      - MINIO_SERVER_URL=${S3_ENDPOINT}
       - MINIO_PROMETHEUS_AUTH_TYPE="public"
     network_mode: host
     volumes:
@@ -381,9 +381,33 @@ services:
       exit 0;
       "
 
+####################################### OBSERVABILITY #######################################
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=30d'
+      - '--web.enable-lifecycle'
+      - '--web.listen-address=${PUBLIC_IP}:9090'
+    restart: unless-stopped
+    network_mode: host
+    labels:
+      org.label-schema.group: "monitoring"
+    logging:
+      options:
+        max-size: "50m"
+    volumes:
+      - /etc/omnileads/prometheus.yml/:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+
   nodeexporter:
     image: prom/node-exporter:latest
-    container_name: nodeexporter
+    container_name: obs-nodeexporter
     user: root
     privileged: true
     volumes:
@@ -394,6 +418,7 @@ services:
       - '--path.procfs=/host/proc'
       - '--path.sysfs=/host/sys'
       - '--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)'
+      - '--web.listen-address=localhost:9100'
     restart: unless-stopped
     network_mode: host
     labels:
@@ -404,7 +429,7 @@ services:
 
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:latest
-    container_name: cadvisor
+    container_name: obs-cadvisor
     restart: unless-stopped
     network_mode: host
     volumes:
@@ -413,6 +438,28 @@ services:
     - /sys:/sys:ro
     - /var/lib/docker/:/var/lib/docker:ro
 
+  redis-exporter:
+    depends_on: 
+      - redis
+    image: oliver006/redis_exporter
+    container_name: obs-redis-exp
+    network_mode: host
+    restart: unless-stopped
+    environment:
+      - REDIS_ADDR=localhost:6379
+      - REDIS_USER=null
+      - REDIS_PASSWORD=null
+
+  loki:
+    image: grafana/loki:2.8.2
+    container_name: obs-loki
+    network_mode: host
+    command: 
+      -config.file=/etc/loki/local-config.yaml
+    volumes:
+      - loki_data:/loki
+      - /etc/omnileads/loki.yml/:/etc/loki/local-config.yaml
+
 volumes:
   postgresql_data:
   redis_data:
@@ -420,4 +467,5 @@ volumes:
   django_static:
   django_callrec_zip:
   mariadb_data:
-
+  prometheus_data:
+  loki_data:

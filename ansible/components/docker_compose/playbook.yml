@@ -46,7 +46,7 @@
     tags:
       - install
 
-  - name: DOCKER-COMPOSE Create custom conf files folder
+  - name: DOCKER-COMPOSE Create asterisk custom conf files folder
     file:
       path:  "{{ asterisk_location_conf }}/custom"
       state: directory
@@ -58,7 +58,7 @@
       - install
 
   # Creo archivos custom & override en fresh-install
-  - name: DOCKER-COMPOSE Create _custom & _override astconf files
+  - name: DOCKER-COMPOSE Create asterisk _custom & _override astconf files
     file:
       path: "{{ asterisk_location_conf }}/custom/{{ item }}"
       state: touch
@@ -135,7 +135,9 @@
     tags:
       - install
       - upgrade
-    when: minio_host is defined
+    when: 
+      - bucket_url is not defined
+      - postgres_out != true
 
   - name: DOCKER-COMPOSE Copy docker-compose.yml service with external Bucket & Postgres
     template:
@@ -146,7 +148,7 @@
       - upgrade
     when: 
       - bucket_url is defined  
-      - postgres_out == "true"
+      - postgres_out == true
 
   - name: DOCKER-COMPOSE Create a new database with name {{ postgres_database }}
     postgresql_db:
@@ -191,8 +193,30 @@
       - restore_file_timestamp is not defined
       - postgres_out == true
 
+  - name: DOCKER-COMPOSE Render prometheus.yml template
+    template:
+      src: "{{ docker_compose_repo_path }}templates/prometheus.yml"
+      dest: /etc/omnileads/prometheus.yml
+      mode: 7777
+      owner: '{{ usuario }}'
+      group: '{{ usuario }}'
+    tags:
+      - install
+      - upgrade
+
+  - name: DOCKER-COMPOSE Render loki.yml template
+    template:
+      src: "{{ docker_compose_repo_path }}templates/loki.yml"
+      dest: /etc/omnileads/loki.yml
+      mode: 7777
+      owner: '{{ usuario }}'
+      group: '{{ usuario }}'
+    tags:
+      - install
+      - upgrade
+
   - name: DOCKER-COMPOSE Pull image
-    command: docker-compose  -f /etc/omnileads/docker-compose.yml pull
+    command: docker-compose -f /etc/omnileads/docker-compose.yml pull
     register: podman_pull
     until: podman_pull is success
     tags:

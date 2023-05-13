@@ -145,6 +145,14 @@
   when:
     - docker_compose is defined   
 
+- name: MAIN add docker-plugin Loki logs
+  command: docker plugin install grafana/loki-docker-driver:latest --alias loki --grant-all-permissions
+  tags:
+    - install
+  when:
+    - docker_compose is defined 
+
+
 # --- install PODMAN
 - name: MAIN Install PODMAN
   apt:

@@ -13,7 +13,7 @@ services:
       - TZ=${TZ}
       - DJANGO_HOSTNAME=${DJANGO_HOSTNAME}
       - UWSGI_PORT=8099
-      - ASTERISK_HOSTNAME=localhost
+      - ASTERISK_HOSTNAME=${ASTERISK_HOSTNAME}
       - AMI_USER=${AMI_USER}
       - AMI_PASSWORD=${AMI_PASSWORD}
       - KAMAILIO_HOSTNAME=${KAMAILIO_HOSTNAME}
@@ -79,7 +79,7 @@ services:
       - TZ=${TZ}
       - DJANGO_HOSTNAME=${DJANGO_HOSTNAME}
       - DAPHNE_PORT=8098
-      - ASTERISK_HOSTNAME=localhost
+      - ASTERISK_HOSTNAME=${ASTERISK_HOSTNAME}
       - AMI_USER=${AMI_USER}
       - AMI_PASSWORD=${AMI_PASSWORD}
       - KAMAILIO_HOSTNAME=${KAMAILIO_HOSTNAME}
@@ -136,7 +136,7 @@ services:
     dns: 8.8.8.8
     environment:
       - TZ=${TZ}
-      - ASTERISK_HOSTNAME=localhost
+      - ASTERISK_HOSTNAME=${ASTERISK_HOSTNAME}
       - AMI_USER=${AMI_USER}
       - AMI_PASSWORD=${AMI_PASSWORD}
       - DJANGO_HOSTNAME=${DJANGO_HOSTNAME}
@@ -345,80 +345,130 @@ services:
       interval: 1s
       timeout: 10s
       retries: 10
-  
-  minio:
-    tty: true
-    container_name: oml-minio
-    image: ${OMLMINIO_IMG}
-    command: server --console-address "localhost:9001" /data
-    environment:
-      - MINIO_ROOT_USER=${S3_HTTP_ADMIN_USER}
-      - MINIO_ROOT_PASSWORD=${S3_HTTP_ADMIN_PASS}
-      - MINIO_SERVER_URL=${S3_ENDPOINT_MINIO}
-      - MINIO_PROMETHEUS_AUTH_TYPE="public"
-    network_mode: host
-    volumes:
-      - minio_data:/data
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
-      interval: 30s
-      timeout: 20s
-      retries: 3
 
-  createbuckets:  
-    tty: true
-    image: minio/mc
-    container_name: oml-initminio
-    depends_on:
-      - minio
-    network_mode: host
-    entrypoint: >
-      /bin/sh -c "
-      /usr/bin/mc config host rm local;
-      /usr/bin/mc config host add --quiet --api s3v4 local http://localhost:9000 minio s3minio123;
-      /usr/bin/mc mb --quiet local/omnileads/;
-      /usr/bin/mc admin user add local omlminio s3omnileads123;
-      /usr/bin/mc admin policy attach local readwrite --user omlminio;
-      exit 0;
-      "
+####################################### WOMBAT Dialer ######################################
 
-  nodeexporter:
-    image: prom/node-exporter:latest
-    container_name: nodeexporter
-    user: root
-    privileged: true
-    volumes:
-      - /proc:/host/proc:ro
-      - /sys:/host/sys:ro
-      - /:/rootfs:ro
-    command:
-      - '--path.procfs=/host/proc'
-      - '--path.sysfs=/host/sys'
-      - '--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)'
-    restart: unless-stopped
-    network_mode: host
-    labels:
-      org.label-schema.group: "monitoring"
-    logging:
-      options:
-        max-size: "50m"
+  # mariadb:
+  #   container_name: oml-mariadb
+  #   dns: 8.8.8.8
+  #   environment:
+  #     - ALLOW_EMPTY_PASSWORD=yes
+  #     - TZ=${TZ}
+  #     - MARIADB_ROOT_PASSWORD=${MYSQL_ROOT_PASS}
+  #     - MARIADB_DATABASE=${WOMBAT_DB}
+  #     - MARIADB_USER=${WOMBAT_DB_USER}
+  #     - MARIADB_PASSWORD=${WOMBAT_DB_PASS}
+  #   image: ${MARIADB_IMG}
+  #   network_mode: host
+  #   privileged: true
+  #   restart: on-failure
+  #   stop_grace_period: 1m30s
+  #   volumes:
+  #     - mariadb_data:/bitnami
 
-  cadvisor:
-    image: gcr.io/cadvisor/cadvisor:latest
-    container_name: cadvisor
-    restart: unless-stopped
-    network_mode: host
-    volumes:
-    - /:/rootfs:ro
-    - /var/run:/var/run:rw
-    - /sys:/sys:ro
-    - /var/lib/docker/:/var/lib/docker:ro
+  # wombat:
+  #   command: >
+  #     bash -c "sed -i '/JDBC_URL/c\JDBC_URL=jdbc:mariadb:\/\/${MYSQL_HOST}\/${WOMBAT_DB}?user=${WOMBAT_DB_USER}&password=${WOMBAT_DB_PASS}&autoReconnect=true' /usr/local/tomcat/webapps/wombat/WEB-INF/tpf.properties && catalina.sh run"
+  #   container_name: oml-wombat
+  #   depends_on:
+  #     - mariadb
+  #     - acd
+  #   dns: 8.8.8.8
+  #   environment:
+  #     - TZ=${TZ}
+  #     - MYSQL_PWD=${MYSQL_ROOT_PASS}
+  #   image: ${WOMBAT_IMG}
+  #   network_mode: host
+  #   privileged: true
+  #   restart: on-failure
+  #   stop_grace_period: 1m30s
+
+####################################### OBSERVABILITY #######################################
+
+  # prometheus:
+  #   image: prom/prometheus:latest
+  #   container_name: prometheus
+  #   command:
+  #     - '--config.file=/etc/prometheus/prometheus.yml'
+  #     - '--storage.tsdb.path=/prometheus'
+  #     - '--web.console.libraries=/etc/prometheus/console_libraries'
+  #     - '--web.console.templates=/etc/prometheus/consoles'
+  #     - '--storage.tsdb.retention.time=30d'
+  #     - '--web.enable-lifecycle'
+  #   restart: unless-stopped
+  #   ports:
+  #     - ${PUBLIC_IP}:9090:9090
+  #   labels:
+  #     org.label-schema.group: "monitoring"
+  #   logging:
+  #     options:
+  #       max-size: "50m"
+  #   volumes:
+  #     - /etc/omnileads/prometheus.yml/:/etc/prometheus/prometheus.yml
+  #     - prometheus_data:/prometheus
+
+  # nodeexporter:
+  #   image: prom/node-exporter:latest
+  #   container_name: obs-nodeexporter
+  #   user: root
+  #   privileged: true
+  #   volumes:
+  #     - /proc:/host/proc:ro
+  #     - /sys:/host/sys:ro
+  #     - /:/rootfs:ro
+  #   command:
+  #     - '--path.procfs=/host/proc'
+  #     - '--path.sysfs=/host/sys'
+  #     - '--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)'
+  #   restart: unless-stopped
+  #   ports:
+  #     - 127.0.0.1:9100:9100
+  #   labels:
+  #     org.label-schema.group: "monitoring"
+  #   logging:
+  #     options:
+  #       max-size: "50m"
+
+  # cadvisor:
+  #   image: gcr.io/cadvisor/cadvisor:latest
+  #   container_name: obs-cadvisor
+  #   restart: unless-stopped
+  #   ports:
+  #     - 127.0.0.1:8080:8080
+  #   volumes:
+  #   - /:/rootfs:ro
+  #   - /var/run:/var/run:rw
+  #   - /sys:/sys:ro
+  #   - /var/lib/docker/:/var/lib/docker:ro
+
+  # redis-exporter:
+  #   depends_on: 
+  #     - redis
+  #   image: oliver006/redis_exporter
+  #   container_name: obs-redis-exp
+  #   ports:
+  #     - 127.0.0.1:9121:9121
+  #   restart: unless-stopped
+  #   environment:
+  #     - REDIS_ADDR=localhost:6379
+  #     - REDIS_USER=null
+  #     - REDIS_PASSWORD=null
+
+  # loki:
+  #   image: grafana/loki:2.8.2
+  #   container_name: obs-loki
+  #   ports:
+  #     - ${PUBLIC_IP}:3100:3100
+  #   command: -config.file=/etc/loki/local-config.yaml
+  #   volumes:
+  #     - loki_data:/loki
 
 volumes:
-  postgresql_data:
   redis_data:
-  minio_data:
   django_static:
   django_callrec_zip:
-  mariadb_data:
-
+  prometheus_data:
+  loki_data:
+  #mariadb_data:
+  #prometheus_data:
+  #loki_data:

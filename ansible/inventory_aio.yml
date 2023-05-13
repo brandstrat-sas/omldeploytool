@@ -1,12 +1,15 @@
 ---
 all:
   hosts:
-    omnileads_aio:
-      omlaio: true
+    omnileads_aio:      
       ansible_host: X.X.X.X
       omni_ip_lan: Z.Z.Z.Z
       ansible_ssh_port: 22
   vars:
+    # --- omlaio: true deploy a systemd podman based omnileads
+    # --- docker_compose: true deploy a docker-compose based omnileads
+    # omlaio: true
+    docker_compose: true
     # --- ansible user auth connection
     ansible_user: root
     # --- Activate the OMniLeads Enterprise Edition - with "AAAA" licensed.

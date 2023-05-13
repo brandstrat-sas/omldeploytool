@@ -8,6 +8,8 @@ COMPOSE_PROJECT_NAME=oml
 # --- "devenv" is for run on docker-desktop (access through localhost)
 ENV=devenv
 
+PUBLIC_IP=
+
 #############################################################
 #               Components image version                    #
 #           versions of each image to deploy                #

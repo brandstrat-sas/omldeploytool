@@ -20,7 +20,7 @@ case $1 in
   --create-debian)
     echo "deploy: $1"
     doctl compute droplet create --image debian-11-x64 \
-    --size s-1vcpu-2gb --region sfo3 \
+    --size s-2vcpu-4gb --region sfo3 \
     --ssh-keys ${SSH_DOCTL} \
     oml-$2
     ;;
@@ -31,30 +31,6 @@ case $1 in
     --ssh-keys ${SSH_DOCTL} \
     oml-$2
     ;;
-  --create-rtpengine)
-    echo "deploy: $1"
-    doctl compute droplet create --image debian-11-x64 \
-    --size s-1vcpu-2gb --region sfo3 \
-    --ssh-keys ${SSH_DOCTL} \
-    --user-data-file ./digitalocean/rtpengine.sh \
-    oml-$2
-    ;;  
-  --create-asterisk)
-    echo "deploy: $1"
-    doctl compute droplet create --image debian-11-x64 \
-    --size s-1vcpu-2gb --region sfo3 \
-    --ssh-keys ${SSH_DOCTL} \
-    --user-data-file ./digitalocean/asterisk.sh \
-    oml-$2
-    ;;    
-  --create-redis)
-    echo "deploy: $1"
-    doctl compute droplet create --image debian-11-x64 \
-    --size s-1vcpu-2gb --region sfo3 \
-    --ssh-keys ${SSH_DOCTL} \
-    --user-data-file ./digitalocean/redis.sh \
-    oml-$2
-    ;;      
   --create-docker)
     echo "deploy: $1 nic: $2"
     doctl compute droplet create --image debian-11-x64 \

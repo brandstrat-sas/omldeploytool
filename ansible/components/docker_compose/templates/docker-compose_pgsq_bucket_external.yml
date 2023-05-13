@@ -11,7 +11,7 @@ services:
       - TZ=${TZ}
       - DJANGO_HOSTNAME=${DJANGO_HOSTNAME}
       - UWSGI_PORT=8099
-      - ASTERISK_HOSTNAME=localhost
+      - ASTERISK_HOSTNAME=${ASTERISK_HOSTNAME}
       - AMI_USER=${AMI_USER}
       - AMI_PASSWORD=${AMI_PASSWORD}
       - KAMAILIO_HOSTNAME=${KAMAILIO_HOSTNAME}
@@ -40,7 +40,7 @@ services:
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
       - S3_ENDPOINT=${S3_ENDPOINT}
-      - S3_ENDPOINT_MINIO={{ bucket_url }}
+      - S3_ENDPOINT_MINIO=${S3_ENDPOINT}
       - AWS_DEFAULT_REGION=us-east-1
       - GOOGLE_MAPS_API_KEY=${GOOGLE_MAPS_API_KEY}
       - GOOGLE_MAPS_CENTER='${GOOGLE_MAPS_CENTER}'
@@ -65,6 +65,10 @@ services:
     stop_grace_period: 1m30s
     tty: true
     working_dir: /opt/omnileads/ominicontacto
+    logging:
+      driver: loki
+      options:
+        loki-url: "http://localhost:3100/loki/api/v1/push"
     volumes:
       - django_static:/opt/omnileads/static
       - django_callrec_zip:/opt/omnileads/asterisk/var/spool/asterisk/monitor
@@ -80,7 +84,7 @@ services:
       - TZ=${TZ}
       - DJANGO_HOSTNAME=${DJANGO_HOSTNAME}
       - DAPHNE_PORT=8098
-      - ASTERISK_HOSTNAME=localhost
+      - ASTERISK_HOSTNAME=${ASTERISK_HOSTNAME}
       - AMI_USER=${AMI_USER}
       - AMI_PASSWORD=${AMI_PASSWORD}
       - KAMAILIO_HOSTNAME=${KAMAILIO_HOSTNAME}
@@ -139,7 +143,7 @@ services:
     dns: 8.8.8.8
     environment:
       - TZ=${TZ}
-      - ASTERISK_HOSTNAME=localhost
+      - ASTERISK_HOSTNAME=${ASTERISK_HOSTNAME}
       - AMI_USER=${AMI_USER}
       - AMI_PASSWORD=${AMI_PASSWORD}
       - DJANGO_HOSTNAME=${DJANGO_HOSTNAME}
@@ -216,16 +220,21 @@ services:
       - S3_BUCKET_NAME=${S3_BUCKET_NAME}
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
-      - S3_ENDPOINT={{ bucket_url }}
+      - S3_ENDPOINT=${S3_ENDPOINT}
       - AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION}
       - HOMERHOST=${HOMERHOST}
       - HOMERPORT=${HOMERPORT}
       - HOMER_ENABLE=False
+      - PGSSL=${PGSSL}
     image: ${OMLACD_IMG}
     network_mode: host
     privileged: true
     restart: on-failure
     stop_grace_period: 1m30s
+    logging:
+      driver: loki
+      options:
+        loki-url: "http://localhost:3100/loki/api/v1/push"
     volumes:
       - /etc/asterisk/custom/:/etc/asterisk/custom
     working_dir: /etc/asterisk
@@ -254,6 +263,10 @@ services:
     privileged: true
     restart: on-failure
     stop_grace_period: 1m30s
+    logging:
+      driver: loki
+      options:
+        loki-url: "http://localhost:3100/loki/api/v1/push"
     volumes:
       - /etc/omnileads/certs/:/${KAMAILIO_CERTS_LOCATION}
 
@@ -297,7 +310,7 @@ services:
     restart: on-failure
     stop_grace_period: 1m30s
     volumes:
-      - redis_data:/data
+      - redis_data:/data"
 
   rtpengine:
     container_name: oml-rtpengine-server
@@ -311,7 +324,7 @@ services:
     privileged: true
     restart: on-failure
     stop_grace_period: 1m30s
-        
+
   websockets:
     tty: true
     container_name: oml-websockets-server
@@ -330,10 +343,34 @@ services:
       interval: 1s
       timeout: 10s
       retries: 10
-  
+
+####################################### OBSERVABILITY #######################################
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=30d'
+      - '--web.enable-lifecycle'
+    restart: unless-stopped
+    ports:
+      - ${PUBLIC_IP}:9090:9090
+    labels:
+      org.label-schema.group: "monitoring"
+    logging:
+      options:
+        max-size: "50m"
+    volumes:
+      - /etc/omnileads/prometheus.yml/:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+
   nodeexporter:
     image: prom/node-exporter:latest
-    container_name: nodeexporter
+    container_name: obs-nodeexporter
     user: root
     privileged: true
     volumes:
@@ -345,7 +382,8 @@ services:
       - '--path.sysfs=/host/sys'
       - '--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)'
     restart: unless-stopped
-    network_mode: host
+    ports:
+      - 127.0.0.1:9100:9100
     labels:
       org.label-schema.group: "monitoring"
     logging:
@@ -354,16 +392,41 @@ services:
 
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:latest
-    container_name: cadvisor
+    container_name: obs-cadvisor
     restart: unless-stopped
-    network_mode: host
+    ports:
+      - 127.0.0.1:8080:8080
     volumes:
     - /:/rootfs:ro
     - /var/run:/var/run:rw
     - /sys:/sys:ro
     - /var/lib/docker/:/var/lib/docker:ro
 
+  redis-exporter:
+    depends_on: 
+      - redis
+    image: oliver006/redis_exporter
+    container_name: obs-redis-exp
+    ports:
+      - 127.0.0.1:9121:9121
+    restart: unless-stopped
+    environment:
+      - REDIS_ADDR=localhost:6379
+      - REDIS_USER=null
+      - REDIS_PASSWORD=null
+
+  loki:
+    image: grafana/loki:2.8.2
+    container_name: obs-loki
+    ports:
+      - ${PUBLIC_IP}:3100:3100
+    command: -config.file=/etc/loki/local-config.yaml
+    volumes:
+      - loki_data:/loki
+
 volumes:
   redis_data:
   django_static:
   django_callrec_zip:
+  prometheus_data:
+  loki_data:

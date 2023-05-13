@@ -473,3 +473,4 @@ volumes:
   django_static:
   django_callrec_zip:
   mariadb_data:
+

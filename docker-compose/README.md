@@ -43,7 +43,7 @@ You need to create a .env file by using (cp) the environment file provided here.
 You don't need to work with the variables file, you can simply proceed with the instance execution through the command:
 
 ```
-$ docker-compose up -d
+$ docker-compose up -d 
 ```
 
 ![Diagrama deploy tool](../systemd/png/deploy-tool-tenant-compose-localhost.png)
@@ -240,15 +240,15 @@ However, we can intelligently use the **Cloud Firewall** technology when operati
 
 Below are the Firewall rules to be applied on All In One instance:
 
-* 443/tcp Nginx: This is where Web/WebRTC requests to Nginx are processed. Port 443 can be opened to the entire Internet.
+* 443/TCP Nginx: This is where Web/WebRTC requests to Nginx are processed. Port 443 can be opened to the entire Internet.
 
-* 40000/50000 UDP: WebRTC sRTP RTPengine: this port range can be opened to the entire Internet.
+* 40000-50000/UDP: WebRTC sRTP RTPengine: this port range can be opened to the entire Internet.
 
 * 5060/UDP Asterisk: This is where SIP requests for incoming calls from the ITSP(s) are processed. This port must be opened by restricting by origin on the IP(s) of the PSTN SIP termination provider(s).
 
-* 20000/30000 UDP VoIP RTP Asterisk: this port range can be opened to the entire Internet.
+* 20000-30000/UDP VoIP RTP Asterisk: this port range must be opened by restricting by origin on the IP(s) of the PSTN SIP termination provider(s).
 
-* 9100/tcp Prometheus node exporter : This is where the connections coming from the monitoring center, more precisely from Prometheus, are processed. This port can be opened by restricting by origin in the IP of the monitoring center.
+* 9090/TCP Prometheus: This is where the connections coming from the monitoring center, more precisely from Prometheus Master, are processed. This port can be opened by restricting by origin in the IP of the monitoring center.
 
 * 3100/TCP Loki: this is where the connections coming from the monitoring center are processed, more precisely from Grafana, are processed. This port can be opened by restricting by origin on the IP of the monitoring center.
 

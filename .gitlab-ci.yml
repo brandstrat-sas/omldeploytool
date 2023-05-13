@@ -45,8 +45,8 @@ deploy-ait-digitalocean:
     - OML_IPADDR_APPLAN=$(doctl compute droplet list |grep cicd-app.${CI_JOB_ID} |awk '{print $4}') && echo "$OML_IPADDR to run tests" 
     - rm -rf ~/omldeploytool
     - git clone --branch $CI_COMMIT_BRANCH https://gitlab.com/omnileads/omldeploytool.git ~/omldeploytool
-    - mkdir -p ~/omldeploytool/systemd/instances/gitlab
-    - cd ~/omldeploytool/systemd 
+    - mkdir -p ~/omldeploytool/ansible/instances/gitlab
+    - cd ~/omldeploytool/ansible 
     - cp inventory_ait.yml instances/gitlab/inventory.yml
     - sed -i "6 s/X.X.X.X/$OML_IPADDR_DATA/g" ./instances/gitlab/inventory.yml
     - sed -i "7 s/Z.Z.Z.Z/$OML_IPADDR_DATALAN/g" ./instances/gitlab/inventory.yml
@@ -75,8 +75,8 @@ deploy-ait-digitalocean:
 #   script:
 #     - rm -rf ~/omldeploytool
 #     - git clone --branch $CI_COMMIT_BRANCH https://gitlab.com/omnileads/omldeploytool.git ~/omldeploytool
-#     - mkdir -p ~/omldeploytool/systemd/instances/gitlab
-#     - cd ~/omldeploytool/systemd
+#     - mkdir -p ~/omldeploytool/ansible/instances/gitlab
+#     - cd ~/omldeploytool/ansible
 #     - cp inventory_ait.yml instances/gitlab/inventory.yml
 #     - sed -i "6 s/X.X.X.X/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
 #     - sed -i "7 s/Z.Z.Z.Z/$PROXMOX_ADDR_VM_DATA/g" ./instances/gitlab/inventory.yml
@@ -104,8 +104,8 @@ deploy-ait-digitalocean:
 #   script:
 #     - rm -rf ~/omldeploytool
 #     - git clone --branch $CI_COMMIT_BRANCH https://gitlab.com/omnileads/omldeploytool.git ~/omldeploytool
-#     - mkdir -p ~/omldeploytool/systemd/instances/gitlab
-#     - cd ~/omldeploytool/systemd
+#     - mkdir -p ~/omldeploytool/ansible/instances/gitlab
+#     - cd ~/omldeploytool/ansible
 #     - cp inventory_aio.yml instances/gitlab/inventory.yml
 #     - sed -i "s/X.X.X.X/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
 #     - sed -i "s/Z.Z.Z.Z/$PROXMOX_ADDR_VM_AIO/g" ./instances/gitlab/inventory.yml
