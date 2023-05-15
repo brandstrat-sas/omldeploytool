@@ -70,6 +70,10 @@ services:
     volumes:
       - django_static:/opt/omnileads/static
       - django_callrec_zip:/opt/omnileads/asterisk/var/spool/asterisk/monitor
+    logging:
+      driver: loki
+      options:
+        loki-url: "http://localhost:3100/loki/api/v1/push"
 
   channels:
     container_name: oml-daphne-server
@@ -129,6 +133,10 @@ services:
     stop_grace_period: 1m30s
     tty: true
     working_dir: /opt/omnileads/ominicontacto
+    logging:
+      driver: loki
+      options:
+        loki-url: "http://localhost:3100/loki/api/v1/push"
 
   crones:
     container_name: oml-cron-server
@@ -187,6 +195,10 @@ services:
     stop_grace_period: 1m30s
     tty: true
     working_dir: /opt/omnileads
+    logging:
+      driver: loki
+      options:
+        loki-url: "http://localhost:3100/loki/api/v1/push"
 
   acd:
     container_name: oml-asterisk-server
@@ -227,6 +239,10 @@ services:
     volumes:
       - /etc/asterisk/custom/:/etc/asterisk/custom
     working_dir: /etc/asterisk
+    logging:
+      driver: loki
+      options:
+        loki-url: "http://localhost:3100/loki/api/v1/push"
 
   kamailio:
     command:
@@ -254,6 +270,10 @@ services:
     stop_grace_period: 1m30s
     volumes:
       - /etc/omnileads/certs/:/${KAMAILIO_CERTS_LOCATION}
+    logging:
+      driver: loki
+      options:
+        loki-url: "http://localhost:3100/loki/api/v1/push"
 
   nginx:
     container_name: oml-nginx-server
@@ -280,6 +300,10 @@ services:
       - django_static:/opt/omnileads/static
       - django_callrec_zip:/opt/omnileads/asterisk/var/spool/asterisk/monitor
       - /etc/omnileads/certs/:/etc/omnileads/certs
+    logging:
+      driver: loki
+      options:
+        loki-url: "http://localhost:3100/loki/api/v1/push"
 
   postgresql:
     container_name: oml-postgres-server
@@ -297,6 +321,10 @@ services:
     stop_grace_period: 1m30s
     volumes:
       - postgresql_data:/var/lib/postgresql/data
+    logging:
+      driver: loki
+      options:
+        loki-url: "http://localhost:3100/loki/api/v1/push"
 
   redis:
     container_name: oml-redis-server
@@ -312,6 +340,10 @@ services:
     stop_grace_period: 1m30s
     volumes:
       - redis_data:/data
+    logging:
+      driver: loki
+      options:
+        loki-url: "http://localhost:3100/loki/api/v1/push"
 
   rtpengine:
     container_name: oml-rtpengine-server
@@ -325,7 +357,12 @@ services:
     privileged: true
     restart: on-failure
     stop_grace_period: 1m30s
-        
+    logging:
+      driver: loki
+      options:
+        loki-url: "http://localhost:3100/loki/api/v1/push"
+
+
   websockets:
     tty: true
     container_name: oml-websockets-server
@@ -344,7 +381,11 @@ services:
       interval: 1s
       timeout: 10s
       retries: 10
-  
+    logging:
+      driver: loki
+      options:
+        loki-url: "http://localhost:3100/loki/api/v1/push"
+
   minio:
     tty: true
     container_name: oml-minio-server
@@ -363,7 +404,11 @@ services:
       interval: 30s
       timeout: 20s
       retries: 3
-
+    logging:
+      driver: loki
+      options:
+        loki-url: "http://localhost:3100/loki/api/v1/push"
+        
   createbuckets:  
     tty: true
     image: minio/mc
