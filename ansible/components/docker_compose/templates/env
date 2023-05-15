@@ -192,17 +192,21 @@ AWS_DEFAULT_REGION=us-east-1
 {% if bucket_url is not defined and fqdn is not defined %}
 {% if infra_env == "cloud" %}
 S3_ENDPOINT=https://{{ omni_ip_wan }}
+S3_ENDPOINT_MINIO=http://localhost:9000
 {% else %}
 S3_ENDPOINT=https://{{ omni_ip_lan }}
+S3_ENDPOINT_MINIO=http://localhost:9000
 {% endif %}
 {% elif bucket_url is not defined and fqdn is defined %}
 S3_ENDPOINT=https://{{ fqdn }}
+S3_ENDPOINT_MINIO=http://localhost:9000
 {% elif bucket_url == "aws" %}
 S3_ENDPOINT_AWS=
 S3_REGION_NAME={{ bucket_region }}
 AWS_DEFAULT_REGION={{ bucket_region }}
 {% else %}
 S3_ENDPOINT={{ bucket_url }}
+S3_ENDPOINT_MINIO=http://localhost:9000
 {% endif %}
 
 
