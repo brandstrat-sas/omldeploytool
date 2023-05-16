@@ -68,7 +68,7 @@ services:
     logging:
       driver: loki
       options:
-        loki-url: "http://localhost:3100/loki/api/v1/push"
+        loki-url: "http://{{ loki_host }}:3100/loki/api/v1/push"
     volumes:
       - django_static:/opt/omnileads/static
       - django_callrec_zip:/opt/omnileads/asterisk/var/spool/asterisk/monitor
@@ -234,9 +234,10 @@ services:
     logging:
       driver: loki
       options:
-        loki-url: "http://localhost:3100/loki/api/v1/push"
+        loki-url: "http://{{ loki_host }}:3100/loki/api/v1/push"
     volumes:
       - /etc/asterisk/custom/:/etc/asterisk/custom
+      - asterisk_data:/var/spool/asterisk/monitor
     working_dir: /etc/asterisk
 
   kamailio:
@@ -266,7 +267,7 @@ services:
     logging:
       driver: loki
       options:
-        loki-url: "http://localhost:3100/loki/api/v1/push"
+        loki-url: "http://{{ loki_host }}:3100/loki/api/v1/push"
     volumes:
       - /etc/omnileads/certs/:/${KAMAILIO_CERTS_LOCATION}
 
@@ -356,9 +357,9 @@ services:
       - '--web.console.templates=/etc/prometheus/consoles'
       - '--storage.tsdb.retention.time=30d'
       - '--web.enable-lifecycle'
+      - '--web.listen-address=${PUBLIC_IP}:9090'
     restart: unless-stopped
-    ports:
-      - ${PUBLIC_IP}:9090:9090
+    network_mode: host
     labels:
       org.label-schema.group: "monitoring"
     logging:
@@ -381,9 +382,9 @@ services:
       - '--path.procfs=/host/proc'
       - '--path.sysfs=/host/sys'
       - '--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)'
+      - '--web.listen-address=localhost:9100'
     restart: unless-stopped
-    ports:
-      - 127.0.0.1:9100:9100
+    network_mode: host
     labels:
       org.label-schema.group: "monitoring"
     logging:
@@ -394,8 +395,7 @@ services:
     image: gcr.io/cadvisor/cadvisor:latest
     container_name: obs-cadvisor
     restart: unless-stopped
-    ports:
-      - 127.0.0.1:8080:8080
+    network_mode: host
     volumes:
     - /:/rootfs:ro
     - /var/run:/var/run:rw
@@ -407,22 +407,12 @@ services:
       - redis
     image: oliver006/redis_exporter
     container_name: obs-redis-exp
-    ports:
-      - 127.0.0.1:9121:9121
+    network_mode: host
     restart: unless-stopped
     environment:
       - REDIS_ADDR=localhost:6379
       - REDIS_USER=null
       - REDIS_PASSWORD=null
-
-  loki:
-    image: grafana/loki:2.8.2
-    container_name: obs-loki
-    ports:
-      - ${PUBLIC_IP}:3100:3100
-    command: -config.file=/etc/loki/local-config.yaml
-    volumes:
-      - loki_data:/loki
 
 volumes:
   redis_data:
@@ -430,3 +420,4 @@ volumes:
   django_callrec_zip:
   prometheus_data:
   loki_data:
+  asterisk_data: 

@@ -35,7 +35,7 @@ It is possible to group these containers on a single Linux instance or cluster t
 
 # Index
 
-* [Bash, Ansible, Systemd & Podman](#bash-ansible-systemd)
+* [Bash + Ansible](#bash-ansible)
 * [Ansible + Inventory](#ansible-inventory)
 * [Bash Script deploy.sh](#bash-script-deploy)
 * [OMniLeads Podman containers](#podman)
@@ -53,9 +53,9 @@ It is possible to group these containers on a single Linux instance or cluster t
 * [Observability](#observability)
 
 
-# Bash + Ansible = Systemd + Podman 📋 <a name="bash-ansible-systemd"></a>
+# Bash + Ansible 📋 <a name="bash-ansible"></a>
 
-An instance of OMniLeads is launched on a Linux server (using Systemd and Podman) by running a bash script (deploy.sh) along with its input parameters and a set of Ansible files (Playbooks + Templates) that are invoked by the script.
+An instance of OMniLeads is launched on a Linux server (using Systemd and Podman or docker-compose) by running a bash script (deploy.sh) along with its input parameters and a set of Ansible files (Playbooks + Templates) that are invoked by the script.
 
 ## Bash Script deploy.sh 📄 <a name="bash-script-deploy"></a>
 
@@ -77,7 +77,6 @@ for example:
 ```
 ./deploy.sh --action=install --tenant=tenant_folder_name
 ```
-
 
 ## Ansible 🔧 <a name="ansible-inventory"></a>
 

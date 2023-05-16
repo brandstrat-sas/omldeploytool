@@ -20,7 +20,7 @@ case $1 in
   --create-debian)
     echo "deploy: $1"
     doctl compute droplet create --image debian-11-x64 \
-    --size s-2vcpu-4gb --region sfo3 \
+    --size s-4vcpu-8gb --region sfo3 \
     --ssh-keys ${SSH_DOCTL} \
     oml-$2
     ;;
@@ -31,6 +31,13 @@ case $1 in
     --ssh-keys ${SSH_DOCTL} \
     oml-$2
     ;;
+  --create-rocky)
+    echo "deploy: $1"
+    doctl compute droplet create --image rockylinux-8-x64 \
+    --size s-2vcpu-4gb --region sfo3 \
+    --ssh-keys ${SSH_DOCTL} \
+    oml-$2
+    ;;  
   --create-docker)
     echo "deploy: $1 nic: $2"
     doctl compute droplet create --image debian-11-x64 \

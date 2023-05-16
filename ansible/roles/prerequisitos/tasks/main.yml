@@ -39,11 +39,11 @@
     - app
     - observability
 
-- name: MAIN Enable EPEL Repository on Rocky Linux
+- name: MAIN Enable EPEL Repository on Rocky or Alma Linux
   dnf:
     name: epel-release
     state: latest
-  when: ansible_facts['distribution'] == "Rocky" 
+  when: ansible_facts['distribution'] == "Rocky" or ansible_facts['distribution'] == "AlmaLinux" 
   tags: 
     - install
     - postgres
@@ -52,7 +52,7 @@
     - observability
     - asterisk
 
-- name: MAIN Install required Rocky Linux packages
+- name: MAIN Install required Rocky or Alma Linux packages
   dnf:
     name:
       - python3
@@ -61,10 +61,9 @@
       - postgresql
       - python3-psycopg2
       - python3-boto3
-      - awscli
       - libselinux-python3
     state: latest
-  when: ansible_facts['distribution'] == "Rocky" 
+  when: ansible_facts['distribution'] == "Rocky" or ansible_facts['distribution'] == "AlmaLinux" 
   tags: 
     - install
     - postgres
@@ -81,23 +80,31 @@
       - libselinux-python3
       - python3
       - python3-pip
-      - podman
     state: latest
   when: ansible_facts['distribution'] == "CentOS" 
   tags: 
     - install
     - postgres
 
-- name: MAIN Disable SELinux Rocky Linux
+- name: MAIN Disable SELinux Rocky or Alma Linux
   selinux:
     state: disabled
-  when: (ansible_os_family == "AlmaLinux") or (ansible_os_family == "Rocky") or (ansible_os_family == "CentOS") 
+  when: ansible_facts['distribution'] == "Rocky" or ansible_facts['distribution'] == "AlmaLinux"  or ansible_facts['distribution'] == "CentOS"
   tags: 
     - install
     - voice
     - app
     - observability
     - asterisk
+
+- name: MAIN Disable SELinux Rocky or Alma Linux
+  command: setenforce 0
+  tags:
+    - install
+    - upgrade
+  when:
+    - docker_compose is defined   
+    - ansible_facts['distribution'] == "Rocky" or ansible_facts['distribution'] == "AlmaLinux" 
 
 # --- install DOCKER
 - name: MAIN Descargar el script de instalación de Docker
@@ -107,7 +114,8 @@
   tags:
     - install
   when:
-    - docker_compose is defined   
+    - docker_compose is defined
+    - ansible_os_family == "Debian" 
 
 - name: MAIN Ejecutar el script de instalación de Docker
   command: sh /tmp/get-docker.sh
@@ -115,6 +123,27 @@
     - install
   when:
     - docker_compose is defined   
+    - ansible_os_family == "Debian"
+    
+- name: MAIN Add docker centos repo
+  command: dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+  tags:
+    - install
+  when:
+    - docker_compose is defined 
+    - ansible_facts['distribution'] == "Rocky" or ansible_facts['distribution'] == "AlmaLinux" 
+
+- name: MAIN Install docker on redhat based
+  dnf:
+    name:
+      - docker-ce 
+      - docker-ce-cli
+      - containerd.io
+  tags:
+    - install    
+  when:
+    - docker_compose is defined 
+    - ansible_facts['distribution'] == "Rocky" or ansible_facts['distribution'] == "AlmaLinux" 
 
 - name: MAIN Agregar el usuario al grupo de Docker
   user:
@@ -122,9 +151,9 @@
     groups: docker
   tags:
     - install
-    - upgrade
   when:
-    - docker_compose is defined   
+    - docker_compose is defined
+    - ansible_os_family == "Debian"
 
 - name: MAIN Reiniciar el servicio de Docker
   systemd:
@@ -151,7 +180,7 @@
     - install
   when:
     - docker_compose is defined 
-
+  ignore_errors: yes
 
 # --- install PODMAN
 - name: MAIN Install PODMAN

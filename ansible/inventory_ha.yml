@@ -190,8 +190,8 @@ all:
     #restore_file_timestamp: 1681215859
 
     # --- Integrations with external hosts
-    # --- Request by Homer
-    #prometheus_host: 
+    # --- Request by docker-compose & promtail
+    #loki_host: 
     # --- Request by Asterisk 
     #homer_host: 
     # --- Request by Web-Video Inbound Calls 

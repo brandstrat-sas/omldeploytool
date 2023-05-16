@@ -73,7 +73,7 @@ services:
     logging:
       driver: loki
       options:
-        loki-url: "http://localhost:3100/loki/api/v1/push"
+        loki-url: "http://{{ loki_host }}:3100/loki/api/v1/push"
 
   channels:
     container_name: oml-daphne-server
@@ -136,7 +136,7 @@ services:
     logging:
       driver: loki
       options:
-        loki-url: "http://localhost:3100/loki/api/v1/push"
+        loki-url: "http://{{ loki_host }}:3100/loki/api/v1/push"
 
   crones:
     container_name: oml-cron-server
@@ -198,7 +198,7 @@ services:
     logging:
       driver: loki
       options:
-        loki-url: "http://localhost:3100/loki/api/v1/push"
+        loki-url: "http://{{ loki_host }}:3100/loki/api/v1/push"
 
   acd:
     container_name: oml-asterisk-server
@@ -243,7 +243,7 @@ services:
     logging:
       driver: loki
       options:
-        loki-url: "http://localhost:3100/loki/api/v1/push"
+        loki-url: "http://{{ loki_host }}:3100/loki/api/v1/push"
 
   kamailio:
     command:
@@ -274,7 +274,7 @@ services:
     logging:
       driver: loki
       options:
-        loki-url: "http://localhost:3100/loki/api/v1/push"
+        loki-url: "http://{{ loki_host }}:3100/loki/api/v1/push"
 
   nginx:
     container_name: oml-nginx-server
@@ -304,7 +304,7 @@ services:
     logging:
       driver: loki
       options:
-        loki-url: "http://localhost:3100/loki/api/v1/push"
+        loki-url: "http://{{ loki_host }}:3100/loki/api/v1/push"
 
   postgresql:
     container_name: oml-postgres-server
@@ -325,7 +325,7 @@ services:
     logging:
       driver: loki
       options:
-        loki-url: "http://localhost:3100/loki/api/v1/push"
+        loki-url: "http://{{ loki_host }}:3100/loki/api/v1/push"
 
   redis:
     container_name: oml-redis-server
@@ -344,7 +344,7 @@ services:
     logging:
       driver: loki
       options:
-        loki-url: "http://localhost:3100/loki/api/v1/push"
+        loki-url: "http://{{ loki_host }}:3100/loki/api/v1/push"
 
   rtpengine:
     container_name: oml-rtpengine-server
@@ -361,7 +361,7 @@ services:
     logging:
       driver: loki
       options:
-        loki-url: "http://localhost:3100/loki/api/v1/push"
+        loki-url: "http://{{ loki_host }}:3100/loki/api/v1/push"
 
 
   websockets:
@@ -385,7 +385,7 @@ services:
     logging:
       driver: loki
       options:
-        loki-url: "http://localhost:3100/loki/api/v1/push"
+        loki-url: "http://{{ loki_host }}:3100/loki/api/v1/push"
 
   minio:
     tty: true
@@ -408,7 +408,7 @@ services:
     logging:
       driver: loki
       options:
-        loki-url: "http://localhost:3100/loki/api/v1/push"
+        loki-url: "http://{{ loki_host }}:3100/loki/api/v1/push"
         
   createbuckets:  
     tty: true
@@ -496,16 +496,6 @@ services:
       - REDIS_USER=null
       - REDIS_PASSWORD=null
 
-  loki:
-    image: grafana/loki:2.8.2
-    container_name: obs-loki
-    network_mode: host
-    command: 
-      -config.file=/etc/loki/local-config.yaml
-    volumes:
-      - loki_data:/loki
-      - /etc/omnileads/loki.yml/:/etc/loki/local-config.yaml
-
 volumes:
   postgresql_data:
   redis_data:
@@ -515,3 +505,4 @@ volumes:
   mariadb_data:
   prometheus_data:
   loki_data:
+  asterisk_data: 
