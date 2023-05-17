@@ -169,7 +169,7 @@
   changed_when: false
   when:
     - bucket_url is not defined
-    - (omlapp is defined) or (omlvoice is defined)
+    - (omlapp is defined) or (omlvoice is defined) or (omldata is defined)
   tags: 
     - install
     - upgrade
