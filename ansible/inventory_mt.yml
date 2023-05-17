@@ -1,17 +1,20 @@
 ---
 all:
   hosts:
-    omnileads_aio:      
-      ansible_host: X.X.X.X
-      omni_ip_lan: Z.Z.Z.Z
-      ansible_ssh_port: 22
+    aio_tenant_1:
+      ansible_host: 172.16.101.44
+    #tenant2:
+    #  ansible_host: X.X.X.X
+    #tenant3:
+    #  ansible_host: X.X.X.X
+    #tenantn:
+    #  ansible_host: X.X.X.X
+
   vars:
-    # --- omlaio: true deploy a systemd podman based omnileads
-    # --- docker_compose: true deploy a docker-compose based omnileads
-    # omlaio: true
     docker_compose: true
     # --- ansible user auth connection
     ansible_user: root
+    ansible_ssh_port: 22
     # --- Activate the OMniLeads Enterprise Edition - with "AAAA" licensed.
     # --- on the contrary you will deploy OMniLeads OSS Edition with GPLV3 licensed. 
     enterprise_edition: false
@@ -21,16 +24,16 @@ all:
     websockets_version: 230204.01
     nginx_version: 230215.01
     kamailio_version: 230204.01
-    asterisk_version: 230508.01
+    asterisk_version: 230516.01
     rtpengine_version: 230426.01
     postgres_version: 230204.01  
     # --- "cloud" instance (access through public IP)
     # --- or "lan" instance (access through private IP)
     # --- in order to set NAT or Publica ADDR for RTP voice packages
-    infra_env: cloud
+    infra_env: lan
     # --- If you have an DNS FQDN resolution, you must to uncomment and set this param
     # --- otherwise leave commented to work invoking through an IP address
-    #fqdn: fts.sefirot.cloud
+    
     # --- If you want to work with Dialer, then you must install Wombat Dialer on a separate host 
     # --- and indicate the IP address or FQDN of that host here (uncomment and set this param):
     #dialer_host: 
@@ -72,8 +75,8 @@ all:
     s3_http_admin_user: omnileads
     s3_http_admin_pass: jdhsgahkdgaskdasdhe2h4231hg4jjhgHJKG
     # --- bucket params
-    bucket_access_key: uoHidalFyBdV7BQa
-    bucket_secret_key: de5lEoTbU8SbV0cNIdVzOMeCxYw5XbKZ
+    bucket_access_key: fdskjahksdjfhkjdsfs
+    bucket_secret_key: jhkjhKJHJKjhgJHGJjHGJHjhgjhgjhgjh
     bucket_name: omnileads
     # --- if your bucket doesn't need region, leave this value (us-east-1)
     bucket_region: us-east-1
@@ -114,19 +117,15 @@ all:
     # --- Docker Registry repo    
     omlapp_repo: omnileads
 
-    # --- IP or hostname that each instance will invoke when locating the other    
-    data_host: "{{ hostvars['omnileads_aio'].omni_ip_lan }}"
-    voice_host: "{{ hostvars['omnileads_aio'].omni_ip_lan }}"
-    application_host: "{{ hostvars['omnileads_aio'].omni_ip_lan }}"
     
     # --- Restore id request by restore filename
     #restore_file_timestamp: 1681215859
 
     # --- Integrations with external hosts
-    # --- Request by Homer
-    #loki_host: 
+    # --- Request by docker-compose & promtail
+    loki_host: grafana.sephir.tech
     # --- Request by Asterisk 
-    #homer_host: 
+    homer_host: grafana.sephir.tech
     # --- Request by Web-Video Inbound Calls 
     #video_host: 
 
@@ -134,3 +133,21 @@ all:
     #backup_bucket: 
     # --- Restore: in case of implementing a separate bucket for restore
     #restore_bucket: 
+
+#############################################################################
+#########################       host groups    ##############################
+#############################################################################
+omnileads_aio:
+  hosts:
+    aio_tenant_1:
+      tenant_id: proxmox_tenant1
+      omni_ip_lan: 172.16.101.44
+#    tenant2:
+#      tenant_id: tenant2
+#      omni_ip_lan: 10.10.10.3
+#    tenant2:
+#      tenant_id: tenant2
+#      omni_ip_lan: 10.10.10.3
+#    tenantn:
+#      tenant_id: tenantn
+#      omni_ip_lan: 10.10.10.n

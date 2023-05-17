@@ -8,28 +8,28 @@ rule_files:
 
 # A scrape configuration containing exactly one endpoint to scrape.
 scrape_configs:
-  - job_name: '{{ tenant_folder }}_host'
+  - job_name: '{{ tenant_id }}_host'
     static_configs:
       - targets: ['localhost:9100']
 
-  # - job_name: '{{ tenant_folder }}_heplify-server'
+  # - job_name: '{{ tenant_id }}_heplify-server'
   #   static_configs:
   #     - targets: ['localhost:9096']
 
 # {% if postgres_out != true %}
-#   - job_name: '{{ tenant_folder }}_postgres'
+#   - job_name: '{{ tenant_id }}_postgres'
 #     static_configs:
 #       - targets: ['localhost:9187']
 # {% endif %}
 
-  - job_name: '{{ tenant_folder }}_redis'
+  - job_name: '{{ tenant_id }}_redis'
     static_configs:
       - targets: ['localhost:9121']
 
-  - job_name: '{{ tenant_folder }}_asterisk'
+  - job_name: '{{ tenant_id }}_asterisk'
     static_configs:
       - targets: ['localhost:7088']
 
-  - job_name: '{{ tenant_folder }}_cadvisor'
+  - job_name: '{{ tenant_id }}_cadvisor'
     static_configs:
       - targets: ['localhost:8080']

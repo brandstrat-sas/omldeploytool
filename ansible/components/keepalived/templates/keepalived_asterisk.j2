@@ -20,13 +20,13 @@ vrrp_script check_component {
    reise    5
 } 
 
-vrrp_sync_group {{ tenant_folder }}_asterisk {
+vrrp_sync_group {{ tenant_id }}_asterisk {
    group {
-      asterisk_{{ tenant_folder }}
+      asterisk_{{ tenant_id }}
    }
 }
 
-vrrp_instance asterisk_{{ tenant_folder }} {
+vrrp_instance asterisk_{{ tenant_id }} {
    state {% if ha_rol == "main" %} MASTER {% else %} BACKUP {% endif %} 
    interface {{ ha_vip_nic }}
    virtual_router_id 51

@@ -162,21 +162,6 @@
     - django
     - observability
 
-# Set loki_host as {{ data_host }} on instances when loki_host is not explicitly defined
-- name: CHECKS Setting loki_host
-  set_fact:
-    loki_host: "{{ data_host }}"
-  changed_when: false
-  when:
-    - loki_host is not defined
-    - (omlapp is defined) or (omlvoice is defined) or (omldata is defined)
-  tags: 
-    - install
-    - upgrade
-    - app
-    - voice
-    - observability
-
 # Set minio_host as {{ data_host }} on App instance when minios_host is not explicitly defined
 - name: CHECKS Setting minio_host
   set_fact:
@@ -303,6 +288,17 @@
     - asterisk
     - observability
 
+# Set prometheus_host as localhost on AIO-Homer instance
+- name: CHECKS Setting prometheus_host as application_host
+  set_fact:
+    prometheus_host: localhost
+  changed_when: false
+  when:
+    - omlaio is defined  or docker_compose is defined
+  tags: 
+    - install
+    - upgrade
+    
 # Set asterisk_host as {{ voice_host }} on App instance when asterisk_host is not explicitly defined
 - name: CHECKS Setting asterisk_host as voice_host
   set_fact:
@@ -310,7 +306,20 @@
   changed_when: false
   when:
     - asterisk_host is not defined
-    - (omlapp is defined) or (omlaio is defined) or (docker_compose is defined)
+    - (omlapp is defined)
+  tags: 
+    - install
+    - upgrade
+    - app
+
+# Set asterisk_host as omni_ip_lan on AIO instance when asterisk_host is not explicitly defined
+- name: CHECKS Setting asterisk_host as voice_host
+  set_fact:
+    asterisk_host: "{{ omni_ip_lan }}"
+  changed_when: false
+  when:
+    - asterisk_host is not defined
+    - omlaio is defined  or docker_compose is defined
   tags: 
     - install
     - upgrade
@@ -323,11 +332,22 @@
   changed_when: false
   when:
     - rtpengine_host is not defined
-    - (omlapp is defined) or (omlaio is defined) or (docker_compose is defined)
+    - (omlapp is defined)
   tags: 
     - install
     - upgrade
-    - app
+
+# Set rtpengine_host as {{ omni_ip_lan }} on App instance when rtpengine_host is not explicitly defined
+- name: CHECKS Setting rtpengine_host as voice_host
+  set_fact:
+    rtpengine_host: "{{ omni_ip_lan }}"
+  changed_when: false
+  when:
+    - rtpengine_host is not defined
+    - omlaio is defined  or docker_compose is defined
+  tags: 
+    - install
+    - upgrade
 
 # Set nginx_host as {{ applicacion_host }} on App instance when minios_host is not explicitly defined
 - name: CHECKS Setting nginx_host as application_host
@@ -336,27 +356,41 @@
   changed_when: false
   when:
     - nginx_host is not defined
-    - (omlvoice is defined)  or (omlaio is defined) or (docker_compose is defined)
+    - (omlvoice is defined)
   tags: 
     - install
     - upgrade
     - voice
     - asterisk
-        
+
+# Set nginx_host as {{ omni_ip_lan }} on AIO instance when minios_host is not explicitly defined
+- name: CHECKS Setting nginx_host as application_host
+  set_fact:
+    nginx_host: "{{ omni_ip_lan }}"
+  changed_when: false
+  when:
+    - nginx_host is not defined
+    - omlaio is defined  or docker_compose is defined
+  tags: 
+    - install
+    - upgrade
+    - voice
+    - asterisk
+
 # --- IMPORTANT: aqui controlo las variables que sean *requisito* para el deploy
 # --- si no está declarada entonces puedo escapar con un fail
 
-- name: CHECKS Check if voice_host variable is defined
-  fail:
-    msg: voice_host variable undefined, edit voice_host variable in inventory file
-  when: voice_host is not defined and assert_voice_host.rc == 1
-  tags: always
+# - name: CHECKS Check if voice_host variable is defined
+#   fail:
+#     msg: voice_host variable undefined, edit voice_host variable in inventory file
+#   when: voice_host is not defined and assert_voice_host.rc == 1
+#   tags: always
 
-- name: CHECKS Check if application_host variable is defined
-  fail:
-    msg: application_host variable undefined, edit voice_host variable in inventory file
-  when: application_host is not defined and assert_application_host.rc == 1
-  tags: always
+# - name: CHECKS Check if application_host variable is defined
+#   fail:
+#     msg: application_host variable undefined, edit voice_host variable in inventory file
+#   when: application_host is not defined and assert_application_host.rc == 1
+#   tags: always
 
 - name: CHECKS Check if omnileads_version variable is defined
   fail:

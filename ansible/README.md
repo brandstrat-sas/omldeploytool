@@ -55,7 +55,7 @@ It is possible to group these containers on a single Linux instance or cluster t
 
 # Bash + Ansible 📋 <a name="bash-ansible"></a>
 
-An instance of OMniLeads is launched on a Linux server (using Systemd and Podman or docker-compose) by running a bash script (deploy.sh) along with its input parameters and a set of Ansible files (Playbooks + Templates) that are invoked by the script.
+An instance of OMniLeads is launched on a Linux server (using Systemd & Podman or docker-compose) by running a bash script (deploy.sh) along with its input parameters and a set of Ansible files (Playbooks + Templates) that are invoked by the script.
 
 ## Bash Script deploy.sh 📄 <a name="bash-script-deploy"></a>
 
@@ -86,10 +86,12 @@ The inventory file is where the type of OMniLeads to generate (all in one, all i
 
 There are three types of inventory files for Ansible:
 
-* **inventory_aio.yml**: It should be invoked when deploying OMniLeads all in one. That is, when deploying all App components on a single Linux instance.
+* **inventory_aio.yml**: It should be invoked when deploying OMniLeads all in one. That is, when deploying all App components on a single Linux instance with Systemd & Podman or docker-compose.
 
 ![Diagrama deploy tool](./png/deploy-tool-tenant-aio.png)
 
+
+![Diagrama deploy tool](./png/deploy-tool-tenant-aio-docker.png)
 
 * **inventory_ait.yml**: It should be invoked when deploying OMniLeads all in three, that is, when deploying all App components on a cluster of three Linux instances (data, voice, & web).
 
@@ -885,14 +887,7 @@ Below are the Firewall rules to be applied on All In One instance:
 
 * 20000/30000 UDP VoIP RTP Asterisk: this port range can be opened to the entire Internet.
 
-* 9100/tcp Prometheus node exporter : This is where the connections coming from the monitoring center, more precisely from Prometheus, are processed. This port can be opened by restricting by origin in the IP of the monitoring center.
-
-* 9187/tcp Prometheus postgres exporter: This is where the connections coming from the monitoring center, more precisely from Prometheus, are processed. This port can be opened by restricting by origin in the IP of the monitoring center.
-
-* 9127/tcp Prometheus redis exporter: This is where the connections coming from the monitoring center, more precisely from Prometheus, are processed. This port can be opened by restricting by origin in the IP of the monitoring center.
-
-* 3100/TCP Loki: this is where the connections coming from the monitoring center are processed, more precisely from Grafana, are processed. This port can be opened by restricting by origin on the IP of the monitoring center.
-
+* 9090/tcp Prometheus metrics: This is where the connections coming from the monitoring center. This port can be opened by restricting by origin in the IP of the monitoring center.
 
 # License & Copyright
 

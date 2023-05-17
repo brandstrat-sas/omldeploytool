@@ -20,13 +20,13 @@ global_defs {
 #   reise    5
 #} 
 
-vrrp_sync_group {{ tenant_folder }}_cron {
+vrrp_sync_group {{ tenant_id }}_cron {
    group {
-      cron_{{ tenant_folder }}
+      cron_{{ tenant_id }}
    }
 }
 
-vrrp_instance cron_{{ tenant_folder }} {
+vrrp_instance cron_{{ tenant_id }} {
    state {% if ha_rol == "main" %} MASTER {% else %} BACKUP {% endif %} 
    interface {{ ha_vip_nic }}
    virtual_router_id 53

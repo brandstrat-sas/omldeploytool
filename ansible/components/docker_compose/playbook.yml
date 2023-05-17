@@ -197,18 +197,7 @@
     template:
       src: "{{ docker_compose_repo_path }}templates/prometheus.yml"
       dest: /etc/omnileads/prometheus.yml
-      mode: 7777
-      owner: '{{ usuario }}'
-      group: '{{ usuario }}'
-    tags:
-      - install
-      - upgrade
-
-  - name: DOCKER-COMPOSE Render loki.yml template
-    template:
-      src: "{{ docker_compose_repo_path }}templates/loki.yml"
-      dest: /etc/omnileads/loki.yml
-      mode: 7777
+      mode: 0777
       owner: '{{ usuario }}'
       group: '{{ usuario }}'
     tags:

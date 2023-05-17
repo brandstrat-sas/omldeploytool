@@ -1,7 +1,7 @@
 #############################
 #   Name of the project     #
 #############################
-COMPOSE_PROJECT_NAME={{ tenant_folder }}
+COMPOSE_PROJECT_NAME={{ tenant_id }}
 
 # --- "cloud" instance (access through public IP)
 # --- "lan" instance (access through private IP)

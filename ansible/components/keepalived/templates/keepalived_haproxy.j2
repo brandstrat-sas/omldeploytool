@@ -19,13 +19,13 @@ vrrp_script check_component {
    fall     3
 } 
 
-vrrp_sync_group {{ tenant_folder }}_haproxy {
+vrrp_sync_group {{ tenant_id }}_haproxy {
    group {
-      haproxy_{{ tenant_folder }}
+      haproxy_{{ tenant_id }}
    }
 }
 
-vrrp_instance haproxy_{{ tenant_folder }} {
+vrrp_instance haproxy_{{ tenant_id }} {
     state {% if ha_rol == "main" %} MASTER {% else %} BACKUP {% endif %} 
     interface {{ ha_vip_nic }}
     virtual_router_id 52

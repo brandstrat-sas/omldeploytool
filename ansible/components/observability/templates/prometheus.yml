@@ -13,15 +13,15 @@ rule_files:
 
 # A scrape configuration containing exactly one endpoint to scrape.
 scrape_configs:
-  - job_name: '{{ tenant_folder }}_app_host'
+  - job_name: '{{ tenant_id }}_app_host'
     static_configs:
       - targets: ['{{ application_host }}:9100']
 
-  - job_name: '{{ tenant_folder }}_voice_host'
+  - job_name: '{{ tenant_id }}_voice_host'
     static_configs:
       - targets: ['{{ voice_host }}:9100']
 
-  - job_name: '{{ tenant_folder }}_data_host'
+  - job_name: '{{ tenant_id }}_data_host'
     static_configs:
       - targets: ['{{ data_host }}:9100']
 
@@ -29,21 +29,21 @@ scrape_configs:
     static_configs:
       - targets: ['localhost:9090']
 
-  - job_name: '{{ tenant_folder }}_heplify-server'
+  - job_name: '{{ tenant_id }}_heplify-server'
     static_configs:
       - targets: ['{{ voice_host }}:9096']
 
 {% if postgres_out != true %}
-  - job_name: '{{ tenant_folder }}_postgres'
+  - job_name: '{{ tenant_id }}_postgres'
     static_configs:
       - targets: ['{{ data_host }}:9187']
 {% endif %}
 
-  - job_name: '{{ tenant_folder }}_redis'
+  - job_name: '{{ tenant_id }}_redis'
     static_configs:
       - targets: ['{{ data_host }}:9121']
 
-  - job_name: '{{ tenant_folder }}_asterisk'
+  - job_name: '{{ tenant_id }}_asterisk'
     static_configs:
       - targets: ['{{ voice_host }}:7088']
 
