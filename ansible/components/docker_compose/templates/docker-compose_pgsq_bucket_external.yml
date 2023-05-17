@@ -40,7 +40,7 @@ services:
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
       - S3_ENDPOINT=${S3_ENDPOINT}
-      - S3_ENDPOINT_MINIO=${S3_ENDPOINT}
+      - S3_ENDPOINT_MINIO=${S3_ENDPOINT_MINIO}
       - AWS_DEFAULT_REGION=us-east-1
       - GOOGLE_MAPS_API_KEY=${GOOGLE_MAPS_API_KEY}
       - GOOGLE_MAPS_CENTER='${GOOGLE_MAPS_CENTER}'
@@ -65,19 +65,17 @@ services:
     stop_grace_period: 1m30s
     tty: true
     working_dir: /opt/omnileads/ominicontacto
+    volumes:
+      - django_static:/opt/omnileads/static
+      - django_callrec_zip:/opt/omnileads/asterisk/var/spool/asterisk/monitor
     logging:
       driver: loki
       options:
         loki-url: "http://{{ loki_host }}:3100/loki/api/v1/push"
-    volumes:
-      - django_static:/opt/omnileads/static
-      - django_callrec_zip:/opt/omnileads/asterisk/var/spool/asterisk/monitor
-
+        loki-external-labels: "env=production,component=uwsgi"
+        
   channels:
     container_name: oml-daphne-server
-    depends_on:
-      - redis
-      - acd
     dns: 8.8.8.8
     environment:
       - DAPHNE_ENABLE=True
@@ -134,12 +132,14 @@ services:
     stop_grace_period: 1m30s
     tty: true
     working_dir: /opt/omnileads/ominicontacto
+    logging:
+      driver: loki
+      options:
+        loki-url: "http://{{ loki_host }}:3100/loki/api/v1/push"
+        loki-external-labels: "env=production,component=daphne"
 
   crones:
     container_name: oml-cron-server
-    depends_on:
-      - redis
-      - acd
     dns: 8.8.8.8
     environment:
       - TZ=${TZ}
@@ -195,6 +195,11 @@ services:
     stop_grace_period: 1m30s
     tty: true
     working_dir: /opt/omnileads
+    logging:
+      driver: loki
+      options:
+        loki-url: "http://{{ loki_host }}:3100/loki/api/v1/push"
+        loki-external-labels: "env=production,component=cron"
 
   acd:
     container_name: oml-asterisk-server
@@ -220,25 +225,25 @@ services:
       - S3_BUCKET_NAME=${S3_BUCKET_NAME}
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
-      - S3_ENDPOINT=${S3_ENDPOINT}
+      - S3_ENDPOINT=${S3_ENDPOINT_MINIO}
       - AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION}
       - HOMERHOST=${HOMERHOST}
       - HOMERPORT=${HOMERPORT}
       - HOMER_ENABLE=False
-      - PGSSL=${PGSSL}
     image: ${OMLACD_IMG}
     network_mode: host
     privileged: true
     restart: on-failure
     stop_grace_period: 1m30s
-    logging:
-      driver: loki
-      options:
-        loki-url: "http://{{ loki_host }}:3100/loki/api/v1/push"
     volumes:
       - /etc/asterisk/custom/:/etc/asterisk/custom
       - asterisk_data:/var/spool/asterisk/monitor
     working_dir: /etc/asterisk
+    logging:
+      driver: loki
+      options:
+        loki-url: "http://{{ loki_host }}:3100/loki/api/v1/push"
+        loki-external-labels: "env=production,component=asterisk"
 
   kamailio:
     command:
@@ -264,18 +269,18 @@ services:
     privileged: true
     restart: on-failure
     stop_grace_period: 1m30s
+    volumes:
+      - /etc/omnileads/certs/:/${KAMAILIO_CERTS_LOCATION}
     logging:
       driver: loki
       options:
         loki-url: "http://{{ loki_host }}:3100/loki/api/v1/push"
-    volumes:
-      - /etc/omnileads/certs/:/${KAMAILIO_CERTS_LOCATION}
+        loki-external-labels: "env=production,component=kamailio"
 
   nginx:
     container_name: oml-nginx-server
     depends_on:
       - app
-      - channels
       - kamailio
       - websockets
     dns: 8.8.8.8
@@ -286,7 +291,7 @@ services:
       - DAPHNE_HOSTNAME=${DAPHNE_HOSTNAME}
       - KAMAILIO_HOSTNAME=${KAMAILIO_HOSTNAME}
       - WEBSOCKETS_HOSTNAME=${WEBSOCKET_HOSTNAME}
-      - S3_ENDPOINT={{ bucket_url }}
+      - S3_ENDPOINT=${S3_ENDPOINT_MINIO}
       - CALLREC_DEVICE=${CALLREC_DEVICE}
     image: ${OMLNGINX_IMG}
     network_mode: host
@@ -297,6 +302,11 @@ services:
       - django_static:/opt/omnileads/static
       - django_callrec_zip:/opt/omnileads/asterisk/var/spool/asterisk/monitor
       - /etc/omnileads/certs/:/etc/omnileads/certs
+    logging:
+      driver: loki
+      options:
+        loki-url: "http://{{ loki_host }}:3100/loki/api/v1/push"
+        loki-external-labels: "env=production,component=nginx"
 
   redis:
     container_name: oml-redis-server
@@ -311,7 +321,12 @@ services:
     restart: on-failure
     stop_grace_period: 1m30s
     volumes:
-      - redis_data:/data"
+      - redis_data:/data
+    logging:
+      driver: loki
+      options:
+        loki-url: "http://{{ loki_host }}:3100/loki/api/v1/push"
+        loki-external-labels: "env=production,component=redis"
 
   rtpengine:
     container_name: oml-rtpengine-server
@@ -325,6 +340,12 @@ services:
     privileged: true
     restart: on-failure
     stop_grace_period: 1m30s
+    logging:
+      driver: loki
+      options:
+        loki-url: "http://{{ loki_host }}:3100/loki/api/v1/push"
+        loki-external-labels: "env=production,component=rtpengine"
+
 
   websockets:
     tty: true
@@ -344,6 +365,12 @@ services:
       interval: 1s
       timeout: 10s
       retries: 10
+    logging:
+      driver: loki
+      options:
+        loki-url: "http://{{ loki_host }}:3100/loki/api/v1/push"
+        loki-external-labels: "env=production,component=websockets"
+
 
 ####################################### OBSERVABILITY #######################################
 
@@ -418,6 +445,6 @@ volumes:
   redis_data:
   django_static:
   django_callrec_zip:
+  mariadb_data:
   prometheus_data:
-  loki_data:
   asterisk_data: 

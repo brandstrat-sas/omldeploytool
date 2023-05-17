@@ -74,7 +74,8 @@ services:
       driver: loki
       options:
         loki-url: "http://{{ loki_host }}:3100/loki/api/v1/push"
-
+        loki-external-labels: "env=production,component=uwsgi"
+        
   channels:
     container_name: oml-daphne-server
     dns: 8.8.8.8
@@ -137,6 +138,7 @@ services:
       driver: loki
       options:
         loki-url: "http://{{ loki_host }}:3100/loki/api/v1/push"
+        loki-external-labels: "env=production,component=daphne"
 
   crones:
     container_name: oml-cron-server
@@ -199,6 +201,7 @@ services:
       driver: loki
       options:
         loki-url: "http://{{ loki_host }}:3100/loki/api/v1/push"
+        loki-external-labels: "env=production,component=cron"
 
   acd:
     container_name: oml-asterisk-server
@@ -244,6 +247,7 @@ services:
       driver: loki
       options:
         loki-url: "http://{{ loki_host }}:3100/loki/api/v1/push"
+        loki-external-labels: "env=production,component=asterisk"
 
   kamailio:
     command:
@@ -275,6 +279,7 @@ services:
       driver: loki
       options:
         loki-url: "http://{{ loki_host }}:3100/loki/api/v1/push"
+        loki-external-labels: "env=production,component=kamailio"
 
   nginx:
     container_name: oml-nginx-server
@@ -305,6 +310,7 @@ services:
       driver: loki
       options:
         loki-url: "http://{{ loki_host }}:3100/loki/api/v1/push"
+        loki-external-labels: "env=production,component=nginx"
 
   postgresql:
     container_name: oml-postgres-server
@@ -326,6 +332,7 @@ services:
       driver: loki
       options:
         loki-url: "http://{{ loki_host }}:3100/loki/api/v1/push"
+        loki-external-labels: "env=production,component=postgres"
 
   redis:
     container_name: oml-redis-server
@@ -345,6 +352,7 @@ services:
       driver: loki
       options:
         loki-url: "http://{{ loki_host }}:3100/loki/api/v1/push"
+        loki-external-labels: "env=production,component=redis"
 
   rtpengine:
     container_name: oml-rtpengine-server
@@ -362,6 +370,7 @@ services:
       driver: loki
       options:
         loki-url: "http://{{ loki_host }}:3100/loki/api/v1/push"
+        loki-external-labels: "env=production,component=rtpengine"
 
 
   websockets:
@@ -386,6 +395,7 @@ services:
       driver: loki
       options:
         loki-url: "http://{{ loki_host }}:3100/loki/api/v1/push"
+        loki-external-labels: "env=production,component=websockets"
 
   minio:
     tty: true
@@ -409,6 +419,7 @@ services:
       driver: loki
       options:
         loki-url: "http://{{ loki_host }}:3100/loki/api/v1/push"
+        loki-external-labels: "env=production,component=minio"
         
   createbuckets:  
     tty: true
@@ -504,5 +515,4 @@ volumes:
   django_callrec_zip:
   mariadb_data:
   prometheus_data:
-  loki_data:
   asterisk_data: 
