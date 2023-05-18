@@ -1,0 +1,14 @@
+version: "3.0"
+
+volumes:
+  redis_swarm:
+
+services:
+
+  rtpengine:
+    container_name: oml-rtpengine
+    dns: 8.8.8.8
+    environment:
+      - ENV=docker-compose-devenv
+    image: omnileads/rtpengine:230426.01
+    

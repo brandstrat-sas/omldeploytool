@@ -5,5 +5,6 @@ development-env/.env
 docker-compose/.env
 docker-compose/instances
 systemd/instances
-systemd/.ssh
+ansible/instances
+ansible/.inventory.yml
 systemd/.inventory.yml
