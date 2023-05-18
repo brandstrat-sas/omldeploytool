@@ -77,6 +77,18 @@
 ###################### HOST Set ########################### ###################### HOST Set ###########################
 
 # Set postgres_out as true when postgres_host is defined on inventory
+- name: CHECKS if tenant_id was set
+  set_fact:
+    tenant_id: "{{ tenant_folder }}"
+  changed_when: false
+  when:
+    - tenant_id is not defined
+    - omlaio is defined or omlapp is defined or omldata is defined or docker_compose is defined
+  tags: 
+    - install
+    - upgrade
+  
+# Set postgres_out as true when postgres_host is defined on inventory
 - name: CHECKS Setting postgres_host & set postgres_out true
   set_fact:
     postgres_out: true

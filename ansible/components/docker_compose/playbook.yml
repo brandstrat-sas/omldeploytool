@@ -197,9 +197,6 @@
     template:
       src: "{{ docker_compose_repo_path }}templates/prometheus.yml"
       dest: /etc/omnileads/prometheus.yml
-      mode: 0777
-      owner: '{{ usuario }}'
-      group: '{{ usuario }}'
     tags:
       - install
       - upgrade
