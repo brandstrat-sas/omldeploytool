@@ -1,8 +1,0 @@
----
-
-all:
-  hosts:
-    omnileads-worker:      
-      ansible_connection: local
-      ansible_user: root
-      swarm_manager: true
