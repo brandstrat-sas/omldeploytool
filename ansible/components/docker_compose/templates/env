@@ -1,27 +1,27 @@
 #############################
 #   Name of the project     #
 #############################
-COMPOSE_PROJECT_NAME=oml
+COMPOSE_PROJECT_NAME={{ tenant_id }}
 
 # --- "cloud" instance (access through public IP)
 # --- "lan" instance (access through private IP)
 # --- "devenv" is for run on docker-desktop (access through localhost)
-ENV=devenv
+ENV={{ infra_env }}
 
-PUBLIC_IP=
+PUBLIC_IP={{ omni_ip_wan }}
 
 #############################################################
 #               Components image version                    #
 #           versions of each image to deploy                #
 #############################################################
 
-OMLAPP_IMG=omnileads/omlapp:1.27.1
-OMLWS_IMG=omnileads/websockets:230204.01
-OMLPGSQL_IMG=omnileads/postgres:230204.01
-OMLACD_IMG=omnileads/asterisk:230508.01
-OMLNGINX_IMG=omnileads/nginx:230215.01
-OMLKAM_IMG=omnileads/kamailio:230204.01
-OMLRTPENGINE_IMG=omnileads/rtpengine:230426.01
+OMLAPP_IMG=omnileads/omlapp:{{ omnileads_version }}
+OMLWS_IMG=omnileads/websockets:{{ websockets_version }}
+OMLPGSQL_IMG=omnileads/postgres:{{postgres_version }}
+OMLACD_IMG=omnileads/asterisk:{{ asterisk_version }}
+OMLNGINX_IMG=omnileads/nginx:{{ nginx_version }}
+OMLKAM_IMG=omnileads/kamailio:{{ kamailio_version }}
+OMLRTPENGINE_IMG=omnileads/rtpengine:{{ rtpengine_version }}
 OMLREDIS_IMG=omnileads/redis:develop
 
 OMLREDISGEARS_IMG=redislabs/redisgears:1.0.9
@@ -34,7 +34,7 @@ CX_SURVEY_REDIS2PGSQL_IMG=freetechsolutions/omlredis2pgsql:develop
 ################################
 # Timezone for the environment #
 ################################
-TZ=America/Argentina/Cordoba
+TZ={{ TZ }}
 
 #####################################################################################
 #  s3-minio is the default option and use the stack bucket                          #
@@ -42,7 +42,7 @@ TZ=America/Argentina/Cordoba
 # if you object storage service use selfsigned TLS/SSL certs,                       #
 # you mus to put *callrec_device=s3-no-check-cert* in order to don't verify CA.     #
 #####################################################################################
-CALLREC_DEVICE=s3-minio
+CALLREC_DEVICE={{ callrec_device }}
 
 
 ###################################################################################################
@@ -50,16 +50,16 @@ CALLREC_DEVICE=s3-minio
 ###################################################################################################
 
 # --- IP or hostname that each instance will invoke when locating the other    
-DJANGO_HOSTNAME=app
-DAPHNE_HOSTNAME=channels
+DJANGO_HOSTNAME=localhost
+DAPHNE_HOSTNAME=localhost
 
 # Session Cookie Age (SCA) is the time in seconds that will last the https session when inactivity
 # is detected in the session (by default is 1 hour)
-SESSION_COOKIE_AGE=3600
+SESSION_COOKIE_AGE={{ SCA }}
 
 # Ephemeral Credentials TTL (ECTTL) is the time in seconds that will last the SIP credentials used
 #to authenticate a SIP user in the telephony system (by default 8 hours)
-EPHEMERAL_USER_TTL=28800
+EPHEMERAL_USER_TTL={{ ECCTL }}
 
 # Secret Key for creating auth ephemeral credentials
 AUTHEPH_SK=SUp3rS3cr3tK3y
@@ -71,13 +71,13 @@ CALIFICACION_REAGENDA=AGENDA
 
 # Login failure limit (LFM) is the attempts a user has to enter an incorrect password in login
 # Decrease it if paranoic reasons
-LOGIN_FAILURE_LIMIT=10
+LOGIN_FAILURE_LIMIT={{ LOGIN_FAILURE_LIMIT }}
 
 
 ##############################################################
 #           google maps integration credentials              #
 ##############################################################
-GOOGLE_MAPS_API_KEY=NULL
+GOOGLE_MAPS_API_KEY={{ google_maps_api_key }}
 GOOGLE_MAPS_CENTER='{ "lat": -31.416668, "lng": -64.183334 }'
 
 #####################################################################################################
@@ -85,22 +85,24 @@ GOOGLE_MAPS_CENTER='{ "lat": -31.416668, "lng": -64.183334 }'
 #####################################################################################################
 
 # --- IP or hostname that each instance will invoke when locating the other    
-ASTERISK_HOSTNAME=acd
+ASTERISK_HOSTNAME={{ asterisk_host }}
 
-AMI_USER=omnileadsami
-AMI_PASSWORD=5_MeO_DMT
+AMI_USER={{ ami_user }}
+AMI_PASSWORD={{ ami_password }}
 
 SIP_EXT_PORT=5060
 #####################################################################################################
 #                                       POSTGRESQL                                                  #
 #####################################################################################################
 # --- IP or hostname that each instance will invoke when locating the other    
-PGHOST=postgresql
+PGHOST={{ postgres_host }}
 
-PGDATABASE=omnileads
-PGPORT=5432
-PGUSER=omnileads
-PGPASSWORD=admin123
+PGDATABASE={{ postgres_database }}
+PGPORT={{ postgres_port }}
+PGUSER={{ postgres_user }}
+PGPASSWORD={{ postgres_password }}
+
+PGSSL={{ postgres_ssl }}
 
 PGHOSTHA=false
 PGHOSTRO=
@@ -110,10 +112,9 @@ PG_EXT_PORT=4444
 #                                           WEBSOCKETS                                                  #
 #########################################################################################################
 # --- IP or hostname that each instance will invoke when locating the other    
-WEBSOCKET_HOSTNAME=websockets
+WEBSOCKET_HOSTNAME={{ websockets_host }}
 
-WEBSOCKET_PORT=8000
-WEBSOCKET_EXT_PORT=8000
+WEBSOCKET_PORT={{ websocket_port }}
 
 # *** Activete verbose ---> DEBUG:fts.oml.services.websockets,websockets.server
 WEBSOCKET_LOGGER=DEBUG:fts.oml.services.websockets;INFO:websockets.server
@@ -121,10 +122,10 @@ WEBSOCKET_LOGGER=DEBUG:fts.oml.services.websockets;INFO:websockets.server
 # ******** HIGH AVAILABILITY ******* # # ******** HIGH AVAILABILITY ******* #
 # ******** HIGH AVAILABILITY ******* # # ******** HIGH AVAILABILITY ******* #
 # *** For redis sentinel cluster ---> redis+sentinel://master/sentinel_01,sentinel_02,sentinel_03
-# *** For simple redis ---> redis://redis:6379
+# *** For simple redis ---> redis://{{ redis_host }}:6379
 
 # --- IP or hostname that each instance will invoke when locating the other    
-WEBSOCKET_REDIS_HOSTNAME=redis://redis:6379
+WEBSOCKET_REDIS_HOSTNAME=redis://{{ redis_host }}:6379
 
 
 #########################################################################################################
@@ -132,13 +133,13 @@ WEBSOCKET_REDIS_HOSTNAME=redis://redis:6379
 #########################################################################################################
 
 # --- IP or hostname that each instance will invoke when locating the other    
-KAMAILIO_HOSTNAME=kamailio
+KAMAILIO_HOSTNAME={{ kamailio_host }}
 
 # Variables for Kamailio memory. SHM is the maximum memory ammount.
 # PKG is the minimum memory ammount
 
-SHM_SIZE=64
-PKG_SIZE=8
+SHM_SIZE={{ shm_size }}
+PKG_SIZE={{ pkg_size }}
 
 
 #########################################################################################################
@@ -151,7 +152,7 @@ PKG_SIZE=8
 # *** nginx or app_lb in case of HA *** #
 
 # --- IP or hostname that each instance will invoke when locating the other    
-OMNILEADS_HOSTNAME=nginx
+OMNILEADS_HOSTNAME={{ nginx_host }}
 
 NGINX_EXT_PORT=443
 
@@ -164,35 +165,49 @@ NGINX_EXT_PORT=443
 # *** redis or redis_lb in case of HA *** #
 
 # --- IP or hostname that each instance will invoke when locating the other    
-REDIS_HOSTNAME=redis
+REDIS_HOSTNAME={{ redis_host }}
 
 
 # ------------------------------------------------------------------------------
 # --- IP or hostname that each instance will invoke when locating the other    
-RTPENGINE_HOSTNAME=rtpengine
+RTPENGINE_HOSTNAME={{ omni_ip_lan }}
 
 #########################################################################################################
 #                                Object Storage BUCKET config                                           #
 #########################################################################################################
 
 # --- name for invoke bucket actions
-S3_BUCKET_NAME=omnileads
+S3_BUCKET_NAME={{ bucket_name }}
 
 # --- MinIO web and console credentials
-S3_HTTP_ADMIN_USER=minio
-S3_HTTP_ADMIN_PASS=s3minio123
+S3_HTTP_ADMIN_USER={{ s3_http_admin_user }}
+S3_HTTP_ADMIN_PASS={{ s3_http_admin_pass }}
 
 # --- Bucket credentials 
-AWS_ACCESS_KEY_ID=omlminio
-AWS_SECRET_ACCESS_KEY=s3omnileads123
+AWS_ACCESS_KEY_ID={{ bucket_access_key }}
+AWS_SECRET_ACCESS_KEY={{ bucket_secret_key }}
 AWS_DEFAULT_REGION=us-east-1
 
-# *** used by storage_service.py & recordings & media_root views
-# your OMniLeads (nginx) ip/hostname
-S3_ENDPOINT=https://localhost
-# *** used by omni-callrec-move.sh Asterisk AGI
-# https://docs.min.io/docs/how-to-use-aws-sdk-for-python-with-minio-server.html
-S3_ENDPOINT_MINIO=http://minio:9000
+
+{% if bucket_url is not defined and fqdn is not defined %}
+{% if infra_env == "cloud" %}
+S3_ENDPOINT=https://{{ omni_ip_wan }}
+S3_ENDPOINT_MINIO=http://localhost:9000
+{% else %}
+S3_ENDPOINT=https://{{ omni_ip_lan }}
+S3_ENDPOINT_MINIO=http://localhost:9000
+{% endif %}
+{% elif bucket_url is not defined and fqdn is defined %}
+S3_ENDPOINT=https://{{ fqdn }}
+S3_ENDPOINT_MINIO=http://localhost:9000
+{% elif bucket_url == "aws" %}
+S3_ENDPOINT_AWS=
+S3_REGION_NAME={{ bucket_region }}
+AWS_DEFAULT_REGION={{ bucket_region }}
+{% else %}
+S3_ENDPOINT={{ bucket_url }}
+S3_ENDPOINT_MINIO=http://localhost:9000
+{% endif %}
 
 
 #########################################################################################################

@@ -1,1 +1,0 @@
-0 1 * * * podman run --rm  --env-file=/etc/default/callrec_converter.env --network=host docker.io/omnileads/callrec_converter:latest converter.sh

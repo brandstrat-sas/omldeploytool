@@ -1,6 +1,6 @@
 #### This project is part of OMniLeads
 
-![Diagrama deploy tool](../systemd/png/omnileads_logo_1.png)
+![Diagrama deploy tool](../ansible/png/omnileads_logo_1.png)
 
 #### 100% Open-Source Contact Center Software
 #### [Community Forum](https://forum.omnileads.net/)
@@ -11,10 +11,11 @@
 * [Requirements](#requirements)
 * [Docker Desktop](#docker_desktop)
 * [Cloud VPS or Onpremise VM](#vps_vm)
+* [Security](#security)
 * [First login](#post_install)
 * [Simulate calls](#pstn_emulator)
 * [Predictive dialer](#wombat_dialer)
-* [Security](#security)
+
 
 
 You need docker installed (on Linux, Mac or Windows) and this reposotory cloned <a name="requirements"></a>
@@ -43,11 +44,37 @@ You need to create a .env file by using (cp) the environment file provided here.
 You don't need to work with the variables file, you can simply proceed with the instance execution through the command:
 
 ```
-$ docker-compose up -d
+$ docker-compose up -d 
 ```
 
-![Diagrama deploy tool](../systemd/png/deploy-tool-tenant-compose-localhost.png)
+![Diagrama deploy tool](../ansible/png/deploy-tool-tenant-compose-localhost.png)
 
+# Security  <a name="security"></a>
+
+OMniLeads is an application that combines Web (https), WebRTC (wss & sRTP) and VoIP (SIP & RTP) technologies. This implies a certain complexity and 
+when deploying it in production under an Internet exposure scenario. 
+
+On the Web side of the things the ideal is to implement a Reverse Proxy or Load Balancer ahead of OMnileads, i.e. exposed to the Internet (TCP 443) 
+and that it forwards the requests to the Nginx of the OMniLeads stack. On the VoIP side, when connecting to the PSTN via VoIP it is ideal to 
+operate behind an SBC (Session Border Controller) exposed to the Internet.
+
+However, we can intelligently use the **Cloud Firewall** technology when operating over VPS exposed to the Internet.
+
+![Diagrama security](../ansible/png/security.png)
+
+Below are the Firewall rules to be applied on All In One instance:
+
+* 443/TCP Nginx: This is where Web/WebRTC requests to Nginx are processed. Port 443 can be opened to the entire Internet.
+
+* 40000-50000/UDP: WebRTC sRTP RTPengine: this port range can be opened to the entire Internet.
+
+* 5060/UDP Asterisk: This is where SIP requests for incoming calls from the ITSP(s) are processed. This port must be opened by restricting by origin on the IP(s) of the PSTN SIP termination provider(s).
+
+* 20000-30000/UDP VoIP RTP Asterisk: this port range must be opened by restricting by origin on the IP(s) of the PSTN SIP termination provider(s).
+
+* 9090/TCP Prometheus (optional, only if you are going to monitor with grafana and prometheus): This is where the connections coming from the monitoring center, more precisely from Prometheus Master, are processed. This port can be opened by restricting by origin in the IP of the monitoring center.
+
+* 3100/TCP Loki (optional, only if you are going to centralize container logs with grafana and loki): this is where the connections coming from the monitoring center are processed, more precisely from Grafana, are processed. This port can be opened by restricting by origin on the IP of the monitoring center.
 
 ### **Onpremise Virtual Machine or Cloud VPS** <a name="vps_vm"></a>
 
@@ -101,7 +128,7 @@ Now, let's proceed to launch the stack:
 $ docker-compose -f docker-compose_aio.yml up -d
 ```
 
-![Diagrama deploy tool](../systemd/png/deploy-tool-tenant-compose-vps.png)
+![Diagrama deploy tool](../ansible/png/deploy-tool-tenant-compose-vps.png)
 
 ### **Onpremise Virtual Machine and VPS Cloud deploy with external bucket**
 
@@ -130,7 +157,7 @@ Now, let's proceed to launch the stack:
 $ docker-compose -f docker-compose_aio_ext_bucket.yml up -d
 ```
 
-![Diagrama deploy tool](../systemd/png/deploy-tool-tenant-compose-vps-external.png)
+![Diagrama deploy tool](../ansible/png/deploy-tool-tenant-compose-vps-external.png)
 
 ## Log in to the Admin UI <a name="post_install"></a>
 
@@ -224,31 +251,4 @@ The other scenarios do not implement Wombat Dialer by default, so if you want to
 Check our official documentation to check this: https://documentacion-omnileads.readthedocs.io/es/stable/maintance.html#configuracion-del-modulo-de-discador-predictivo
 
 Note: when configuring initial mariadb credentials the root pass is ***admin123***, then on the AMI connection, the server address is ***acd***.
-
-# Security  <a name="security"></a>
-
-OMniLeads is an application that combines Web (https), WebRTC (wss & sRTP) and VoIP (SIP & RTP) technologies. This implies a certain complexity and 
-when deploying it in production under an Internet exposure scenario. 
-
-On the Web side of the things the ideal is to implement a Reverse Proxy or Load Balancer ahead of OMnileads, i.e. exposed to the Internet (TCP 443) 
-and that it forwards the requests to the Nginx of the OMniLeads stack. On the VoIP side, when connecting to the PSTN via VoIP it is ideal to 
-operate behind an SBC (Session Border Controller) exposed to the Internet.
-
-However, we can intelligently use the **Cloud Firewall** technology when operating over VPS exposed to the Internet.
-
-![Diagrama security](../systemd/png/security.png)
-
-Below are the Firewall rules to be applied on All In One instance:
-
-* 443/tcp Nginx: This is where Web/WebRTC requests to Nginx are processed. Port 443 can be opened to the entire Internet.
-
-* 40000/50000 UDP: WebRTC sRTP RTPengine: this port range can be opened to the entire Internet.
-
-* 5060/UDP Asterisk: This is where SIP requests for incoming calls from the ITSP(s) are processed. This port must be opened by restricting by origin on the IP(s) of the PSTN SIP termination provider(s).
-
-* 20000/30000 UDP VoIP RTP Asterisk: this port range can be opened to the entire Internet.
-
-* 9100/tcp Prometheus node exporter : This is where the connections coming from the monitoring center, more precisely from Prometheus, are processed. This port can be opened by restricting by origin in the IP of the monitoring center.
-
-* 3100/TCP Loki: this is where the connections coming from the monitoring center are processed, more precisely from Grafana, are processed. This port can be opened by restricting by origin on the IP of the monitoring center.
 

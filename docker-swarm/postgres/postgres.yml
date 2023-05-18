@@ -1,0 +1,18 @@
+version: "3.0"
+
+volumes:
+  postgres_swarm:
+
+services:
+  postgresql:
+    environment:
+      - TZ=America/Cordoba/Argentina
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres123
+      - POSTGRES_DB=omnileads
+    image: omnileads/postgres:230204.01
+    stop_grace_period: 1m30s
+    volumes:
+      - postgres_swarm:/var/lib/postgresql/data
+
+  

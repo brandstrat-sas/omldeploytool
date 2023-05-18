@@ -1,0 +1,261 @@
+# Copyright (C) 2018 Freetech Solutions
+
+# This file is part of OMniLeads
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see http://www.gnu.org/licenses/.
+#
+---
+
+- name: OS_CONF Disable ufw
+  systemd:
+    name: ufw
+    state: stopped
+    enabled: no
+    daemon_reload: yes
+  ignore_errors: yes
+  tags: 
+    - install
+    - voice
+    - app
+    - observability
+    - asterisk
+
+- name: OS_CONF Disable firewallD
+  systemd:
+    name: firewalld
+    state: stopped
+    enabled: no
+    daemon_reload: yes
+  ignore_errors: yes
+  tags: 
+    - install
+    - voice
+    - app
+    - observability
+    - asterisk
+
+- name: Disable SELinux
+  selinux:
+    state: disabled
+  when: ansible_os_family == "RedHat"
+
+- name: OS_CONF Ensure group {{ usuario }} exists
+  group:
+    name: '{{ usuario }}'
+    state: present
+  tags: 
+    - install
+    - voice
+    - app
+    - observability
+    - asterisk
+
+- name: OS_CONF Add the {{ usuario }} user
+  user:
+    name: '{{ usuario }}'
+    group: '{{ usuario }}'
+    comment: OMniLeads OS user
+    shell: /bin/bash
+    home: '{{ django_deploy_path }}'
+  tags: 
+    - install
+    - voice
+    - app
+    - observability
+    - asterisk
+
+- name: OS_CONF Creates /etc/omnileads directory
+  file:
+    path: /etc/omnileads
+    state: directory
+    owner: '{{ usuario }}'
+    group: '{{ usuario }}'
+    mode: 0764
+    recurse: yes
+  when: etc_omnileads.stat.exists == false
+  tags: 
+    - install
+    - voice
+    - app
+    - observability
+    - asterisk
+
+
+- name: OS_CONF Creates /etc/omnileads/certs directory
+  file:
+    path: '{{ certs_location }}'
+    state: directory
+    owner: '{{ usuario }}'
+    group: '{{ usuario }}'
+    mode: 0764
+  when: etc_omnileads.stat.exists == false
+  tags: 
+    - install
+    - voice
+    - app
+    - observability
+    - asterisk
+
+
+- name: OS_CONF Creates /var/lib/omnileads directory
+  file:
+    path: '{{ asterisk_sounds_host_path }}'
+    state: directory
+    owner: '{{ usuario }}'
+    group: '{{ usuario }}'
+    mode: 0764
+    recurse: yes
+  when: var_lib_omnileads.stat.exists == false
+  tags: 
+    - install
+    - voice
+    - app
+    - asterisk
+
+- name: OS_CONF Copy selfsigned SSL certs
+  copy:
+    src: "certs/cert.pem"
+    dest: /etc/omnileads/certs/cert.pem
+    owner: '{{ usuario }}'
+    group: '{{ usuario }}'
+    mode: 0777
+  tags: 
+    - install
+    - voice
+    - app
+    - observability
+    - asterisk
+    - upgrade
+  when:
+    - certs == "selfsigned"
+
+- name: OS_CONF Copy custom SSL certs
+  copy:
+    src: "../../../instances/{{ tenant_folder }}/cert.pem"
+    dest: /etc/omnileads/certs/cert.pem
+    owner: '{{ usuario }}'
+    group: '{{ usuario }}'
+    mode: 0777
+  tags: 
+    - install
+    - voice
+    - app
+    - observability
+    - asterisk
+    - upgrade
+  when:
+    - certs == "custom"
+
+- name: OS_CONF Copy selfsigned SSL certs
+  copy:
+    src: "certs/key.pem"
+    dest: /etc/omnileads/certs/key.pem
+    owner: "{{ usuario }}"
+    group: "{{ usuario }}"
+    mode: 0777
+  tags: 
+    - install
+    - voice
+    - app
+    - observability
+    - asterisk
+    - upgrade
+  when:
+    - certs == "selfsigned"
+
+- name: OS_CONF Copy custom SSL certs
+  copy:
+    src: "../../../instances/{{ tenant_folder }}/key.pem"
+    dest: /etc/omnileads/certs/key.pem
+    owner: "{{ usuario }}"
+    group: "{{ usuario }}"
+    mode: 0777
+  tags: 
+    - install
+    - voice
+    - app
+    - observability
+    - asterisk
+    - upgrade
+  when:
+    - certs == "custom"
+
+- name: OS_CONF Copy oml_manage script
+  template:
+    src: "templates/oml_manage.sh"
+    dest: /usr/local/bin/oml_manage
+    mode: 0755
+  tags: 
+    - install
+    - voice
+    - app
+    - observability
+    - asterisk
+    - upgrade
+
+- name: OS_CONF Set timezone of server
+  timezone: name={{ TZ }}
+  tags: 
+    - install
+    - voice
+    - app
+    - observability
+    - asterisk
+    - upgrade
+
+- name: OS_CONF Copy Prometheus Node Exporter service
+  template:
+    src: "templates/prometheus_node_exporter.service"
+    dest: /etc/systemd/system/
+    mode: 0600
+  tags: 
+    - install
+    - voice
+    - app
+    - observability
+    - asterisk
+    - upgrade
+  when: docker_compose is not defined  
+
+- name: OS_CONF Copy Prometheus Node Exporter env
+  template:
+    src: "templates/prometheus_node_exporter.env"
+    dest: /etc/default/
+    mode: 0600
+  tags: 
+    - install
+    - voice
+    - app
+    - observability
+    - asterisk
+    - upgrade
+  when: docker_compose is not defined  
+
+- name: OS_CONF Enable and start systemd Prometheus Node Exporter service
+  systemd:
+    name: prometheus_node_exporter
+    state: restarted
+    enabled: yes
+    daemon_reload: yes
+  tags: 
+    - install
+    - voice
+    - app
+    - observability
+    - asterisk
+    - upgrade
+  when: 
+     - postgres_host_ha is not defined
+     - redis_host_ha is not defined
+     - docker_compose is not defined

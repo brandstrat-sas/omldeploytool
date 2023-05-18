@@ -1,0 +1,25 @@
+version: "3.0"
+
+volumes:
+  redis_swarm:
+
+services:
+  redis:
+    image: redislabs/redisgears:1.0.9
+    deploy:
+      #placement: 
+      #  constraints: 
+      #    - node.role != manager
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+    volumes:
+      - redis_swarm:/data  
+    ports:
+      - 6379:6379  
+    env_file: ./redis.env
+
+  
