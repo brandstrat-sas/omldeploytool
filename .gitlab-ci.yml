@@ -28,68 +28,38 @@ deploy-docker-compose-digitalocean:
     - web
     - merge_request
 
-deploy-ait-digitalocean:
-  stage: deploy
-  environment: DOCTL_DIGITALOCEAN_SYSTEMD
-  script:
-    - doctl compute droplet create --image ${DIGITALOCEAN_DROPLET_IMG} --size ${DIGITALOCEAN_DROPLET_SIZE_SYSTEMD} --region ${DIGITALOCEAN_REGION} --ssh-keys ${DIGITALOCEAN_SSH_KEY} cicd-data.${CI_JOB_ID}
-    - doctl compute droplet create --image ${DIGITALOCEAN_DROPLET_IMG} --size ${DIGITALOCEAN_DROPLET_SIZE_SYSTEMD} --region ${DIGITALOCEAN_REGION} --ssh-keys ${DIGITALOCEAN_SSH_KEY} cicd-voice.${CI_JOB_ID}
-    - doctl compute droplet create --image ${DIGITALOCEAN_DROPLET_IMG} --size ${DIGITALOCEAN_DROPLET_SIZE_SYSTEMD} --region ${DIGITALOCEAN_REGION} --ssh-keys ${DIGITALOCEAN_SSH_KEY} cicd-app.${CI_JOB_ID}
-    - sleep 60
-    - OML_IPADDR_DATA=$(doctl compute droplet list |grep cicd-data.${CI_JOB_ID} |awk '{print $3}') && echo "$OML_IPADDR to run tests" 
-    - OML_IPADDR_DATALAN=$(doctl compute droplet list |grep cicd-data.${CI_JOB_ID} |awk '{print $4}') && echo "$OML_IPADDR to run tests" 
-    - OML_IPADDR_VOICE=$(doctl compute droplet list |grep cicd-voice.${CI_JOB_ID} |awk '{print $3}') && echo "$OML_IPADDR to run tests" 
-    - OML_IPADDR_VOICELAN=$(doctl compute droplet list |grep cicd-voice.${CI_JOB_ID} |awk '{print $4}') && echo "$OML_IPADDR to run tests" 
-    - OML_IPADDR_APP=$(doctl compute droplet list |grep cicd-app.${CI_JOB_ID} |awk '{print $3}') && echo "$OML_IPADDR to run tests" 
-    - OML_IPADDR_APPLAN=$(doctl compute droplet list |grep cicd-app.${CI_JOB_ID} |awk '{print $4}') && echo "$OML_IPADDR to run tests" 
-    - rm -rf ~/omldeploytool
-    - git clone --branch $CI_COMMIT_BRANCH https://gitlab.com/omnileads/omldeploytool.git ~/omldeploytool
-    - mkdir -p ~/omldeploytool/ansible/instances/gitlab
-    - cd ~/omldeploytool/ansible 
-    - cp inventory_ait.yml instances/gitlab/inventory.yml
-    - sed -i "6 s/X.X.X.X/$OML_IPADDR_DATA/g" ./instances/gitlab/inventory.yml
-    - sed -i "7 s/Z.Z.Z.Z/$OML_IPADDR_DATALAN/g" ./instances/gitlab/inventory.yml
-    - sed -i "11 s/X.X.X.X/$OML_IPADDR_VOICE/g" ./instances/gitlab/inventory.yml
-    - sed -i "12 s/Z.Z.Z.Z/$OML_IPADDR_VOICELAN/g" ./instances/gitlab/inventory.yml
-    - sed -i "16 s/X.X.X.X/$OML_IPADDR_APP/g" ./instances/gitlab/inventory.yml
-    - sed -i "17 s/Z.Z.Z.Z/$OML_IPADDR_APPLAN/g" ./instances/gitlab/inventory.yml
-    - sed -i "63 s/s3/s3-no-check-cert/g" ./instances/gitlab/inventory.yml
-    - bash -x deploy.sh --action=install --tenant=gitlab
-    - until curl -sk --head --request GET https://$OML_IPADDR_APP |grep "302" > /dev/null; do echo "Environment still being installed, sleeping 60 seconds"; sleep 60; done; echo "Environment is up"
-    - sleep 120
-    - doctl compute droplet delete -f cicd-app.${CI_JOB_ID}
-    - doctl compute droplet delete -f cicd-data.${CI_JOB_ID}
-    - doctl compute droplet delete -f cicd-voice.${CI_JOB_ID}
-  tags:
-    - deploy
-  only:
-    - /.*pipeline-systemd.*$/
-    - /.*pipeline-all.*$/
-    - schedules
-    - web
-    - merge_request
-
-# deploy-ait-lan:
+# deploy-ait-digitalocean:
 #   stage: deploy
 #   environment: DOCTL_DIGITALOCEAN_SYSTEMD
 #   script:
+#     - doctl compute droplet create --image ${DIGITALOCEAN_DROPLET_IMG} --size ${DIGITALOCEAN_DROPLET_SIZE_SYSTEMD} --region ${DIGITALOCEAN_REGION} --ssh-keys ${DIGITALOCEAN_SSH_KEY} cicd-data.${CI_JOB_ID}
+#     - doctl compute droplet create --image ${DIGITALOCEAN_DROPLET_IMG} --size ${DIGITALOCEAN_DROPLET_SIZE_SYSTEMD} --region ${DIGITALOCEAN_REGION} --ssh-keys ${DIGITALOCEAN_SSH_KEY} cicd-voice.${CI_JOB_ID}
+#     - doctl compute droplet create --image ${DIGITALOCEAN_DROPLET_IMG} --size ${DIGITALOCEAN_DROPLET_SIZE_SYSTEMD} --region ${DIGITALOCEAN_REGION} --ssh-keys ${DIGITALOCEAN_SSH_KEY} cicd-app.${CI_JOB_ID}
+#     - sleep 60
+#     - OML_IPADDR_DATA=$(doctl compute droplet list |grep cicd-data.${CI_JOB_ID} |awk '{print $3}') && echo "$OML_IPADDR to run tests" 
+#     - OML_IPADDR_DATALAN=$(doctl compute droplet list |grep cicd-data.${CI_JOB_ID} |awk '{print $4}') && echo "$OML_IPADDR to run tests" 
+#     - OML_IPADDR_VOICE=$(doctl compute droplet list |grep cicd-voice.${CI_JOB_ID} |awk '{print $3}') && echo "$OML_IPADDR to run tests" 
+#     - OML_IPADDR_VOICELAN=$(doctl compute droplet list |grep cicd-voice.${CI_JOB_ID} |awk '{print $4}') && echo "$OML_IPADDR to run tests" 
+#     - OML_IPADDR_APP=$(doctl compute droplet list |grep cicd-app.${CI_JOB_ID} |awk '{print $3}') && echo "$OML_IPADDR to run tests" 
+#     - OML_IPADDR_APPLAN=$(doctl compute droplet list |grep cicd-app.${CI_JOB_ID} |awk '{print $4}') && echo "$OML_IPADDR to run tests" 
 #     - rm -rf ~/omldeploytool
 #     - git clone --branch $CI_COMMIT_BRANCH https://gitlab.com/omnileads/omldeploytool.git ~/omldeploytool
 #     - mkdir -p ~/omldeploytool/ansible/instances/gitlab
-#     - cd ~/omldeploytool/ansible
+#     - cd ~/omldeploytool/ansible 
 #     - cp inventory_ait.yml instances/gitlab/inventory.yml
-#     - sed -i "6 s/X.X.X.X/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
-#     - sed -i "7 s/Z.Z.Z.Z/$PROXMOX_ADDR_VM_DATA/g" ./instances/gitlab/inventory.yml
-#     - sed -i "11 s/X.X.X.X/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
-#     - sed -i "12 s/Z.Z.Z.Z/$PROXMOX_ADDR_VM_VOICE/g" ./instances/gitlab/inventory.yml
-#     - sed -i "16 s/X.X.X.X/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
-#     - sed -i "17 s/Z.Z.Z.Z/$PROXMOX_ADDR_VM_APP/g" ./instances/gitlab/inventory.yml
-#     - sed -i "8 s/22/5701/g" ./instances/gitlab/inventory.yml
-#     - sed -i "13 s/22/5702/g" ./instances/gitlab/inventory.yml
-#     - sed -i "18 s/22/5703/g" ./instances/gitlab/inventory.yml
-#     - sed -i "38 s/cloud/lan/g" ./instances/gitlab/inventory.yml
+#     - sed -i "6 s/X.X.X.X/$OML_IPADDR_DATA/g" ./instances/gitlab/inventory.yml
+#     - sed -i "7 s/Z.Z.Z.Z/$OML_IPADDR_DATALAN/g" ./instances/gitlab/inventory.yml
+#     - sed -i "11 s/X.X.X.X/$OML_IPADDR_VOICE/g" ./instances/gitlab/inventory.yml
+#     - sed -i "12 s/Z.Z.Z.Z/$OML_IPADDR_VOICELAN/g" ./instances/gitlab/inventory.yml
+#     - sed -i "16 s/X.X.X.X/$OML_IPADDR_APP/g" ./instances/gitlab/inventory.yml
+#     - sed -i "17 s/Z.Z.Z.Z/$OML_IPADDR_APPLAN/g" ./instances/gitlab/inventory.yml
+#     - sed -i "63 s/s3/s3-no-check-cert/g" ./instances/gitlab/inventory.yml
 #     - bash -x deploy.sh --action=install --tenant=gitlab
-#     - until curl -sk --head --request GET https://$PROXMOX_ADDR:5704|grep "302" > /dev/null; do echo "Environment still being installed, sleeping 60 seconds"; sleep 60; done; echo "Environment is up"
+#     - until curl -sk --head --request GET https://$OML_IPADDR_APP |grep "302" > /dev/null; do echo "Environment still being installed, sleeping 60 seconds"; sleep 60; done; echo "Environment is up"
+#     - sleep 120
+#     - doctl compute droplet delete -f cicd-app.${CI_JOB_ID}
+#     - doctl compute droplet delete -f cicd-data.${CI_JOB_ID}
+#     - doctl compute droplet delete -f cicd-voice.${CI_JOB_ID}
 #   tags:
 #     - deploy
 #   only:
@@ -97,6 +67,37 @@ deploy-ait-digitalocean:
 #     - /.*pipeline-all.*$/
 #     - schedules
 #     - web
+#     - merge_request
+
+deploy-ait-lan:
+  stage: deploy
+  environment: DOCTL_DIGITALOCEAN_SYSTEMD
+  script:
+    - rm -rf ~/omldeploytool
+    - git clone --branch $CI_COMMIT_BRANCH https://gitlab.com/omnileads/omldeploytool.git ~/omldeploytool
+    - mkdir -p ~/omldeploytool/ansible/instances/gitlab
+    - cd ~/omldeploytool/ansible
+    - cp inventory_ait.yml instances/gitlab/inventory.yml
+    - sed -i "6 s/X.X.X.X/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
+    - sed -i "7 s/Z.Z.Z.Z/$PROXMOX_ADDR_VM_DATA/g" ./instances/gitlab/inventory.yml
+    - sed -i "11 s/X.X.X.X/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
+    - sed -i "12 s/Z.Z.Z.Z/$PROXMOX_ADDR_VM_VOICE/g" ./instances/gitlab/inventory.yml
+    - sed -i "16 s/X.X.X.X/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
+    - sed -i "17 s/Z.Z.Z.Z/$PROXMOX_ADDR_VM_APP/g" ./instances/gitlab/inventory.yml
+    - sed -i "8 s/22/5701/g" ./instances/gitlab/inventory.yml
+    - sed -i "13 s/22/5702/g" ./instances/gitlab/inventory.yml
+    - sed -i "18 s/22/5703/g" ./instances/gitlab/inventory.yml
+    - sed -i "38 s/cloud/lan/g" ./instances/gitlab/inventory.yml
+    - sed -i "63 s/s3/s3-no-check-cert/g" ./instances/gitlab/inventory.yml
+    - bash -x deploy.sh --action=install --tenant=gitlab
+    - until curl -sk --head --request GET https://$PROXMOX_ADDR:5704|grep "302" > /dev/null; do echo "Environment still being installed, sleeping 60 seconds"; sleep 60; done; echo "Environment is up"
+  tags:
+    - deploy
+  only:
+    - /.*pipeline-systemd.*$/
+    - /.*pipeline-all.*$/
+    - schedules
+    - web
 
 deploy-docker-ansible:
   stage: deploy
