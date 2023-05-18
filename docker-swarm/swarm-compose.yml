@@ -1,0 +1,204 @@
+version: '3.3'
+
+services:
+  app:
+    env_file: omnileads.env
+    depends_on:
+      - postgresql
+      - redis
+      - acd
+      - minio
+    image: omnileads/omlapp:1.27.1
+    privileged: true
+    restart: on-failure
+    stdin_open: true
+    stop_grace_period: 1m30s
+    tty: true
+    working_dir: /opt/omnileads/ominicontacto
+    volumes:
+      - django_static:/opt/omnileads/static
+      - django_callrec_zip:/opt/omnileads/asterisk/var/spool/asterisk/monitor    
+
+  channels:
+    env_file: omnileads.env
+    image: omnileads/omlapp:1.27.1
+    privileged: true
+    restart: on-failure
+    stdin_open: true
+    stop_grace_period: 1m30s
+    tty: true
+    working_dir: /opt/omnileads/ominicontacto
+
+  crones:
+    env_file: omnileads.env
+    image: omnileads/omlapp:1.27.1
+    privileged: true
+    restart: on-failure
+    stdin_open: true
+    stop_grace_period: 1m30s
+    tty: true
+    working_dir: /opt/omnileads
+
+  acd:
+    env_file: omnileads.env
+    depends_on:
+      - postgresql
+      - redis
+      - websockets
+      - minio
+    image: omnileads/asterisk:230508.01
+    expose:
+        - 40000-40999/udp
+    ports:
+      - 5060:5060/udp
+    privileged: true
+    restart: on-failure
+    stop_grace_period: 1m30s
+    volumes:
+      - ./ast_custom_conf:/etc/asterisk/custom
+    working_dir: /etc/asterisk
+
+  kamailio:
+    env_file: omnileads.env
+    command:
+      - /bin/bash
+    depends_on:
+      - redis
+      - acd
+      - rtpengine
+    image: omnileads/kamailio:230204.01
+    privileged: true
+    restart: on-failure
+    stop_grace_period: 1m30s
+    volumes:
+      - ./certs:/etc/omnileads/certs
+
+  nginx:
+    env_file: omnileads.env
+    depends_on:
+      - app
+      - kamailio
+      - websockets
+    image: omnileads/nginx:230215.01
+    privileged: true
+    ports:
+      - 443:443/tcp
+    restart: on-failure
+    stop_grace_period: 1m30s
+    volumes:
+      - django_static:/opt/omnileads/static
+      - django_callrec_zip:/opt/omnileads/asterisk/var/spool/asterisk/monitor
+
+  postgresql:
+    env_file: omnileads.env
+    image: omnileads/postgres:230204.01
+    privileged: true
+    restart: on-failure
+    stop_grace_period: 1m30s
+    volumes:
+      - postgresql_swarm:/var/lib/postgresql/data
+
+  redis:
+    env_file: omnileads.env
+    image: redislabs/redisgears:1.0.9
+    privileged: true
+    restart: on-failure
+    stop_grace_period: 1m30s
+    volumes:
+      - redis_swarm:/data
+
+  rtpengine:
+    env_file: omnileads.env
+    image: omnileads/rtpengine:230426.01
+    privileged: true
+    restart: on-failure
+    stop_grace_period: 1m30s
+
+  websockets:
+    env_file: omnileads.env
+    tty: true
+    image: omnileads/websockets:230204.01
+    depends_on:
+      - redis
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health-checks"]
+      interval: 1s
+      timeout: 10s
+      retries: 10
+
+  minio:
+    env_file: omnileads.env
+    tty: true
+    image: quay.io/minio/minio
+    command: server --console-address "localhost:9001" /data
+    ports:
+      - 9001:9001
+      - 9000:9000
+    volumes:
+      - minio_swarm:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+  createbuckets:  
+    env_file: omnileads.env
+    tty: true
+    image: minio/mc
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      /usr/bin/mc config host rm local;
+      /usr/bin/mc config host add --quiet --api s3v4 local http://minio:9000 minio s3minio123;
+      /usr/bin/mc mb --quiet local/omnileads/;
+      /usr/bin/mc admin user add local omlminio s3omnileads123;
+      /usr/bin/mc admin policy attach local readwrite --user omlminio;
+      exit 0;
+      "
+      
+  mariadb:
+    env_file: omnileads.env
+    image: bitnami/mariadb:latest
+    privileged: true
+    restart: on-failure
+    stop_grace_period: 1m30s
+    volumes:
+      - mariadb_swarm:/bitnami
+
+  wombat:
+    env_file: omnileads.env
+    command: >
+      bash -c "sed -i '/JDBC_URL/c\JDBC_URL=jdbc:mariadb:\/\/${MYSQL_HOST}\/${WOMBAT_DB}?user=${WOMBAT_DB_USER}&password=${WOMBAT_DB_PASS}&autoReconnect=true' /usr/local/tomcat/webapps/wombat/WEB-INF/tpf.properties && catalina.sh run"
+    depends_on:
+      - mariadb
+      - acd
+    image: freetechsolutions/omldialer:21.06.2-7
+    ports:
+      - 8082:8080/tcp
+    privileged: true
+    restart: on-failure
+    stop_grace_period: 1m30s
+
+  pbxemulator:
+    env_file: omnileads.env
+    hostname: pbxemulator
+    image: omnileads/pstn_emulator:latest
+    ports:
+      - 6060:6060/udp
+      - 10000-10020:10000-10020/udp
+    privileged: true
+    restart: on-failure
+    stdin_open: true
+    stop_grace_period: 1m30s
+    tty: true
+
+volumes:
+  postgresql_swarm:
+  redis_swarm:
+  minio_swarm:
+  django_static:
+  django_callrec_zip:
+  mariadb_swarm:
+
