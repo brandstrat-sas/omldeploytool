@@ -391,7 +391,7 @@
 
 - name: CHECKS Setting loki_host as localhost
   set_fact:
-    nginx_host: localhost
+    loki_host: localhost
   changed_when: false
   when:
     - loki_host is not defined
@@ -399,8 +399,6 @@
   tags: 
     - install
     - upgrade
-    - voice
-    - asterisk
 
 # --- IMPORTANT: aqui controlo las variables que sean *requisito* para el deploy
 # --- si no está declarada entonces puedo escapar con un fail
