@@ -18,8 +18,6 @@ deploy-docker-compose-digitalocean:
     - sleep 60
     - OML_IPADDR=$(doctl compute droplet list |grep cicd-aio.${CI_JOB_ID} |awk '{print $3}') && echo "$OML_IPADDR to run tests"
     - until curl -sk --head --request GET https://$OML_IPADDR |grep "302" > /dev/null; do echo "Environment still being installed, sleeping 60 seconds"; sleep 60; done; echo "Environment is up"
-    - sleep 10
-    - docker exec -it oml-django-server python3 manage.py inicializar_entorno
     - sleep 120
     - doctl compute droplet delete -f cicd-aio.${CI_JOB_ID}
     - rm -rf ./omldeploytool
@@ -115,9 +113,6 @@ deploy-docker-ansible:
     - sed -i "30 s/cloud/lan/g" ./instances/gitlab/inventory.yml
     - bash -x deploy.sh --action=install --tenant=gitlab
     - until curl -sk --head --request GET https://$PROXMOX_ADDR:5706|grep "302" > /dev/null; do echo "Environment still being installed, sleeping 60 seconds"; sleep 60; done; echo "Environment is up"
-    - sleep 10
-    - docker exec -it oml-django-server python3 manage.py cambiar_admin_password
-    - docker exec -it oml-django-server python3 manage.py inicializar_entorno
   tags:
     - deploy
   only:

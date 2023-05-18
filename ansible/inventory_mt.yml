@@ -3,13 +3,22 @@ all:
   hosts:
     aio_tenant_1:
       ansible_host: 172.16.101.44
-    #tenant2:
+    #aio_tenant_2:
     #  ansible_host: X.X.X.X
-    #tenant3:
+    #aio_tenant_3:
     #  ansible_host: X.X.X.X
-    #tenantn:
+    #data_tenant_4:
     #  ansible_host: X.X.X.X
-
+    #voice_tenant_4:
+    #  ansible_host: X.X.X.X
+    #app_tenant_4:
+    #  ansible_host: X.X.X.X
+    #data_tenant_5:
+    #  ansible_host: X.X.X.X
+    #voice_tenant_5:
+    #  ansible_host: X.X.X.X
+    #app_tenant_5:
+    #  ansible_host: X.X.X.X
   vars:
     docker_compose: true
     # --- ansible user auth connection
@@ -142,12 +151,36 @@ omnileads_aio:
     aio_tenant_1:
       tenant_id: proxmox_tenant1
       omni_ip_lan: 172.16.101.44
-#    tenant2:
-#      tenant_id: tenant2
-#      omni_ip_lan: 10.10.10.3
-#    tenant2:
-#      tenant_id: tenant2
-#      omni_ip_lan: 10.10.10.3
-#    tenantn:
-#      tenant_id: tenantn
-#      omni_ip_lan: 10.10.10.n
+  #  aio_tenant2:
+  #    tenant_id: tenant2
+  #    omni_ip_lan: 10.10.10.3
+  #  aio_tenant3:
+  #    tenant_id: tenant3
+  #    omni_ip_lan: 10.10.10.3
+
+omnileads_data:
+  hosts:
+    data_tenant_4:
+      tenant_id: cloud_tenant4
+      omni_ip_lan: 10.10.10.2
+    # data_tenant_5:
+    #   tenant_id: cloud_tenant5
+    #   omni_ip_lan: 10.10.10.5
+
+omnileads_voice:
+  hosts:
+    voice_tenant_4:
+      tenant_id: cloud_tenant4
+      omni_ip_lan: 10.10.10.3
+    # voice_tenant_5:
+    #   tenant_id: cloud_tenant5
+    #   omni_ip_lan: 10.10.10.6
+
+omnileads_app:
+  hosts:
+    app_tenant_4:
+      tenant_id: cloud_tenant4
+      omni_ip_lan: 10.10.10.4
+    # app_tenant_5:
+    #   tenant_id: cloud_tenant5
+    #   omni_ip_lan: 10.10.10.7
