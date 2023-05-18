@@ -450,7 +450,6 @@ services:
       - '--web.console.templates=/etc/prometheus/consoles'
       - '--storage.tsdb.retention.time=30d'
       - '--web.enable-lifecycle'
-      - '--web.listen-address=${PUBLIC_IP}:9090'
     restart: unless-stopped
     network_mode: host
     labels:

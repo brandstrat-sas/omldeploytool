@@ -11,7 +11,7 @@
 
 ```
 git clone https://gitlab.com/omnileads/omldeploytool.git
-cd omldeploytool/systemd
+cd omldeploytool/ansible
 ```
 
 In this section, we will find a tool manager for OMniLeads that will allow us to carry out deployments:

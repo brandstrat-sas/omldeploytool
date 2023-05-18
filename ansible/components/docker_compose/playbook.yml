@@ -201,6 +201,12 @@
       - install
       - upgrade
 
+  - name: DOCKER-COMPOSE set permissions prometheus.yml config file
+    command: chmod 777 /etc/omnileads/prometheus.yml
+    tags:
+      - install
+      - upgrade
+      
   - name: DOCKER-COMPOSE Pull image
     command: docker-compose -f /etc/omnileads/docker-compose.yml pull
     register: podman_pull
