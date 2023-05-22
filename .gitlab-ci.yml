@@ -127,14 +127,14 @@ deploy-ha-lan:
     - mkdir -p ~/omldeploytool/ansible/instances/gitlab
     - cd ~/omldeploytool/ansible
     - cp inventory_ha.yml instances/gitlab/inventory.yml
-    - sed -i "34 s/22/5707/g" ./instances/gitlab/inventory.yml
-    - sed -i "40 s/22/5708/g" ./instances/gitlab/inventory.yml
-    - sed -i "45 s/22/5709/g" ./instances/gitlab/inventory.yml
-    - sed -i "50 s/22/5710/g" ./instances/gitlab/inventory.yml
-    - sed -i "55 s/22/5711/g" ./instances/gitlab/inventory.yml
-    - sed -i "60 s/22/5712/g" ./instances/gitlab/inventory.yml
-    - sed -i "65 s/22/5713/g" ./instances/gitlab/inventory.yml
-    - sed -i "70 s/22/5714/g" ./instances/gitlab/inventory.yml
+    - sed -i "34 s/22/5107/g" ./instances/gitlab/inventory.yml
+    - sed -i "40 s/22/5108/g" ./instances/gitlab/inventory.yml
+    - sed -i "45 s/22/5109/g" ./instances/gitlab/inventory.yml
+    - sed -i "50 s/22/5110/g" ./instances/gitlab/inventory.yml
+    - sed -i "55 s/22/5111/g" ./instances/gitlab/inventory.yml
+    - sed -i "60 s/22/5112/g" ./instances/gitlab/inventory.yml
+    - sed -i "65 s/22/5113/g" ./instances/gitlab/inventory.yml
+    - sed -i "70 s/22/5114/g" ./instances/gitlab/inventory.yml
     - sed -i "30 s/172.16.101.101/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
     - sed -i "36 s/172.16.101.102/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
     - sed -i "42 s/172.16.101.103/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
