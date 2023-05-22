@@ -69,32 +69,6 @@ deploy-docker-compose-digitalocean:
 #     - web
 #     - merge_request
 
-deploy-ait-lan:
-  stage: deploy
-  environment: DOCTL_DIGITALOCEAN_SYSTEMD
-  script:
-    - rm -rf ~/omldeploytool
-    - git clone --branch $CI_COMMIT_BRANCH https://gitlab.com/omnileads/omldeploytool.git ~/omldeploytool
-    - mkdir -p ~/omldeploytool/ansible/instances/gitlab
-    - cd ~/omldeploytool/ansible
-    - cp inventory_ait.yml instances/gitlab/inventory.yml
-    - sed -i "8 s/22/5701/g" ./instances/gitlab/inventory.yml
-    - sed -i "13 s/22/5702/g" ./instances/gitlab/inventory.yml
-    - sed -i "88 s/22/5703/g" ./instances/gitlab/inventory.yml
-    - sed -i "105 s/cloud/lan/g" ./instances/gitlab/inventory.yml
-    - sed -i "133 s/s3/s3-no-check-cert/g" ./instances/gitlab/inventory.yml
-    - sed -i "s/#tenant_example_5_data/tenant_example_5_data/g" ./instances/gitlab/inventory.yml
-    - sed -i "s/#tenant_example_5_voice/tenant_example_5_voice/g" ./instances/gitlab/inventory.yml
-    - sed -i "s/#tenant_example_5_app/tenant_example_5_app/g" ./instances/gitlab/inventory.yml
-    - bash -x deploy.sh --action=install --tenant=gitlab
-    - until curl -sk --head --request GET https://$PROXMOX_ADDR:5704|grep "302" > /dev/null; do echo "Environment still being installed, sleeping 60 seconds"; sleep 60; done; echo "Environment is up"
-  tags:
-    - deploy
-  only:
-    - /.*pipeline-systemd.*$/
-    - /.*pipeline-all.*$/
-    - schedules
-    - web
 
 deploy-docker-ansible:
   stage: deploy
@@ -142,3 +116,47 @@ deploy-docker-ansible:
 #     - /.*pipeline-all.*$/
 #     - schedules
 #     - web
+
+
+deploy-ha-lan:
+  stage: deploy
+  environment: PROXMOX_HA_SYSTEMD
+  script:
+    - rm -rf ~/omldeploytool
+    - git clone --branch $CI_COMMIT_BRANCH https://gitlab.com/omnileads/omldeploytool.git ~/omldeploytool
+    - mkdir -p ~/omldeploytool/ansible/instances/gitlab
+    - cd ~/omldeploytool/ansible
+    - cp inventory_ha.yml instances/gitlab/inventory.yml
+    - sed -i "34 s/22/5707/g" ./instances/gitlab/inventory.yml
+    - sed -i "40 s/22/5708/g" ./instances/gitlab/inventory.yml
+    - sed -i "45 s/22/5709/g" ./instances/gitlab/inventory.yml
+    - sed -i "50 s/22/5710/g" ./instances/gitlab/inventory.yml
+    - sed -i "55 s/22/5711/g" ./instances/gitlab/inventory.yml
+    - sed -i "60 s/22/5712/g" ./instances/gitlab/inventory.yml
+    - sed -i "65 s/22/5713/g" ./instances/gitlab/inventory.yml
+    - sed -i "70 s/22/5714/g" ./instances/gitlab/inventory.yml
+    - sed -i "30 s/172.16.101.101/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
+    - sed -i "36 s/172.16.101.102/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
+    - sed -i "42 s/172.16.101.103/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
+    - sed -i "47 s/172.16.101.104/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
+    - sed -i "52 s/172.16.101.105/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
+    - sed -i "57 s/172.16.101.106/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
+    - sed -i "62 s/172.16.101.107/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
+    - sed -i "67 s/172.16.101.108/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
+    - sed -i "249 s/#//g" ./instances/gitlab/inventory.yml
+    - sed -i "250 s/#//g" ./instances/gitlab/inventory.yml
+    - sed -i "257 s/#//g" ./instances/gitlab/inventory.yml
+    - sed -i "258 s/#//g" ./instances/gitlab/inventory.yml
+    - sed -i "265 s/#//g" ./instances/gitlab/inventory.yml
+    - sed -i "266 s/#//g" ./instances/gitlab/inventory.yml
+    - sed -i "272 s/#//g" ./instances/gitlab/inventory.yml
+    - sed -i "273 s/#//g" ./instances/gitlab/inventory.yml
+    - bash -x deploy.sh --action=install --tenant=gitlab
+    - until curl -sk --head --request GET https://$PROXMOX_ADDR:5704|grep "302" > /dev/null; do echo "Environment still being installed, sleeping 60 seconds"; sleep 60; done; echo "Environment is up"
+  tags:
+    - deploy
+  only:
+    - /.*pipeline-systemd.*$/
+    - /.*pipeline-all.*$/
+    - schedules
+    - web
