@@ -1,26 +1,87 @@
+# Copyright (C) 2023 Freetech Solutions
+
+# This file is part of OMniLeads
+
+# This program is free software: You can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY, without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see http://www.gnu.org/licenses/.
 ---
+
+###############################################################################################################
+# -- The complete list of host                                                                                #
+###############################################################################################################
+
 all:
-  hosts:
-    aio_tenant_1:
-      ansible_host: 172.16.101.44
-    #aio_tenant_2:
-    #  ansible_host: X.X.X.X
-    #aio_tenant_3:
-    #  ansible_host: X.X.X.X
-    #data_tenant_4:
-    #  ansible_host: X.X.X.X
-    #voice_tenant_4:
-    #  ansible_host: X.X.X.X
-    #app_tenant_4:
-    #  ansible_host: X.X.X.X
-    #data_tenant_5:
-    #  ansible_host: X.X.X.X
-    #voice_tenant_5:
-    #  ansible_host: X.X.X.X
-    #app_tenant_5:
-    #  ansible_host: X.X.X.X
-  vars:
-    docker_compose: true
+  children:
+    # -----------------------------------------
+    # -----------------------------------------
+    aio_instances:      
+      hosts:
+        tenant_example_1:
+          tenant_id: tenant_example_1
+          ansible_host: 172.16.101.44          
+          omni_ip_lan: 172.16.101.44
+          infra_env: lan        
+        tenant_example_2:
+          tenant_id: tenant_example_2
+          ansible_host: 190.19.11.2         
+          omni_ip_lan: 10.10.10.2
+        tenant_example_3:
+          tenant_id: tenant_example_3
+          ansible_host: 201.22.11.2
+          omni_ip_lan: 10.10.10.3
+          postgres_host:          
+          postgres_port: 
+          postgres_user: 
+          postgres_password: 
+          postgres_database: omnileads
+          postgres_maintenance_db: defaultdb
+          postgres_ssl: true
+          bucket_access_key: 
+          bucket_secret_key: 
+          bucket_name: tenant_example_3
+        tenant_example_4:
+          tenant_id: tenant_example_4
+          ansible_host: 
+          omni_ip_lan: 
+      vars:
+        docker_compose: true
+    # -----------------------------------------
+    # -----------------------------------------
+    cluster_instances:
+      children:
+        tenant_example_5:
+          hosts:
+            tenant_example_5_data:
+              ansible_host: 172.16.101.41
+              omni_ip_lan: 172.16.101.41
+            tenant_example_5_voice:
+              ansible_host: 172.16.101.42
+              omni_ip_lan: 172.16.101.42      
+            tenant_example_5_app:
+              ansible_host: 172.16.101.43
+              omni_ip_lan: 172.16.101.43
+          vars:
+            tenant_id: tenant_example_5
+            data_host: 172.16.101.41
+            voice_host: 172.16.101.42
+            application_host: 172.16.101.43
+            infra_env: lan
+
+##################################################################################################################
+# -- OMniLeads Common Variables                                                                                  #
+##################################################################################################################
+
+  vars:    
     # --- ansible user auth connection
     ansible_user: root
     ansible_ssh_port: 22
@@ -36,13 +97,14 @@ all:
     asterisk_version: 230516.01
     rtpengine_version: 230426.01
     postgres_version: 230204.01  
+    centos_postgresql_version: 11
     # --- "cloud" instance (access through public IP)
     # --- or "lan" instance (access through private IP)
     # --- in order to set NAT or Publica ADDR for RTP voice packages
-    infra_env: lan
+    infra_env: cloud
     # --- If you have an DNS FQDN resolution, you must to uncomment and set this param
     # --- otherwise leave commented to work invoking through an IP address
-    
+    #fqdn: fts.sefirot.cloud
     # --- If you want to work with Dialer, then you must install Wombat Dialer on a separate host 
     # --- and indicate the IP address or FQDN of that host here (uncomment and set this param):
     #dialer_host: 
@@ -71,7 +133,7 @@ all:
     # --- PostgreSQL    
     postgres_port: 5432
     postgres_user: omnileads
-    postgres_password: AVNS_XZ1h82JjcV1w_Gyq6XY
+    postgres_password: HJGKJHGDSAKJHK7856765DASDAS675765JHGJHSAjjhgjhaaa
     postgres_database: omnileads
     # --- *postgres* or *defaultdb* depend ...
     postgres_maintenance_db: postgres
@@ -83,9 +145,9 @@ all:
     # --- minio auth Web and Console admin params
     s3_http_admin_user: omnileads
     s3_http_admin_pass: jdhsgahkdgaskdasdhe2h4231hg4jjhgHJKG
-    # --- bucket params
-    bucket_access_key: fdskjahksdjfhkjdsfs
-    bucket_secret_key: jhkjhKJHJKjhgJHGJjHGJHjhgjhgjhgjh
+    # --- bucket params    
+    bucket_access_key: Hghjkdghjkdhasjdasdsada
+    bucket_secret_key: jknkjhkjh4523kjhcksjdhkjfdhKJHHKJGKJh786876876NBVJHB
     bucket_name: omnileads
     # --- if your bucket doesn't need region, leave this value (us-east-1)
     bucket_region: us-east-1
@@ -123,18 +185,18 @@ all:
     #email_use_ssl:
     #email_use_tls:
 
-    # --- Docker Registry repo    
+    # --- Docker Registry repo
+    # --- If you are going to use another registry for the images, you must indicate here
     omlapp_repo: omnileads
 
-    
     # --- Restore id request by restore filename
     #restore_file_timestamp: 1681215859
 
     # --- Integrations with external hosts
     # --- Request by docker-compose & promtail
-    loki_host: grafana.sephir.tech
-    # --- Request by Asterisk 
-    homer_host: grafana.sephir.tech
+    loki_host: 190.19.150.222
+    # --- Request by Asterisk hep module
+    homer_host: 190.19.150.222
     # --- Request by Web-Video Inbound Calls 
     #video_host: 
 
@@ -143,44 +205,39 @@ all:
     # --- Restore: in case of implementing a separate bucket for restore
     #restore_bucket: 
 
-#############################################################################
-#########################       host groups    ##############################
-#############################################################################
+    ha_notification_email: mr_robot@mr_robot.com
+
+#############################################################################################################
+# -- In this section the hosts are grouped based on the type of deployment (AIO, Cluster & Cluster HA).     #
+#############################################################################################################
+
 omnileads_aio:
   hosts:
-    aio_tenant_1:
-      tenant_id: proxmox_tenant1
-      omni_ip_lan: 172.16.101.44
-  #  aio_tenant2:
-  #    tenant_id: tenant2
-  #    omni_ip_lan: 10.10.10.3
-  #  aio_tenant3:
-  #    tenant_id: tenant3
-  #    omni_ip_lan: 10.10.10.3
+    #tenant_example_1:
+    #tenant_example_3:
+    #tenant_example_4:
+    #tenant_example_2:
 
 omnileads_data:
   hosts:
-    data_tenant_4:
-      tenant_id: cloud_tenant4
-      omni_ip_lan: 10.10.10.2
-    # data_tenant_5:
-    #   tenant_id: cloud_tenant5
-    #   omni_ip_lan: 10.10.10.5
-
+    #tenant_example_5_data:
+    #tenant_ha_example_postgres_1:
+    #tenant_ha_example_postgres_2:
+  vars:
+    omldata: true
+    
 omnileads_voice:
   hosts:
-    voice_tenant_4:
-      tenant_id: cloud_tenant4
-      omni_ip_lan: 10.10.10.3
-    # voice_tenant_5:
-    #   tenant_id: cloud_tenant5
-    #   omni_ip_lan: 10.10.10.6
+    #tenant_example_5_voice:
+    #tenant_ha_example_voice_1:
+    #tenant_ha_example_voice_2:
+  vars:
+    omlvoice: true
 
 omnileads_app:
   hosts:
-    app_tenant_4:
-      tenant_id: cloud_tenant4
-      omni_ip_lan: 10.10.10.4
-    # app_tenant_5:
-    #   tenant_id: cloud_tenant5
-    #   omni_ip_lan: 10.10.10.7
+    #tenant_example_5_app:
+    #tenant_ha_example_app_1:
+    #tenant_ha_example_app_2:
+  vars:
+    omlapp: true

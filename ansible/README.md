@@ -109,16 +109,31 @@ For example:
 ---
 all:
   hosts:
-    omnileads_aio:
+    tenant_1:
       omlaio: true
-      ansible_host: X.X.X.X
-      omni_ip_lan: Z.Z.Z.Z
-      ansible_ssh_port: 22
+      ansible_host: 190.19.10.122
+      omni_ip_lan: 172.16.101.12
+      infra_env: cloud
+      TZ: America/Argentina/Cordoba
+      bucket_name: tenant_1
+    tenant_2:  
+      docker_compose: true
+      ansible_host: 10.10.10.2
+      omni_ip_lan: 10.10.10.2
+      infra_env: lan
+      TZ: America/Mexico_City
+      bucket_name: tenant_2
+    .
+    .
+    .
+    .  
 ```
 
-Then we count the tenant variables to display, labeled/indented under *vars:*. Here we find
+Then we count the tenants variables to display, labeled/indented under *vars:*. Here we find
 all the adjustable parameters when invoking a deploy instance. each one is
 described by a *# --- comment* preceding it.
+
+These variables affect all hosts, unless they are explicitly declared within the host, as exemplified  above by *TZ* or *bucket_name*.
 
 ```
 vars:
@@ -126,10 +141,10 @@ vars:
     ansible_user: root
     # --- Activate the OMniLeads Enterprise Edition - with "AAAA" licensed.
     # --- on the contrary you will deploy OMniLeads OSS Edition with GPLV3 licensed. 
-    enterprise_edition: true
+    enterprise_edition: false
     # --- versions of each image to deploy
     # --- versions of each image to deploy
-    omnileads_version: 1.26.0
+    omnileads_version: 1.27.0
     websockets_version: 230204.01
     nginx_version: 230215.01
     kamailio_version: 230204.01
@@ -143,6 +158,33 @@ vars:
     # --- If you have an DNS FQDN resolution, you must to uncomment and set this param
     # --- otherwise leave commented to work invoking through an IP address
     #fqdn: fidelio.sephir.tech
+```
+
+Finally, we have the section where the hosts should be grouped according to their nature. 
+On one side we have the omnileads_aio family, here below you must list the AIO instances you want to deploy.
+Then we have *omnileads_data*, *omnileads_voice*, *omnileads_app* and *omnileads_haproxy* where the instances that form clusters should be grouped. 
+
+```
+omnileads_aio:
+  hosts:
+    tenant_1:
+    tenant_2:
+    tenant_4:
+
+omnileads_data:
+  hosts:
+    tenant_3_data:
+      
+omnileads_voice:
+  hosts:
+    tenant_3_voice:
+  
+omnileads_app:
+  hosts:
+    tenant_3_app:
+  
+omnileads_haproxy:
+  hosts:
 ```
 
 ## Systemd & Podman 🔧 <a name="ansible-inventory"></a>

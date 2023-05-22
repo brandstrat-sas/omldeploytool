@@ -34,7 +34,7 @@
 ##################### Postgresql Node Backup #########################
 
     - name: Recovery BACKUP RW Node standby clone
-      shell: "sudo -u postgres {{ repmgr_bin }}repmgr -h {{ hostvars['sql_1'].omni_ip_lan }} -U repmgr -d repmgr -f {{ pg_lib_location_no_version }}/repmgr.conf standby clone --dry-run"
+      shell: "sudo -u postgres {{ repmgr_bin }}repmgr -h {{ postgres_1 }} -U repmgr -d repmgr -f {{ pg_lib_location_no_version }}/repmgr.conf standby clone --dry-run"
       args:
         executable: /bin/bash
       register: dry_run
@@ -42,7 +42,7 @@
         - ha_rol == "backup"
     
     - name: Recovery BACKUP RW Node
-      shell: "sudo -u postgres {{ repmgr_bin }}repmgr -h {{ hostvars['sql_1'].omni_ip_lan }} -U repmgr -d repmgr -f {{ pg_lib_location_no_version }}/repmgr.conf standby clone -F"
+      shell: "sudo -u postgres {{ repmgr_bin }}repmgr -h {{ postgres_1 }} -U repmgr -d repmgr -f {{ pg_lib_location_no_version }}/repmgr.conf standby clone -F"
       args:
         executable: /bin/bash
       when: 

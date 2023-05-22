@@ -140,23 +140,6 @@
   when:
     - certs == "selfsigned"
 
-- name: OS_CONF Copy custom SSL certs
-  copy:
-    src: "../../../instances/{{ tenant_folder }}/cert.pem"
-    dest: /etc/omnileads/certs/cert.pem
-    owner: '{{ usuario }}'
-    group: '{{ usuario }}'
-    mode: 0777
-  tags: 
-    - install
-    - voice
-    - app
-    - observability
-    - asterisk
-    - upgrade
-  when:
-    - certs == "custom"
-
 - name: OS_CONF Copy selfsigned SSL certs
   copy:
     src: "certs/key.pem"
@@ -174,6 +157,23 @@
   when:
     - certs == "selfsigned"
 
+- name: OS_CONF Copy custom SSL certs
+  copy:
+    src: "../../../instances/{{ tenant_folder }}/cert.pem"
+    dest: /etc/omnileads/certs/cert.pem
+    owner: '{{ usuario }}'
+    group: '{{ usuario }}'
+    mode: 0777
+  tags: 
+    - install
+    - voice
+    - app
+    - observability
+    - asterisk
+    - upgrade
+  when:
+    - certs == "custom"
+    
 - name: OS_CONF Copy custom SSL certs
   copy:
     src: "../../../instances/{{ tenant_folder }}/key.pem"

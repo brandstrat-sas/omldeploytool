@@ -13,6 +13,13 @@ case $ACTION in
     --size $SIZE --region sfo3 \
     --ssh-keys ${SSH_DOCTL} $NAME
   ;;
+  do-instance-aio)
+    doctl compute droplet create --image $IMG \
+    --size $SIZE --region sfo3 \
+    --ssh-keys ${SSH_DOCTL} \
+    --user-data-file ../docker-compose/user-data.sh \
+    $NAME
+  ;;
   do-postgres)
     doctl databases create $NAME \
     --engine pg \
@@ -28,6 +35,9 @@ case $ACTION in
   do-dbdelete)
     doctl database delete $NAME
   ;;
+  do-dbconn)
+    doctl databases connection $NAME
+  ;;  
   vultr-instance)
     vultr-cli instance create --region scl \
     --plan $SIZE --os $IMG --vpc-enable true \
@@ -39,6 +49,16 @@ case $ACTION in
   ;;
   vultr-delete)
     vultr-cli instance delete $NAME
+  ;;
+  linode-instance)
+    linode-cli linodes create --label $NAME --region us-east --image $IMG \
+    --type $SIZE --private_ip true --root_pass 
+  ;;
+  linode-list)
+    linode-cli linodes list
+  ;;
+  linode-delete)
+    linode-cli linodes rm $NAME
   ;;
   *)
   ;;
@@ -54,7 +74,7 @@ do
       oml_name="${i#*=}"
       shift
     ;;
-    --action=ubuntu|--action=debian|--action=rocky|--action=postgres|--action=bucket|--action=list|--action=delete)
+    --action=ubuntu|--action=debian|--action=rocky|--action=alma|--action=postgres|--action=bucket|--action=list|--action=delete|--action=dbconn|--action=aio-ubu|--action=dbdelete)
       oml_action="${i#*=}"
       shift
     ;;  
@@ -78,7 +98,7 @@ How to use it:
         ubuntu
         debian
         rocky
-        docker
+        aio-ubu
         postgres
         bucket
         list
@@ -115,6 +135,10 @@ case $oml_cloud in
         img=rockylinux-8-x64
         action=do-instance
       ;;
+      aio-ubu)
+        img=ubuntu-22-04-x64
+        action=do-instance-aio
+      ;;
       postgres)
         action=do-postgres
       ;;
@@ -126,6 +150,9 @@ case $oml_cloud in
       ;;
       dbdelete)
         action=do-dbdelete
+      ;;
+      dbconn)
+        action=do-dbconn
       ;;
       *)
         echo pepe
@@ -158,8 +185,16 @@ case $oml_cloud in
         action=vultr-instance
       ;;
       rocky)
-        img=448
+        img=1869
         action=vultr-instance
+      ;;
+      alma)
+        img=1868
+        action=vultr-instance
+      ;;
+      aio-ubu)
+        img=img=1743
+        action=vultr-instance-aio
       ;;
       postgres)
         action=vultr-postgres
@@ -184,6 +219,57 @@ case $oml_cloud in
       ;;
       l)
         size=vc2-4c-8gb
+      ;;
+      *)
+        echo no size
+      ;;  
+    esac
+  ;;
+  linode)
+    case $oml_action in
+      ubuntu)
+        img=linode/ubuntu22.04
+        action=linode-instance
+      ;;
+      debian)
+        img=linode/debian11
+        action=linode-instance
+      ;;
+      rocky)
+        img=linode/rocky9
+        action=linode-instance
+      ;;
+      alma)
+        img=linode/almalinux9
+        action=linode-instance
+      ;;
+      aio-ubu)
+        img=linode/ubuntu22.04
+        action=linode-instance-aio
+      ;;
+      postgres)
+        action=linode-postgres
+      ;;
+      list)
+        action=linode-list
+      ;;
+      delete)
+        action=linode-delete
+      ;;
+      *)
+        echo pepe
+        exit 1
+      ;;  
+    esac
+    case $oml_size in
+      s)
+        size=g6-standard-1
+      ;;
+      m)
+        size=g6-standard-2
+      ;;
+      l)
+        size=g6-standard-4
       ;;
       *)
         echo no size

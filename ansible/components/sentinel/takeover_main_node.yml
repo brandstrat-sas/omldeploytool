@@ -26,7 +26,7 @@
   tasks:
 
     - name: Recovery MAIN RW Node
-      shell: "podman exec -it oml-sentinel-server redis-cli -h {{ hostvars['app_2'].omni_ip_lan }} -p 26379 sentinel failover master"
+      shell: "podman exec -it oml-sentinel-server redis-cli -h {{ app_2 }} -p 26379 sentinel failover master"
       args:
         executable: /bin/bash
     
