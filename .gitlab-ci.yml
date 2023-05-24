@@ -70,6 +70,9 @@ deploy-systemd-cluster:
     - sed -i "76 s/22/5703/g" ./instances/gitlab/inventory.yml
     - sed -i "136 s/s3/s3-no-check-cert/g" ./instances/gitlab/inventory.yml        
     - sed -i "220 s/tenant_example_1/#tenant_example_1/g" ./instances/gitlab/inventory.yml
+    - sed -i "66 s/172.16.101.41/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
+    - sed -i "70 s/172.16.101.42/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
+    - sed -i "74 s/172.16.101.43/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
     - bash -x deploy.sh --action=install --tenant=gitlab
     - until curl -sk --head --request GET https://$PROXMOX_ADDR:5704|grep "302" > /dev/null; do echo "Environment still being installed, sleeping 60 seconds"; sleep 60; done; echo "Environment is up"
   tags:
