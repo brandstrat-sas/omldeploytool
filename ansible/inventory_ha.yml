@@ -29,29 +29,37 @@ all:
             tenant_aaa_sql_1:
               ansible_host: 172.16.101.101
               omni_ip_lan: 172.16.101.101
-              ha_vip_nic: eth0        
+              ansible_ssh_port: 22
+              ha_vip_nic: eth0
             tenant_aaa_sql_2:
               ansible_host: 172.16.101.102
               omni_ip_lan: 172.16.101.102
+              ansible_ssh_port: 22
               ha_vip_nic: eth0
             tenant_aaa_voice_1: 
               ansible_host: 172.16.101.103
               omni_ip_lan: 172.16.101.103
+              ansible_ssh_port: 22
             tenant_aaa_voice_2: 
               ansible_host: 172.16.101.104
               omni_ip_lan: 172.16.101.104
+              ansible_ssh_port: 22
             tenant_aaa_app_1:
               ansible_host: 172.16.101.105
               omni_ip_lan: 172.16.101.105
+              ansible_ssh_port: 22
             tenant_aaa_app_2:
               ansible_host: 172.16.101.106
               omni_ip_lan: 172.16.101.106
+              ansible_ssh_port: 22
             tenant_aaa_haproxy_1: 
               ansible_host: 172.16.101.107
               omni_ip_lan: 172.16.101.107
+              ansible_ssh_port: 22
             tenant_aaa_haproxy_2: 
               ansible_host: 172.16.101.108
               omni_ip_lan: 172.16.101.108
+              ansible_ssh_port: 22
           vars:
             tenant_id: tenant_aaa
             ### estas variables pueden ser optimizadas ###

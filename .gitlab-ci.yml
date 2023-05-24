@@ -156,32 +156,24 @@ deploy-ha-lan:
     - mkdir -p ~/omldeploytool/ansible/instances/gitlab
     - cd ~/omldeploytool/ansible
     - cp inventory_ha.yml instances/gitlab/inventory.yml
-    - sed -i "34 s/22/5107/g" ./instances/gitlab/inventory.yml
-    - sed -i "40 s/22/5108/g" ./instances/gitlab/inventory.yml
-    - sed -i "45 s/22/5109/g" ./instances/gitlab/inventory.yml
-    - sed -i "50 s/22/5110/g" ./instances/gitlab/inventory.yml
-    - sed -i "55 s/22/5111/g" ./instances/gitlab/inventory.yml
-    - sed -i "60 s/22/5112/g" ./instances/gitlab/inventory.yml
-    - sed -i "65 s/22/5113/g" ./instances/gitlab/inventory.yml
-    - sed -i "70 s/22/5114/g" ./instances/gitlab/inventory.yml
     - sed -i "30 s/172.16.101.101/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
-    - sed -i "36 s/172.16.101.102/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
-    - sed -i "42 s/172.16.101.103/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
-    - sed -i "47 s/172.16.101.104/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
-    - sed -i "52 s/172.16.101.105/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
-    - sed -i "57 s/172.16.101.106/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
-    - sed -i "62 s/172.16.101.107/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
-    - sed -i "67 s/172.16.101.108/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
-    - sed -i "249 s/#//g" ./instances/gitlab/inventory.yml
-    - sed -i "250 s/#//g" ./instances/gitlab/inventory.yml
-    - sed -i "257 s/#//g" ./instances/gitlab/inventory.yml
-    - sed -i "258 s/#//g" ./instances/gitlab/inventory.yml
-    - sed -i "265 s/#//g" ./instances/gitlab/inventory.yml
-    - sed -i "266 s/#//g" ./instances/gitlab/inventory.yml
-    - sed -i "272 s/#//g" ./instances/gitlab/inventory.yml
-    - sed -i "273 s/#//g" ./instances/gitlab/inventory.yml
+    - sed -i "32 s/22/5107/g" ./instances/gitlab/inventory.yml
+    - sed -i "35 s/172.16.101.102/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
+    - sed -i "37 s/22/5108/g" ./instances/gitlab/inventory.yml
+    - sed -i "40 s/172.16.101.103/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
+    - sed -i "42 s/22/5109/g" ./instances/gitlab/inventory.yml
+    - sed -i "44 s/172.16.101.104/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
+    - sed -i "46 s/22/5110/g" ./instances/gitlab/inventory.yml
+    - sed -i "48 s/172.16.101.105/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
+    - sed -i "50 s/22/5111/g" ./instances/gitlab/inventory.yml
+    - sed -i "52 s/172.16.101.106/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
+    - sed -i "54 s/22/5112/g" ./instances/gitlab/inventory.yml
+    - sed -i "56 s/172.16.101.107/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
+    - sed -i "58 s/22/5113/g" ./instances/gitlab/inventory.yml
+    - sed -i "60 s/172.16.101.108/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
+    - sed -i "62 s/22/5114/g" ./instances/gitlab/inventory.yml                    
     - bash -x deploy.sh --action=install --tenant=gitlab
-    - until curl -sk --head --request GET https://$PROXMOX_ADDR:5704|grep "302" > /dev/null; do echo "Environment still being installed, sleeping 60 seconds"; sleep 60; done; echo "Environment is up"
+    - until curl -sk --head --request GET https://$PROXMOX_ADDR:5115|grep "302" > /dev/null; do echo "Environment still being installed, sleeping 60 seconds"; sleep 60; done; echo "Environment is up"
   tags:
     - deploy
   only:
