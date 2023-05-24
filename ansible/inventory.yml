@@ -65,12 +65,15 @@ all:
             tenant_example_5_data:
               ansible_host: 172.16.101.41
               omni_ip_lan: 172.16.101.41
+              ansible_ssh_port: 22
             tenant_example_5_voice:
               ansible_host: 172.16.101.42
-              omni_ip_lan: 172.16.101.42      
+              omni_ip_lan: 172.16.101.42
+              ansible_ssh_port: 22
             tenant_example_5_app:
               ansible_host: 172.16.101.43
               omni_ip_lan: 172.16.101.43
+              ansible_ssh_port: 22
           vars:
             tenant_id: tenant_example_5
             data_host: 172.16.101.41
@@ -214,31 +217,24 @@ all:
 
 omnileads_aio:
   hosts:
-    #tenant_example_1:
+    tenant_example_1:
+    #tenant_example_2:
     #tenant_example_3:
     #tenant_example_4:
-    #tenant_example_2:
-
 omnileads_data:
   hosts:
-    #tenant_example_5_data:
-    #tenant_ha_example_postgres_1:
-    #tenant_ha_example_postgres_2:
+    tenant_example_5_data:    
   vars:
     omldata: true
     
 omnileads_voice:
   hosts:
-    #tenant_example_5_voice:
-    #tenant_ha_example_voice_1:
-    #tenant_ha_example_voice_2:
+    tenant_example_5_voice:
   vars:
     omlvoice: true
 
 omnileads_app:
   hosts:
-    #tenant_example_5_app:
-    #tenant_ha_example_app_1:
-    #tenant_ha_example_app_2:
+    tenant_example_5_app:
   vars:
     omlapp: true
