@@ -45,11 +45,25 @@
     - observability
     - asterisk
 
-- name: Disable SELinux
+- name: MAIN Disable SELinux Rocky or Alma Linux
   selinux:
     state: disabled
-  when: ansible_os_family == "RedHat"
+  when: ansible_facts['distribution'] == "Rocky" or ansible_facts['distribution'] == "AlmaLinux"  or ansible_facts['distribution'] == "CentOS"
+  tags: 
+    - install
+    - voice
+    - app
+    - observability
+    - asterisk
 
+- name: MAIN Disable SELinux Rocky or Alma Linux
+  command: setenforce 0
+  tags:
+    - install
+    - upgrade
+  when: ansible_facts['distribution'] == "Rocky" or ansible_facts['distribution'] == "AlmaLinux"  or ansible_facts['distribution'] == "CentOS"
+  ignore_errors: yes
+  
 - name: OS_CONF Ensure group {{ usuario }} exists
   group:
     name: '{{ usuario }}'

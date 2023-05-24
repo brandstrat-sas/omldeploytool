@@ -82,24 +82,6 @@
     - install
     - postgres
 
-- name: MAIN Disable SELinux Rocky or Alma Linux
-  selinux:
-    state: disabled
-  when: ansible_facts['distribution'] == "Rocky" or ansible_facts['distribution'] == "AlmaLinux"  or ansible_facts['distribution'] == "CentOS"
-  tags: 
-    - install
-    - voice
-    - app
-    - observability
-    - asterisk
-
-- name: MAIN Disable SELinux Rocky or Alma Linux
-  command: setenforce 0
-  tags:
-    - install
-    - upgrade
-  when: ansible_facts['distribution'] == "Rocky" or ansible_facts['distribution'] == "AlmaLinux"  or ansible_facts['distribution'] == "CentOS"
-  
 # --- install DOCKER
 - name: MAIN Descargar el script de instalación de Docker
   get_url:
