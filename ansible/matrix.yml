@@ -48,7 +48,9 @@
   when: postgres_host_ha is defined
 
 - import_playbook: components/redis/playbook.yml
-  when: omldata is defined or omlaio is defined
+  when: 
+    - omldata is defined or omlaio is defined
+    - omnileads_ha is not defined
 
 - import_playbook: components/redis/playbook_ha.yml
   when: omnileads_ha is defined
@@ -102,5 +104,7 @@
   when: omlapp is defined or omlaio is defined
 
 - import_playbook: components/observability/prometheus.yml
-  when: omlapp is defined or omlaio is defined
+  when: 
+    - omlapp is defined or omlaio is defined
+    - omnileads_ha is not defined
   

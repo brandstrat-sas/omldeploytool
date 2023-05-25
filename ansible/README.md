@@ -82,23 +82,21 @@ for example:
 
 Ansible is structured in an inventory file, a root playbook (matrix.yml), and a series of playbooks that implement base actions on the VM or group of VMs, as well as specific tasks that deploy each of the OMniLeads components.
 
-The inventory file is where the type of OMniLeads to generate (all in one, all in three, or high availability) is stored, along with configuration parameters such as connection data for postgres, asterisk, redis, object storage, etc.
+bla bla bla bla bla
 
-There are three types of inventory files for Ansible:
-
-* **inventory_aio.yml**: It should be invoked when deploying OMniLeads all in one. That is, when deploying all App components on a single Linux instance with Systemd & Podman or docker-compose.
 
 ![Diagrama deploy tool](./png/deploy-tool-tenant-aio.png)
 
 
 ![Diagrama deploy tool](./png/deploy-tool-tenant-aio-docker.png)
 
-* **inventory_ait.yml**: It should be invoked when deploying OMniLeads all in three, that is, when deploying all App components on a cluster of three Linux instances (data, voice, & web).
+
+It should be invoked when deploying OMniLeads all in three, that is, when deploying all App components on a cluster of three Linux instances (data, voice, & web).
 
 ![Diagrama deploy tool](./png/deploy-tool-tenant-ait.png)
 
 
-* **inventory_ha.yml**: It should be invoked when deploying OMniLeads under an On-Premise High Availability scheme, based on two physical servers (hypervisors) with 8 VMs on which the components are distributed.
+It should be invoked when deploying OMniLeads under an On-Premise High Availability scheme, based on two physical servers (hypervisors) with 8 VMs on which the components are distributed.
 
 ![Diagrama deploy tool](./png/deploy-tool-tenant-ha.png)
 
@@ -107,42 +105,246 @@ For example:
 
 ```
 ---
+###############################################################################################################
+# -- The complete list of host                                                                                #
+###############################################################################################################
+
 all:
-  hosts:
-    omnileads_aio:
-      omlaio: true
-      ansible_host: X.X.X.X
-      omni_ip_lan: Z.Z.Z.Z
-      ansible_ssh_port: 22
+  children:
+    # -----------------------------------------
+    # -----------------------------------------
+    aio_instances:      
+      hosts:
+        tenant_example_1:
+          tenant_id: tenant_example_1
+          ansible_host: 190.19.150.18
+          omni_ip_lan: 172.16.101.44
+          ansible_ssh_port: 5705
+          infra_env: lan        
+        tenant_example_2:
+          tenant_id: tenant_example_2
+          ansible_host: 190.19.11.2
+          omni_ip_lan: 10.10.10.2          
+        tenant_example_3:
+          tenant_id: tenant_example_3
+          ansible_host: 201.22.11.2
+          omni_ip_lan: 10.10.10.3
+          postgres_host:          
+          postgres_port: 
+          postgres_user: 
+          postgres_password: 
+          postgres_database: omnileads
+          postgres_maintenance_db: defaultdb
+          postgres_ssl: true
+          bucket_access_key: 
+          bucket_secret_key: 
+          bucket_name: tenant_example_3
+        tenant_example_4:
+          tenant_id: tenant_example_4
+          ansible_host: 
+          omni_ip_lan: 
+      vars:
+        docker_compose: true
+    # -----------------------------------------
+    # -----------------------------------------
+    cluster_instances:
+      children:
+        tenant_example_5:
+          hosts:
+            tenant_example_5_data:
+              ansible_host: 172.16.101.41
+              omni_ip_lan: 172.16.101.41
+            tenant_example_5_voice:
+              ansible_host: 172.16.101.42
+              omni_ip_lan: 172.16.101.42      
+            tenant_example_5_app:
+              ansible_host: 172.16.101.43
+              omni_ip_lan: 172.16.101.43
+          vars:
+            tenant_id: tenant_example_5
+            data_host: 172.16.101.41
+            voice_host: 172.16.101.42
+            application_host: 172.16.101.43
+            infra_env: lan
 ```
 
-Then we count the tenant variables to display, labeled/indented under *vars:*. Here we find
+Then we count the tenants variables to display, labeled/indented under *vars:*. Here we find
 all the adjustable parameters when invoking a deploy instance. each one is
 described by a *# --- comment* preceding it.
 
+These variables affect all hosts, unless they are explicitly declared within the host, as exemplified  above by *TZ* or *bucket_name*.
+
 ```
-vars:
+##################################################################################################################
+# -- OMniLeads Common Variables                                                                                  #
+##################################################################################################################
+
+  vars:    
     # --- ansible user auth connection
     ansible_user: root
+    ansible_ssh_port: 22
     # --- Activate the OMniLeads Enterprise Edition - with "AAAA" licensed.
     # --- on the contrary you will deploy OMniLeads OSS Edition with GPLV3 licensed. 
-    enterprise_edition: true
+    enterprise_edition: false
     # --- versions of each image to deploy
     # --- versions of each image to deploy
-    omnileads_version: 1.26.0
+    omnileads_version: 1.28.0
     websockets_version: 230204.01
     nginx_version: 230215.01
     kamailio_version: 230204.01
-    asterisk_version: 230204.01
-    rtpengine_version: 230204.01
-    postgres_version: 230204.01    
+    asterisk_version: 230522.01
+    rtpengine_version: 230426.01
+    postgres_version: 230204.01  
+    centos_postgresql_version: 11
     # --- "cloud" instance (access through public IP)
     # --- or "lan" instance (access through private IP)
     # --- in order to set NAT or Publica ADDR for RTP voice packages
     infra_env: cloud
     # --- If you have an DNS FQDN resolution, you must to uncomment and set this param
     # --- otherwise leave commented to work invoking through an IP address
-    #fqdn: fidelio.sephir.tech
+    #fqdn: fts.sefirot.cloud
+    # --- If you want to work with Dialer, then you must install Wombat Dialer on a separate host 
+    # --- and indicate the IP address or FQDN of that host here (uncomment and set this param):
+    #dialer_host: 
+    # --- set postgres_host if you have your own postgres (standalone host or cloud service)
+    # --- otherwise leave commented to deploy PostgreSQL on Application Host instance
+    #postgres_host: 
+    # --- Read Only connection host address (in case of RW/RO postgres cluster):
+    #postgres_ro_host: 
+    # --- if you have your own bucket (standalone host or cloud service) put here the URL
+    # --- example VULTR: https://ewr1.vultrobjects.com
+    # --- example Digital Ocean: https://sfo3.digitaloceanspaces.com
+    # --- example onpremise: https://192.168.100.10
+    # --- if you want to deploy MinIO objects storage on application_host, you must to put '#' before
+    #bucket_url: https://sfo3.digitaloceanspaces.com
+    # --- RTPEngine if you have your own instances put here the IP or hostname
+    #rtpengine_host: 
+    # --- time zone (for example: America/Argentina/Cordoba)
+    TZ: America/Argentina/Cordoba
+    # --- TLS/SSL Certs configuration (selfsigned, custom or certbot letsencrypt)
+    # --- if you have your own certs, put them into instances/tenant folder and
+    # --- change this to *custom*
+    certs: selfsigned
+    # --- if you object storage service use selfsigned TLS/SSL certs, you mus to put
+    # --- *callrec_device=s3-no-check-cert* in order to don't verify CA.
+    callrec_device: s3
+    # --- PostgreSQL    
+    postgres_port: 5432
+    postgres_user: omnileads
+    postgres_password: HJGKJHGDSAKJHK7856765DASDAS675765JHGJHSAjjhgjhaaa
+    postgres_database: omnileads
+    # --- *postgres* or *defaultdb* depend ...
+    postgres_maintenance_db: postgres
+    postgres_ssl: false
+    # --- If you have a PGSQL cluster you can activated cluster mode
+    # --- in order to split INSERT (RW node) & QUERIES (RO node)
+    postgres_ha: false
+    # --- OBJECT STORAGE
+    # --- minio auth Web and Console admin params
+    s3_http_admin_user: omnileads
+    s3_http_admin_pass: jdhsgahkdgaskdasdhe2h4231hg4jjhgHJKG
+    # --- bucket params    
+    bucket_access_key: Hghjkdghjkdhasjdasdsada
+    bucket_secret_key: jknkjhkjh4523kjhcksjdhkjfdhKJHHKJGKJh786876876NBVJHB
+    bucket_name: omnileads
+    # --- if your bucket doesn't need region, leave this value (us-east-1)
+    bucket_region: us-east-1
+    # --- Asterisk Manager Interface (AMI) user & password
+    ami_user: omnileads
+    ami_password: C12H17N2O4P_o98o98
+    # --- Wombat Dialer API user & pass
+    dialer_user: demoadmin
+    dialer_password: demo
+    # ---  kamailio shm & pkg memory params
+    shm_size: 64
+    pkg_size: 8
+    # --- is the time in seconds that will last the https session when inactivity
+    SCA: 3600
+    # --- Ephemeral Credentials TTL (ECTTL) is the time in seconds            #
+    # --- that will last the SIP credentials used to authenticate a SIP user  #
+    # --- in the telephony system
+    ECCTL: 28800
+    # --- is the attempts a user has to enter an incorrect password in login
+    LOGIN_FAILURE_LIMIT: 10
+    # --- google maps integration credentials
+    google_maps_api_key: NULL
+    google_maps_center: '{ "lat": -31.416668, "lng": -64.183334 }'
+    # --- SMTP server params, if you want to use your own SMTP, put true and
+    # --- uncomment all necesary
+    email_smtp_relay: false
+    #email_backend:
+    #email_default_from:
+    #email_host:
+    #email_password:
+    #email_user:
+    #email_port:
+    #email_ssl_certfile:
+    #email_ssl_keyfile:
+    #email_use_ssl:
+    #email_use_tls:
+
+    # --- Docker Registry repo
+    # --- If you are going to use another registry for the images, you must indicate here
+    omlapp_repo: omnileads
+
+    # --- Restore id request by restore filename
+    #restore_file_timestamp: 1681215859
+
+    # --- Integrations with external hosts
+    # --- Request by docker-compose & promtail
+    loki_host: 190.19.150.222
+    # --- Request by Asterisk hep module
+    homer_host: 190.19.150.222
+    # --- Request by Web-Video Inbound Calls 
+    #video_host: 
+
+    # --- BACKUPs: in case of implementing a separate bucket for backups
+    #backup_bucket: 
+    # --- Restore: in case of implementing a separate bucket for restore
+    #restore_bucket: 
+
+    ha_notification_email: mr_robot@mr_robot.com
+```
+
+Finally, we have the section where the hosts should be grouped according to their nature. 
+On one side we have the omnileads_aio family, here below you must list the AIO instances you want to deploy.
+Then we have *omnileads_data*, *omnileads_voice*, *omnileads_app* and *omnileads_haproxy* where the instances that form clusters should be grouped. 
+
+```
+#############################################################################################################
+# -- In this section the hosts are grouped based on the type of deployment (AIO, Cluster & Cluster HA).     #
+#############################################################################################################
+
+omnileads_aio:
+  hosts:
+    #tenant_example_1:
+    #tenant_example_3:
+    #tenant_example_4:
+    #tenant_example_2:
+
+omnileads_data:
+  hosts:
+    #tenant_example_5_data:
+    #tenant_ha_example_postgres_1:
+    #tenant_ha_example_postgres_2:
+  vars:
+    omldata: true
+    
+omnileads_voice:
+  hosts:
+    #tenant_example_5_voice:
+    #tenant_ha_example_voice_1:
+    #tenant_ha_example_voice_2:
+  vars:
+    omlvoice: true
+
+omnileads_app:
+  hosts:
+    #tenant_example_5_app:
+    #tenant_ha_example_app_1:
+    #tenant_ha_example_app_2:
+  vars:
+    omlapp: true
 ```
 
 ## Systemd & Podman 🔧 <a name="ansible-inventory"></a>
@@ -504,102 +706,9 @@ Then, as an example, we will continue with the IPs proposed at the time of creat
 
 ```
 ---
-omnileads_data:
-  hosts:
-    sql_1:  
-      ansible_host: 172.16.101.101      
-      omni_ip_lan: 172.16.101.101
-      ansible_ssh_port: 22
-      ha_rol: main
-    sql_2:  
-      ansible_host: 172.16.101.102
-      omni_ip_lan: 172.16.101.102
-      ansible_ssh_port: 22  
-      ha_rol: backup
-  vars:
-    postgres_host_ha: true
-    ha_vip_nic: eth0
-    netaddr: 172.16.101.0/16
-    netprefix: 24
-omnileads_voice:
-  hosts:
-    voice_1:  
-      ansible_host: 172.16.101.103
-      omni_ip_lan: 172.16.101.103
-      ansible_ssh_port: 22
-      ha_rol: main
-    voice_2:
-      ansible_host: 172.16.101.104
-      omni_ip_lan: 172.16.101.104
-      ansible_ssh_port: 22
-      ha_rol: backup
-  vars:
-    omlvoice: true
-    ha_vip_nic: ens18    
-omnileads_haproxy:
-  hosts:
-    haproxy_1:
-      ansible_host: 172.16.101.108
-      omni_ip_lan: 172.16.101.108
-      ansible_ssh_port: 22
-      ha_rol: main
-    haproxy_2:  
-      ansible_host: 172.16.101.109
-      omni_ip_lan: 172.16.101.109
-      ansible_ssh_port: 22  
-      ha_rol: backup
-  vars:
-    omlhaproxy: true
-    ha_vip_nic: ens18
-    app_port: 443
-omnileads_app:
-  hosts:
-    app_1:  
-      ansible_host: 172.16.101.105
-      ansible_ssh_port: 22
-      omni_ip_lan: 172.16.101.105
-      ha_rol: main
-    app_2:
-      ansible_host: 172.16.101.106
-      ansible_ssh_port: 22
-      omni_ip_lan: 172.16.101.106
-      ha_rol: backup
-  vars:
-    ha_vip_nic: ens18
-    omlapp: true
 
-all: 
-  vars:
-    # --- ansible user auth connection
-    ansible_user: root
 
-    # -- Cluster Redis IP (Haproxy VIP)
-    redis_host: 172.16.101.204
-    # --  Cluster redis Main node
-    redis_ip_main: 172.16.101.104
-    # --  Cluster postgres RW IP
-    postgres_host: 172.16.101.201
-    # --  Cluster postgres RO IP
-    postgres_ro_host: 172.16.101.202
-    # --  Cluster Voice (Asterisk + RTPengine) IP
-    voice_host: 172.16.101.203
-    # -- Cluster HTTP Web App (HAProxy VIP)
-    application_host: 172.16.101.204
-    # -- Cluster public NAT IP
-    omni_ip_wan: 190.19.150.8
 
-    kamailio_version: 230204.01
-    asterisk_version: 230417.01
-    rtpengine_version: 230204.01
-    omnileads_version: 1.27.0
-    websockets_version: 230204.01
-    nginx_version: 230215.01
-    postgres_version: 230204.01
-    centos_postgresql_version: 11
-    ...
-    ...
-    ...
-    ...
 ```
 
 > Note: Remember that all VMs must have the ssh key of our deployer: **ssh-copy-id root@....**.

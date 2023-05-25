@@ -1,8 +1,9 @@
 stages:
   - deploy
 
-deploy-docker-compose-digitalocean:
+deploy-docker-compose-cloud:
   stage: deploy
+  environment: CLOUD_DOCKER_AIO
   image: omnileads/doctl:230427.01
   variables: 
     DIGITALOCEAN_ACCESS_TOKEN: $DIGITALOCEAN_ACCESS_TOKEN
@@ -27,6 +28,97 @@ deploy-docker-compose-digitalocean:
     - schedules
     - web
     - merge_request
+
+deploy-docker-compose-ansible:
+  stage: deploy
+  environment: PROXMOX_DOCKER_ANSIBLE
+  script:
+    - rm -rf ~/omldeploytool
+    - git clone --branch $CI_COMMIT_BRANCH https://gitlab.com/omnileads/omldeploytool.git ~/omldeploytool
+    - mkdir -p ~/omldeploytool/ansible/instances/gitlab
+    - cd ~/omldeploytool/ansible
+    - cp inventory.yml instances/gitlab/inventory.yml
+    - sed -i "s/190.19.150.18/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
+    - sed -i "s/172.16.101.44/$PROXMOX_ADDR_VM_AIO/g" ./instances/gitlab/inventory.yml
+    - sed -i "226 s/tenant_example_5_data/#tenant_example_5_data/g" ./instances/gitlab/inventory.yml
+    - sed -i "232 s/tenant_example_5_voice/#tenant_example_5_voice/g" ./instances/gitlab/inventory.yml
+    - sed -i "238 s/tenant_example_5_app/#tenant_example_5_app/g" ./instances/gitlab/inventory.yml
+    - bash -x deploy.sh --action=install --tenant=gitlab
+    - until curl -sk --head --request GET https://$PROXMOX_ADDR:5706|grep "302" > /dev/null; do echo "Environment still being installed, sleeping 60 seconds"; sleep 60; done; echo "Environment is up"
+  tags:
+    - deploy
+  only:
+    - /.*pipeline-systemd.*$/
+    - /.*pipeline-all.*$/
+    - schedules
+    - web
+
+deploy-systemd-cluster:
+  stage: deploy
+  environment: PROXMOX_CLUSTER_SYSTEMD
+  script:
+    - rm -rf ~/omldeploytool
+    - git clone --branch $CI_COMMIT_BRANCH https://gitlab.com/omnileads/omldeploytool.git ~/omldeploytool
+    - mkdir -p ~/omldeploytool/ansible/instances/gitlab
+    - cd ~/omldeploytool/ansible
+    - cp inventory.yml instances/gitlab/inventory.yml
+    - sed -i "66 s/172.16.101.41/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
+    - sed -i "68 s/22/5701/g" ./instances/gitlab/inventory.yml
+    - sed -i "70 s/172.16.101.42/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
+    - sed -i "72 s/22/5702/g" ./instances/gitlab/inventory.yml
+    - sed -i "74 s/172.16.101.43/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
+    - sed -i "76 s/22/5703/g" ./instances/gitlab/inventory.yml
+    - sed -i "136 s/s3/s3-no-check-cert/g" ./instances/gitlab/inventory.yml        
+    - sed -i "220 s/tenant_example_1/#tenant_example_1/g" ./instances/gitlab/inventory.yml
+    - sed -i "66 s/172.16.101.41/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
+    - sed -i "70 s/172.16.101.42/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
+    - sed -i "74 s/172.16.101.43/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
+    - bash -x deploy.sh --action=install --tenant=gitlab
+    - until curl -sk --head --request GET https://$PROXMOX_ADDR:5704|grep "302" > /dev/null; do echo "Environment still being installed, sleeping 60 seconds"; sleep 60; done; echo "Environment is up"
+  tags:
+    - deploy
+  only:
+    - /.*pipeline-systemd.*$/
+    - /.*pipeline-all.*$/
+    - schedules
+    - web
+
+deploy-systemd-ha:
+  stage: deploy
+  environment: PROXMOX_HA_SYSTEMD
+  script:
+    - rm -rf ~/omldeploytool
+    - git clone --branch $CI_COMMIT_BRANCH https://gitlab.com/omnileads/omldeploytool.git ~/omldeploytool
+    - mkdir -p ~/omldeploytool/ansible/instances/gitlab
+    - cd ~/omldeploytool/ansible
+    - cp inventory_ha.yml instances/gitlab/inventory.yml
+    - sed -i "30 s/172.16.101.101/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
+    - sed -i "32 s/22/5107/g" ./instances/gitlab/inventory.yml
+    - sed -i "35 s/172.16.101.102/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
+    - sed -i "37 s/22/5108/g" ./instances/gitlab/inventory.yml
+    - sed -i "40 s/172.16.101.103/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
+    - sed -i "42 s/22/5109/g" ./instances/gitlab/inventory.yml
+    - sed -i "44 s/172.16.101.104/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
+    - sed -i "46 s/22/5110/g" ./instances/gitlab/inventory.yml
+    - sed -i "48 s/172.16.101.105/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
+    - sed -i "50 s/22/5111/g" ./instances/gitlab/inventory.yml
+    - sed -i "52 s/172.16.101.106/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
+    - sed -i "54 s/22/5112/g" ./instances/gitlab/inventory.yml
+    - sed -i "56 s/172.16.101.107/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
+    - sed -i "58 s/22/5113/g" ./instances/gitlab/inventory.yml
+    - sed -i "60 s/172.16.101.108/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
+    - sed -i "62 s/22/5114/g" ./instances/gitlab/inventory.yml                    
+    - bash -x deploy.sh --action=install --tenant=gitlab
+    - until curl -sk --head --request GET https://$PROXMOX_ADDR:5115|grep "302" > /dev/null; do echo "Environment still being installed, sleeping 60 seconds"; sleep 60; done; echo "Environment is up"
+  tags:
+    - deploy
+  only:
+    - /.*pipeline-systemd.*$/
+    - /.*pipeline-all.*$/
+    - schedules
+    - web
+
+###################################################################################################################################################################################################################
 
 # deploy-ait-digitalocean:
 #   stage: deploy
@@ -68,59 +160,6 @@ deploy-docker-compose-digitalocean:
 #     - schedules
 #     - web
 #     - merge_request
-
-deploy-ait-lan:
-  stage: deploy
-  environment: DOCTL_DIGITALOCEAN_SYSTEMD
-  script:
-    - rm -rf ~/omldeploytool
-    - git clone --branch $CI_COMMIT_BRANCH https://gitlab.com/omnileads/omldeploytool.git ~/omldeploytool
-    - mkdir -p ~/omldeploytool/ansible/instances/gitlab
-    - cd ~/omldeploytool/ansible
-    - cp inventory_ait.yml instances/gitlab/inventory.yml
-    - sed -i "6 s/X.X.X.X/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
-    - sed -i "7 s/Z.Z.Z.Z/$PROXMOX_ADDR_VM_DATA/g" ./instances/gitlab/inventory.yml
-    - sed -i "11 s/X.X.X.X/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
-    - sed -i "12 s/Z.Z.Z.Z/$PROXMOX_ADDR_VM_VOICE/g" ./instances/gitlab/inventory.yml
-    - sed -i "16 s/X.X.X.X/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
-    - sed -i "17 s/Z.Z.Z.Z/$PROXMOX_ADDR_VM_APP/g" ./instances/gitlab/inventory.yml
-    - sed -i "8 s/22/5701/g" ./instances/gitlab/inventory.yml
-    - sed -i "13 s/22/5702/g" ./instances/gitlab/inventory.yml
-    - sed -i "18 s/22/5703/g" ./instances/gitlab/inventory.yml
-    - sed -i "38 s/cloud/lan/g" ./instances/gitlab/inventory.yml
-    - sed -i "63 s/s3/s3-no-check-cert/g" ./instances/gitlab/inventory.yml
-    - bash -x deploy.sh --action=install --tenant=gitlab
-    - until curl -sk --head --request GET https://$PROXMOX_ADDR:5704|grep "302" > /dev/null; do echo "Environment still being installed, sleeping 60 seconds"; sleep 60; done; echo "Environment is up"
-  tags:
-    - deploy
-  only:
-    - /.*pipeline-systemd.*$/
-    - /.*pipeline-all.*$/
-    - schedules
-    - web
-
-deploy-docker-ansible:
-  stage: deploy
-  environment: PROXMOX_ANSIBLE_AIO
-  script:
-    - rm -rf ~/omldeploytool
-    - git clone --branch $CI_COMMIT_BRANCH https://gitlab.com/omnileads/omldeploytool.git ~/omldeploytool
-    - mkdir -p ~/omldeploytool/ansible/instances/gitlab
-    - cd ~/omldeploytool/ansible
-    - cp inventory_aio.yml instances/gitlab/inventory.yml
-    - sed -i "s/X.X.X.X/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
-    - sed -i "s/Z.Z.Z.Z/$PROXMOX_ADDR_VM_AIO/g" ./instances/gitlab/inventory.yml
-    - sed -i "7 s/22/5705/g" ./instances/gitlab/inventory.yml
-    - sed -i "30 s/cloud/lan/g" ./instances/gitlab/inventory.yml
-    - bash -x deploy.sh --action=install --tenant=gitlab
-    - until curl -sk --head --request GET https://$PROXMOX_ADDR:5706|grep "302" > /dev/null; do echo "Environment still being installed, sleeping 60 seconds"; sleep 60; done; echo "Environment is up"
-  tags:
-    - deploy
-  only:
-    - /.*pipeline-systemd.*$/
-    - /.*pipeline-all.*$/
-    - schedules
-    - web
 
 
 # deploy-systemd-ansible:

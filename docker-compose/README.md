@@ -32,8 +32,8 @@ cd omldeploytool/docker-compose
 In this folder, we will find three Docker Compose files.
 
 * **docker-compose.yml**: is used to launch the stack on the workstation with Docker Desktop.
-* **docker-compose_aio.yml**: is used to launch the stack on a VPS or VM."
-* **docker-compose_aio_ext_bucket.yml**: is used to launch the stack on a VPS or VM and using an external bucket
+* **docker-compose_prod.yml**: is used to launch the stack on a VPS or VM."
+* **docker-compose_prod_external_backend.yml**: is used to launch the stack on a VPS or VM and using an external bucket
 
 ## Setup your environment
 
@@ -125,7 +125,7 @@ S3_ENDPOINT_MINIO=http://localhost:9000
 Now, let's proceed to launch the stack:
 
 ```
-$ docker-compose -f docker-compose_aio.yml up -d
+$ docker-compose -f docker-compose_prod.yml up -d
 ```
 
 ![Diagrama deploy tool](../ansible/png/deploy-tool-tenant-compose-vps.png)
@@ -154,7 +154,7 @@ AWS_SECRET_ACCESS_KEY=HJGGH675675hjghjgHJGHJg67567HJHVHJGdsaddadakjhjk
 Now, let's proceed to launch the stack:
 
 ```
-$ docker-compose -f docker-compose_aio_ext_bucket.yml up -d
+$ docker-compose -f docker-compose_prod_external_backend.yml up -d
 ```
 
 ![Diagrama deploy tool](../ansible/png/deploy-tool-tenant-compose-vps-external.png)
