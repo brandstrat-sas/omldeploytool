@@ -58,10 +58,6 @@
       - python3
       - python3-pip
       - jq
-      - postgresql
-      - python3-psycopg2
-      - python3-boto3
-      - libselinux-python3
     state: latest
   when: ansible_facts['distribution'] == "Rocky" or ansible_facts['distribution'] == "AlmaLinux" 
   tags: 
@@ -85,26 +81,6 @@
   tags: 
     - install
     - postgres
-
-- name: MAIN Disable SELinux Rocky or Alma Linux
-  selinux:
-    state: disabled
-  when: ansible_facts['distribution'] == "Rocky" or ansible_facts['distribution'] == "AlmaLinux"  or ansible_facts['distribution'] == "CentOS"
-  tags: 
-    - install
-    - voice
-    - app
-    - observability
-    - asterisk
-
-- name: MAIN Disable SELinux Rocky or Alma Linux
-  command: setenforce 0
-  tags:
-    - install
-    - upgrade
-  when:
-    - docker_compose is defined   
-    - ansible_facts['distribution'] == "Rocky" or ansible_facts['distribution'] == "AlmaLinux" 
 
 # --- install DOCKER
 - name: MAIN Descargar el script de instalación de Docker
@@ -172,7 +148,7 @@
   tags:
     - install  
   when:
-    - docker_compose is defined   
+    - docker_compose is defined
 
 - name: MAIN add docker-plugin Loki logs
   command: docker plugin install grafana/loki-docker-driver:latest --alias loki --grant-all-permissions
@@ -205,7 +181,7 @@
       - podman
     state: latest
   when: 
-    - ansible_facts['distribution'] == "Rocky" 
+    - ansible_facts['distribution'] == "Rocky" or ansible_facts['distribution'] == "AlmaLinux" 
     - docker_compose is not defined
   tags: 
     - install

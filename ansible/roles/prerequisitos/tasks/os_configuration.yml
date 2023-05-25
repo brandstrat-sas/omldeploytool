@@ -45,11 +45,25 @@
     - observability
     - asterisk
 
-- name: Disable SELinux
+- name: MAIN Disable SELinux Rocky or Alma Linux
   selinux:
     state: disabled
-  when: ansible_os_family == "RedHat"
+  when: ansible_facts['distribution'] == "Rocky" or ansible_facts['distribution'] == "AlmaLinux"  or ansible_facts['distribution'] == "CentOS"
+  tags: 
+    - install
+    - voice
+    - app
+    - observability
+    - asterisk
 
+- name: MAIN Disable SELinux Rocky or Alma Linux
+  command: setenforce 0
+  tags:
+    - install
+    - upgrade
+  when: ansible_facts['distribution'] == "Rocky" or ansible_facts['distribution'] == "AlmaLinux"  or ansible_facts['distribution'] == "CentOS"
+  ignore_errors: yes
+  
 - name: OS_CONF Ensure group {{ usuario }} exists
   group:
     name: '{{ usuario }}'
@@ -140,23 +154,6 @@
   when:
     - certs == "selfsigned"
 
-- name: OS_CONF Copy custom SSL certs
-  copy:
-    src: "../../../instances/{{ tenant_folder }}/cert.pem"
-    dest: /etc/omnileads/certs/cert.pem
-    owner: '{{ usuario }}'
-    group: '{{ usuario }}'
-    mode: 0777
-  tags: 
-    - install
-    - voice
-    - app
-    - observability
-    - asterisk
-    - upgrade
-  when:
-    - certs == "custom"
-
 - name: OS_CONF Copy selfsigned SSL certs
   copy:
     src: "certs/key.pem"
@@ -174,6 +171,23 @@
   when:
     - certs == "selfsigned"
 
+- name: OS_CONF Copy custom SSL certs
+  copy:
+    src: "../../../instances/{{ tenant_folder }}/cert.pem"
+    dest: /etc/omnileads/certs/cert.pem
+    owner: '{{ usuario }}'
+    group: '{{ usuario }}'
+    mode: 0777
+  tags: 
+    - install
+    - voice
+    - app
+    - observability
+    - asterisk
+    - upgrade
+  when:
+    - certs == "custom"
+    
 - name: OS_CONF Copy custom SSL certs
   copy:
     src: "../../../instances/{{ tenant_folder }}/key.pem"

@@ -434,7 +434,7 @@
         - ha_rol == 'main'
 
     - name: REPMGR RSYNC main to readonly
-      shell: "sudo -u postgres rsync -a {{ pg_lib_location_no_version }}/basebackup/  -e 'ssh -o StrictHostKeyChecking=no' root@{{ hostvars['sql_2'].omni_ip_lan }}:{{ pg_lib_location_no_version }}/11/data/"
+      shell: "sudo -u postgres rsync -a {{ pg_lib_location_no_version }}/basebackup/  -e 'ssh -o StrictHostKeyChecking=no' root@{{ postgres_2 }}:{{ pg_lib_location_no_version }}/11/data/"
       when: 
         - omnileads_ha is defined      
         - ha_rol == 'main'
@@ -446,7 +446,7 @@
         - ha_rol == 'main'
 
     - name: REPMGR readonly clone from main
-      shell: "sudo -u postgres /usr/local/bin/repmgr -h {{ hostvars['sql_1'].omni_ip_lan }} -U repmgr -d repmgr -f {{ pg_lib_location_no_version }}/repmgr.conf standby clone -F"
+      shell: "sudo -u postgres /usr/local/bin/repmgr -h {{ postgres_1 }} -U repmgr -d repmgr -f {{ pg_lib_location_no_version }}/repmgr.conf standby clone -F"
       when: 
         - omnileads_ha is defined
         - ha_rol == 'backup'
