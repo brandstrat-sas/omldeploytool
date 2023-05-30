@@ -141,7 +141,7 @@
 
   - name: DOCKER-COMPOSE Copy docker-compose.yml service with external Bucket & Postgres
     template:
-      src: "{{ docker_compose_repo_path }}templates/docker-compose_pgsq_bucket_external.yml"
+      src: "{{ docker_compose_repo_path }}templates/docker-compose_prod_external_backend.yml"
       dest: /etc/omnileads/docker-compose.yml
     tags:
       - install
@@ -149,6 +149,16 @@
     when: 
       - bucket_url is defined  
       - postgres_out == true
+
+  - name: DOCKER-COMPOSE Copy docker-compose.yml service with external Bucket
+      template:
+        src: "{{ docker_compose_repo_path }}templates/docker-compose_prod_external_bucket.yml"
+        dest: /etc/omnileads/docker-compose.yml
+      tags:
+        - install
+        - upgrade
+      when: 
+        - bucket_url is defined  
 
   - name: DOCKER-COMPOSE Create a new database with name {{ postgres_database }}
     postgresql_db:
