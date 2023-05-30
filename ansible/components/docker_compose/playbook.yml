@@ -24,6 +24,8 @@
     - install
   vars:
     img_repo: '{{ container_image_registry }}/omnileads'
+    docker_compose_bucket: docker-compose_prod_external_bucket.yml
+    docker_compose_bucket_postgres: docker-compose_prod_external_backend.yml
   tasks:
 
   - name: DOCKER-COMPOSE Set environment variables for this installation
@@ -128,7 +130,7 @@
     tags:
       - install
 
-  - name: DOCKER-COMPOSE Copy docker-compose.yml service
+  - name: DOCKER-COMPOSE Copy docker-compose.yml
     template:
       src: "{{ docker_compose_repo_path }}templates/docker-compose.yml"
       dest: /etc/omnileads/docker-compose.yml
@@ -139,9 +141,9 @@
       - bucket_url is not defined
       - postgres_out != true
 
-  - name: DOCKER-COMPOSE Copy docker-compose.yml service with external Bucket & Postgres
+  - name: DOCKER-COMPOSE Copy docker-compose.yml with external Bucket & Postgres
     template:
-      src: "{{ docker_compose_repo_path }}templates/docker-compose_prod_external_backend.yml"
+      src: "{{ docker_compose_repo_path }}templates/{{ docker_compose_bucket_postgres }}"
       dest: /etc/omnileads/docker-compose.yml
     tags:
       - install
@@ -151,14 +153,15 @@
       - postgres_out == true
 
   - name: DOCKER-COMPOSE Copy docker-compose.yml service with external Bucket
-      template:
-        src: "{{ docker_compose_repo_path }}templates/docker-compose_prod_external_bucket.yml"
-        dest: /etc/omnileads/docker-compose.yml
-      tags:
-        - install
-        - upgrade
-      when: 
-        - bucket_url is defined  
+    template:
+      src: "{{ docker_compose_repo_path }}templates/{{ docker_compose_bucket }}"
+      dest: /etc/omnileads/docker-compose.yml
+    tags:
+      - install
+      - upgrade
+    when: 
+      - bucket_url is defined  
+      - postgres_out != true
 
   - name: DOCKER-COMPOSE Create a new database with name {{ postgres_database }}
     postgresql_db:
