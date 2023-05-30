@@ -177,19 +177,6 @@
     when: 
       - upgrade_from_oml_1 is not defined
       - postgres_out == true
-      
-  - name: DOCKER-COMPOSE Create a new database with name {{ postgres_homer_db }}
-    postgresql_db:
-      name: "{{ postgres_homer_db }}"
-      login_host: "{{ postgres_host }}"
-      login_password: "{{ postgres_password }}"
-      login_user: "{{ postgres_user }}"
-      port: "{{ postgres_port }}"
-      maintenance_db: "{{ postgres_maintenance_db }}"
-      state: present
-    tags:
-      - install
-    when: postgres_out == true
 
   - name: DOCKER-COMPOSE Adds plperl extension to the database {{ postgres_database }}
     postgresql_ext:

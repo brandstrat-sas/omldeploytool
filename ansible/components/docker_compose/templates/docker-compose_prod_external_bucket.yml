@@ -477,3 +477,4 @@ volumes:
   mariadb_data:
   prometheus_data:
   asterisk_data: 
+  postgres_data: 
