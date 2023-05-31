@@ -225,6 +225,7 @@ HOMERPORT=9060
 PROMETHEUS_ADDR={{ omni_ip_wan }}
 {% else %}
 PROMETHEUS_ADDR={{ omni_ip_lan }}
+{% endif %}
 
 #########################################################################################################
 #                                    DIALER                                                             #
