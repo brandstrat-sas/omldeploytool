@@ -26,6 +26,7 @@
     img_repo: '{{ container_image_registry }}/omnileads'
     docker_compose_bucket: docker-compose_prod_external_bucket.yml
     docker_compose_bucket_postgres: docker-compose_prod_external_backend.yml
+    docker_compose_bucket_postgres_rtpengine: docker-compose_prod_external_backend_rtpengine.yml
   tasks:
 
   - name: DOCKER-COMPOSE Set environment variables for this installation
@@ -140,6 +141,18 @@
     when: 
       - bucket_url is not defined
       - postgres_out != true
+
+  - name: DOCKER-COMPOSE Copy docker-compose.yml with external Bucket, Postgres & RTPengine
+    template:
+      src: "{{ docker_compose_repo_path }}templates/{{ docker_compose_bucket_postgres_rtpengine }}"
+      dest: /etc/omnileads/docker-compose.yml
+    tags:
+      - install
+      - upgrade
+    when: 
+      - bucket_url is defined
+      - postgres_out == true
+      - rtpengine_out == true
 
   - name: DOCKER-COMPOSE Copy docker-compose.yml with external Bucket & Postgres
     template:

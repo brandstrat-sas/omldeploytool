@@ -257,7 +257,6 @@ services:
     depends_on:
       - redis
       - acd
-      - rtpengine 
     dns: 8.8.8.8
     environment:
       - TZ=${TZ}
@@ -332,25 +331,6 @@ services:
       options:
         loki-url: "http://{{ loki_host }}:3100/loki/api/v1/push"
         loki-external-labels: "env=production,component=redis"
-
-  rtpengine:
-    container_name: oml-rtpengine-server
-    dns: 8.8.8.8
-    environment:
-      - TZ=${TZ}
-      - ENV=docker-compose-${ENV}
-      - RTPENGINE_HOSTNAME=${RTPENGINE_HOSTNAME}
-    image: ${OMLRTPENGINE_IMG}
-    network_mode: host
-    privileged: true
-    restart: on-failure
-    stop_grace_period: 1m30s
-    logging:
-      driver: loki
-      options:
-        loki-url: "http://{{ loki_host }}:3100/loki/api/v1/push"
-        loki-external-labels: "env=production,component=rtpengine"
-
 
   websockets:
     tty: true
