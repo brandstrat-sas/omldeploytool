@@ -164,6 +164,7 @@
     when: 
       - bucket_url is defined  
       - postgres_out == true
+      - rtpengine_out != true
 
   - name: DOCKER-COMPOSE Copy docker-compose.yml service with external Bucket
     template:
@@ -175,6 +176,7 @@
     when: 
       - bucket_url is defined  
       - postgres_out != true
+      - rtpengine_out != true
 
   - name: DOCKER-COMPOSE Create a new database with name {{ postgres_database }}
     postgresql_db:
