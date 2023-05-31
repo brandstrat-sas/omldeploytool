@@ -109,7 +109,7 @@ deploy-systemd-ha:
     - sed -i "60 s/172.16.101.108/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
     - sed -i "62 s/22/5114/g" ./instances/gitlab/inventory.yml                    
     - bash -x deploy.sh --action=install --tenant=gitlab
-    - until curl -sk --head --request GET https://$PROXMOX_ADDR:5115|grep "302" > /dev/null; do echo "Environment still being installed, sleeping 60 seconds"; sleep 60; done; echo "Environment is up"
+    #- until curl -sk --head --request GET https://$PROXMOX_ADDR:5115|grep "302" > /dev/null; do echo "Environment still being installed, sleeping 60 seconds"; sleep 60; done; echo "Environment is up"
   tags:
     - deploy
   only:
