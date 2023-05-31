@@ -40,7 +40,7 @@ services:
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
       - S3_ENDPOINT=${S3_ENDPOINT}
-      - AWS_DEFAULT_REGION=us-east-1
+      - S3_REGION_NAME=${AWS_DEFAULT_REGION}
       - GOOGLE_MAPS_API_KEY=${GOOGLE_MAPS_API_KEY}
       - GOOGLE_MAPS_CENTER='${GOOGLE_MAPS_CENTER}'
       - EMAIL_BACKEND=django.core.mail.backends.dummy.EmailBackend
@@ -384,7 +384,7 @@ services:
       - '--web.console.templates=/etc/prometheus/consoles'
       - '--storage.tsdb.retention.time=30d'
       - '--web.enable-lifecycle'
-      - '--web.listen-address=${PUBLIC_IP}:9090'
+      - '--web.listen-address=${PROMETHEUS_ADDR}:9090'
     restart: unless-stopped
     network_mode: host
     labels:
