@@ -110,6 +110,8 @@
       - oml_sip_trunks_override.conf
       - oml_voicemail_custom.conf
       - oml_voicemail_override.conf
+      - oml_pjsip_transports_override.conf
+      - oml_pjsip_transports_custom.conf
     when: ast_custom_exists.rc == 0
     tags:
       - install
@@ -128,8 +130,6 @@
       - oml_extensions_modules_custom.conf
       - oml_extensions_postcall_custom.conf
       - oml_extensions_precall_custom.conf
-      - oml_pjsip_transports_override.conf
-      - oml_pjsip_transports_custom.conf
     tags:
       - install
 

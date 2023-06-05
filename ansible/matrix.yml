@@ -112,3 +112,4 @@
   when: 
     - docker_compose is not defined
     - omnileads_ha is not defined
+    - loki_host is defined

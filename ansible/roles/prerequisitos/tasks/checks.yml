@@ -201,7 +201,7 @@
 # Set minio_host as {{ data_host }} on App instance when minios_host is not explicitly defined
 - name: CHECKS Setting minio_host
   set_fact:
-    minio_host: "{{ data_host }}"
+    minio_host: "http://{{ data_host }}:9000"
   changed_when: false
   when:
     - bucket_url is not defined
@@ -415,16 +415,6 @@
     - voice
     - asterisk
 
-- name: CHECKS Setting loki_host as localhost
-  set_fact:
-    loki_host: localhost
-  changed_when: false
-  when:
-    - loki_host is not defined
-    - docker_compose is defined
-  tags: 
-    - install
-    - upgrade
 
 # --- IMPORTANT: aqui controlo las variables que sean *requisito* para el deploy
 # --- si no está declarada entonces puedo escapar con un fail

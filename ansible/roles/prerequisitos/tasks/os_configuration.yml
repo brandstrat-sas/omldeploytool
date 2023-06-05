@@ -171,7 +171,7 @@
   when:
     - certs == "selfsigned"
 
-- name: OS_CONF Copy custom SSL certs
+- name: OS_CONF Copy custom SSL cert.pem
   copy:
     src: "../../../instances/{{ tenant_folder }}/cert.pem"
     dest: /etc/omnileads/certs/cert.pem
@@ -187,8 +187,27 @@
     - upgrade
   when:
     - certs == "custom"
-    
-- name: OS_CONF Copy custom SSL certs
+    - cert_file_name is not defined
+
+- name: OS_CONF Copy custom tenant SSL cert.pem
+  copy:
+    src: "../../../instances/{{ tenant_folder }}/{{ cert_file_name }}"
+    dest: /etc/omnileads/certs/cert.pem
+    owner: '{{ usuario }}'
+    group: '{{ usuario }}'
+    mode: 0777
+  tags: 
+    - install
+    - voice
+    - app
+    - observability
+    - asterisk
+    - upgrade
+  when:
+    - certs == "custom"
+    - cert_file_name is defined
+
+- name: OS_CONF Copy custom SSL key.pem
   copy:
     src: "../../../instances/{{ tenant_folder }}/key.pem"
     dest: /etc/omnileads/certs/key.pem
@@ -204,6 +223,25 @@
     - upgrade
   when:
     - certs == "custom"
+    - key_file_name is not defined
+
+- name: OS_CONF Copy custom tenant SSL key.pem
+  copy:
+    src: "../../../instances/{{ tenant_folder }}/{{ key_file_name }}"
+    dest: /etc/omnileads/certs/key.pem
+    owner: "{{ usuario }}"
+    group: "{{ usuario }}"
+    mode: 0777
+  tags: 
+    - install
+    - voice
+    - app
+    - observability
+    - asterisk
+    - upgrade
+  when:
+    - certs == "custom"
+    - key_file_name is defined
 
 - name: OS_CONF Copy oml_manage script
   template:
