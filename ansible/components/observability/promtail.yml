@@ -21,6 +21,7 @@
     - omnileads_data
     - omnileads_voice
     - omnileads_app
+    - omnileads_aio
   tags:
     - all_components
     - observability

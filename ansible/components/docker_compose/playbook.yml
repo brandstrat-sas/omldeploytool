@@ -128,6 +128,8 @@
       - oml_extensions_modules_custom.conf
       - oml_extensions_postcall_custom.conf
       - oml_extensions_precall_custom.conf
+      - oml_pjsip_transports_override.conf
+      - oml_pjsip_transports_custom.conf
     tags:
       - install
 

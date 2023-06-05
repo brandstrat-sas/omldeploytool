@@ -107,4 +107,8 @@
   when: 
     - omlapp is defined or omlaio is defined
     - omnileads_ha is not defined
-  
+
+- import_playbook: components/observability/promtail.yml
+  when: 
+    - docker_compose is not defined
+    - omnileads_ha is not defined

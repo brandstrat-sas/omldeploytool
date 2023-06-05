@@ -12,16 +12,6 @@ scrape_configs:
     static_configs:
       - targets: ['localhost:9100']
 
-  # - job_name: '{{ tenant_id }}_heplify-server'
-  #   static_configs:
-  #     - targets: ['localhost:9096']
-
-# {% if postgres_out != true %}
-#   - job_name: '{{ tenant_id }}_postgres'
-#     static_configs:
-#       - targets: ['localhost:9187']
-# {% endif %}
-
   - job_name: '{{ tenant_id }}_redis'
     static_configs:
       - targets: ['localhost:9121']

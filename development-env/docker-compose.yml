@@ -170,6 +170,7 @@ services:
       - omnileads
     ports:
       - ${SIP_EXT_PORT}:5060/udp
+      - 7088:7088
     privileged: true
     restart: on-failure
     stop_grace_period: 1m30s
@@ -287,8 +288,8 @@ services:
     container_name: oml-rtpengine
     dns: 8.8.8.8
     environment:
+      - ENV=docker-compose-${ENV}
       - TZ=${TZ}
-      - ENV=devenv
     image: ${OMLRTPENGINE_IMG}
     networks:
       - omnileads

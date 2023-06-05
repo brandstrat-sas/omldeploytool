@@ -2,17 +2,42 @@ global:
   scrape_interval:     10s
   evaluation_interval: 10s
 
-  # Attach these labels to any time series or alerts when communicating with
-  # external systems (federation, remote storage, Alertmanager).
-  external_labels:
-      monitor: 'docker-heplify-server'
+#   # Attach these labels to any time series or alerts when communicating with
+#   # external systems (federation, remote storage, Alertmanager).
+#   external_labels:
+#       monitor: 'docker-heplify-server'
 
-# Load and evaluate rules in this file every 'evaluation_interval' seconds.
-rule_files:
-  - "alert.rules"
+# # Load and evaluate rules in this file every 'evaluation_interval' seconds.
+# rule_files:
+#   - "alert.rules"
 
 # A scrape configuration containing exactly one endpoint to scrape.
-scrape_configs:
+scrape_configs:  
+
+{% if omlaio is defined  or docker_compose is defined %}
+
+  - job_name: '{{ tenant_id }}_host'
+    static_configs:
+      - targets: ['localhost:9100']
+
+  - job_name: '{{ tenant_id }}_redis'
+    static_configs:
+      - targets: ['localhost:9121']
+
+  - job_name: '{{ tenant_id }}_asterisk'
+    static_configs:
+      - targets: ['localhost:7088']
+
+  - job_name: '{{ tenant_id }}_cadvisor'
+    static_configs:
+      - targets: ['localhost:8080']
+
+{% else %}
+
+  - job_name: '{{ tenant_id }}_postgres'
+    static_configs:
+      - targets: ['{{ data_host }}:9187']
+  
   - job_name: '{{ tenant_id }}_app_host'
     static_configs:
       - targets: ['{{ application_host }}:9100']
@@ -25,19 +50,9 @@ scrape_configs:
     static_configs:
       - targets: ['{{ data_host }}:9100']
 
-  - job_name: prometheus
-    static_configs:
-      - targets: ['localhost:9090']
-
   - job_name: '{{ tenant_id }}_heplify-server'
     static_configs:
       - targets: ['{{ voice_host }}:9096']
-
-{% if postgres_out != true %}
-  - job_name: '{{ tenant_id }}_postgres'
-    static_configs:
-      - targets: ['{{ data_host }}:9187']
-{% endif %}
 
   - job_name: '{{ tenant_id }}_redis'
     static_configs:
@@ -47,8 +62,9 @@ scrape_configs:
     static_configs:
       - targets: ['{{ voice_host }}:7088']
 
-alerting:
-  alertmanagers:
-  - scheme: http
-    static_configs:
-    - targets:
+{% endif %}
+# alerting:
+#   alertmanagers:
+#   - scheme: http
+#     static_configs:
+#     - targets:

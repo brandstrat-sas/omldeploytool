@@ -53,11 +53,28 @@ ExecStart=/usr/bin/podman run \
   --volume=oml_promtail:/tmp \
   --volume=postgres_logs:/var/log/postgres/:ro \
   --volume=redis_logs:/var/log/redis:ro \
-  --volume=loki_logs:/var/log/loki:ro \
   --name=promtail-server \
   --rm  \
   {{ container_image_registry }}/grafana/promtail -config.file=/etc/promtail/promtail.yml -config.expand-env=true
 {% else %}
+ExecStart=/usr/bin/podman run \
+  --cidfile=%t/%n.ctr-id \
+  --cgroups=no-conmon \
+  --sdnotify=conmon \
+  --replace \
+  --detach \
+  --network=host \
+  --volume=/etc/default/promtail.yml:/etc/promtail/promtail.yml \
+  --volume=oml_promtail:/tmp \
+  --volume=postgres_logs:/var/log/postgres/:ro \
+  --volume=redis_logs:/var/log/redis:ro \
+  --volume=django_logs:/var/log/django/:ro \
+  --volume=nginx_logs:/var/log/nginx:ro \
+  --name=promtail-server \
+  --volume=asterisk_logs:/var/log/asterisk/:ro \
+  --volume=rtpengine_logs:/var/log/rtpengine:ro \
+  --rm  \
+  {{ container_image_registry }}/grafana/promtail -config.file=/etc/promtail/promtail.yml -config.expand-env=true
 {% endif %}     
 
 ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
