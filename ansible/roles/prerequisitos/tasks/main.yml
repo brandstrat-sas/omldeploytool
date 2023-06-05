@@ -30,7 +30,6 @@
       - python3-psycopg2
       - postgresql-client
       - certbot
-      - python3-certbot-nginx
     update_cache: yes
     state: latest
   when: ansible_os_family == "Debian"
