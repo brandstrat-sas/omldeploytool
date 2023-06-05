@@ -30,8 +30,6 @@ all:
           tenant_id: tenant_example_1
           ansible_host: 190.19.150.18
           omni_ip_lan: 172.16.101.44
-          ansible_ssh_port: 5705
-          infra_env: lan        
         tenant_example_2:
           tenant_id: tenant_example_2
           ansible_host: 190.19.11.2
