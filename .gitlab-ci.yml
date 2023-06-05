@@ -31,7 +31,7 @@ deploy-docker-compose-cloud:
 
 deploy-docker-compose-ansible:
   stage: deploy
-  environment: PROXMOX_DOCKER_ANSIBLE
+  environment: CLOUD_DOCKER_ANSIBLE
   script:
     - doctl auth init -t ${DIGITALOCEAN_ACCESS_TOKEN}
     - doctl compute droplet create --image ${DIGITALOCEAN_DROPLET_IMG} --size ${DIGITALOCEAN_DROPLET_SIZE} --region ${DIGITALOCEAN_REGION} --ssh-keys ${DIGITALOCEAN_SSH_KEY} cicd-ansible-compose.${CI_JOB_ID}
@@ -49,7 +49,7 @@ deploy-docker-compose-ansible:
     - sed -i "230 s/tenant_example_5_voice/#tenant_example_5_voice/g" ./instances/gitlab/inventory.yml
     - sed -i "236 s/tenant_example_5_app/#tenant_example_5_app/g" ./instances/gitlab/inventory.yml
     - bash -x deploy.sh --action=install --tenant=gitlab
-    - until curl -sk --head --request GET https://$OML_IPADDR:5706|grep "302" > /dev/null; do echo "Environment still being installed, sleeping 60 seconds"; sleep 60; done; echo "Environment is up"
+    - until curl -sk --head --request GET https://$OML_IPADDR|grep "302" > /dev/null; do echo "Environment still being installed, sleeping 60 seconds"; sleep 60; done; echo "Environment is up"
     - sleep 120
     - doctl compute droplet delete -f cicd-ansible-compose.${CI_JOB_ID}
   tags:
@@ -100,7 +100,7 @@ deploy-systemd-ha:
     - cd ~/omldeploytool/ansible
     - cp inventory_ha.yml instances/gitlab/inventory.yml
     - sed -i "30 s/172.16.101.101/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
-    - sed -i "32 s/22/5107/g" ./instances/gitlab/inventory.yml
+    - sed -i "32 s/22/5107/g" ./instances/gitlab/inventory.yml  
     - sed -i "35 s/172.16.101.102/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
     - sed -i "37 s/22/5108/g" ./instances/gitlab/inventory.yml
     - sed -i "40 s/172.16.101.103/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
