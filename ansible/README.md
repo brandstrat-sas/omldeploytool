@@ -61,7 +61,7 @@ An instance of OMniLeads is launched on a Linux server (using Systemd & Podman o
 
 This executable script triggers the deploy actions. It is responsible for receiving the action parameters to execute and the tenant on which to deploy the action.
 
-The script searches for the inventory file of the tenant on which it needs to operate and then launches the root Ansible playbook (matrix.yml) through ansible-playbook with the corresponding tags to respond to the request made. 
+The script searches for the inventory file of the tenant (or group of them) on which it needs to operate and then launches the root Ansible playbook (matrix.yml) through ansible-playbook with the corresponding tags to respond to the request made. 
 
 ```
 ./deploy.sh --help
@@ -75,27 +75,32 @@ To run an installation, upgrades, backup or restore deployment, two parameters m
 for example: 
 
 ```
-./deploy.sh --action=install --tenant=tenant_folder_name
+./deploy.sh --action=install --tenant=tenants_folder_name
 ```
 
 ## Ansible 🔧 <a name="ansible-inventory"></a>
 
 Ansible allows you to run a number of tasks on a set of hosts specified in your inventory file. Depending on the structure and variables of this file, OMniLeads instances based on docker or podman can be launched. 
 
-OML All in One with docker-compose:
+This tool is capable of deploying OMniLeads in three layouts: 
+
+* docker-compose:
 ![Diagrama deploy tool](./png/deploy-tool-tenant-aio-docker.png)
 
 
-OML All in One with Podman & Systemd:
+* OML All in One with Podman & Systemd:
 ![Diagrama deploy tool](./png/deploy-tool-tenant-aio.png)
 
 
 
-OML Cluster with Podman & Systemd:
+* OML Cluster with Podman & Systemd:
 ![Diagrama deploy tool](./png/deploy-tool-tenant-ait.png)
 
 
-For example:
+The following is the generic version of inventory.yml file available in this repository.
+
+In the first section of the file you can list the different hosts grouped by tenant and by type of deployment (All in one or Cluster).
+
 
 ```
 ---
@@ -361,7 +366,7 @@ For example:
 ```
 mkdir instances/cloud_oml
 mkdir instances/onpremise_oml
-mkdir instances/company_A_oml
+mkdir instances/company_A_omls
 ```
 
 Once the tenant folder is generated, there you will need to place a copy of the *inventory.yml* file available
@@ -370,7 +375,7 @@ in the root of this repository, in order to customize and tack inside the privat
 ```
 cp inventory.yml instances/cloud_oml
 cp inventory.yml instances/onpremise_oml
-cp inventory.yml instances/company_A_oml
+cp inventory.yml instances/company_A_omls
 ```
 
 Then, once we have adjusted the inventory.yml file inside the tenant's folder, we can trigger its deployment.
@@ -396,27 +401,25 @@ The important thing is that the selected distribution has a version of Podman (3
 
 Then you should work on the inventory.yml tenant file.
 
+![inventory deploy example header](./png/inventory_header_deploy_1.png)
+
 ```
-all:
-  hosts:
-    omnileads_aio:
-      omldata: true
-      ansible_host: 172.16.101.43 
-      omni_ip_lan: 172.16.101.43
-      ansible_ssh_port: 22      
-  vars:
-    # --- ansible user auth connection
-    ansible_user: root
+algarrobo:
+  tenant_id: algarrobo
+  ansible_host: 190.19.150.18
+  omni_ip_lan: 172.16.101.44
+  infra_env: lan
 ```
 
-The parameter ansible_host refers to the IP or FQDN used to establish an SSH connection. The omni_ip_lan parameter refers to the private IP (LAN) that will be used when opening certain ports for components and when they connect with each other.
+The ***infra_env*** variable can be initialized as "lan" or "cloud" (default), depending on whether the instance will be accessible via WAN access (IPADDR or FQDN) or via LAN access (IP or FQDN).
 
-The ***infra_env*** variable can be initialized as "lan" or "cloud", depending on whether the instance will be accessible via WAN access (IPADDR or FQDN) or via LAN access (IP or FQDN).
+The *bucket_url* and *postgres_host* parameters must be commented out, so that both (PostgreSQL and Object Storage MinIO) are deployed within the AIO instance.
 
-Regarding the variable that is commented out by default, ***#fqdn:*** should be used (uncommented and initialized) as soon as the instance is accessed via a fqdn.
+Then in the vars section, we have all the parameters that omnileads expects to work. These variables affect all the hosts that are going to be managed from this inventory.yml. 
 
-The rest of the variables are documented as comments within the file.
+Finally in the last section of the file, we must make sure that our tenant is listed in the omnileads_aio hosts group.
 
+![inventory deploy example footer](./png/inventory_end_deploy_2.png)
 
 Let's run the bash scrip:
 
@@ -438,46 +441,72 @@ Ansible needs to establish an SSH connection to deploy the actions.
 
 ![Diagrama deploy cloud services](./png/deploy-tool-tenant-components-ait.png)
 
-You must to generate the tenant folder and put here an inventory.yml file, for example:
-
-```
-mkdir instances/my_subscriber_002
-cp inventory_ait.yml instances/my_subscriber_002/inventory.yml
-```
-
-> Note: don't forget to generate the inventory.yml file from the appropriate template for the type of installation you want to deploy: _aio or _ait, or _ha.
 
 Then you should work on the inventory.yml tenant file.
 
 ```
-all:
-  hosts:
-    omnileads_data:
-      omldata: true
-      ansible_host: 24.199.100.87
-      omni_ip_lan: 10.10.10.2
-      ansible_ssh_port: 22      
-    omnileads_voice:
-      omlvoice: true
-      ansible_host: 144.126.221.171
-      omni_ip_lan: 10.10.10.3
-      ansible_ssh_port: 22      
-    omnileads_app:
-      omlapp: true
-      ansible_host: 143.198.49.244
-      omni_ip_lan: 10.10.10.4
-      ansible_ssh_port: 22  
+# -----------------------------------------
+# -----------------------------------------
+cluster_instances:
+  children:
+    tenant_mr_x:
+      hosts:
+        tenant_mr_x_data:
+          ansible_host: 172.16.101.41
+          omni_ip_lan: 172.16.101.41
+          ansible_ssh_port: 22
+        tenant_mr_x_voice:
+          ansible_host: 172.16.101.42
+          omni_ip_lan: 172.16.101.42
+          ansible_ssh_port: 22
+        tenant_mr_x_app:
+          ansible_host: 172.16.101.43
+          omni_ip_lan: 172.16.101.43
+          ansible_ssh_port: 22
+      vars:
+        tenant_id: tenant_mr_x
+        data_host: 172.16.101.41
+        voice_host: 172.16.101.42
+        application_host: 172.16.101.43
+        infra_env: lan
 ```
-
 The parameter ansible_host refers to the IP or FQDN used to establish an SSH connection. The omni_ip_lan parameter refers to the private IP (LAN) that will be used when opening certain ports for components and when they connect with each other.
 
 The infra_env variable can be initialized as "lan" or "cloud", depending on whether the OMniLeads instance will be accessible via WAN access (IPADDR or FQDN) or via LAN access (IP or FQDN).
 
-Regarding the variable that is commented out by default, #fqdn should be used (uncommented and initialized) as soon as the instance is accessed via a hostname or FQDN.
+The *bucket_url* and *postgres_host* parameters must be commented out, so that both (PostgreSQL and Object Storage MinIO) are deployed within the AIO instance.
 
-And finally, the *bucket_url* and *postgres_host* parameters must be commented out, so that both (PostgreSQL and Object Storage MinIO) are deployed within the AIO instance.
 The rest of the parameters can be customized as desired.
-Finally, the deploy.sh should be executed.
+
+Finally in the last section of the file, we must make sure that our tenant is listed in the omnileads_aio hosts group.
+
+```
+omnileads_aio:
+  hosts:
+    #tenant_example_1:
+    #tenant_example_2:
+    #tenant_example_3:
+    #tenant_example_4:
+
+omnileads_data:
+  hosts:
+    tenant_mr_x_data:    
+  vars:
+    omldata: true
+    
+omnileads_voice:
+  hosts:
+    tenant_mr_x_voice:
+  vars:
+    omlvoice: true
+
+omnileads_app:
+  hosts:
+    tenant_mr_x_5_app:
+  vars:
+    omlapp: true
+
+```
 
 ```
 ./deploy.sh --action=install --tenant=tenant_name_folder
