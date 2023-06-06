@@ -3,6 +3,7 @@ services:
   app:
     container_name: oml-django
     depends_on:
+      - postgresql
       - redis
       - acd
     dns: 8.8.8.8
@@ -70,6 +71,9 @@ services:
       - django_callrec_zip:/opt/omnileads/asterisk/var/spool/asterisk/monitor
 
   channels:
+    depends_on:
+      - redis
+      - acd
     container_name: oml-django-channels
     dns: 8.8.8.8
     environment:
@@ -130,6 +134,9 @@ services:
     working_dir: /opt/omnileads/ominicontacto
 
   crones:
+    depends_on:
+      - redis
+      - acd
     container_name: oml-django-cron
     dns: 8.8.8.8
     environment:
@@ -190,6 +197,7 @@ services:
   acd:
     container_name: oml-asterisk
     depends_on:
+      - postgresql
       - redis
       - websockets
     dns: 8.8.8.8
@@ -232,6 +240,7 @@ services:
     depends_on:
       - redis
       - acd
+      - rtpengine 
     dns: 8.8.8.8
     environment:
       - TZ=${TZ}
@@ -276,6 +285,23 @@ services:
       - django_static:/opt/omnileads/static
       - django_callrec_zip:/opt/omnileads/asterisk/var/spool/asterisk/monitor
       - ./certs:/etc/omnileads/certs
+
+  postgresql:
+    container_name: oml-postgres
+    dns: 8.8.8.8
+    environment:
+      - TZ=${TZ}
+      - POSTGRES_USER=${PGUSER}
+      - POSTGRES_PASSWORD=${PGPASSWORD}
+      - POSTGRES_DB=${PGDATABASE}
+    image: ${OMLPGSQL_IMG}
+    command: postgres -c listen_addresses=${PGHOST}
+    network_mode: host
+    privileged: true
+    restart: on-failure
+    stop_grace_period: 1m30s
+    volumes:
+      - postgresql_data:/var/lib/postgresql/data
 
   redis:
     container_name: oml-redis

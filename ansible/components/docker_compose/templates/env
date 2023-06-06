@@ -170,7 +170,7 @@ REDIS_HOSTNAME={{ redis_host }}
 
 # ------------------------------------------------------------------------------
 # --- IP or hostname that each instance will invoke when locating the other    
-RTPENGINE_HOSTNAME={{ omni_ip_lan }}
+RTPENGINE_HOSTNAME={{ rtpengine_host }}
 
 #########################################################################################################
 #                                Object Storage BUCKET config                                           #
@@ -220,6 +220,12 @@ HOMER_ENABLE=false
 HOMERHOST=heplify-server
 
 HOMERPORT=9060
+
+{% if infra_env == "cloud" %}
+PROMETHEUS_ADDR={{ omni_ip_wan }}
+{% else %}
+PROMETHEUS_ADDR={{ omni_ip_lan }}
+{% endif %}
 
 #########################################################################################################
 #                                    DIALER                                                             #

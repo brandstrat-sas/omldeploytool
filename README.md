@@ -20,7 +20,7 @@ the application practically without configuration.
 To launch the application using Ansible on any modern Linux instance with [Podman](https://docs.podman.io/en/latest/) or [Docker-Engine](https://docker.com/) support.
 Under this format, hundreds of instances of the application can be managed using Ansible.
 
-[Ansible](systemd/README.md)
+[Ansible](ansible/README.md)
 
 #### development-environment :sunflower: :notes: :dizzy:
 

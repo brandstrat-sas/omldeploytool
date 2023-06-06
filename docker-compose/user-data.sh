@@ -1,6 +1,7 @@
 #!/bin/bash
 
 oml_nic=eth1
+env=cloud
 
 PRIVATE_IPV4=$(ip addr show $oml_nic | grep "inet\b" | awk '{print $2}' | cut -d/ -f1)
 PUBLIC_IPV4=$(curl ifconfig.co)
@@ -12,10 +13,9 @@ bash ~/get-docker.sh
 
 git clone https://gitlab.com/omnileads/omldeploytool.git ~/omldeploytool
 cd ~/omldeploytool/docker-compose
-git checkout oml-289-dev-aio-compose-ansible
 cp env .env
 
-sed -i "s/ENV=devenv/ENV=cloud/g" .env
+sed -i "s/ENV=devenv/ENV=$env/g" .env
 sed -i "s/DJANGO_HOSTNAME=app/DJANGO_HOSTNAME=localhost/g" .env
 sed -i "s/PUBLIC_IP=/PUBLIC_IP=$PUBLIC_IPV4/g" .env
 sed -i "s/DAPHNE_HOSTNAME=channels/DAPHNE_HOSTNAME=localhost/g" .env

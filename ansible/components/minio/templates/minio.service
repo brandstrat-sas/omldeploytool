@@ -21,7 +21,11 @@ ExecStart=/usr/bin/podman run \
   --name=oml-minio-server \
   --volume=oml_minio:/data \
   --rm  \
-  quay.io/minio/minio:{{ minio_version }} server /data --console-address "{{ minio_host }}:9090"
+  {% if omlaio is defined %}
+  quay.io/minio/minio:{{ minio_version }} server /data --console-address "localhost:9001"
+  {% else %}
+  quay.io/minio/minio:{{ minio_version }} server /data --console-address "{{ data_host }}:9001"
+  {% endif %}
 ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
 ExecStopPost=/usr/bin/podman rm -f --ignore --cidfile=%t/%n.ctr-id
 Type=notify

@@ -22,124 +22,62 @@
 
 all:
   children:
-    cluster_ha_instances:
+    # -----------------------------------------
+    # -----------------------------------------
+    aio_instances:      
+      hosts:
+        tenant_example_1:
+          tenant_id: tenant_example_1
+          ansible_host: 190.19.150.18
+          omni_ip_lan: 172.16.101.44
+        tenant_example_2:
+          tenant_id: tenant_example_2
+          ansible_host: 190.19.11.2
+          omni_ip_lan: 10.10.10.2          
+        tenant_example_3:
+          tenant_id: tenant_example_3
+          ansible_host: 201.22.11.2
+          omni_ip_lan: 10.10.10.3
+          postgres_host:          
+          postgres_port: 
+          postgres_user: 
+          postgres_password: 
+          postgres_database: omnileads
+          postgres_maintenance_db: defaultdb
+          postgres_ssl: true
+          bucket_access_key: 
+          bucket_secret_key: 
+          bucket_name: tenant_example_3
+        tenant_example_4:
+          tenant_id: tenant_example_4
+          ansible_host: 
+          omni_ip_lan: 
+      vars:
+        docker_compose: true
+    # -----------------------------------------
+    # -----------------------------------------
+    cluster_instances:
       children:
-        tenant_aaa: 
+        tenant_example_5:
           hosts:
-            tenant_aaa_sql_1:
-              ansible_host: 172.16.101.101
-              omni_ip_lan: 172.16.101.101
+            tenant_example_5_data:
+              ansible_host: 172.16.101.41
+              omni_ip_lan: 172.16.101.41
               ansible_ssh_port: 22
-              ha_vip_nic: eth0
-            tenant_aaa_sql_2:
-              ansible_host: 172.16.101.102
-              omni_ip_lan: 172.16.101.102
+            tenant_example_5_voice:
+              ansible_host: 172.16.101.42
+              omni_ip_lan: 172.16.101.42
               ansible_ssh_port: 22
-              ha_vip_nic: eth0
-            tenant_aaa_voice_1: 
-              ansible_host: 172.16.101.103
-              omni_ip_lan: 172.16.101.103
-              ansible_ssh_port: 22
-            tenant_aaa_voice_2: 
-              ansible_host: 172.16.101.104
-              omni_ip_lan: 172.16.101.104
-              ansible_ssh_port: 22
-            tenant_aaa_app_1:
-              ansible_host: 172.16.101.105
-              omni_ip_lan: 172.16.101.105
-              ansible_ssh_port: 22
-            tenant_aaa_app_2:
-              ansible_host: 172.16.101.106
-              omni_ip_lan: 172.16.101.106
-              ansible_ssh_port: 22
-            tenant_aaa_haproxy_1: 
-              ansible_host: 172.16.101.107
-              omni_ip_lan: 172.16.101.107
-              ansible_ssh_port: 22
-            tenant_aaa_haproxy_2: 
-              ansible_host: 172.16.101.108
-              omni_ip_lan: 172.16.101.108
+            tenant_example_5_app:
+              ansible_host: 172.16.101.43
+              omni_ip_lan: 172.16.101.43
               ansible_ssh_port: 22
           vars:
-            tenant_id: tenant_aaa
-            ### estas variables pueden ser optimizadas ###
-            postgres_1: 172.16.101.101
-            postgres_2: 172.16.101.102
-            voice_1: 172.16.101.103
-            voice_2: 172.16.101.104
-            app_1: 172.16.101.105
-            app_2: 172.16.101.106            
-            haproxy_1: 172.16.101.107
-            ##############################################
-            ha_vip_nic: ens18
-            app_port: 443
-            # -- cluster info & virtual IPs
-            redis_host: 172.16.101.204
-            redis_ip_main: 172.16.101.105
-            postgres_host: 172.16.101.201
-            postgres_ro_host: 172.16.101.202
-            voice_host: 172.16.101.203
-            application_host: 172.16.101.204
-            bucket_url: https://172.16.101.3:9000
-            bucket_access_key: mYLcr7sx5vEbe7PO
-            bucket_secret_key: v1Dl34Q29Bv6ruaWS7cUAEvSVfAtvGkR
-            bucket_name: proxmox-deb
-
-####################################### TALCA ########################################
-####################################### TALCA ########################################
-####################################### TALCA ########################################
-####################################### TALCA ########################################
-####################################### TALCA ########################################
-
-        tenant_bbb: 
-          hosts:
-            tenant_bbb_sql_1:
-              ansible_host: 172.16.101.111
-              omni_ip_lan: 172.16.101.111
-            tenant_bbb_sql_2:
-              ansible_host: 172.16.101.112
-              omni_ip_lan: 172.16.101.112
-            tenant_bbb_voice_1: 
-              ansible_host: 172.16.101.113
-              omni_ip_lan: 172.16.101.113
-            tenant_bbb_voice_2: 
-              ansible_host: 172.16.101.114
-              omni_ip_lan: 172.16.101.114
-            tenant_bbb_app_1:
-              ansible_host: 172.16.101.115
-              omni_ip_lan: 172.16.101.115
-            tenant_bbb_app_2:
-              ansible_host: 172.16.101.116
-              omni_ip_lan: 172.16.101.116
-            tenant_bbb_haproxy_1: 
-              ansible_host: 172.16.101.117
-              omni_ip_lan: 172.16.101.117
-            tenant_bbb_haproxy_2: 
-              ansible_host: 172.16.101.118
-              omni_ip_lan: 172.16.101.118              
-          vars:
-            tenant_id: tenant_bbb
-            postgres_1: 172.16.101.101
-            postgres_2: 172.16.101.102
-            voice_1: 172.16.101.103
-            voice_2: 172.16.101.104
-            app_1: 172.16.101.105
-            app_2: 172.16.101.106
-            haproxy_1: 172.16.101.107
-            ##############################################
-            ha_vip_nic: ens18
-            app_port: 443
-            # -- cluster info & virtual IPs
-            redis_host: 172.16.101.204
-            redis_ip_main: 172.16.101.105
-            postgres_host: 172.16.101.201
-            postgres_ro_host: 172.16.101.202
-            voice_host: 172.16.101.203
-            application_host: 172.16.101.204
-            bucket_url: https://172.16.101.3:9000
-            bucket_access_key: mYLcr7sx5vEbe7PO
-            bucket_secret_key: v1Dl34Q29Bv6ruaWS7cUAEvSVfAtvGkR
-            bucket_name: tenant_bbb
+            tenant_id: tenant_example_5
+            data_host: 172.16.101.41
+            voice_host: 172.16.101.42
+            application_host: 172.16.101.43
+            infra_env: lan
 
 ##################################################################################################################
 # -- OMniLeads Common Variables                                                                                  #
@@ -158,14 +96,14 @@ all:
     websockets_version: 230204.01
     nginx_version: 230215.01
     kamailio_version: 230204.01
-    asterisk_version: 230604.01
+    asterisk_version: 230524.01
     rtpengine_version: 230524.01
     postgres_version: 230204.01  
     centos_postgresql_version: 11
     # --- "cloud" instance (access through public IP)
     # --- or "lan" instance (access through private IP)
     # --- in order to set NAT or Publica ADDR for RTP voice packages
-    infra_env: ha
+    infra_env: cloud
     # --- If you have an DNS FQDN resolution, you must to uncomment and set this param
     # --- otherwise leave commented to work invoking through an IP address
     #fqdn: fts.sefirot.cloud
@@ -182,7 +120,7 @@ all:
     # --- example Digital Ocean: https://sfo3.digitaloceanspaces.com
     # --- example onpremise: https://192.168.100.10
     # --- if you want to deploy MinIO objects storage on application_host, you must to put '#' before
-    bucket_url: https://172.16.101.3:9000
+    #bucket_url: https://sfo3.digitaloceanspaces.com
     # --- RTPEngine if you have your own instances put here the IP or hostname
     #rtpengine_host: 
     # --- time zone (for example: America/Argentina/Cordoba)
@@ -193,7 +131,7 @@ all:
     certs: selfsigned
     # --- if you object storage service use selfsigned TLS/SSL certs, you mus to put
     # --- *callrec_device=s3-no-check-cert* in order to don't verify CA.
-    callrec_device: s3-no-check-cert
+    callrec_device: s3
     # --- PostgreSQL    
     postgres_port: 5432
     postgres_user: omnileads
@@ -210,10 +148,9 @@ all:
     s3_http_admin_user: omnileads
     s3_http_admin_pass: jdhsgahkdgaskdasdhe2h4231hg4jjhgHJKG
     # --- bucket params    
-    
-    bucket_access_key: mYLcr7sx5vEbe7PO
-    bucket_secret_key: v1Dl34Q29Bv6ruaWS7cUAEvSVfAtvGkR
-    bucket_name: proxmox-deb
+    bucket_access_key: Hghjkdghjkdhasjdasdsada
+    bucket_secret_key: jknkjhkjh4523kjhcksjdhkjfdhKJHHKJGKJh786876876NBVJHB
+    bucket_name: omnileads
     # --- if your bucket doesn't need region, leave this value (us-east-1)
     bucket_region: us-east-1
     # --- Asterisk Manager Interface (AMI) user & password
@@ -269,7 +206,6 @@ all:
     #backup_bucket: 
     # --- Restore: in case of implementing a separate bucket for restore
     #restore_bucket: 
-    omnileads_ha: true
 
     ha_notification_email: mr_robot@mr_robot.com
 
@@ -277,77 +213,26 @@ all:
 # -- In this section the hosts are grouped based on the type of deployment (AIO, Cluster & Cluster HA).     #
 #############################################################################################################
 
+omnileads_aio:
+  hosts:
+    tenant_example_1:
+    #tenant_example_2:
+    #tenant_example_3:
+    #tenant_example_4:
 omnileads_data:
-  children:
-    sql_1:
-      hosts:
-        tenant_aaa_sql_1:
-        #tenant_bbb_sql_1:
-      vars:
-        omldata: true
-        ha_rol: main
-        postgres_host_ha: true
-        netaddr: 172.16.101.0/16
-        netprefix: 24
-    sql_2:
-      hosts:
-        tenant_aaa_sql_2:
-        #tenant_bbb_sql_2:
-      vars:
-        omldata: true
-        ha_rol: backup        
-        postgres_host_ha: true
-        postgres_host_ha: true
-        netaddr: 172.16.101.0/16
-        netprefix: 24
-
+  hosts:
+    tenant_example_5_data:    
+  vars:
+    omldata: true
+    
 omnileads_voice:
-  children:
-    voice_1:
-      hosts:
-        tenant_aaa_voice_1:
-        #tenant_bbb_voice_1:
-      vars:
-        omlvoice: true
-        ha_rol: main
-    voice_2:
-      hosts:
-        tenant_aaa_voice_2:
-        #tenant_bbb_voice_2:
-      vars:
-        omlvoice: true
-        ha_rol: backup
+  hosts:
+    tenant_example_5_voice:
+  vars:
+    omlvoice: true
 
 omnileads_app:
-  children:    
-    app_1:
-      hosts:
-        tenant_aaa_app_1:
-        #tenant_bbb_app_1:
-      vars:
-        omlapp: true
-        ha_rol: main
-    app_2:
-      hosts:
-        tenant_aaa_app_2:
-        #tenant_bbb_app_2:
-      vars:
-        omlapp: true
-        ha_rol: backup
-        
-omnileads_haproxy:
-  children:
-    haproxy_1:
-      hosts:
-        tenant_aaa_haproxy_1:
-        #tenant_bbb_haproxy_1:
-      vars:
-        omlhaproxy: true
-        ha_rol: main
-    haproxy_2:
-      hosts:
-        tenant_aaa_haproxy_2:
-        #tenant_bbb_haproxy_2:
-      vars:
-        omlhaproxy: true
-        ha_rol: backup
+  hosts:
+    tenant_example_5_app:
+  vars:
+    omlapp: true

@@ -10,7 +10,7 @@ node_id=2
 node_name='postgres02'
 {% endif %}
 
-conninfo='host={{ ansible_host }} port=5432 dbname=repmgr user=repmgr'
+conninfo='host={{ omni_ip_lan }} port=5432 dbname=repmgr user=repmgr'
 
 data_directory='/var/lib/pgsql/11/data'
 pg_bindir='/usr/pgsql-11/bin'
