@@ -61,9 +61,13 @@
   when: omnileads_ha is defined
 
 - import_playbook: components/rtpengine/playbook.yml
+<<<<<<< HEAD
   when: 
     - omlvoice is defined or systemd is defined
     - docker_compose is not defined
+=======
+  when: omlvoice is defined or systemd is defined
+>>>>>>> d195c03 (systemd & docker_compose AIO, upgrade verions img, falta inventory y jobs)
 
 - import_playbook: components/keepalived/playbook.yml
   when: omnileads_ha is defined
@@ -72,6 +76,7 @@
   when: omnileads_ha is defined
 
 - import_playbook: components/asterisk/playbook.yml
+<<<<<<< HEAD
   when: 
     - omlvoice is defined or systemd is defined
     - docker_compose is not defined
@@ -90,6 +95,18 @@
   when: 
     - omlapp is defined or systemd is defined
     - docker_compose is not defined
+=======
+  when: omlvoice is defined or systemd is defined
+    
+- import_playbook: components/kamailio/playbook.yml
+  when: omlapp is defined or systemd is defined
+
+- import_playbook: components/websockets/playbook.yml
+  when: omlapp is defined or systemd is defined
+
+- import_playbook: components/daphne/playbook.yml
+  when: omlapp is defined or systemd is defined
+>>>>>>> d195c03 (systemd & docker_compose AIO, upgrade verions img, falta inventory y jobs)
 
 - import_playbook: components/django/playbook.yml
   when: 
