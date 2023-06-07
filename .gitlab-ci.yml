@@ -45,9 +45,9 @@ deploy-docker-compose-ansible:
     - cp inventory.yml instances/gitlab/inventory.yml
     - sed -i "s/190.19.150.18/$OML_IPADDR/g" ./instances/gitlab/inventory.yml
     - sed -i "s/172.16.101.44/$OML_IPADDR_APPLAN/g" ./instances/gitlab/inventory.yml
-    - sed -i "224 s/tenant_example_5_data/#tenant_example_5_data/g" ./instances/gitlab/inventory.yml
-    - sed -i "230 s/tenant_example_5_voice/#tenant_example_5_voice/g" ./instances/gitlab/inventory.yml
-    - sed -i "236 s/tenant_example_5_app/#tenant_example_5_app/g" ./instances/gitlab/inventory.yml
+    - sed -i "225 s/tenant_example_5_data/#tenant_example_5_data/g" ./instances/gitlab/inventory.yml
+    - sed -i "231 s/tenant_example_5_voice/#tenant_example_5_voice/g" ./instances/gitlab/inventory.yml
+    - sed -i "237 s/tenant_example_5_app/#tenant_example_5_app/g" ./instances/gitlab/inventory.yml
     - bash -x deploy.sh --action=install --tenant=gitlab
     - until curl -sk --head --request GET https://$OML_IPADDR|grep "302" > /dev/null; do echo "Environment still being installed, sleeping 60 seconds"; sleep 60; done; echo "Environment is up"
     - sleep 120
@@ -75,8 +75,8 @@ deploy-systemd-cluster:
     - sed -i "70 s/22/5702/g" ./instances/gitlab/inventory.yml
     - sed -i "72 s/172.16.101.43/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
     - sed -i "74 s/22/5703/g" ./instances/gitlab/inventory.yml
-    - sed -i "134 s/s3/s3-no-check-cert/g" ./instances/gitlab/inventory.yml        
-    - sed -i "218 s/tenant_example_1/#tenant_example_1/g" ./instances/gitlab/inventory.yml
+    - sed -i "135 s/s3/s3-no-check-cert/g" ./instances/gitlab/inventory.yml        
+    - sed -i "219 s/tenant_example_1/#tenant_example_1/g" ./instances/gitlab/inventory.yml
     - sed -i "65 s/172.16.101.41/$PROXMOX_ADDR_VM_DATA_MAIN/g" ./instances/gitlab/inventory.yml
     - sed -i "69 s/172.16.101.42/$PROXMOX_ADDR_VM_VOICE/g" ./instances/gitlab/inventory.yml
     - sed -i "73 s/172.16.101.43/$PROXMOX_ADDR_VM_APP/g" ./instances/gitlab/inventory.yml

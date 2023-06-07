@@ -76,6 +76,28 @@
 ###################### HOST Set ########################### ###################### HOST Set ###########################
 ###################### HOST Set ########################### ###################### HOST Set ###########################
 
+# # Set tenant_id
+# - name: SET callrec_device ansible VAR
+#   set_fact:
+#     callrec_device: s3-minio
+#   changed_when: false
+#   when:
+#     - bucket_url is not defined
+#   tags: 
+#     - install
+#     - upgrade
+
+# - name: SET callrec_device ansible VAR
+#   set_fact:
+#     callrec_device: s3
+#   changed_when: false
+#   when:
+#     - bucket_url is defined
+#     -  
+#   tags: 
+#     - install
+#     - upgrade
+
 # Set tenant_id
 - name: CHECKS if tenant_id was set
   set_fact:
@@ -83,7 +105,7 @@
   changed_when: false
   when:
     - tenant_id is not defined
-    - omlaio is defined or omlapp is defined or omldata is defined or docker_compose is defined
+    - systemd is defined or omlapp is defined or omldata is defined or docker_compose is defined
   tags: 
     - install
     - upgrade
@@ -95,7 +117,7 @@
   changed_when: false
   when:
     - postgres_host is defined
-    - omlaio is defined or omlapp is defined or omldata is defined or docker_compose is defined
+    - systemd is defined or omlapp is defined or omldata is defined or docker_compose is defined
   tags: 
     - install
     - upgrade
@@ -112,7 +134,7 @@
   changed_when: false
   when:
     - postgres_host is not defined
-    - omlaio is defined or omlapp is defined or omldata is defined or docker_compose is defined
+    - systemd is defined or omlapp is defined or omldata is defined or docker_compose is defined
   tags: 
     - install
     - upgrade
@@ -129,7 +151,7 @@
   changed_when: false
   when:
     - rtpengine_host is defined
-    - omlaio is defined or omlapp is defined or omldata is defined or docker_compose is defined
+    - systemd is defined or omlapp is defined or omldata is defined or docker_compose is defined
   tags: 
     - install
     - upgrade
@@ -141,7 +163,7 @@
   changed_when: false
   when:
     - rtpengine_host is not defined
-    - omlaio is defined or omlapp is defined or omldata is defined or docker_compose is defined
+    - systemd is defined or omlapp is defined or omldata is defined or docker_compose is defined
   tags: 
     - install
     - upgrade
@@ -153,7 +175,7 @@
   changed_when: false
   when:
     - dialer_host is not defined
-    - omlaio is defined or omlapp is defined or docker_compose is defined
+    - systemd is defined or omlapp is defined or docker_compose is defined
   tags: 
     - install
     - upgrade
@@ -188,7 +210,7 @@
   changed_when: false
   when:
     - postgres_host is not defined
-    - omlaio is defined  or docker_compose is defined
+    - systemd is defined  or docker_compose is defined
   tags: 
     - install
     - upgrade
@@ -221,7 +243,7 @@
   changed_when: false
   when:
     - bucket_url is not defined
-    - omlaio is defined or docker_compose is defined
+    - systemd is defined or docker_compose is defined
   tags: 
     - install
     - upgrade
@@ -237,7 +259,7 @@
   changed_when: false
   when:
     - websockets_host is not defined
-    - (omlapp is defined)  or (omlaio is defined)
+    - (omlapp is defined)  or (systemd is defined)
   tags: 
     - install
     - upgrade
@@ -250,7 +272,7 @@
   changed_when: false
   when:
     - websockets_host is not defined
-    - omlaio is defined  or docker_compose is defined
+    - systemd is defined  or docker_compose is defined
   tags: 
     - install
     - upgrade
@@ -276,7 +298,7 @@
   changed_when: false
   when:
     - kamailio_host is not defined
-    - omlaio is defined  or docker_compose is defined
+    - systemd is defined  or docker_compose is defined
   tags: 
     - install
     - upgrade
@@ -303,7 +325,7 @@
   changed_when: false
   when:
     - redis_host is not defined
-    - omlaio is defined  or docker_compose is defined
+    - systemd is defined  or docker_compose is defined
   tags: 
     - install
     - upgrade
@@ -330,7 +352,7 @@
     prometheus_host: localhost
   changed_when: false
   when:
-    - omlaio is defined  or docker_compose is defined
+    - systemd is defined  or docker_compose is defined
   tags: 
     - install
     - upgrade
@@ -355,7 +377,7 @@
   changed_when: false
   when:
     - asterisk_host is not defined
-    - omlaio is defined  or docker_compose is defined
+    - systemd is defined  or docker_compose is defined
   tags: 
     - install
     - upgrade
@@ -382,7 +404,7 @@
   changed_when: false
   when:
     - rtpengine_host is not defined
-    - omlaio is defined  or docker_compose is defined
+    - systemd is defined  or docker_compose is defined
   tags: 
     - install
     - upgrade
@@ -408,7 +430,7 @@
   changed_when: false
   when:
     - nginx_host is not defined
-    - omlaio is defined  or docker_compose is defined
+    - systemd is defined  or docker_compose is defined
   tags: 
     - install
     - upgrade
@@ -523,16 +545,16 @@
     - voice
     - asterisk
 
-- name: CHECKS Check if callrec_device variable is defined
-  fail:
-    msg: callrec_device variable undefined, edit callrec_device variable in inventory file
-  when: callrec_device is not defined and assert_callrec_device.rc == 1
-  tags: 
-    - install 
-    - upgrade
-    - app
-    - voice
-    - asterisk
+# - name: CHECKS Check if callrec_device variable is defined
+#   fail:
+#     msg: callrec_device variable undefined, edit callrec_device variable in inventory file
+#   when: callrec_device is not defined and assert_callrec_device.rc == 1
+#   tags: 
+#     - install 
+#     - upgrade
+#     - app
+#     - voice
+#     - asterisk
     
 - name: CHECKS Check if postgres user variable is defined
   fail:

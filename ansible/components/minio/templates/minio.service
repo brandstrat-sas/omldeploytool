@@ -21,7 +21,7 @@ ExecStart=/usr/bin/podman run \
   --name=oml-minio-server \
   --volume=oml_minio:/data \
   --rm  \
-  {% if omlaio is defined %}
+  {% if systemd is defined %}
   quay.io/minio/minio:{{ minio_version }} server /data --console-address "localhost:9001"
   {% else %}
   quay.io/minio/minio:{{ minio_version }} server /data --console-address "{{ data_host }}:9001"

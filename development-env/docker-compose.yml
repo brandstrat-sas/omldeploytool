@@ -165,6 +165,7 @@ services:
       - HOMERPORT=${HOMERPORT}
       - HOMER_ENABLE=True
       - NETWORK_MODE=bridge
+      - ENV=devenv
     image: ${OMLACD_IMG}
     networks:
       - omnileads
@@ -288,7 +289,7 @@ services:
     container_name: oml-rtpengine
     dns: 8.8.8.8
     environment:
-      - ENV=docker-compose-${ENV}
+      - ENV=devenv
       - TZ=${TZ}
     image: ${OMLRTPENGINE_IMG}
     networks:
