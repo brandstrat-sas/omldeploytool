@@ -51,8 +51,8 @@ all:
         tenant_example_4:
           docker_compose: true
           tenant_id: tenant_example_4
-          ansible_host: 
-          omni_ip_lan:
+          ansible_host: 190.19.150.19
+          omni_ip_lan: 172.16.101.45
       vars:  
     # -----------------------------------------
     # -----------------------------------------
