@@ -64,7 +64,7 @@ deploy-docker-compose-ansible:
   stage: deploy
   environment: DOCKER_COMPOSE
   script:
-  - doctl auth init -t ${DIGITALOCEAN_ACCESS_TOKEN}
+    - doctl auth init -t ${DIGITALOCEAN_ACCESS_TOKEN}
     - doctl compute droplet create --image ${DIGITALOCEAN_DROPLET_IMG} --size ${DIGITALOCEAN_DROPLET_SIZE} --region ${DIGITALOCEAN_REGION} --ssh-keys ${DIGITALOCEAN_SSH_KEY} cicd-ansible-compose.${CI_JOB_ID}
     - sleep 60
     - OML_IPADDR=$(doctl compute droplet list |grep cicd-ansible-compose.${CI_JOB_ID} |awk '{print $3}') && echo "$OML_IPADDR to run tests"
