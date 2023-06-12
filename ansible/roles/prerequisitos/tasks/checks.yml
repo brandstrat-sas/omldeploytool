@@ -185,7 +185,7 @@
     - django
     - observability
 
-# Set postgres_host as {{ data_host }} on App instance when postgres_host is not explicitly defined on cluster scenary
+# Set postgres_host as {{ data_host }} when postgres_host is not explicitly defined on cluster scenary
 - name: CHECKS Setting postgres_host cluster
   set_fact:
     postgres_host: "{{ data_host }}"
