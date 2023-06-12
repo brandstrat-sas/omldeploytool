@@ -212,7 +212,7 @@ services:
       - websockets
     dns: 8.8.8.8
     environment:
-      - ENV=docker-compose-${ENV}
+      - ENV=${ENV}
       - TZ=${TZ}
       - ASTERISK_LOCATION=
       - AMI_USER=${AMI_USER}
@@ -338,7 +338,7 @@ services:
     dns: 8.8.8.8
     environment:
       - TZ=${TZ}
-      - ENV=docker-compose-${ENV}
+      - ENV=${ENV}
       - RTPENGINE_HOSTNAME=${RTPENGINE_HOSTNAME}
     image: ${OMLRTPENGINE_IMG}
     network_mode: host
@@ -381,7 +381,7 @@ services:
 
   prometheus:
     image: prom/prometheus:latest
-    container_name: prometheus
+    container_name: obs-prometheus
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
