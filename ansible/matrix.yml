@@ -41,16 +41,18 @@
 
 - import_playbook: components/postgresql/playbook.yml
   when: 
-    - omldata is defined or omlaio is defined
+    - omldata is defined or systemd is defined
     - postgres_out != true
+    - docker_compose is not defined
     
 - import_playbook: components/postgresql/playbook_ha.yml
   when: postgres_host_ha is defined
 
 - import_playbook: components/redis/playbook.yml
   when: 
-    - omldata is defined or omlaio is defined
+    - omldata is defined or systemd is defined
     - omnileads_ha is not defined
+    - docker_compose is not defined
 
 - import_playbook: components/redis/playbook_ha.yml
   when: omnileads_ha is defined
@@ -59,7 +61,9 @@
   when: omnileads_ha is defined
 
 - import_playbook: components/rtpengine/playbook.yml
-  when: omlvoice is defined or omlaio is defined
+  when: 
+    - omlvoice is defined or systemd is defined
+    - docker_compose is not defined
 
 - import_playbook: components/keepalived/playbook.yml
   when: omnileads_ha is defined
@@ -68,21 +72,30 @@
   when: omnileads_ha is defined
 
 - import_playbook: components/asterisk/playbook.yml
-  when: omlvoice is defined or omlaio is defined
-    
+  when: 
+    - omlvoice is defined or systemd is defined
+    - docker_compose is not defined
+
 - import_playbook: components/kamailio/playbook.yml
-  when: omlapp is defined or omlaio is defined
+  when: 
+    - omlapp is defined or systemd is defined
+    - docker_compose is not defined
 
 - import_playbook: components/websockets/playbook.yml
-  when: omlapp is defined or omlaio is defined
+  when: 
+    - omlapp is defined or systemd is defined
+    - docker_compose is not defined
 
 - import_playbook: components/daphne/playbook.yml
-  when: omlapp is defined or omlaio is defined
+  when: 
+    - omlapp is defined or systemd is defined
+    - docker_compose is not defined
 
 - import_playbook: components/django/playbook.yml
   when: 
-    - omlapp is defined or omlaio is defined
+    - omlapp is defined or systemd is defined
     - omnileads_ha is not defined
+    - docker_compose is not defined
 
 - import_playbook: components/django/playbook_ha.yml
   when: 
@@ -95,18 +108,25 @@
     - docker_compose is not defined
 
 - import_playbook: components/cron/playbook.yml
-  when: omlapp is defined or omlaio is defined
-    
+  when: 
+    - omlapp is defined or systemd is defined
+    - docker_compose is not defined
+
 - import_playbook: components/nginx/playbook.yml
-  when: omlapp is defined or omlaio is defined
+  when: 
+    - omlapp is defined or systemd is defined
+    - docker_compose is not defined
 
 - import_playbook: components/pstn_emulator/playbook.yml
-  when: omlapp is defined or omlaio is defined
+  when: 
+    - omlapp is defined or systemd is defined
+    - docker_compose is not defined
 
 - import_playbook: components/observability/prometheus.yml
   when: 
-    - omlapp is defined or omlaio is defined
+    - omlapp is defined or systemd is defined
     - omnileads_ha is not defined
+    - docker_compose is not defined
 
 - import_playbook: components/observability/promtail.yml
   when: 

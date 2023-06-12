@@ -42,7 +42,7 @@ TZ={{ TZ }}
 # if you object storage service use selfsigned TLS/SSL certs,                       #
 # you mus to put *callrec_device=s3-no-check-cert* in order to don't verify CA.     #
 #####################################################################################
-CALLREC_DEVICE={{ callrec_device }}
+
 
 
 ###################################################################################################
@@ -190,6 +190,7 @@ AWS_DEFAULT_REGION=us-east-1
 
 
 {% if bucket_url is not defined and fqdn is not defined %}
+CALLREC_DEVICE=s3-minio
 {% if infra_env == "cloud" %}
 S3_ENDPOINT=https://{{ omni_ip_wan }}
 S3_ENDPOINT_MINIO=http://localhost:9000
@@ -198,15 +199,18 @@ S3_ENDPOINT=https://{{ omni_ip_lan }}
 S3_ENDPOINT_MINIO=http://localhost:9000
 {% endif %}
 {% elif bucket_url is not defined and fqdn is defined %}
+CALLREC_DEVICE=s3-minio
 S3_ENDPOINT=https://{{ fqdn }}
 S3_ENDPOINT_MINIO=http://localhost:9000
 {% elif bucket_url == "aws" %}
 S3_ENDPOINT_AWS=
 S3_REGION_NAME={{ bucket_region }}
+CALLREC_DEVICE=s3-aws
 AWS_DEFAULT_REGION={{ bucket_region }}
 {% else %}
 S3_ENDPOINT={{ bucket_url }}
 S3_ENDPOINT_MINIO=http://localhost:9000
+CALLREC_DEVICE=s3
 {% endif %}
 
 
