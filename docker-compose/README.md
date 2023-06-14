@@ -33,7 +33,7 @@ In this folder, we will find three Docker Compose files.
 
 * **docker-compose.yml**: is used to launch the stack on the workstation with Docker Desktop.
 * **docker-compose_prod.yml**: is used to launch the stack on a VPS or VM."
-* **docker-compose_prod_external_backend.yml**: is used to launch the stack on a VPS or VM and using an external bucket
+* **docker-compose_prod_external_bucket.yml**: is used to launch the stack on a VPS or VM and using an external bucket
 
 ## Setup your environment
 
@@ -154,10 +154,10 @@ AWS_SECRET_ACCESS_KEY=HJGGH675675hjghjgHJGHJg67567HJHVHJGdsaddadakjhjk
 Now, let's proceed to launch the stack:
 
 ```
-$ docker-compose -f docker-compose_prod_external_backend.yml up -d
+$ docker-compose -f docker-compose_prod_external_bucket.yml up -d
 ```
 
-![Diagrama deploy tool](../ansible/png/deploy-tool-tenant-compose-vps-external.png)
+![Diagrama deploy tool](../ansible/png/deploy-tool-tenant-compose-vps-external-bucket.png)
 
 ## Log in to the Admin UI <a name="post_install"></a>
 
