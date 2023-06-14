@@ -105,6 +105,8 @@ PGPASSWORD=admin123
 PGHOSTHA=false
 PGHOSTRO=
 
+PGSSL=false
+
 PG_EXT_PORT=4444
 #########################################################################################################
 #                                           WEBSOCKETS                                                  #
