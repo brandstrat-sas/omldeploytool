@@ -6,5 +6,5 @@
 * kamailio:   230204.01
 * websockets: 230204.01
 * rtpengine:  230606.01
-* postgres:   230204.01
+* postgres:   230613.01
 
