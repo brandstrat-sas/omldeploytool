@@ -265,7 +265,7 @@ services:
     dns: 8.8.8.8
     environment:
       - TZ=${TZ}
-      - ENV=${ENV}
+      - ENV=prodenv
       - DJANGO_HOSTNAME=${DJANGO_HOSTNAME}
       - DAPHNE_HOSTNAME=${DAPHNE_HOSTNAME}
       - KAMAILIO_HOSTNAME=${KAMAILIO_HOSTNAME}
