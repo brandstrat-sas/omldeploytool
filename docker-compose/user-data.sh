@@ -17,8 +17,8 @@ PUBLIC_IPV4=$(curl ifconfig.co)
 # curl -fsSL https://get.docker.com -o ~/get-docker.sh
 # bash ~/get-docker.sh
 
-git clone https://gitlab.com/omnileads/omldeploytool.git ~/omldeploytool
-cd ~/omldeploytool/docker-compose
+git clone https://gitlab.com/omnileads/omldeploytool.git 
+cd ./omldeploytool/docker-compose
 cp env .env
 
 sed -i "s/ENV=devenv/ENV=$env/g" .env
@@ -37,11 +37,11 @@ sed -i "s/redis:6379/localhost:6379/g" .env
 if [[ "${bucket_url}" != "NULL" ]];then
 sed -i "s/CALLREC_DEVICE=s3-minio/CALLREC_DEVICE=s3/g" .env
 sed -i "s/S3_BUCKET_NAME=omnileads/S3_BUCKET_NAME=$bucket_name/g" .env
+sed -i "s/AWS_ACCESS_KEY_ID=omlminio/AWS_ACCESS_KEY_ID=$bucket_access_key/g" .env
 sed -i "s/AWS_SECRET_ACCESS_KEY=s3omnileads123/AWS_SECRET_ACCESS_KEY=$bucket_secret_key/g" .env
-sed -i "s/AWS_SECRET_ACCESS_KEY=s3omnileads123/AWS_SECRET_ACCESS_KEY=$bucket_access_key/g" .env
 sed -i "s%\S3_ENDPOINT=https://localhost%S3_ENDPOINT=$bucket_url%g" .env
     if [[ "${aws_region}" != "NULL" ]];then
-        sed -i "s/bucket_region: us-east-1/bucket_region: ${aws_region}/g" $inventory_path/inventory.yml
+        sed -i "s/bucket_region: us-east-1/bucket_region: ${aws_region}/g" .env
     fi
 else
     sed -i "s%\S3_ENDPOINT=https://localhost%S3_ENDPOINT=https://$PUBLIC_IPV4%g" .env
