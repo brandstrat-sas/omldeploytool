@@ -9,10 +9,10 @@ bucket_secret_key=${BUCKET_SECRET_KEY}
 bucket_region=${BUCKET_REGION}
 bucket_name=${BUCKET_NAME}
 
+apt update && apt install git curl
+
 PRIVATE_IPV4=$(ip addr show $oml_nic | grep "inet\b" | awk '{print $2}' | cut -d/ -f1)
 PUBLIC_IPV4=$(curl ifconfig.co)
-
-apt update && apt install git curl
 
 curl -fsSL https://get.docker.com -o ~/get-docker.sh
 bash ~/get-docker.sh
@@ -42,6 +42,7 @@ if [ -z "$bucket_url" ];then
     elif [[ "$ENV" == "nat" ]];then    
         sed -i "s%\S3_ENDPOINT=https://localhost%S3_ENDPOINT=https://$PRIVATE_IPV4%g" .env
     fi    
+    sed -i "s/minio:9000/localhost:9000/g" .env
     /usr/libexec/docker/cli-plugins/docker-compose -f docker-compose_prod.yml up -d
 else    
     sed -i "s/CALLREC_DEVICE=s3-minio/CALLREC_DEVICE=s3/g" .env
