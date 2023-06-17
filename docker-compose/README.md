@@ -33,7 +33,7 @@ In this folder, we will find three Docker Compose files.
 
 * **docker-compose.yml**: is used to launch the stack on the workstation with Docker Desktop.
 * **docker-compose_prod.yml**: is used to launch the stack on a VPS or VM."
-* **docker-compose_prod_external_backend.yml**: is used to launch the stack on a VPS or VM and using an external bucket
+* **docker-compose_prod_external_bucket.yml**: is used to launch the stack on a VPS or VM and using an external bucket
 
 ## Setup your environment
 
@@ -78,71 +78,83 @@ Below are the Firewall rules to be applied on All In One instance:
 
 ### **Onpremise Virtual Machine or Cloud VPS** <a name="vps_vm"></a>
 
-You can use docker-compose to run an instance of OMniLeads on a Virtual Machine or VPS (cloud). However, some configuration work with the .env file may be necessary.
-
 >  Note: If working on a VPS with a public IP address, it is a mandatory requirement that it also has a network interface with the ability to associate a private IP address.
 
-* To begin with, it's important to specify the scenario we'll be working with, which will be cloud if we're working on a VPS, and lan if we're using an on-premise Virtual Machine.
+The user-data.sh script can be used to deploy to a debian-based clean instance.
+
+For example:
 
 ```
-ENV=cloud
-```
-or
-
-```
-ENV=lan
+export NIC=eth0 ENV=lan && bash -x user-data.sh
 ```
 
-* The hostname of each component must be modified
+You must to specify the private ipv4 NIC and scenario (ENV) we'll be working with, which will be cloud if we're working on a VPS (cloud), and lan if we're using an on-premise Virtual Machine (lan).
+The BUCKE_NAME=NULL is necesary in order to work with the minio (localhost) object storage.
+
+If we look at the .env file, we will see that the variables corresponding to the hostname of each component have been modified:
 
 ```
 DJANGO_HOSTNAME=localhost
 DAPHNE_HOSTNAME=localhost
-ASTERISK_HOSTNAME=10.10.10.2
+ASTERISK_HOSTNAME=$PRIVATE_IPV4
 WEBSOCKET_HOSTNAME=localhosts
 WEBSOCKET_REDIS_HOSTNAME=redis://localhost:6379
 PGHOST=localhost
-OMNILEADS_HOSTNAME=10.10.10.2
-RTPENGINE_HOSTNAME=10.10.10.2
+OMNILEADS_HOSTNAME=$PRIVATE_IPV4
+RTPENGINE_HOSTNAME=$PRIVATE_IPV4
 REDIS_HOSTNAME=localhost
 KAMAILIO_HOSTNAME=localhost
 ```
 
-* Finally, we must indicate to the App the URL to invoke the internal bucket, using an fqdn or an IP. If an IP is used, and we are deploying on a cloud environment, a Public IP should be used, while if the environment is LAN, a Private IP should be used.
+depending on the scenario (lan or cloud), the .env in terms of bucket, should look like this:
 
-LAN:
+if ENV=lan:
 ```
-S3_ENDPOINT=https://10.10.10.2
+S3_ENDPOINT=https://$PRIVATE_IPV4
 S3_ENDPOINT_MINIO=http://localhost:9000
 ```
 
-Cloud:
+if ENV=cloud:
 ```
-S3_ENDPOINT=https://190.19.122.2
+S3_ENDPOINT=https://$PUBLIC_IPV4 or S3_ENDPOINT=https://$FQDN
 S3_ENDPOINT_MINIO=http://localhost:9000
-```
-
-Now, let's proceed to launch the stack:
-
-```
-$ docker-compose -f docker-compose_prod.yml up -d
 ```
 
 ![Diagrama deploy tool](../ansible/png/deploy-tool-tenant-compose-vps.png)
 
 ### **Onpremise Virtual Machine and VPS Cloud deploy with external bucket**
 
-For this scenario, we consider all the modifications executed in the previous item, except that here we need to take into account some issues regarding the bucket variables.
+>  Note: If working on a VPS with a public IP address, it is a mandatory requirement that it also has a network interface with the ability to associate a private IP address.
 
 >  Note: If working on a VPS with a public IP address, it is a mandatory requirement that it also has a network interface with the ability to associate a private IP address.
 
-* The variable must be modified so that it becomes:
+The user-data.sh script can be used to deploy to a debian-based clean instance.
+
+For example:
 
 ```
-CALLREC_DEVICE=s3
+export NIC=eth1 ENV=cloud BUCKET_URL=https://sfo1.digitaloceanspaces.com BUCKET_ACCESS_KEY=mbXUfdsjlh3424R9XY BUCKET_SECRET_KEY=iicHG76O+CIbRZ432iugdsa BUCKET_REGION=NULL BUCKET_NAME=curso-oml && bash -x user-data.sh
 ```
 
-* The endpoint URL and access parameters must be specified. For example:
+You must to specify the private ipv4 NIC and scenario (ENV) we'll be working with, which will be cloud if we're working on a VPS (cloud), and lan if we're using an on-premise Virtual Machine (lan).
+The BUCKE_NAME=NULL is necesary in order to work with the minio (localhost) object storage.
+
+If we look at the .env file, we will see that the variables corresponding to the hostname of each component have been modified:
+
+```
+DJANGO_HOSTNAME=localhost
+DAPHNE_HOSTNAME=localhost
+ASTERISK_HOSTNAME=$PRIVATE_IPV4
+WEBSOCKET_HOSTNAME=localhosts
+WEBSOCKET_REDIS_HOSTNAME=redis://localhost:6379
+PGHOST=localhost
+OMNILEADS_HOSTNAME=$PRIVATE_IPV4
+RTPENGINE_HOSTNAME=$PRIVATE_IPV4
+REDIS_HOSTNAME=localhost
+KAMAILIO_HOSTNAME=localhost
+```
+
+The endpoint URL and access parameters must be specified. For example:
 
 ```
 S3_ENDPOINT=https://sfo3.digitaloceanspaces.com
@@ -151,13 +163,13 @@ AWS_ACCESS_KEY_ID=ojkghjkhjkh4jk23h4jk23hjk4
 AWS_SECRET_ACCESS_KEY=HJGGH675675hjghjgHJGHJg67567HJHVHJGdsaddadakjhjk
 ```
 
-Now, let's proceed to launch the stack:
+You can invoke the docker-compose with:
 
 ```
-$ docker-compose -f docker-compose_prod_external_backend.yml up -d
+$ docker-compose -f docker-compose_prod_external_bucket.yml up -d
 ```
 
-![Diagrama deploy tool](../ansible/png/deploy-tool-tenant-compose-vps-external.png)
+![Diagrama deploy tool](../ansible/png/deploy-tool-tenant-compose-vps-external-bucket.png)
 
 ## Log in to the Admin UI <a name="post_install"></a>
 

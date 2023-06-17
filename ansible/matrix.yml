@@ -90,6 +90,20 @@
   when: 
     - omlapp is defined or systemd is defined
     - docker_compose is not defined
+- import_playbook: components/kamailio/playbook.yml
+  when: 
+    - omlapp is defined or systemd is defined
+    - docker_compose is not defined
+
+- import_playbook: components/websockets/playbook.yml
+  when: 
+    - omlapp is defined or systemd is defined
+    - docker_compose is not defined
+
+- import_playbook: components/daphne/playbook.yml
+  when: 
+    - omlapp is defined or systemd is defined
+    - docker_compose is not defined
 
 - import_playbook: components/django/playbook.yml
   when: 
