@@ -17,9 +17,9 @@ PUBLIC_IP=
 
 OMLAPP_IMG=omnileads/omlapp:1.28.0
 OMLWS_IMG=omnileads/websockets:230204.01
-OMLPGSQL_IMG=omnileads/postgres:230204.01
+OMLPGSQL_IMG=omnileads/postgres:230613.01
 OMLACD_IMG=omnileads/asterisk:230606.01
-OMLNGINX_IMG=omnileads/nginx:230204.01
+OMLNGINX_IMG=omnileads/nginx:230215.01
 OMLKAM_IMG=omnileads/kamailio:230204.01
 OMLRTPENGINE_IMG=omnileads/rtpengine:230606.01
 OMLREDIS_IMG=omnileads/redis:develop
@@ -104,6 +104,8 @@ PGPASSWORD=admin123
 
 PGHOSTHA=false
 PGHOSTRO=
+
+PGSSL=false
 
 PG_EXT_PORT=4444
 #########################################################################################################

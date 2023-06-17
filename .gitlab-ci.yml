@@ -65,6 +65,39 @@ deploy-docker-compose-ansible:
   environment: DOCKER_COMPOSE
   script:
     - doctl auth init -t ${DIGITALOCEAN_ACCESS_TOKEN}
+    - doctl compute droplet create --image ${DIGITALOCEAN_DROPLET_IMG} --size ${DIGITALOCEAN_DROPLET_SIZE} --region ${DIGITALOCEAN_REGION} --ssh-keys ${DIGITALOCEAN_SSH_KEY} cicd-systemd.${CI_JOB_ID}
+    - sleep 60
+    - OML_IPADDR=$(doctl compute droplet list |grep cicd-systemd.${CI_JOB_ID} |awk '{print $3}') && echo "$OML_IPADDR to run tests"
+    - OML_IPADDR_APPLAN=$(doctl compute droplet list |grep cicd-systemd.${CI_JOB_ID} |awk '{print $4}') && echo "$OML_IPADDR_APPLAN to run tests" 
+    - rm -rf ~/omldeploytool
+    - git clone --branch $CI_COMMIT_BRANCH https://gitlab.com/omnileads/omldeploytool.git ~/omldeploytool
+    - mkdir -p ~/omldeploytool/ansible/instances/gitlab
+    - cd ~/omldeploytool/ansible
+    - cp inventory.yml instances/gitlab/inventory.yml
+    - sed -i "s/190.19.150.19/$OML_IPADDR/g" ./instances/gitlab/inventory.yml
+    - sed -i "s/172.16.101.45/$OML_IPADDR_APPLAN/g" ./instances/gitlab/inventory.yml
+    - sed -i "224 s/tenant_example_5_data/#tenant_example_5_data/g" ./instances/gitlab/inventory.yml
+    - sed -i "230 s/tenant_example_5_voice/#tenant_example_5_voice/g" ./instances/gitlab/inventory.yml
+    - sed -i "236 s/tenant_example_5_app/#tenant_example_5_app/g" ./instances/gitlab/inventory.yml
+    - sed -i "218 s/tenant_example_1/#tenant_example_1/g" ./instances/gitlab/inventory.yml
+    - sed -i "221 s/#tenant_example_4/tenant_example_4/g" ./instances/gitlab/inventory.yml
+    - bash -x deploy.sh --action=install --tenant=gitlab
+    - until curl -sk --head --request GET https://$OML_IPADDR|grep "302" > /dev/null; do echo "Environment still being installed, sleeping 60 seconds"; sleep 60; done; echo "Environment is up"
+    - sleep 120
+    - doctl compute droplet delete -f cicd-systemd.${CI_JOB_ID}
+  tags:
+    - deploy
+  only:
+    - /.*pipeline-systemd.*$/
+    - /.*pipeline-all.*$/
+    - schedules
+    - web
+
+deploy-docker-compose-ansible:
+  stage: deploy
+  environment: DOCKER_COMPOSE
+  script:
+  - doctl auth init -t ${DIGITALOCEAN_ACCESS_TOKEN}
     - doctl compute droplet create --image ${DIGITALOCEAN_DROPLET_IMG} --size ${DIGITALOCEAN_DROPLET_SIZE} --region ${DIGITALOCEAN_REGION} --ssh-keys ${DIGITALOCEAN_SSH_KEY} cicd-ansible-compose.${CI_JOB_ID}
     - sleep 60
     - OML_IPADDR=$(doctl compute droplet list |grep cicd-ansible-compose.${CI_JOB_ID} |awk '{print $3}') && echo "$OML_IPADDR to run tests"
