@@ -26,11 +26,7 @@
   ignore_errors: yes
   tags: 
     - install
-    - voice
-    - app
-    - observability
-    - asterisk
-
+    
 - name: OS_CONF Disable firewallD
   systemd:
     name: firewalld
@@ -40,22 +36,7 @@
   ignore_errors: yes
   tags: 
     - install
-    - voice
-    - app
-    - observability
-    - asterisk
-
-- name: MAIN Disable SELinux Rocky or Alma Linux
-  selinux:
-    state: disabled
-  when: ansible_facts['distribution'] == "Rocky" or ansible_facts['distribution'] == "AlmaLinux"  or ansible_facts['distribution'] == "CentOS"
-  tags: 
-    - install
-    - voice
-    - app
-    - observability
-    - asterisk
-
+          
 - name: MAIN Disable SELinux Rocky or Alma Linux
   command: setenforce 0
   tags:
@@ -70,10 +51,6 @@
     state: present
   tags: 
     - install
-    - voice
-    - app
-    - observability
-    - asterisk
 
 - name: OS_CONF Add the {{ usuario }} user
   user:
@@ -84,10 +61,6 @@
     home: '{{ django_deploy_path }}'
   tags: 
     - install
-    - voice
-    - app
-    - observability
-    - asterisk
 
 - name: OS_CONF Creates /etc/omnileads directory
   file:
@@ -100,11 +73,6 @@
   when: etc_omnileads.stat.exists == false
   tags: 
     - install
-    - voice
-    - app
-    - observability
-    - asterisk
-
 
 - name: OS_CONF Creates /etc/omnileads/certs directory
   file:
@@ -116,11 +84,6 @@
   when: etc_omnileads.stat.exists == false
   tags: 
     - install
-    - voice
-    - app
-    - observability
-    - asterisk
-
 
 - name: OS_CONF Creates /var/lib/omnileads directory
   file:
@@ -133,9 +96,6 @@
   when: var_lib_omnileads.stat.exists == false
   tags: 
     - install
-    - voice
-    - app
-    - asterisk
 
 - name: OS_CONF Copy selfsigned SSL certs
   copy:
@@ -146,10 +106,6 @@
     mode: 0777
   tags: 
     - install
-    - voice
-    - app
-    - observability
-    - asterisk
     - upgrade
   when:
     - certs == "selfsigned"
@@ -163,10 +119,6 @@
     mode: 0777
   tags: 
     - install
-    - voice
-    - app
-    - observability
-    - asterisk
     - upgrade
   when:
     - certs == "selfsigned"
@@ -180,10 +132,6 @@
     mode: 0777
   tags: 
     - install
-    - voice
-    - app
-    - observability
-    - asterisk
     - upgrade
   when:
     - certs == "custom"
@@ -198,10 +146,6 @@
     mode: 0777
   tags: 
     - install
-    - voice
-    - app
-    - observability
-    - asterisk
     - upgrade
   when:
     - certs == "custom"
@@ -216,10 +160,6 @@
     mode: 0777
   tags: 
     - install
-    - voice
-    - app
-    - observability
-    - asterisk
     - upgrade
   when:
     - certs == "custom"
@@ -234,10 +174,6 @@
     mode: 0777
   tags: 
     - install
-    - voice
-    - app
-    - observability
-    - asterisk
     - upgrade
   when:
     - certs == "custom"
@@ -250,20 +186,12 @@
     mode: 0755
   tags: 
     - install
-    - voice
-    - app
-    - observability
-    - asterisk
     - upgrade
 
 - name: OS_CONF Set timezone of server
   timezone: name={{ TZ }}
   tags: 
     - install
-    - voice
-    - app
-    - observability
-    - asterisk
     - upgrade
 
 - name: OS_CONF Copy Prometheus Node Exporter service
@@ -273,10 +201,6 @@
     mode: 0600
   tags: 
     - install
-    - voice
-    - app
-    - observability
-    - asterisk
     - upgrade
   when: docker_compose is not defined  
 
@@ -287,10 +211,6 @@
     mode: 0600
   tags: 
     - install
-    - voice
-    - app
-    - observability
-    - asterisk
     - upgrade
   when: docker_compose is not defined  
 
@@ -302,10 +222,6 @@
     daemon_reload: yes
   tags: 
     - install
-    - voice
-    - app
-    - observability
-    - asterisk
     - upgrade
   when: 
      - postgres_host_ha is not defined
