@@ -32,27 +32,27 @@
     - prerequisitos
 
 - import_playbook: components/docker_compose/playbook.yml
-  when: docker_compose is defined
+  when: container_orchest == "docker_compose"
 
 - import_playbook: components/minio/playbook.yml
   when: 
     - bucket_url is not defined
-    - docker_compose is not defined
+    - container_orchest == "systemd"
 
 - import_playbook: components/postgresql/playbook.yml
   when: 
-    - omldata is defined or systemd is defined
+    - inventory_hostname in groups['omnileads_data'] or inventory_hostname in groups['omnileads_aio']
     - postgres_out != true
-    - docker_compose is not defined
+    - container_orchest == "systemd"
     
 - import_playbook: components/postgresql/playbook_ha.yml
   when: postgres_host_ha is defined
 
 - import_playbook: components/redis/playbook.yml
   when: 
-    - omldata is defined or systemd is defined
+    - inventory_hostname in groups['omnileads_data'] or inventory_hostname in groups['omnileads_aio']
     - omnileads_ha is not defined
-    - docker_compose is not defined
+    - container_orchest == "systemd"
 
 - import_playbook: components/redis/playbook_ha.yml
   when: omnileads_ha is defined
@@ -62,8 +62,8 @@
 
 - import_playbook: components/rtpengine/playbook.yml
   when: 
-    - omlvoice is defined or systemd is defined
-    - docker_compose is not defined
+    - inventory_hostname in groups['omnileads_voice'] or inventory_hostname in groups['omnileads_aio']
+    - container_orchest == "systemd"
 
 - import_playbook: components/keepalived/playbook.yml
   when: omnileads_ha is defined
@@ -73,77 +73,69 @@
 
 - import_playbook: components/asterisk/playbook.yml
   when: 
-    - omlvoice is defined or systemd is defined
-    - docker_compose is not defined
+    - inventory_hostname in groups['omnileads_voice'] or inventory_hostname in groups['omnileads_aio']
+    - container_orchest == "systemd"
 
 - import_playbook: components/kamailio/playbook.yml
   when: 
-    - omlapp is defined or systemd is defined
-    - docker_compose is not defined
+    - inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_aio']
+    - container_orchest == "systemd"
 
 - import_playbook: components/websockets/playbook.yml
   when: 
-    - omlapp is defined or systemd is defined
-    - docker_compose is not defined
+    - inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_aio']
+    - container_orchest == "systemd"
 
 - import_playbook: components/daphne/playbook.yml
   when: 
-    - omlapp is defined or systemd is defined
-    - docker_compose is not defined
-- import_playbook: components/kamailio/playbook.yml
-  when: 
-    - omlapp is defined or systemd is defined
-    - docker_compose is not defined
-
-- import_playbook: components/websockets/playbook.yml
-  when: 
-    - omlapp is defined or systemd is defined
-    - docker_compose is not defined
+    - inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_aio']
+    - container_orchest == "systemd"
 
 - import_playbook: components/daphne/playbook.yml
   when: 
-    - omlapp is defined or systemd is defined
-    - docker_compose is not defined
+    - inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_aio']
+    - container_orchest == "systemd"
 
 - import_playbook: components/django/playbook.yml
   when: 
-    - omlapp is defined or systemd is defined
+    - inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_aio']
     - omnileads_ha is not defined
-    - docker_compose is not defined
+    - container_orchest == "systemd"
 
 - import_playbook: components/django/playbook_ha.yml
   when: 
-    - omlapp is defined
+    - inventory_hostname in groups['omnileads_app']
     - omnileads_ha is defined
 
 - import_playbook: components/addons/playbook.yml
   when: 
+    - inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_aio']
     - enterprise_edition == true
-    - docker_compose is not defined
+    - container_orchest == "systemd"
 
 - import_playbook: components/cron/playbook.yml
   when: 
-    - omlapp is defined or systemd is defined
-    - docker_compose is not defined
+    - inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_aio']
+    - container_orchest == "systemd"
 
 - import_playbook: components/nginx/playbook.yml
   when: 
-    - omlapp is defined or systemd is defined
-    - docker_compose is not defined
+    - inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_aio']
+    - container_orchest == "systemd"
 
 - import_playbook: components/pstn_emulator/playbook.yml
   when: 
-    - omlapp is defined or systemd is defined
-    - docker_compose is not defined
+    - inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_aio']
+    - container_orchest == "systemd"
 
 - import_playbook: components/observability/prometheus.yml
   when: 
-    - omlapp is defined or systemd is defined
+    - inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_aio']
     - omnileads_ha is not defined
-    - docker_compose is not defined
+    - container_orchest == "systemd"
 
 - import_playbook: components/observability/promtail.yml
   when: 
-    - docker_compose is not defined
+    - container_orchest == "systemd"
     - omnileads_ha is not defined
     - loki_host is defined

@@ -15,7 +15,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see http://www.gnu.org/licenses/.
 ---
-
 ###############################################################################################################
 # -- The complete list of host                                                                                #
 ###############################################################################################################
@@ -24,9 +23,10 @@ all:
   children:
     # -----------------------------------------
     # -----------------------------------------
-    aio_instances:      
+    omnileads_aio:      
       hosts:
         tenant_example_1:
+          #container_orchest: docker_compose (by default systemd)
           tenant_id: tenant_example_1
           ansible_host: 190.19.150.18
           omni_ip_lan: 172.16.101.44
@@ -48,12 +48,11 @@ all:
           bucket_access_key: 
           bucket_secret_key: 
           bucket_name: tenant_example_3
-        tenant_example_4:
-          docker_compose: true
+        tenant_example_4:          
           tenant_id: tenant_example_4
           ansible_host: 190.19.150.19
           omni_ip_lan: 172.16.101.45
-      vars:  
+      vars:
     # -----------------------------------------
     # -----------------------------------------
     cluster_instances:
@@ -86,26 +85,24 @@ all:
     # --- ansible user auth connection
     ansible_user: root
     ansible_ssh_port: 22
-    # --- You must to defined the container orchestrator.
-    # --- docker_compose: true OR systemd: true (default)
-    systemd: true
     # --- Activate the OMniLeads Enterprise Edition - with "AAAA" licensed.
     # --- on the contrary you will deploy OMniLeads OSS Edition with GPLV3 licensed. 
     enterprise_edition: false
     # --- versions of each image to deploy
     # --- versions of each image to deploy
-    omnileads_version: 1.28.0
-    websockets_version: 230204.01
+    omnileads_version: 1.29.0
+    asterisk_version: 230622.01
     nginx_version: 230215.01
     kamailio_version: 230204.01
-    asterisk_version: 230606.01
+    websockets_version: 230204.01
     rtpengine_version: 230606.01
-    postgres_version: 230613.01
+    postgres_version: 230624.01
     centos_postgresql_version: 11
     # --- Asterisk & RTPengine scenary for SIP & RTP
     # --- "cloud" instance (access through public IP)
     # --- "lan" instance (access through private IP)
-    # --- or "nat" instance (access through Public NAT IP)    
+    # --- "nat" instance (access through Public NAT IP)    
+    # --- or "all" in order to access through all NICs
     infra_env: cloud
     # --- If you have an DNS FQDN resolution, you must to uncomment and set this param
     # --- otherwise leave commented to work invoking through an IP address
@@ -193,6 +190,8 @@ all:
 
     # --- Restore id request by restore filename
     #restore_file_timestamp: 1681215859
+    # --- Restore source object Storage SSL certs: custom or selfsigned
+    #restore_bucket_selfsigned_certs: true
 
     # --- Integrations with external hosts
     # --- Request by docker-compose & promtail
@@ -219,20 +218,15 @@ omnileads_aio:
     #tenant_example_2:
     #tenant_example_3:
     #tenant_example_4:
+
 omnileads_data:
   hosts:
     tenant_example_5_data:    
-  vars:
-    omldata: true
     
 omnileads_voice:
   hosts:
     tenant_example_5_voice:
-  vars:
-    omlvoice: true
 
 omnileads_app:
   hosts:
     tenant_example_5_app:
-  vars:
-    omlapp: true

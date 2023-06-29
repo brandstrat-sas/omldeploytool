@@ -112,7 +112,7 @@ all:
   children:
     # -----------------------------------------
     # -----------------------------------------
-    aio_instances:      
+    omnileads_aio:      
       hosts:
         tenant_example_1:
           tenant_id: tenant_example_1
@@ -491,20 +491,14 @@ omnileads_aio:
 omnileads_data:
   hosts:
     tenant_mr_x_data:    
-  vars:
-    omldata: true
     
 omnileads_voice:
   hosts:
     tenant_mr_x_voice:
-  vars:
-    omlvoice: true
 
 omnileads_app:
   hosts:
     tenant_mr_x_5_app:
-  vars:
-    omlapp: true
 
 ```
 
@@ -537,9 +531,9 @@ Then, once OMnileads is deployed on the corresponding instance/s, each container
 can be managed as a systemd service.
 
 ```
-systemd start component
-systemd restart component
-systemd stop component
+systemctl start component
+systemctl restart component
+systemctl stop component
 ```
 
 Behind every action triggered by the systemctl command, there is actually a Podman container that is launched, stopped, or restarted. This container is the result of the image invoked along with the environment variables.
@@ -603,7 +597,7 @@ This is the standard for all components.
 # Upgrade from CentOS-7 OMniLeads instance :arrows_counterclockwise: <a name="upgrade_from_centos7"></a>
 
 
-You must deploy an "all in three" instance of OMniLeads making sure that the inventory.yml variables listed below should be the same as their 
+You must deploy the new OMniLeads instances making sure that the inventory.yml variables listed below should be the same as their 
 counterparts in the CentOS 7 instance from which you want to migrate. below should be the same as their counterparts in the CentOS 7 instance from which you want to migrate.
 
 * ami_user
@@ -614,41 +608,58 @@ counterparts in the CentOS 7 instance from which you want to migrate. below shou
 * dialer_user
 * dialer_password
 
-On the OMniLeads 1.2X CentOS-7 instance run the following commands to generate a postgres backup on the one hand 
+On the OMniLeads 1.X CentOS-7 instance run the following commands to generate a postgres backup on the one hand 
 and then upload to the Bucket Object Storage of the new OMniLeads version the recordings, telephony audios, Asterisk customizations (if any) _custom.conf & _override.conf. 
 (if any) Asterisk _custom.conf & _override_conf customizations and also the Postgres backup itself.
 
 ```
-export NOMBRE_BACKUP: algun_nombre
+export NOMBRE_BACKUP=some_file_name
 pg_dump omnileads > /tmp/pgsql-backup-$NOMBRE_BACKUP.sql
-export AWS_ACCESS_KEY_ID=uLZTnLB0aURXI6NB
-export AWS_SECRET_ACCESS_KEY=VSlMrqEWS7aWtgrn7G2zs949W6jdFleY
-export S3_ENDPOINT=https://172.16.101.3:9000
-export S3_BUCKET_NAME=tenant1 # nombre del bucket del inventory.yml env 2.0
-aws --endpoint ${S3_ENDPOINT} --no-verify-ssl s3 sync /opt/omnileads/media_root s3://${S3_BUCKET_NAME}/media_root
-aws --endpoint ${S3_ENDPOINT} --no-verify-ssl s3 sync /opt/omnileads/asterisk/var/spool/asterisk/monitor/ s3://${S3_BUCKET_NAME}
-aws --endpoint ${S3_ENDPOINT} --no-verify-ssl s3 cp /tmp/pgsql-backup-$NOMBRE_BACKUP.sql  s3://${S3_BUCKET_NAME}/backup/
+export AWS_ACCESS_KEY_ID=$your_new_instance_bucket_key
+export AWS_SECRET_ACCESS_KEY=$your_new_instance_bucket_secret_key
+export S3_BUCKET_NAME=$your_new_instance_bucket_name
 mkdir /opt/omnileads/asterisk/etc/asterisk/custom
-cd /opt/omnileads/asterisk/etc/asterisk
-cp *_custom* ./custom
-cp *_override* ./custom
-aws --endpoint ${S3_ENDPOINT} --no-verify-ssl s3 sync /etc/asterisk/custom/ s3://${S3_BUCKET_NAME}/backup/asterisk/$NOMBRE_BACKUP/
+cp /opt/omnileads/asterisk/etc/asterisk/*_custom* /opt/omnileads/asterisk/etc/asterisk/custom/
+cp /opt/omnileads/asterisk/etc/asterisk/*_override* /opt/omnileads/asterisk/etc/asterisk/custom/
 ```
 
-From the fact of having everything necessary to restore the service on the new infrastructure in the Bucket of the same one, 
-you can proceed with the deploy of this restoration process. 
+If you are going to use the object storage self-hosted by OMnileads in an AIO instance:
+```
+export S3_ENDPOINT=http://$OML_AIO_IP:9000 
+```
+
+If you are going to use the object storage self-hosted by OMnileads in an AIT cluster instance:
+```
+export S3_ENDPOINT=http://$OML_DATA_IP:9000 
+```
+
+If you are going to use an external object storage service:
+```
+export S3_ENDPOINT=https://$object_storage_url 
+```
+
+Finally, all backups are uploaded to the bucklet of the new OMniLeads instance:
+```
+aws --endpoint ${S3_ENDPOINT} s3 sync /opt/omnileads/media_root s3://${S3_BUCKET_NAME}/media_root
+aws --endpoint ${S3_ENDPOINT} s3 sync /opt/omnileads/asterisk/var/spool/asterisk/monitor/ s3://${S3_BUCKET_NAME}
+aws --endpoint ${S3_ENDPOINT} s3 cp /tmp/pgsql-backup-$NOMBRE_BACKUP.sql  s3://${S3_BUCKET_NAME}/backup/
+aws --endpoint ${S3_ENDPOINT} s3 sync /opt/omnileads/asterisk/etc/asterisk/custom/ s3://${S3_BUCKET_NAME}/backup/asterisk/$NOMBRE_BACKUP/
+```
+
+Given that all the necessary components for restoring the service on the new infrastructure are available in the same Bucket,
+you can proceed with deploying the restoration process.
 
 At the end of the file there is the variable *restore_file_timestamp* which must contain the name used in the previous step to refer to the backups.
 previous step to refer to the backups taken.
 
 ```
-restore_file_timestamp: NOMBRE_BACKUP
+restore_file_timestamp: $NOMBRE_BACKUP
 ```
 
 Execute the restore deploy on the tenant in question:
 
 ```
-./deploy.sh --action=restore --tenant=tenant1
+./deploy.sh --action=restore --tenant=$your_inventory_folder_name
 ```
 
 # Perform a Backup :floppy_disk: <a name="backups"></a>

@@ -24,10 +24,12 @@ websocket_port: 8000
 uwsgi_port: 8098
 daphne_port: 8099
 redis_port: 6379
+fastagi_port: 
+postgres_port: 5432
 
 redisgears_version: 1.0.9
 redis_ha_version: develop
-postgres_version: 13
+#postgres_version: 13
 minio_version: latest
 haproxy_version: 2.0-buster
 
@@ -38,20 +40,11 @@ homer_enable: true
 prometheus_enable: true
 postgres_homer_db: homer7
 
-packages_url: https://fts-public-packages.s3.amazonaws.com
-asterisk_package: "{{ packages_url }}/asterisk/asterisk-{{ asterisk_version }}.x86_64.rpm"
-kamailio_package: "{{ packages_url }}/kamailio/kamailio-{{ kamailio_version }}.x86_64.rpm"
-redis_package: "{{ packages_url }}/redis/redis-{{ redis_version }}.x86_64.rpm"
-rtpengine_package: "{{ packages_url }}/rtpengine/rtpengine-{{ rtpengine_version }}.x86_64.rpm"
-virtualenv_package: "{{ packages_url }}/virtualenv/virtualenv-{{ virtualenv_version }}.x86_64.rpm"
-websockets_package: "{{ packages_url }}/omnileads-websockets/omnileads-websockets-{{ websockets_version }}.x86_64.rpm"
-redisgears_package: "{{ packages_url }}/redis/redisgears-{{ redisgears_version }}.so"
-################ URL's ############################
-epel_repository: https://download-ib01.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
-oml_utilities_repo: https://gitlab.com/omnileads/omlutilities.git
-#URLS para descargar asterisk
+# systemd or docker_compose
+container_orchest: systemd
 
-oml_os: bullseye
+
+################ URL's ############################
 admin_user: admin
 usuario: omnileads
 container_network: omnileads
@@ -77,7 +70,7 @@ rtpengine_name: "rtpengine-mr{{ rtpengine_version }}"
 mysql_root_password: ""
 mariadb_host: localhost
 
-minio_persistent_path: /var/lib/omnileads/minio
+#minio_persistent_path: /var/lib/omnileads/minio
 
 redis_ha: false
 high_load: false
