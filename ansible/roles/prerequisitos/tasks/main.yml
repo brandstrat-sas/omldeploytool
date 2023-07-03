@@ -25,20 +25,13 @@
       - wget
       - jq
       - sngrep
-      - awscli
       - python3-boto3
       - python3-psycopg2
-      - postgresql-client
-      - certbot
     update_cache: yes
     state: latest
   when: ansible_os_family == "Debian"
   tags: 
     - install
-    - voice
-    - asterisk
-    - app
-    - observability
 
 - name: MAIN Enable EPEL Repository on Rocky or Alma Linux
   dnf:
@@ -47,11 +40,6 @@
   when: ansible_facts['distribution'] == "Rocky" or ansible_facts['distribution'] == "AlmaLinux" 
   tags: 
     - install
-    - postgres
-    - voice
-    - app
-    - observability
-    - asterisk
 
 - name: MAIN Install required Rocky or Alma Linux packages
   dnf:
@@ -63,11 +51,6 @@
   when: ansible_facts['distribution'] == "Rocky" or ansible_facts['distribution'] == "AlmaLinux" 
   tags: 
     - install
-    - postgres
-    - voice
-    - app
-    - observability
-    - asterisk
 
 - name: MAIN Install required Centos7 SQL packages
   yum:
@@ -81,7 +64,6 @@
   when: ansible_facts['distribution'] == "CentOS" 
   tags: 
     - install
-    - postgres
 
 # --- install DOCKER
 - name: MAIN Descargar el script de instalación de Docker
@@ -91,7 +73,7 @@
   tags:
     - install
   when:
-    - docker_compose is defined
+    - container_orchest == "docker_compose"
     - ansible_os_family == "Debian" 
 
 - name: MAIN Ejecutar el script de instalación de Docker
@@ -99,7 +81,7 @@
   tags:
     - install
   when:
-    - docker_compose is defined   
+    - container_orchest == "docker_compose"   
     - ansible_os_family == "Debian"
     
 - name: MAIN Add docker centos repo
@@ -107,7 +89,7 @@
   tags:
     - install
   when:
-    - docker_compose is defined 
+    - container_orchest == "docker_compose" 
     - ansible_facts['distribution'] == "Rocky" or ansible_facts['distribution'] == "AlmaLinux" 
 
 - name: MAIN Install docker on redhat based
@@ -119,7 +101,7 @@
   tags:
     - install    
   when:
-    - docker_compose is defined 
+    - container_orchest == "docker_compose" 
     - ansible_facts['distribution'] == "Rocky" or ansible_facts['distribution'] == "AlmaLinux" 
 
 - name: MAIN Agregar el usuario al grupo de Docker
@@ -129,7 +111,7 @@
   tags:
     - install
   when:
-    - docker_compose is defined
+    - container_orchest == "docker_compose"
     - ansible_os_family == "Debian"
 
 - name: MAIN Reiniciar el servicio de Docker
@@ -139,7 +121,7 @@
   tags:
     - install  
   when:
-    - docker_compose is defined   
+    - container_orchest == "docker_compose"   
 
 - name: MAIN docker-compose link bin
   file: 
@@ -149,14 +131,14 @@
   tags:
     - install  
   when:
-    - docker_compose is defined
+    - container_orchest == "docker_compose"
 
 - name: MAIN add docker-plugin Loki logs
   command: docker plugin install grafana/loki-docker-driver:latest --alias loki --grant-all-permissions
   tags:
     - install
   when:
-    - docker_compose is defined 
+    - container_orchest == "docker_compose" 
   ignore_errors: yes
 
 # --- install PODMAN
@@ -168,13 +150,9 @@
     state: latest
   when: 
      - ansible_os_family == "Debian"
-     - docker_compose is not defined
+     - container_orchest == "systemd"
   tags: 
     - install
-    - voice
-    - asterisk
-    - app
-    - observability
 
 - name: MAIN Install PODMAN
   dnf:
@@ -183,14 +161,9 @@
     state: latest
   when: 
     - ansible_facts['distribution'] == "Rocky" or ansible_facts['distribution'] == "AlmaLinux" 
-    - docker_compose is not defined
+    - container_orchest == "systemd"
   tags: 
     - install
-    - postgres
-    - voice
-    - app
-    - observability
-    - asterisk
 
 - name: MAIN Check if Omnileads has been installed previously
   include: checks.yml

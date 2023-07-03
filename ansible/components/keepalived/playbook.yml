@@ -50,7 +50,7 @@
       src: "{{ keepalived_repo_path }}templates/keepalived_asterisk.j2"
       dest: /etc/keepalived/keepalived.conf
     when:
-      - omlvoice is defined
+      - inventory_hostname in groups['omnileads_voice']
     tags:
       - upgrade
 
@@ -60,7 +60,7 @@
       dest: /usr/bin/check_ha.sh
       mode: 755
     when:
-      - omlvoice is defined
+      - inventory_hostname in groups['omnileads_voice']
     tags:
       - upgrade
 
@@ -70,7 +70,7 @@
       dest: /usr/bin/asterisk_transition.sh
       mode: 755
     when:
-      - omlvoice is defined    
+      - inventory_hostname in groups['omnileads_voice']
     tags:
       - upgrade
 
@@ -98,7 +98,7 @@
       src: "{{ keepalived_repo_path }}templates/keepalived_cron.j2" 
       dest: /etc/keepalived/keepalived.conf
     when:
-      - omlapp is defined
+      - inventory_hostname in groups['omnileads_app']
     tags:
       - upgrade
 
@@ -108,7 +108,7 @@
       dest: /usr/bin/check_ha.sh
       mode: 755
     when:
-      - omlapp is defined
+      - inventory_hostname in groups['omnileads_app']
     tags:
       - upgrade
 

@@ -18,6 +18,8 @@ ExecStart=/usr/bin/podman run \
   --detach \
   --network=host \
   --env-file=/etc/default/prometheus_node_exporter.env \
+  --volume=/:/host-root:ro,rslave \
+  --volume=/var/lib/containers:/host-var-lib-container:ro,rslave \
   --name=oml-prometheus_node_exporter-server \
   --rm  \
   {{ container_image_registry }}/prom/node-exporter:latest

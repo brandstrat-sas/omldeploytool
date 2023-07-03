@@ -1,4 +1,4 @@
-# Copyright (C) 2022 Freetech Solutions
+# Copyright (C) 2023 Freetech Solutions
 
 # This file is part of OMniLeads
 
@@ -20,60 +20,91 @@
 - name: OMniLeads Backup Playbook
   hosts: 
     - omnileads_data
+    - omnileads_app
     - omnileads_voice
     - omnileads_aio
   tags:
     - backup
-
+  vars:
+    img_repo: '{{ container_image_registry }}/omnileads/omlapp'
   tasks:
 
-    - name: BACKUP database
-      shell: "podman exec -it oml-postgresql-server bash -c 'PGPASSWORD=\"{{ postgres_password }}\" pg_dump --dbname={{ postgres_database }} --host={{ data_host }} --port={{ postgres_port }} --username={{ postgres_user }}' > /tmp/pgsql-backup-{{ file_timestamp }}.sql"
-      when: 
-        - omldata is defined
-        - postgres_out is not true
+    - name: BACKUP generate file_timestamp
+      set_fact:
+        file_timestamp: "{{ ansible_date_time.epoch }}"
 
-    - name: BACKUP upload postgres backup to Bucket
-      aws_s3:
-        bucket: '{{ bucket_name }}'
-        object: 'backup/pgsql-backup-{{ file_timestamp }}.sql'
-        src: '/tmp/pgsql-backup-{{ file_timestamp }}.sql'
-        mode: put
-        region: '{{ bucket_region }}'
-        aws_access_key: '{{ bucket_access_key }}'
-        aws_secret_key: '{{ bucket_secret_key }}'
-        s3_url: '{{ bucket_url }}'
-        encrypt: no
+    - name: BACKUP postgres DB selfhosted bucket cluster
+      shell: "podman run -e POSTGRES_BACKUP=True -e S3_ENDPOINT=http://{{ data_host }}:9000 -e S3_BUCKET_NAME={{ bucket_name }} -e BACKUP_FILENAME=pgsql-backup-{{ file_timestamp }}.sql -e AWS_ACCESS_KEY_ID={{ bucket_access_key }}  -e AWS_SECRET_ACCESS_KEY={{ bucket_secret_key }} -e PGUSER={{ postgres_user }} -e PGPASSWORD={{ postgres_password }} -e PGDATABASE={{ postgres_database }} -e PGHOST={{ data_host }} -e PGPORT={{ postgres_port }} {{ img_repo }}:{{ omnileads_version }}"
       when:
+        - inventory_hostname in groups['omnileads_app']
+        - container_orchest == "systemd"
+        - bucket_url is not defined
+        
+    - name: BACKUP postgres DB selfhosted bucket AIO
+      shell: "podman run --network=host -e POSTGRES_BACKUP=True -e S3_ENDPOINT=http://localhost:9000 -e S3_BUCKET_NAME={{ bucket_name }} -e BACKUP_FILENAME=pgsql-backup-{{ file_timestamp }}.sql -e AWS_ACCESS_KEY_ID={{ bucket_access_key }}  -e AWS_SECRET_ACCESS_KEY={{ bucket_secret_key }} -e PGUSER={{ postgres_user }} -e PGPASSWORD={{ postgres_password }} -e PGDATABASE={{ postgres_database }} -e PGHOST=localhost -e PGPORT={{ postgres_port }} {{ img_repo }}:{{ omnileads_version }}"
+      when:
+        - inventory_hostname in groups['omnileads_aio']
+        - container_orchest == "systemd"
+        - bucket_url is not defined
+
+    - name: BACKUP postgres DB external bucket cluster
+      shell: "podman run -e POSTGRES_BACKUP=True -e S3_ENDPOINT={{ bucket_url }} -e S3_BUCKET_NAME={{ bucket_name }} -e BACKUP_FILENAME=pgsql-backup-{{ file_timestamp }}.sql -e AWS_ACCESS_KEY_ID={{ bucket_access_key }}  -e AWS_SECRET_ACCESS_KEY={{ bucket_secret_key }} -e PGUSER={{ postgres_user }} -e PGPASSWORD={{ postgres_password }} -e PGDATABASE={{ postgres_database }} -e PGHOST={{ data_host }} -e PGPORT={{ postgres_port }} {{ img_repo }}:{{ omnileads_version }}"
+      when:
+        - inventory_hostname in groups['omnileads_app']
+        - container_orchest == "systemd"
         - bucket_url is defined
-        - callrec_device != "s3-no-check-cert"
-        - omldata is defined
-        - postgres_out is not true
+        - bucket_ssl_selfsigned is not defined
 
-    - name: BACKUP upload postgres backup to insecure SSL BUCKET
-      shell: "export AWS_ACCESS_KEY_ID={{ bucket_access_key }} &&  export AWS_SECRET_ACCESS_KEY={{ bucket_secret_key }} && aws --endpoint {{ bucket_url }} --no-verify-ssl s3 cp /tmp/pgsql-backup-{{ file_timestamp }}.sql  s3://{{ bucket_name }}/backup/"
+    - name: BACKUP postgres DB external bucket AIO
+      shell: "podman run --network=host -e POSTGRES_BACKUP=True -e S3_ENDPOINT={{ bucket_url }} -e S3_BUCKET_NAME={{ bucket_name }} -e BACKUP_FILENAME=pgsql-backup-{{ file_timestamp }}.sql -e AWS_ACCESS_KEY_ID={{ bucket_access_key }}  -e AWS_SECRET_ACCESS_KEY={{ bucket_secret_key }} -e PGUSER={{ postgres_user }} -e PGPASSWORD={{ postgres_password }} -e PGDATABASE={{ postgres_database }} -e PGHOST=localhost -e PGPORT={{ postgres_port }} {{ img_repo }}:{{ omnileads_version }}"
       when:
+        - inventory_hostname in groups['omnileads_aio']
+        - container_orchest == "systemd"
         - bucket_url is defined
-        - callrec_device == "s3-no-check-cert"
-        - omldata is defined
-        - postgres_out is not true
+        - bucket_ssl_selfsigned is not defined
 
-    - name: BACKUP asterisk custom config files
-      s3_sync:
-        bucket: '{{ bucket_name }}'
-        key_prefix: 'backup/asterisk/{{ file_timestamp }}'
-        file_root: '/etc/asterisk/custom/'
-        region: '{{ bucket_region }}'
-        aws_access_key: '{{ bucket_access_key }}'
-        aws_secret_key: '{{ bucket_secret_key }}'
-        ec2_url: '{{ bucket_url }}'
+    - name: BACKUP postgres DB external bucket ssl selfsigned cluster
+      shell: "podman run -e SSL_SELFSIGNED=true -e POSTGRES_BACKUP=True -e S3_ENDPOINT={{ bucket_url }} -e S3_BUCKET_NAME={{ bucket_name }} -e BACKUP_FILENAME=pgsql-backup-{{ file_timestamp }}.sql -e AWS_ACCESS_KEY_ID={{ bucket_access_key }}  -e AWS_SECRET_ACCESS_KEY={{ bucket_secret_key }} -e PGUSER={{ postgres_user }} -e PGPASSWORD={{ postgres_password }} -e PGDATABASE={{ postgres_database }} -e PGHOST={{ data_host }} -e PGPORT={{ postgres_port }} {{ img_repo }}:{{ omnileads_version }}"
       when:
+        - inventory_hostname in groups['omnileads_app']
+        - container_orchest == "systemd"
         - bucket_url is defined
-        - callrec_device != "s3-no-check-cert"
-        - omlvoice is defined  
+        - bucket_ssl_selfsigned is defined
 
-    - name: BACKUP upload asterisk backup to insecure SSL BUCKET
-      shell: "export AWS_ACCESS_KEY_ID={{ bucket_access_key }} &&  export AWS_SECRET_ACCESS_KEY={{ bucket_secret_key }} && aws --endpoint {{ bucket_url }} --no-verify-ssl s3 sync {{ asterisk_location_conf }}/custom/ s3://{{ bucket_name }}/backup/asterisk/{{ file_timestamp }}/"
+    - name: BACKUP postgres DB external bucket ssl selfsigned AIO
+      shell: "podman run --network=host -e SSL_SELFSIGNED=true -e POSTGRES_BACKUP=True -e S3_ENDPOINT={{ bucket_url }} -e S3_BUCKET_NAME={{ bucket_name }} -e BACKUP_FILENAME=pgsql-backup-{{ file_timestamp }}.sql -e AWS_ACCESS_KEY_ID={{ bucket_access_key }}  -e AWS_SECRET_ACCESS_KEY={{ bucket_secret_key }} -e PGUSER={{ postgres_user }} -e PGPASSWORD={{ postgres_password }} -e PGDATABASE={{ postgres_database }} -e PGHOST=localhost -e PGPORT={{ postgres_port }} {{ img_repo }}:{{ omnileads_version }}"
       when:
-        - callrec_device == "s3-no-check-cert"
-        - omlvoice is defined
+        - inventory_hostname in groups['omnileads_aio']
+        - container_orchest == "systemd"
+        - bucket_url is defined
+        - bucket_ssl_selfsigned is defined    
+    
+    - name: BACKUP upload asterisk backup to selfhosted BUCKET cluster
+      shell: "podman exec -it oml-asterisk-server aws --endpoint-url http://{{ data_host }}:9000 s3 sync {{ asterisk_location_conf }}/custom/ s3://{{ bucket_name }}/backup/asterisk/{{ file_timestamp }}/"
+      when:        
+        - inventory_hostname in groups['omnileads_voice']
+        - container_orchest == "systemd"
+        - bucket_url is not defined
+
+    - name: BACKUP upload asterisk backup to selfhosted BUCKET AIO
+      shell: "podman exec -it oml-asterisk-server aws --endpoint-url http://localhost:9000 --no-verify-ssl s3 sync {{ asterisk_location_conf }}/custom/ s3://{{ bucket_name }}/backup/asterisk/{{ file_timestamp }}/"
+      when:        
+        - inventory_hostname in groups['omnileads_aio']
+        - container_orchest == "systemd"
+        - bucket_url is not defined
+    
+    - name: BACKUP upload asterisk backup to external BUCKET
+      shell: "podman exec -it oml-asterisk-server aws --endpoint-url {{ bucket_url }} s3 sync {{ asterisk_location_conf }}/custom/ s3://{{ bucket_name }}/backup/asterisk/{{ file_timestamp }}/"
+      when:        
+        - inventory_hostname in groups['omnileads_voice'] or inventory_hostname in groups['omnileads_aio']
+        - container_orchest == "systemd"
+        - bucket_url is defined
+        - bucket_ssl_selfsigned is not defined
+
+    - name: BACKUP upload asterisk backup to insecure SSL external BUCKET
+      shell: "podman exec -it oml-asterisk-server aws --endpoint-url {{ bucket_url }} --no-verify-ssl s3 sync {{ asterisk_location_conf }}/custom/ s3://{{ bucket_name }}/backup/asterisk/{{ file_timestamp }}/"
+      when:        
+        - inventory_hostname in groups['omnileads_aio'] or inventory_hostname in groups['omnileads_voice']
+        - container_orchest == "systemd"
+        - bucket_url is defined
+        - bucket_ssl_selfsigned is defined

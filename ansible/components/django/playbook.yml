@@ -107,7 +107,7 @@
       owner: "{{ usuario }}"
       group: "{{ usuario }}"
     when: 
-      - omlapp is defined
+      - inventory_hostname in groups['omnileads_app']
       - scalable_tunings is defined
 
   - name: DJANGO Enable and start systemd service

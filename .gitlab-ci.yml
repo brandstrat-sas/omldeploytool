@@ -11,6 +11,8 @@ deploy-docker-compose-cloud:
     DIGITALOCEAN_DROPLET_SIZE: $DIGITALOCEAN_DROPLET_SIZE
     DIGITALOCEAN_REGION: $DIGITALOCEAN_REGION
     DIGITALOCEAN_SSH_KEY: $DIGITALOCEAN_SSH_KEY
+    NIC: eth1
+    ENV: cloud
     CI_JOB_ID: $CI_JOB_ID
   script:
     - doctl auth init -t ${DIGITALOCEAN_ACCESS_TOKEN}
@@ -22,12 +24,10 @@ deploy-docker-compose-cloud:
     - sleep 120
     - doctl compute droplet delete -f cicd-docker-compose.${CI_JOB_ID}
     - rm -rf ./omldeploytool
-  only:
-    - /.*pipeline_prod.*$/
-    - /.*pipeline-all.*$/
-    - schedules
-    - web
-    - merge_request
+  rules:
+    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"'
+    - if: '$CI_COMMIT_REF_NAME =~ /deploy/'
+    - if: '$CI_PIPELINE_SOURCE == "web"'
 
 deploy-systemd-ansible:
   stage: deploy
@@ -54,11 +54,10 @@ deploy-systemd-ansible:
     - doctl compute droplet delete -f cicd-systemd.${CI_JOB_ID}
   tags:
     - deploy
-  only:
-    - /.*pipeline-systemd.*$/
-    - /.*pipeline-all.*$/
-    - schedules
-    - web
+  rules:
+    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"'
+    - if: '$CI_COMMIT_REF_NAME =~ /deploy/'
+    - if: '$CI_PIPELINE_SOURCE == "web"'
 
 deploy-docker-compose-ansible:
   stage: deploy
@@ -87,11 +86,10 @@ deploy-docker-compose-ansible:
     - doctl compute droplet delete -f cicd-systemd.${CI_JOB_ID}
   tags:
     - deploy
-  only:
-    - /.*pipeline-systemd.*$/
-    - /.*pipeline-all.*$/
-    - schedules
-    - web
+rules:
+    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"'
+    - if: '$CI_COMMIT_REF_NAME =~ /deploy/'
+    - if: '$CI_PIPELINE_SOURCE == "web"'
 
 deploy-docker-compose-ansible:
   stage: deploy
@@ -120,11 +118,10 @@ deploy-docker-compose-ansible:
     - doctl compute droplet delete -f cicd-ansible-compose.${CI_JOB_ID}
   tags:
     - deploy
-  only:
-    - /.*pipeline-systemd.*$/
-    - /.*pipeline-all.*$/
-    - schedules
-    - web
+  rules:
+    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"'
+    - if: '$CI_COMMIT_REF_NAME =~ /deploy/'
+    - if: '$CI_PIPELINE_SOURCE == "web"'
 
 deploy-systemd-cluster:
   stage: deploy
@@ -149,11 +146,10 @@ deploy-systemd-cluster:
     - until curl -sk --head --request GET https://$PROXMOX_ADDR:5704|grep "302" > /dev/null; do echo "Environment still being installed, sleeping 60 seconds"; sleep 60; done; echo "Environment is up"
   tags:
     - deploy
-  only:
-    - /.*pipeline-systemd.*$/
-    - /.*pipeline-all.*$/
-    - schedules
-    - web
+  rules:
+    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"'
+    - if: '$CI_COMMIT_REF_NAME =~ /deploy/'
+    - if: '$CI_PIPELINE_SOURCE == "web"'
 
 deploy-systemd-ha:
   stage: deploy
@@ -184,11 +180,10 @@ deploy-systemd-ha:
     #- until curl -sk --head --request GET https://$PROXMOX_ADDR:5115|grep "302" > /dev/null; do echo "Environment still being installed, sleeping 60 seconds"; sleep 60; done; echo "Environment is up"
   tags:
     - deploy
-  only:
-    - /.*pipeline-systemd.*$/
-    - /.*pipeline-all.*$/
-    - schedules
-    - web
+  rules:
+    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"'
+    - if: '$CI_COMMIT_REF_NAME =~ /deploy/'
+    - if: '$CI_PIPELINE_SOURCE == "web"'
 
 ###################################################################################################################################################################################################################
 
