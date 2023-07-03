@@ -614,7 +614,7 @@ and then upload to the Bucket Object Storage of the new OMniLeads version the re
 
 ```
 export NOMBRE_BACKUP=some_file_name
-pg_dump omnileads > /tmp/pgsql-backup-$NOMBRE_BACKUP.sql
+pg_dump -F c omnileads -f /tmp/pgsql-backup-$NOMBRE_BACKUP.sql --no-acl
 export AWS_ACCESS_KEY_ID=$your_new_instance_bucket_key
 export AWS_SECRET_ACCESS_KEY=$your_new_instance_bucket_secret_key
 export S3_BUCKET_NAME=$your_new_instance_bucket_name
