@@ -81,6 +81,11 @@
     - inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_aio']
     - container_orchest == "systemd"
 
+- import_playbook: components/fastagi/playbook.yml
+  when: 
+    - inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_aio']
+    - container_orchest == "systemd"
+
 - import_playbook: components/websockets/playbook.yml
   when: 
     - inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_aio']

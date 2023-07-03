@@ -155,6 +155,7 @@ case ${oml_action} in
     asterisk_repo_path=$(pwd)/components/asterisk/ \
     docker_compose_repo_path=$(pwd)/components/docker_compose/ \
     rtpengine_repo_path=$(pwd)/components/rtpengine/ \
+    fastagi_repo_path=$(pwd)/components/fastagi/ \
     websockets_repo_path=$(pwd)/components/websockets/ \
     nginx_repo_path=$(pwd)/components/nginx/ \
     minio_repo_path=$(pwd)/components/minio/ \

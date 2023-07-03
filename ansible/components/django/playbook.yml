@@ -85,13 +85,7 @@
       - postgres_out == true
       
   - name: POSTGRESQL Adds plperl extension to the database {{ postgres_database }}
-    postgresql_ext:
-      name: plperl
-      db: "{{ postgres_database }}"
-      login_host: "{{ postgres_host }}"
-      login_password: "{{ postgres_password }}"
-      login_user: "{{ postgres_user }}"
-      port: "{{ postgres_port }}"
+    shell: podman exec -it oml-django-server psql -U {{ postgres_user }} -d {{ postgres_database }} -c "CREATE EXTENSION IF NOT EXISTS plperl;" 
     tags:
       - install
     when: 
