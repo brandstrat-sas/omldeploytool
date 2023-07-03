@@ -3,7 +3,7 @@
 
 case $1 in
 
-{% if docker_compose is defined %}
+{% if container_orchest == "docker_compose" %}
   --reset_pass)
     echo "reset django admin password"
     docker exec -it oml-django-server python3 /opt/omnileads/ominicontacto/manage.py cambiar_admin_password
@@ -12,11 +12,7 @@ case $1 in
     echo "init Environment with some data"
     docker exec -it oml-django-server python3 /opt/omnileads/ominicontacto/manage.py inicializar_entorno
     ;;
-  --init_env_devops)
-    echo "init Environment with some data"
-    docker exec -it oml-django-server python3 /opt/omnileads/ominicontacto/manage.py inicializar_entorno --qa-devops
-    ;;
-  --regenerar_asterisk)
+--regenerar_asterisk)
     echo "regenerate redis asterisk data"
     docker exec -it oml-django-server python3 /opt/omnileads/ominicontacto/manage.py regenerar_asterisk
     ;;
