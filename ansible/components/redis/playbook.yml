@@ -27,7 +27,7 @@
     - redis
     
   vars:
-    img_repo: '{{ container_image_registry }}/redislabs/redisgears'
+    img_repo: '{{ container_image_registry }}/omnileads/redis'
     img_repo_ha: '{{ container_image_registry }}/omnileads/redis'
     img_prometheus_repo: 'docker.io/oliver006/redis_exporter'
   tasks:
@@ -62,7 +62,7 @@
     when: omnileads_ha is defined  
 
   - name: REDIS Pull image
-    command: podman pull --quiet {{ img_repo }}:{{ redisgears_version }}
+    command: podman pull --quiet {{ img_repo }}:{{ redis_version }}
     register: podman_pull
     until: podman_pull is success
     tags:

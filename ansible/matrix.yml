@@ -64,6 +64,7 @@
   when: 
     - inventory_hostname in groups['omnileads_voice'] or inventory_hostname in groups['omnileads_aio']
     - container_orchest == "systemd"
+    - rtpengine_out != true
 
 - import_playbook: components/keepalived/playbook.yml
   when: omnileads_ha is defined

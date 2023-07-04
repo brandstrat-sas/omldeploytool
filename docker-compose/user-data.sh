@@ -3,13 +3,13 @@
 oml_nic=${NIC}
 env=${ENV}
 
+version=${BRANCH}
+
 bucket_url=${BUCKET_URL}
 bucket_access_key=${BUCKET_ACCESS_KEY}
 bucket_secret_key=${BUCKET_SECRET_KEY}
 bucket_region=${BUCKET_REGION}
 bucket_name=${BUCKET_NAME}
-
-apt update && apt install git curl
 
 PRIVATE_IPV4=$(ip addr show $oml_nic | grep "inet\b" | awk '{print $2}' | cut -d/ -f1)
 PUBLIC_IPV4=$(curl ifconfig.co)
@@ -17,7 +17,12 @@ PUBLIC_IPV4=$(curl ifconfig.co)
 curl -fsSL https://get.docker.com -o ~/get-docker.sh
 bash ~/get-docker.sh
 
-git clone https://gitlab.com/omnileads/omldeploytool.git 
+if [ -z "$version" ];then
+    git clone https://gitlab.com/omnileads/omldeploytool.git
+else
+    git -b $version clone https://gitlab.com/omnileads/omldeploytool.git
+fi
+
 cd ./omldeploytool/docker-compose
 cp env .env
 
@@ -26,6 +31,7 @@ sed -i "s/DJANGO_HOSTNAME=app/DJANGO_HOSTNAME=localhost/g" .env
 sed -i "s/PUBLIC_IP=/PUBLIC_IP=$PUBLIC_IPV4/g" .env
 sed -i "s/DAPHNE_HOSTNAME=channels/DAPHNE_HOSTNAME=localhost/g" .env
 sed -i "s/ASTERISK_HOSTNAME=acd/ASTERISK_HOSTNAME=$PRIVATE_IPV4/g" .env
+sed -i "s/FASTAGI_HOSTNAME=fastagi/FASTAGI_HOSTNAME=$PRIVATE_IPV4/g" .env
 sed -i "s/PGHOST=postgresql/PGHOST=localhost/g" .env
 sed -i "s/WEBSOCKET_HOSTNAME=websockets/WEBSOCKET_HOSTNAME=localhost/g" .env
 sed -i "s/KAMAILIO_HOSTNAME=kamailio/KAMAILIO_HOSTNAME=localhost/g" .env
