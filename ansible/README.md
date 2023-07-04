@@ -45,6 +45,7 @@ It is possible to group these containers on a single Linux instance or cluster t
 * [Deploy with backend (Postgres y Object Storage) as cloud services](#cloud-deploy)
 * [Deploy High Availability on-premise instance](#onpremise-deploy)
 * [TLS Certs provisioning](#tls-cert-provisioning)
+* [Security](#security)
 * [Deploy an upgrade from CentOS7](#upgrade_from_centos7)
 * [Deploy an upgrade](#upgrades)
 * [Deploy a rollback](#rollback)
@@ -82,18 +83,13 @@ for example:
 
 Ansible allows you to run a number of tasks on a set of hosts specified in your inventory file. Depending on the structure and variables of this file, OMniLeads instances based on docker or podman can be launched. 
 
-This tool is capable of deploying OMniLeads in three layouts: 
-
-* docker-compose:
-![Diagrama deploy tool](./png/deploy-tool-tenant-aio-docker.png)
-
+This tool is capable of deploying OMniLeads in two layouts: 
 
 * OML All in One with Podman & Systemd:
 ![Diagrama deploy tool](./png/deploy-tool-tenant-aio.png)
 
 
-
-* OML Cluster with Podman & Systemd:
+* OML  Cluster with Podman & Systemd:
 ![Diagrama deploy tool](./png/deploy-tool-tenant-ait.png)
 
 
@@ -101,213 +97,20 @@ The following is the generic version of inventory.yml file available in this rep
 
 In the first section of the file you can list the different hosts grouped by tenant and by type of deployment (All in one or Cluster).
 
+AIO instances:
 
-```
----
-###############################################################################################################
-# -- The complete list of host                                                                                #
-###############################################################################################################
+![inventory deploy example header](./png/inventory_aio_section.png)
 
-all:
-  children:
-    # -----------------------------------------
-    # -----------------------------------------
-    omnileads_aio:      
-      hosts:
-        tenant_example_1:
-          tenant_id: tenant_example_1
-          ansible_host: 190.19.150.18
-          omni_ip_lan: 172.16.101.44
-          ansible_ssh_port: 5705
-          infra_env: lan        
-        tenant_example_2:
-          tenant_id: tenant_example_2
-          ansible_host: 190.19.11.2
-          omni_ip_lan: 10.10.10.2          
-        tenant_example_3:
-          tenant_id: tenant_example_3
-          ansible_host: 201.22.11.2
-          omni_ip_lan: 10.10.10.3
-          postgres_host:          
-          postgres_port: 
-          postgres_user: 
-          postgres_password: 
-          postgres_database: omnileads
-          postgres_maintenance_db: defaultdb
-          postgres_ssl: true
-          bucket_access_key: 
-          bucket_secret_key: 
-          bucket_name: tenant_example_3
-        tenant_example_4:
-          tenant_id: tenant_example_4
-          ansible_host: 
-          omni_ip_lan: 
-      vars:
-        docker_compose: true
-    # -----------------------------------------
-    # -----------------------------------------
-    cluster_instances:
-      children:
-        tenant_example_5:
-          hosts:
-            tenant_example_5_data:
-              ansible_host: 172.16.101.41
-              omni_ip_lan: 172.16.101.41
-            tenant_example_5_voice:
-              ansible_host: 172.16.101.42
-              omni_ip_lan: 172.16.101.42      
-            tenant_example_5_app:
-              ansible_host: 172.16.101.43
-              omni_ip_lan: 172.16.101.43
-          vars:
-            tenant_id: tenant_example_5
-            data_host: 172.16.101.41
-            voice_host: 172.16.101.42
-            application_host: 172.16.101.43
-            infra_env: lan
-```
+Cluster instances:
 
-Then we count the tenants variables to display, labeled/indented under *vars:*. Here we find
-all the adjustable parameters when invoking a deploy instance. each one is
-described by a *# --- comment* preceding it.
+![inventory deploy 2 section](./png/inventory_cluster_section.png)
 
-These variables affect all hosts, unless they are explicitly declared within the host, as exemplified  above by *TZ* or *bucket_name*.
+In the second section of the file you can parameterize the runtime variables. By default it affects ALL declared instances, unless the same variable is declared within the host or group specific variables section.
 
-```
-##################################################################################################################
-# -- OMniLeads Common Variables                                                                                  #
-##################################################################################################################
-
-  vars:    
-    # --- ansible user auth connection
-    ansible_user: root
-    ansible_ssh_port: 22
-    # --- Activate the OMniLeads Enterprise Edition - with "AAAA" licensed.
-    # --- on the contrary you will deploy OMniLeads OSS Edition with GPLV3 licensed. 
-    enterprise_edition: false
-    # --- versions of each image to deploy
-    # --- versions of each image to deploy
-    omnileads_version: 1.28.0
-    websockets_version: 230204.01
-    nginx_version: 230215.01
-    kamailio_version: 230204.01
-    asterisk_version: 230522.01
-    rtpengine_version: 230426.01
-    postgres_version: 230204.01  
-    centos_postgresql_version: 11
-    # --- "cloud" instance (access through public IP)
-    # --- or "lan" instance (access through private IP)
-    # --- in order to set NAT or Publica ADDR for RTP voice packages
-    infra_env: cloud
-    # --- If you have an DNS FQDN resolution, you must to uncomment and set this param
-    # --- otherwise leave commented to work invoking through an IP address
-    #fqdn: fts.sefirot.cloud
-    # --- If you want to work with Dialer, then you must install Wombat Dialer on a separate host 
-    # --- and indicate the IP address or FQDN of that host here (uncomment and set this param):
-    #dialer_host: 
-    # --- set postgres_host if you have your own postgres (standalone host or cloud service)
-    # --- otherwise leave commented to deploy PostgreSQL on Application Host instance
-    #postgres_host: 
-    # --- Read Only connection host address (in case of RW/RO postgres cluster):
-    #postgres_ro_host: 
-    # --- if you have your own bucket (standalone host or cloud service) put here the URL
-    # --- example VULTR: https://ewr1.vultrobjects.com
-    # --- example Digital Ocean: https://sfo3.digitaloceanspaces.com
-    # --- example onpremise: https://192.168.100.10
-    # --- if you want to deploy MinIO objects storage on application_host, you must to put '#' before
-    #bucket_url: https://sfo3.digitaloceanspaces.com
-    # --- RTPEngine if you have your own instances put here the IP or hostname
-    #rtpengine_host: 
-    # --- time zone (for example: America/Argentina/Cordoba)
-    TZ: America/Argentina/Cordoba
-    # --- TLS/SSL Certs configuration (selfsigned, custom or certbot letsencrypt)
-    # --- if you have your own certs, put them into instances/tenant folder and
-    # --- change this to *custom*
-    certs: selfsigned
-    # --- if you object storage service use selfsigned TLS/SSL certs, you mus to put
-    # --- *callrec_device=s3-no-check-cert* in order to don't verify CA.
-    callrec_device: s3
-    # --- PostgreSQL    
-    postgres_port: 5432
-    postgres_user: omnileads
-    postgres_password: HJGKJHGDSAKJHK7856765DASDAS675765JHGJHSAjjhgjhaaa
-    postgres_database: omnileads
-    # --- *postgres* or *defaultdb* depend ...
-    postgres_maintenance_db: postgres
-    postgres_ssl: false
-    # --- If you have a PGSQL cluster you can activated cluster mode
-    # --- in order to split INSERT (RW node) & QUERIES (RO node)
-    postgres_ha: false
-    # --- OBJECT STORAGE
-    # --- minio auth Web and Console admin params
-    s3_http_admin_user: omnileads
-    s3_http_admin_pass: jdhsgahkdgaskdasdhe2h4231hg4jjhgHJKG
-    # --- bucket params    
-    bucket_access_key: Hghjkdghjkdhasjdasdsada
-    bucket_secret_key: jknkjhkjh4523kjhcksjdhkjfdhKJHHKJGKJh786876876NBVJHB
-    bucket_name: omnileads
-    # --- if your bucket doesn't need region, leave this value (us-east-1)
-    bucket_region: us-east-1
-    # --- Asterisk Manager Interface (AMI) user & password
-    ami_user: omnileads
-    ami_password: C12H17N2O4P_o98o98
-    # --- Wombat Dialer API user & pass
-    dialer_user: demoadmin
-    dialer_password: demo
-    # ---  kamailio shm & pkg memory params
-    shm_size: 64
-    pkg_size: 8
-    # --- is the time in seconds that will last the https session when inactivity
-    SCA: 3600
-    # --- Ephemeral Credentials TTL (ECTTL) is the time in seconds            #
-    # --- that will last the SIP credentials used to authenticate a SIP user  #
-    # --- in the telephony system
-    ECCTL: 28800
-    # --- is the attempts a user has to enter an incorrect password in login
-    LOGIN_FAILURE_LIMIT: 10
-    # --- google maps integration credentials
-    google_maps_api_key: NULL
-    google_maps_center: '{ "lat": -31.416668, "lng": -64.183334 }'
-    # --- SMTP server params, if you want to use your own SMTP, put true and
-    # --- uncomment all necesary
-    email_smtp_relay: false
-    #email_backend:
-    #email_default_from:
-    #email_host:
-    #email_password:
-    #email_user:
-    #email_port:
-    #email_ssl_certfile:
-    #email_ssl_keyfile:
-    #email_use_ssl:
-    #email_use_tls:
-
-    # --- Docker Registry repo
-    # --- If you are going to use another registry for the images, you must indicate here
-    omlapp_repo: omnileads
-
-    # --- Restore id request by restore filename
-    #restore_file_timestamp: 1681215859
-
-    # --- Integrations with external hosts
-    # --- Request by docker-compose & promtail
-    loki_host: 190.19.150.222
-    # --- Request by Asterisk hep module
-    homer_host: 190.19.150.222
-    # --- Request by Web-Video Inbound Calls 
-    #video_host: 
-
-    # --- BACKUPs: in case of implementing a separate bucket for backups
-    #backup_bucket: 
-    # --- Restore: in case of implementing a separate bucket for restore
-    #restore_bucket: 
-
-    ha_notification_email: mr_robot@mr_robot.com
-```
-
-Finally, we have the section where the hosts should be grouped according to their nature. 
+Finally, we have the section where the hosts should be grouped according arq. 
 On one side we have the omnileads_aio family, here below you must list the AIO instances you want to deploy.
-Then we have *omnileads_data*, *omnileads_voice*, *omnileads_app* and *omnileads_haproxy* where the instances that form clusters should be grouped. 
+Then we have *omnileads_data*, *omnileads_voice*, *omnileads_app* where the instances that form clusters should be grouped. 
+
 
 ```
 #############################################################################################################
@@ -324,26 +127,17 @@ omnileads_aio:
 omnileads_data:
   hosts:
     #tenant_example_5_data:
-    #tenant_ha_example_postgres_1:
-    #tenant_ha_example_postgres_2:
-  vars:
-    omldata: true
+    #tenant_example_6_data:
     
 omnileads_voice:
   hosts:
     #tenant_example_5_voice:
-    #tenant_ha_example_voice_1:
-    #tenant_ha_example_voice_2:
-  vars:
-    omlvoice: true
+    #tenant_example_6_voice:
 
 omnileads_app:
   hosts:
     #tenant_example_5_app:
-    #tenant_ha_example_app_1:
-    #tenant_ha_example_app_2:
-  vars:
-    omlapp: true
+    #tenant_example_6_app:
 ```
 
 # Inventory file :office: <a name="subscriber-traking"></a>
@@ -352,12 +146,8 @@ In order to manage multiple instances (or group of them) from this deployment to
 a folder called **instances** at the root of this directory. The reserved name for this folder is
 **instances** since said string is inside the .gitignore of the repository.
 
-The idea is that the mentioned folder works as a separate GIT repository, thus providing the possibility
-to maintain an integral backup in turn that the SRE or IT people is supported in the use of GIT.
-
 ```
-cd omldeploytool/ansible
-git clone your_tenants_config_repo instances
+mkdir instances
 ```
 
 Then, for each *instance* to be managed, a sub-folder must be created within instances.
@@ -401,8 +191,6 @@ The important thing is that the selected distribution has a version of Podman (3
 
 Then you should work on the inventory.yml tenant file.
 
-![inventory deploy example header](./png/inventory_header_deploy_1.png)
-
 ```
 algarrobo:
   tenant_id: algarrobo
@@ -419,7 +207,33 @@ Then in the vars section, we have all the parameters that omnileads expects to w
 
 Finally in the last section of the file, we must make sure that our tenant is listed in the omnileads_aio hosts group.
 
-![inventory deploy example footer](./png/inventory_end_deploy_2.png)
+```
+#############################################################################################################
+# -- In this section the hosts are grouped based on the type of deployment (AIO, Cluster & Cluster HA).     #
+#############################################################################################################
+
+omnileads_aio:
+  hosts:
+    algarrobo:
+    #tenant_example_3:
+    #tenant_example_4:
+    #tenant_example_2:
+
+omnileads_data:
+  hosts:
+    #tenant_example_5_data:
+    #tenant_example_6_data:
+    
+omnileads_voice:
+  hosts:
+    #tenant_example_5_voice:
+    #tenant_example_6_voice:
+
+omnileads_app:
+  hosts:
+    #tenant_example_5_app:
+    #tenant_example_6_app:
+```
 
 Let's run the bash scrip:
 
@@ -513,18 +327,6 @@ Once the URL is available with the App returning the login view,  we can log in 
 oml_manage --reset_pass
 ```
 
-## docker-compose 🔧 <a name="docker-compose"></a>
-
-Then, once OMnileads is deployed on the corresponding instance/s, each container on which a component works
-can be managed with docker-compose utility.
-
-```
-cd /etc/omnileads
-docker-compose up -d
-```
-
-All files are located in the directory /etc/omnileads.
-
 ## Systemd & Podman 🔧 <a name="podman-systemd"></a>
 
 Then, once OMnileads is deployed on the corresponding instance/s, each container on which a component works
@@ -593,6 +395,31 @@ S3_ENDPOINT=http://172.16.101.221:9000
 ```
 
 This is the standard for all components.
+
+# Security 🛡️ <a name="security"></a>
+
+OMniLeads is an application that combines Web (https), WebRTC (wss & sRTP) and VoIP (SIP & RTP) technologies. This implies a certain complexity and 
+when deploying it in production under an Internet exposure scenario. 
+
+On the Web side of the things the ideal is to implement a Reverse Proxy or Load Balancer ahead of OMnileads, i.e. exposed to the Internet (TCP 443) 
+and that it forwards the requests to the Nginx of the OMniLeads stack. On the VoIP side, when connecting to the PSTN via VoIP it is ideal to 
+operate behind an SBC (Session Border Controller) exposed to the Internet.
+
+However, we can intelligently use the **Cloud Firewall** technology when operating over VPS exposed to the Internet.
+
+![Diagrama security](./png/security.png)
+
+Below are the Firewall rules to be applied on All In One instance:
+
+* 443/tcp Nginx: This is where Web/WebRTC requests to Nginx are processed. Port 443 can be opened to the entire Internet.
+
+* 40000/50000 UDP: WebRTC sRTP RTPengine: this port range can be opened to the entire Internet.
+
+* 5060/UDP Asterisk: This is where SIP requests for incoming calls from the ITSP(s) are processed. This port must be opened by restricting by origin on the IP(s) of the PSTN SIP termination provider(s).
+
+* 20000/30000 UDP VoIP RTP Asterisk: this port range can be opened to the entire Internet.
+
+* 9090/tcp Prometheus metrics: This is where the connections coming from the monitoring center. This port can be opened by restricting by origin in the IP of the monitoring center.
 
 # Upgrade from CentOS-7 OMniLeads instance :arrows_counterclockwise: <a name="upgrade_from_centos7"></a>
 
@@ -790,32 +617,6 @@ Finally, you will be able to have an instance of Grafana and Prometheus that inv
 to them build dashboards, on the other hand Grafana must to invoke the Loki deployed on tenant like data-source for logs analisys.
 
 ![Diagrama deploy tool zoom](./png/observability_MT.png)
-
-
-# Security 
-
-OMniLeads is an application that combines Web (https), WebRTC (wss & sRTP) and VoIP (SIP & RTP) technologies. This implies a certain complexity and 
-when deploying it in production under an Internet exposure scenario. 
-
-On the Web side of the things the ideal is to implement a Reverse Proxy or Load Balancer ahead of OMnileads, i.e. exposed to the Internet (TCP 443) 
-and that it forwards the requests to the Nginx of the OMniLeads stack. On the VoIP side, when connecting to the PSTN via VoIP it is ideal to 
-operate behind an SBC (Session Border Controller) exposed to the Internet.
-
-However, we can intelligently use the **Cloud Firewall** technology when operating over VPS exposed to the Internet.
-
-![Diagrama security](./png/security.png)
-
-Below are the Firewall rules to be applied on All In One instance:
-
-* 443/tcp Nginx: This is where Web/WebRTC requests to Nginx are processed. Port 443 can be opened to the entire Internet.
-
-* 40000/50000 UDP: WebRTC sRTP RTPengine: this port range can be opened to the entire Internet.
-
-* 5060/UDP Asterisk: This is where SIP requests for incoming calls from the ITSP(s) are processed. This port must be opened by restricting by origin on the IP(s) of the PSTN SIP termination provider(s).
-
-* 20000/30000 UDP VoIP RTP Asterisk: this port range can be opened to the entire Internet.
-
-* 9090/tcp Prometheus metrics: This is where the connections coming from the monitoring center. This port can be opened by restricting by origin in the IP of the monitoring center.
 
 # License & Copyright
 
