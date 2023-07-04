@@ -26,7 +26,7 @@ all:
     aio_instances:
       hosts:
         tenant_example_1:
-          #container_orchest: docker_compose (by default systemd)
+          #container_orchest: docker_compose (default is systemd)
           tenant_id: tenant_example_1
           ansible_host: 190.19.150.18
           omni_ip_lan: 172.16.101.44

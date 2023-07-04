@@ -194,6 +194,25 @@ services:
     tty: true
     working_dir: /opt/omnileads
 
+  fastagi:
+    depends_on:
+      - postgresql
+      - redis
+    image: ${OMLFASTAGI_IMG}
+    container_name: oml-fastagi
+    environment:
+      - AMI_HOST=${ASTERISK_HOSTNAME}
+      - AMI_USER=${AMI_USER}
+      - AMI_PASSWD=${AMI_PASSWORD}
+      - AMI_PORT=5038
+      - POSTGRES_HOST=${PGHOST}
+      - POSTGRES_PORT=${PGPORT}
+      - POSTGRES_DB=${PGDATABASE}
+      - POSTGRES_USER=${PGUSER}
+      - POSTGRES_PASSWORD=${PGPASSWORD}
+      - REDIS_HOSTNAME=${REDIS_HOSTNAME}
+    network_mode: host
+
   acd:
     container_name: oml-asterisk
     depends_on:
@@ -203,6 +222,7 @@ services:
     dns: 8.8.8.8
     environment:
       - ENV=${ENV}
+      - FASTAGI=${FASTAGI_HOSTNAME}
       - TZ=${TZ}
       - ASTERISK_LOCATION=
       - AMI_USER=${AMI_USER}

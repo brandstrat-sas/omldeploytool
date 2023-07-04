@@ -9,8 +9,6 @@ bucket_secret_key=${BUCKET_SECRET_KEY}
 bucket_region=${BUCKET_REGION}
 bucket_name=${BUCKET_NAME}
 
-apt update && apt install git curl
-
 PRIVATE_IPV4=$(ip addr show $oml_nic | grep "inet\b" | awk '{print $2}' | cut -d/ -f1)
 PUBLIC_IPV4=$(curl ifconfig.co)
 
