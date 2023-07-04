@@ -23,7 +23,7 @@ all:
   children:
     # -----------------------------------------
     # -----------------------------------------
-    omnileads_aio:      
+    aio_instances:
       hosts:
         tenant_example_1:
           #container_orchest: docker_compose (by default systemd)
