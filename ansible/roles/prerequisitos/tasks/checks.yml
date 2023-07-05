@@ -68,10 +68,9 @@
 ###################### HOST Set ########################### ###################### HOST Set ###########################
 
 # Set postgres_out as true when postgres_host is defined on inventory
-- name: CHECKS Setting postgres_host & set postgres_out true
+- name: CHECKS Setting postgres_out true
   set_fact:
     postgres_out: true
-  changed_when: false
   when:
     - postgres_host is defined
     - inventory_hostname in groups['omnileads_aio'] or inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_data']
@@ -80,10 +79,9 @@
     - upgrade
 
 # Set postgres_out as false when postgres_host is not defined on inventory
-- name: CHECKS Setting postgres_host & set postgres_out false
+- name: CHECKS Setting postgres_out false
   set_fact:
     postgres_out: false
-  changed_when: false
   when:
     - postgres_host is not defined
     - inventory_hostname in groups['omnileads_aio'] or inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_data']
@@ -267,7 +265,6 @@
 - name: CHECKS Setting rtpengine_host & set rtpengine_out true
   set_fact:
     rtpengine_out: true
-  changed_when: false
   when:
     - rtpengine_host is defined
     - inventory_hostname in groups['omnileads_aio'] or inventory_hostname in groups['omnileads_voice']
@@ -279,7 +276,6 @@
 - name: CHECKS Setting rtpengine_host & set rtpengine_out true
   set_fact:
     rtpengine_out: false
-  changed_when: false
   when:
     - rtpengine_host is not defined
     - inventory_hostname in groups['omnileads_aio'] or inventory_hostname in groups['omnileads_voice']
