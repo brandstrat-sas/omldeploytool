@@ -245,7 +245,7 @@
   changed_when: false
   when:
     - asterisk_host is not defined
-    - inventory_hostname in groups['omnileads_app']
+    - inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_voice']
   tags: 
     - install
     - upgrade
