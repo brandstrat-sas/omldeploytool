@@ -42,7 +42,7 @@
 - import_playbook: components/postgresql/playbook.yml
   when: 
     - inventory_hostname in groups['omnileads_data'] or inventory_hostname in groups['omnileads_aio']
-    - postgres_out != true
+    - postgres_out == "false"
     - container_orchest == "systemd"
     
 - import_playbook: components/postgresql/playbook_ha.yml
@@ -64,7 +64,7 @@
   when: 
     - inventory_hostname in groups['omnileads_voice'] or inventory_hostname in groups['omnileads_aio']
     - container_orchest == "systemd"
-    - rtpengine_out != true
+    - rtpengine_out == "false"
 
 - import_playbook: components/keepalived/playbook.yml
   when: omnileads_ha is defined
