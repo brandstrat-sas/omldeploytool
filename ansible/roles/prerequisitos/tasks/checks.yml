@@ -31,7 +31,7 @@
   fail: msg="omni_distribution con valor {{ ansible_os_family }} es invalida"
   when: ansible_os_family != "Debian" and ansible_os_family != "Rocky" and ansible_os_family != "AlmaLinux" and ansible_os_family != "RedHat"
   changed_when: false
-  tags: always
+  tags: always  
 
 - name: CHECKS Check if exists /etc/omnileads
   stat:
@@ -68,10 +68,9 @@
 ###################### HOST Set ########################### ###################### HOST Set ###########################
 
 # Set postgres_out as true when postgres_host is defined on inventory
-- name: CHECKS Setting postgres_host & set postgres_out true
+- name: CHECKS Setting postgres_out true
   set_fact:
     postgres_out: true
-  changed_when: false
   when:
     - postgres_host is defined
     - inventory_hostname in groups['omnileads_aio'] or inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_data']
@@ -80,10 +79,9 @@
     - upgrade
 
 # Set postgres_out as false when postgres_host is not defined on inventory
-- name: CHECKS Setting postgres_host & set postgres_out false
+- name: CHECKS Setting postgres_out false
   set_fact:
     postgres_out: false
-  changed_when: false
   when:
     - postgres_host is not defined
     - inventory_hostname in groups['omnileads_aio'] or inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_data']
@@ -91,30 +89,6 @@
     - install
     - upgrade
 
-# Set rtpengine_out as true when postgres_host is defined on inventory
-- name: CHECKS Setting rtpengine_host & set rtpengine_out true
-  set_fact:
-    rtpengine_out: true
-  changed_when: false
-  when:
-    - rtpengine_host is defined
-    - inventory_hostname in groups['omnileads_aio'] or inventory_hostname in groups['omnileads_app']
-  tags: 
-    - install
-    - upgrade
-
-# Set rtpengine_out as false when postgres_host is not defined on inventory
-- name: CHECKS Setting postgres_host & set rtpengine_out false
-  set_fact:
-    rtpengine_out: false
-  changed_when: false
-  when:
-    - rtpengine_host is not defined
-    - inventory_hostname in groups['omnileads_aio'] or inventory_hostname in groups['omnileads_app']
-  tags: 
-    - install
-    - upgrade
-    
 # Set dialer_host as localhost on App instance when dialer_host is not explicitly defined
 - name: CHECKS Setmientrating dialer_host
   set_fact:
@@ -132,7 +106,6 @@
 - name: CHECKS Setting postgres_host cluster
   set_fact:
     postgres_host: "{{ data_host }}"
-    postgres_out: false
   changed_when: false
   when:
     - postgres_host is not defined
@@ -269,7 +242,7 @@
   changed_when: false
   when:
     - asterisk_host is not defined
-    - inventory_hostname in groups['omnileads_app']
+    - inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_voice']
   tags: 
     - install
     - upgrade
@@ -288,11 +261,32 @@
     - upgrade
     - app
 
+# Set rtpengine_out as true when postgres_host is defined on inventory
+- name: CHECKS Setting rtpengine_host & set rtpengine_out true
+  set_fact:
+    rtpengine_out: true
+  when:
+    - rtpengine_host is defined
+    - inventory_hostname in groups['omnileads_aio'] or inventory_hostname in groups['omnileads_voice']
+  tags: 
+    - install
+    - upgrade
+
+# Set rtpengine_out as true when postgres_host is defined on inventory
+- name: CHECKS Setting rtpengine_host & set rtpengine_out true
+  set_fact:
+    rtpengine_out: false
+  when:
+    - rtpengine_host is not defined
+    - inventory_hostname in groups['omnileads_aio'] or inventory_hostname in groups['omnileads_voice']
+  tags: 
+    - install
+    - upgrade
+
 # Set rtpengine_host as {{ voice_host }} on App instance when rtpengine_host is not explicitly defined
 - name: CHECKS Setting rtpengine_host as voice_host
   set_fact:
     rtpengine_host: "{{ voice_host }}"
-    rtpengine_out: false
   changed_when: false
   when:
     - rtpengine_host is not defined
@@ -305,10 +299,35 @@
 - name: CHECKS Setting rtpengine_host as private_ipv4_addr
   set_fact:
     rtpengine_host: "{{ omni_ip_lan }}"
-    rtpengine_out: false
   changed_when: false
   when:
     - rtpengine_host is not defined
+    - inventory_hostname in groups['omnileads_aio']
+  tags: 
+    - install
+    - upgrade
+
+# Set fastagi_host as {{ app_host }} on Asterisk instance when fastagi_host is not explicitly defined
+- name: CHECKS Setting fastagi_host as voice_host
+  set_fact:
+    fastagi_host: "{{ application_host }}"
+    fastagi_out: false
+  changed_when: false
+  when:
+    - fastagi_host is not defined
+    - inventory_hostname in groups['omnileads_voice']
+  tags: 
+    - install
+    - upgrade
+
+# Set fastagi_host as localhost on AIO instance when fastagi_host is not explicitly defined
+- name: CHECKS Setting fastagi_host as private_ipv4_addr
+  set_fact:
+    fastagi_host: "{{ omni_ip_lan }}"
+    fastagi_out: false
+  changed_when: false
+  when:
+    - fastagi_host is not defined
     - inventory_hostname in groups['omnileads_aio']
   tags: 
     - install

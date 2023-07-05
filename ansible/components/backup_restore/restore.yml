@@ -77,15 +77,15 @@
         - inventory_hostname in groups['omnileads_voice'] or inventory_hostname in groups['omnileads_aio']
         - container_orchest == "systemd"
 
-    - name: RESTORE asterisk from inselfhosted BUCKET cluster
-      shell: "podman exec -it oml-asterisk-server aws --endpoint-url http://{{ data_host }}:9000 --no-verify-ssl s3 sync s3://{{ bucket_name }}/backup/asterisk/{{ restore_file_timestamp }} {{ asterisk_location_conf }}/custom/ --delete"
+    - name: RESTORE asterisk from selfhosted BUCKET cluster
+      shell: "podman exec -it oml-asterisk-server aws --endpoint-url http://{{ data_host }}:9000 s3 sync s3://{{ bucket_name }}/backup/asterisk/{{ restore_file_timestamp }} {{ asterisk_location_conf }}/custom/ --delete"
       when:       
         - inventory_hostname in groups['omnileads_voice']
         - container_orchest == "systemd"
         - bucket_url is not defined
 
-    - name: RESTORE asterisk from inselfhosted BUCKET cluster
-      shell: "podman exec -it oml-asterisk-server aws --endpoint-url http://localhost:9000 --no-verify-ssl s3 sync s3://{{ bucket_name }}/backup/asterisk/{{ restore_file_timestamp }} {{ asterisk_location_conf }}/custom/ --delete"
+    - name: RESTORE asterisk from selfhosted BUCKET cluster
+      shell: "podman exec -it oml-asterisk-server aws --endpoint-url http://localhost:9000 s3 sync s3://{{ bucket_name }}/backup/asterisk/{{ restore_file_timestamp }} {{ asterisk_location_conf }}/custom/ --delete"
       when:       
         - inventory_hostname in groups['omnileads_aio']
         - container_orchest == "systemd"

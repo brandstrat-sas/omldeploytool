@@ -1,8 +1,8 @@
 [Unit]
-Description=Podman container-oml-redis-server.service
+Description=Podman cron.service
 Documentation=man:podman-generate-systemd(1)
 Wants=network-online.target
-After=network-online.target
+After=network-online.target daphne.service omnileads.service
 RequiresMountsFor=%t/containers
 
 [Service]
@@ -17,11 +17,10 @@ ExecStart=/usr/bin/podman run \
   --replace \
   --detach \
   --network=host \
-  --env-file=/etc/default/redis.env \
-  --name=oml-redis-server \
-  --volume=oml_redis:/data \
-  --rm \
-  docker.io/omnileads/redis:{{ redis_version }}
+  --env-file=/etc/default/fastagi.env \
+  --name=oml-fastagi-server \
+  --rm  \
+  {{ container_image_registry }}/omnileads/fastagi:{{ fastagi_version }}
 ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
 ExecStopPost=/usr/bin/podman rm -f --ignore --cidfile=%t/%n.ctr-id
 Type=notify

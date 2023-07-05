@@ -8,14 +8,19 @@
 
 ################# Versiones de aplicaciones ####################
 
-ANSIBLE_VERSION: 2.9.2
+omnileads_version: 1.29.0
+asterisk_version: 230703.01
+fastagi_version: 230703.01
+nginx_version: 230215.01
+websockets_version: 230204.01
+kamailio_version: 230204.01
+rtpengine_version: 230606.01
+postgres_version: 230624.01
+redis_version: 230704.01
 
-WOMBAT_VERSION: 20.02.1-272
+centos_postgresql_version: 11
+
 INSTALL_PREFIX: /opt/omnileads/
-ASTERISK_LOCATION: /opt/omnileads/asterisk
-KAMAILIO_LOCATION: /opt/omnileads/kamailio
-VIRTUALENV_LOCATION: "{{ INSTALL_PREFIX }}/virtualenv"
-WEBSOCKET_LOCATION: "{{ INSTALL_PREFIX }}/websockets"
 USUARIO: omnileads
 MONITORFORMAT: mp3
 
@@ -27,9 +32,7 @@ redis_port: 6379
 fastagi_port: 
 postgres_port: 5432
 
-redisgears_version: 1.0.9
 redis_ha_version: develop
-#postgres_version: 13
 minio_version: latest
 haproxy_version: 2.0-buster
 
@@ -42,6 +45,10 @@ postgres_homer_db: homer7
 
 # systemd or docker_compose
 container_orchest: systemd
+
+redis_ha: false
+high_load: false
+schedule: Agenda
 
 
 ################ URL's ############################
@@ -56,22 +63,12 @@ asterisk_audios_oml_url: https://fts-public-packages.s3-sa-east-1.amazonaws.com/
 asterisk_sounds: asterisk-core-sounds-en-alaw-current.tar.gz
 oml_sounds: asterisk-oml-sounds-current.tar.gz
 ast_agis_location: /var/lib/asterisk/agi-bin
-ast_blacklist_location: "{{ asterisk_location }}/var/spool/asterisk/blacklist"
 ast_conf_location: /etc/asterisk
 ast_logs_location: /var/log/asterisk
 ast_sounds_location: /var/lib/asterisk/sounds
 asterisk_sounds_host_path: /var/lib/omnileads/asterisk/sounds
 certs_location: "/etc/omnileads/certs"
-kamailio_location: '{{ lookup("env","KAMAILIO_LOCATION") }}'
-websockets_location: '{{ lookup("env","WEBSOCKET_LOCATION") }}'
-static_route: "{{ django_deploy_path }}/ominicontacto/ominicontacto_app/static/ominicontacto"
-odbc_location: /etc/
-rtpengine_name: "rtpengine-mr{{ rtpengine_version }}"
-mysql_root_password: ""
-mariadb_host: localhost
 
 #minio_persistent_path: /var/lib/omnileads/minio
 
-redis_ha: false
-high_load: false
-schedule: Agenda
+ANSIBLE_VERSION: 2.9.2

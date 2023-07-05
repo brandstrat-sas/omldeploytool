@@ -133,6 +133,27 @@ services:
     tty: true
     working_dir: /opt/omnileads/
 
+  fastagi:
+    image: fastagi-server
+    container_name: oml-fastagi
+    environment:
+      - AMI_HOST=${ASTERISK_HOSTNAME}
+      - AMI_USER=${AMI_USER}
+      - AMI_PASSWD=${AMI_PASSWORD}
+      - AMI_PORT=5038
+      - POSTGRES_HOST=${PGHOST}
+      - POSTGRES_PORT=${PGPORT}
+      - POSTGRES_DB=${PGDATABASE}
+      - POSTGRES_USER=${PGUSER}
+      - POSTGRES_PASSWORD=${PGPASSWORD}
+      - REDIS_HOSTNAME=${REDIS_HOSTNAME}
+    volumes:
+      - ${REPO_PATH}/omlfastagi/server:/fastagi/server
+    networks:
+      - omnileads  
+    ports:
+      - "4573:4573"
+  
   acd:
     build:
       target: run
@@ -144,6 +165,7 @@ services:
       - minio
     dns: 8.8.8.8
     environment:
+      - FASTAGI=${FASTAGI_HOSTNAME}
       - TZ=${TZ}
       - ASTERISK_LOCATION=${ASTERISK_LOCATION}
       - AMI_USER=${AMI_USER}
