@@ -20,6 +20,10 @@ redis_version: 230704.01
 
 centos_postgresql_version: 11
 
+INSTALL_PREFIX: /opt/omnileads/
+USUARIO: omnileads
+MONITORFORMAT: mp3
+
 container_image_registry: docker.io
 websocket_port: 8000
 uwsgi_port: 8098
