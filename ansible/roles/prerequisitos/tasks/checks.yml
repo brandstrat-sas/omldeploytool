@@ -91,30 +91,6 @@
     - install
     - upgrade
 
-# Set rtpengine_out as true when postgres_host is defined on inventory
-- name: CHECKS Setting rtpengine_host & set rtpengine_out true
-  set_fact:
-    rtpengine_out: true
-  changed_when: false
-  when:
-    - rtpengine_host is defined
-    - inventory_hostname in groups['omnileads_aio'] or inventory_hostname in groups['omnileads_app']
-  tags: 
-    - install
-    - upgrade
-
-# Set rtpengine_out as false when postgres_host is not defined on inventory
-- name: CHECKS Setting postgres_host & set rtpengine_out false
-  set_fact:
-    rtpengine_out: false
-  changed_when: false
-  when:
-    - rtpengine_host is not defined
-    - inventory_hostname in groups['omnileads_aio'] or inventory_hostname in groups['omnileads_app']
-  tags: 
-    - install
-    - upgrade
-    
 # Set dialer_host as localhost on App instance when dialer_host is not explicitly defined
 - name: CHECKS Setmientrating dialer_host
   set_fact:
@@ -287,6 +263,18 @@
     - install
     - upgrade
     - app
+
+# Set rtpengine_out as true when postgres_host is defined on inventory
+- name: CHECKS Setting rtpengine_host & set rtpengine_out true
+  set_fact:
+    rtpengine_out: true
+  changed_when: false
+  when:
+    - rtpengine_host is defined
+    - inventory_hostname in groups['omnileads_aio'] or inventory_hostname in groups['omnileads_app']
+  tags: 
+    - install
+    - upgrade
 
 # Set rtpengine_host as {{ voice_host }} on App instance when rtpengine_host is not explicitly defined
 - name: CHECKS Setting rtpengine_host as voice_host
