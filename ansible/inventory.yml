@@ -274,7 +274,7 @@ omnileads_aio:
 
 omnileads_data:
   hosts:
-    tenant_example_5_data:    
+    tenant_example_5_data:
     
 omnileads_voice:
   hosts:

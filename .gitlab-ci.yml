@@ -14,6 +14,7 @@ deploy-docker-compose-cloud:
     NIC: eth1
     ENV: cloud
     CI_JOB_ID: $CI_JOB_ID
+    BRANCH: $CI_COMMIT_REF_NAME
   script:
     - doctl auth init -t ${DIGITALOCEAN_ACCESS_TOKEN}
     - git clone -b $CI_COMMIT_REF_NAME https://gitlab.com/omnileads/omldeploytool.git
@@ -83,6 +84,9 @@ deploy-ait-cloud:
     - sed -i "s/190.134.62.33/$OML_IPADDR_APP/g" ./instances/gitlab/inventory.yml
     - sed -i "s/192.168.0.4/$OML_IPADDR_APPLAN/g" ./instances/gitlab/inventory.yml
     - sed -i "270 s/tenant_example_1/#tenant_example_1/g" ./instances/gitlab/inventory.yml
+    - sed -i "277 s/tenant_example_5_data/tenant_example_6_data/g" ./instances/gitlab/inventory.yml
+    - sed -i "281 s/tenant_example_5_voice/tenant_example_6_voice/g" ./instances/gitlab/inventory.yml
+    - sed -i "285 s/tenant_example_5_app/tenant_example_6_app/g" ./instances/gitlab/inventory.yml
     - bash -x deploy.sh --action=install --tenant=gitlab
     - until curl -sk --head --request GET https://$OML_IPADDR_APP |grep "302" > /dev/null; do echo "Environment still being installed, sleeping 60 seconds"; sleep 60; done; echo "Environment is up"
     - sleep 120
@@ -94,69 +98,3 @@ deploy-ait-cloud:
   rules:
     - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"'
     - if: '$CI_PIPELINE_SOURCE == "web"'
-
-
-# deploy-systemd-cluster:
-#   stage: deploy
-#   environment: SYSTEMD_CLUSTER
-#   script:
-#     - rm -rf ~/omldeploytool
-#     - git clone --branch $CI_COMMIT_BRANCH https://gitlab.com/omnileads/omldeploytool.git ~/omldeploytool
-#     - mkdir -p ~/omldeploytool/ansible/instances/gitlab
-#     - cd ~/omldeploytool/ansible
-#     - cp inventory.yml instances/gitlab/inventory.yml
-#     - sed -i "64 s/172.16.101.41/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
-#     - sed -i "65 s/172.16.101.41/$PROXMOX_ADDR_VM_DATA_MAIN/g" ./instances/gitlab/inventory.yml
-#     - sed -i "66 s/22/5701/g" ./instances/gitlab/inventory.yml
-#     - sed -i "68 s/172.16.101.42/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
-#     - sed -i "69 s/172.16.101.42/$PROXMOX_ADDR_VM_VOICE/g" ./instances/gitlab/inventory.yml
-#     - sed -i "70 s/22/5702/g" ./instances/gitlab/inventory.yml
-#     - sed -i "72 s/172.16.101.43/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
-#     - sed -i "73 s/172.16.101.43/$PROXMOX_ADDR_VM_APP/g" ./instances/gitlab/inventory.yml
-#     - sed -i "74 s/22/5703/g" ./instances/gitlab/inventory.yml
-#     - sed -i "218 s/tenant_example_1/#tenant_example_1/g" ./instances/gitlab/inventory.yml            
-#     - bash -x deploy.sh --action=install --tenant=gitlab
-#     - until curl -sk --head --request GET https://$PROXMOX_ADDR:5704|grep "302" > /dev/null; do echo "Environment still being installed, sleeping 60 seconds"; sleep 60; done; echo "Environment is up"
-#   tags:
-#     - deploy
-#   rules:
-#     - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"'
-#     - if: '$CI_COMMIT_REF_NAME =~ /deploy/'
-#     - if: '$CI_PIPELINE_SOURCE == "web"'
-
-# deploy-systemd-ha:
-#   stage: deploy
-#   environment: PROXMOX_HA_SYSTEMD
-#   script:
-#     - rm -rf ~/omldeploytool
-#     - git clone --branch $CI_COMMIT_BRANCH https://gitlab.com/omnileads/omldeploytool.git ~/omldeploytool
-#     - mkdir -p ~/omldeploytool/ansible/instances/gitlab
-#     - cd ~/omldeploytool/ansible
-#     - cp inventory_ha.yml instances/gitlab/inventory.yml
-#     - sed -i "30 s/172.16.101.101/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
-#     - sed -i "32 s/22/5107/g" ./instances/gitlab/inventory.yml  
-#     - sed -i "35 s/172.16.101.102/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
-#     - sed -i "37 s/22/5108/g" ./instances/gitlab/inventory.yml
-#     - sed -i "40 s/172.16.101.103/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
-#     - sed -i "42 s/22/5109/g" ./instances/gitlab/inventory.yml
-#     - sed -i "44 s/172.16.101.104/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
-#     - sed -i "46 s/22/5110/g" ./instances/gitlab/inventory.yml
-#     - sed -i "48 s/172.16.101.105/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
-#     - sed -i "50 s/22/5111/g" ./instances/gitlab/inventory.yml
-#     - sed -i "52 s/172.16.101.106/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
-#     - sed -i "54 s/22/5112/g" ./instances/gitlab/inventory.yml
-#     - sed -i "56 s/172.16.101.107/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
-#     - sed -i "58 s/22/5113/g" ./instances/gitlab/inventory.yml
-#     - sed -i "60 s/172.16.101.108/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
-#     - sed -i "62 s/22/5114/g" ./instances/gitlab/inventory.yml                    
-#     - bash -x deploy.sh --action=install --tenant=gitlab
-#     #- until curl -sk --head --request GET https://$PROXMOX_ADDR:5115|grep "302" > /dev/null; do echo "Environment still being installed, sleeping 60 seconds"; sleep 60; done; echo "Environment is up"
-#   tags:
-#     - deploy
-#   rules:
-#     - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"'
-#     - if: '$CI_COMMIT_REF_NAME =~ /deploy/'
-#     - if: '$CI_PIPELINE_SOURCE == "web"'
-
-###################################################################################################################################################################################################################
-

@@ -3,6 +3,8 @@
 oml_nic=${NIC}
 env=${ENV}
 
+version=${BRANCH}
+
 bucket_url=${BUCKET_URL}
 bucket_access_key=${BUCKET_ACCESS_KEY}
 bucket_secret_key=${BUCKET_SECRET_KEY}
@@ -15,7 +17,12 @@ PUBLIC_IPV4=$(curl ifconfig.co)
 curl -fsSL https://get.docker.com -o ~/get-docker.sh
 bash ~/get-docker.sh
 
-git clone https://gitlab.com/omnileads/omldeploytool.git 
+if [ -z "$version" ];then
+    git clone https://gitlab.com/omnileads/omldeploytool.git
+else
+    git -b $version clone https://gitlab.com/omnileads/omldeploytool.git
+fi
+
 cd ./omldeploytool/docker-compose
 cp env .env
 
