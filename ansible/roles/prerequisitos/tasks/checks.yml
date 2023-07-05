@@ -108,7 +108,6 @@
 - name: CHECKS Setting postgres_host cluster
   set_fact:
     postgres_host: "{{ data_host }}"
-    postgres_out: false
   changed_when: false
   when:
     - postgres_host is not defined
@@ -271,7 +270,19 @@
   changed_when: false
   when:
     - rtpengine_host is defined
-    - inventory_hostname in groups['omnileads_aio'] or inventory_hostname in groups['omnileads_app']
+    - inventory_hostname in groups['omnileads_aio'] or inventory_hostname in groups['omnileads_voice']
+  tags: 
+    - install
+    - upgrade
+
+# Set rtpengine_out as true when postgres_host is defined on inventory
+- name: CHECKS Setting rtpengine_host & set rtpengine_out true
+  set_fact:
+    rtpengine_out: false
+  changed_when: false
+  when:
+    - rtpengine_host is not defined
+    - inventory_hostname in groups['omnileads_aio'] or inventory_hostname in groups['omnileads_voice']
   tags: 
     - install
     - upgrade
@@ -280,7 +291,6 @@
 - name: CHECKS Setting rtpengine_host as voice_host
   set_fact:
     rtpengine_host: "{{ voice_host }}"
-    rtpengine_out: false
   changed_when: false
   when:
     - rtpengine_host is not defined
@@ -293,7 +303,6 @@
 - name: CHECKS Setting rtpengine_host as private_ipv4_addr
   set_fact:
     rtpengine_host: "{{ omni_ip_lan }}"
-    rtpengine_out: false
   changed_when: false
   when:
     - rtpengine_host is not defined
