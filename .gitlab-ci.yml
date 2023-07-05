@@ -1,37 +1,37 @@
 stages:
   - deploy
 
-deploy-docker-compose-cloud:
-  stage: deploy
-  environment: CLOUD_DOCKER_AIO
-  image: omnileads/doctl:230427.01
-  variables: 
-    DIGITALOCEAN_ACCESS_TOKEN: $DIGITALOCEAN_ACCESS_TOKEN
-    DIGITALOCEAN_DROPLET_IMG: $DIGITALOCEAN_DROPLET_IMG
-    DIGITALOCEAN_DROPLET_SIZE: $DIGITALOCEAN_DROPLET_SIZE
-    DIGITALOCEAN_REGION: $DIGITALOCEAN_REGION
-    DIGITALOCEAN_SSH_KEY: $DIGITALOCEAN_SSH_KEY
-    NIC: eth1
-    ENV: cloud
-    CI_JOB_ID: $CI_JOB_ID
-    BRANCH: $CI_COMMIT_REF_NAME
-  script:
-    - doctl auth init -t ${DIGITALOCEAN_ACCESS_TOKEN}
-    - git clone -b $CI_COMMIT_REF_NAME https://gitlab.com/omnileads/omldeploytool.git
-    - doctl compute droplet create --image ${DIGITALOCEAN_DROPLET_IMG} --size ${DIGITALOCEAN_DROPLET_SIZE} --region ${DIGITALOCEAN_REGION} --ssh-keys ${DIGITALOCEAN_SSH_KEY} --user-data-file ./omldeploytool/docker-compose/user-data.sh cicd-docker-compose.${CI_JOB_ID}
-    - sleep 60
-    - OML_IPADDR=$(doctl compute droplet list |grep cicd-docker-compose.${CI_JOB_ID} |awk '{print $3}') && echo "$OML_IPADDR to run tests"
-    - until curl -sk --head --request GET https://$OML_IPADDR |grep "302" > /dev/null; do echo "Environment still being installed, sleeping 60 seconds"; sleep 60; done; echo "Environment is up"
-    - sleep 120
-    - doctl compute droplet delete -f cicd-docker-compose.${CI_JOB_ID}
-    - rm -rf ./omldeploytool
-  rules:
-    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"'
-    - if: '$CI_PIPELINE_SOURCE == "web"'
+# deploy-docker-compose-cloud:
+#   stage: deploy
+#   environment: CLOUD_DOCKER_AIO
+#   image: omnileads/doctl:230427.01
+#   variables: 
+#     DIGITALOCEAN_ACCESS_TOKEN: $DIGITALOCEAN_ACCESS_TOKEN
+#     DIGITALOCEAN_DROPLET_IMG: $DIGITALOCEAN_DROPLET_IMG
+#     DIGITALOCEAN_DROPLET_SIZE: $DIGITALOCEAN_DROPLET_SIZE
+#     DIGITALOCEAN_REGION: $DIGITALOCEAN_REGION
+#     DIGITALOCEAN_SSH_KEY: $DIGITALOCEAN_SSH_KEY
+#     NIC: eth1
+#     ENV: cloud
+#     CI_JOB_ID: $CI_JOB_ID
+#     BRANCH: $CI_COMMIT_REF_NAME
+#   script:
+#     - doctl auth init -t ${DIGITALOCEAN_ACCESS_TOKEN}
+#     - git clone -b $CI_COMMIT_REF_NAME https://gitlab.com/omnileads/omldeploytool.git
+#     - doctl compute droplet create --image ${DIGITALOCEAN_DROPLET_IMG} --size ${DIGITALOCEAN_DROPLET_SIZE} --region ${DIGITALOCEAN_REGION} --ssh-keys ${DIGITALOCEAN_SSH_KEY} --user-data-file ./omldeploytool/docker-compose/user-data.sh cicd-docker-compose.${CI_JOB_ID}
+#     - sleep 60
+#     - OML_IPADDR=$(doctl compute droplet list |grep cicd-docker-compose.${CI_JOB_ID} |awk '{print $3}') && echo "$OML_IPADDR to run tests"
+#     - until curl -sk --head --request GET https://$OML_IPADDR |grep "302" > /dev/null; do echo "Environment still being installed, sleeping 60 seconds"; sleep 60; done; echo "Environment is up"
+#     - sleep 120
+#     - doctl compute droplet delete -f cicd-docker-compose.${CI_JOB_ID}
+#     - rm -rf ./omldeploytool
+#   rules:
+#     - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"'
+#     - if: '$CI_PIPELINE_SOURCE == "web"'
 
 deploy-aio-cloud:
   stage: deploy
-  environment: SYSTEMD_AIO
+  environment: SYSTEMD_AIO  
   script:
     - doctl auth init -t ${DIGITALOCEAN_ACCESS_TOKEN}
     - doctl compute droplet create --image ${DIGITALOCEAN_DROPLET_IMG} --size ${DIGITALOCEAN_DROPLET_SIZE} --region ${DIGITALOCEAN_REGION} --ssh-keys ${DIGITALOCEAN_SSH_KEY} cicd-systemd.${CI_JOB_ID}
