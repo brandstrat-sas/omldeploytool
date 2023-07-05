@@ -231,7 +231,7 @@ all:
     #restore_bucket_selfsigned_certs: true
 
     # ------------------------------------------------------------------------------------------------ #
-    # ---------------------------- Container IMG TAG customizartion ---------------------------------- #
+    # ---------------------------- Container IMG TAG customization ----------------------------------- #
     # ------------------------------------------------------------------------------------------------ #
     
     # --- For each OML Deploy Tool release, a versioned stack with the latest stable images of each component is maintained (group_vars/all)
