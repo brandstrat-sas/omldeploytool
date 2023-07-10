@@ -114,7 +114,6 @@
       - restore_file_timestamp is not defined
       - postgres_out == true
 
-
   # - name: Reset Admin Pass
   #   shell: "oml_manage --reset_pass"
   #   args:
