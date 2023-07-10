@@ -134,7 +134,7 @@ services:
     working_dir: /opt/omnileads/
 
   fastagi:
-    image: fastagi-server
+    image: ${OMLFASTAGI_IMG}
     container_name: oml-fastagi
     environment:
       - AMI_HOST=${ASTERISK_HOSTNAME}
@@ -147,13 +147,26 @@ services:
       - POSTGRES_USER=${PGUSER}
       - POSTGRES_PASSWORD=${PGPASSWORD}
       - REDIS_HOSTNAME=${REDIS_HOSTNAME}
-    volumes:
-      - ${REPO_PATH}/omlfastagi/server:/fastagi/server
+    #volumes:
+    #  - ${REPO_PATH}/omlfastagi/server:/fastagi/server
     networks:
       - omnileads  
     ports:
       - "4573:4573"
   
+  ami: 
+    image: ${OMLAMI_IMG}
+    container_name: oml-ami
+    environment:
+      - ASTERISK_HOSTNAME=${ASTERISK_HOSTNAME}
+      - AMI_USER=${AMI_USER}
+      - AMI_PASSWORD=${AMI_PASSWORD}
+      - REDIS_HOSTNAME=${REDIS_HOSTNAME}
+    #volumes:
+    #  - ${REPO_PATH}/omlfastagi/server:/fastagi/server
+    networks:
+      - omnileads  
+    
   acd:
     build:
       target: run

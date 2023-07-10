@@ -84,15 +84,6 @@
       - upgrade_from_oml_1 is not defined 
       - postgres_out == true
       
-  - name: POSTGRESQL Adds plperl extension to the database {{ postgres_database }}
-    shell: podman exec -it oml-django-server psql -U {{ postgres_user }} -d {{ postgres_database }} -c "CREATE EXTENSION IF NOT EXISTS plperl;" 
-    tags:
-      - install
-    when: 
-      - upgrade_from_oml_1 is not defined 
-      - restore_file_timestamp is not defined
-      - postgres_out == true
-
   - name: Scalable Tunings; UWSGI Copy custom uwsgi.ini
     template:
       src: "{{ django_repo_path }}templates/uwsgi.ini"
@@ -113,6 +104,16 @@
     tags:
       - install
       - upgrade
+
+  - name: POSTGRESQL Adds plperl extension to the database {{ postgres_database }}
+    shell: podman exec -it oml-django-server psql -U {{ postgres_user }} -d {{ postgres_database }} -c "CREATE EXTENSION IF NOT EXISTS plperl;" 
+    tags:
+      - install
+    when: 
+      - upgrade_from_oml_1 is not defined 
+      - restore_file_timestamp is not defined
+      - postgres_out == true
+
 
   # - name: Reset Admin Pass
   #   shell: "oml_manage --reset_pass"
