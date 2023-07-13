@@ -27,7 +27,7 @@
     - app
     - django
   vars:
-    img_repo: '{{ container_image_registry }}/omnileads/omlapp'
+    img_repo: '{{ container_image_registry }}/omnileads/pstn_emulator'
     INSTALL_PREFIX: "/opt/omnileads"
 
   tasks:
@@ -52,7 +52,7 @@
       - upgrade
     
   - name: PSTN_EMULATOR Pull image
-    command: podman pull --quiet {{ img_repo }}:{{ omnileads_version }}
+    command: podman pull --quiet {{ img_repo }}:{{ pstn_emulator_version }}
     register: podman_pull
     until: podman_pull is success
     tags:

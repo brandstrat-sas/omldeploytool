@@ -20,7 +20,7 @@ ExecStart=/usr/bin/podman run \
   --env-file=/etc/default/omlcron.env \
   --name=oml-cron-server \
   --rm  \
-  {{ container_image_registry }}/omnileads/omlapp:{{ omnileads_version }}
+  {{ container_image_registry }}/{{ omlapp_repo }}/omlapp:{{ omnileads_version }}
 ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
 ExecStopPost=/usr/bin/podman rm -f --ignore --cidfile=%t/%n.ctr-id
 Type=notify

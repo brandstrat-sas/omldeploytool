@@ -19,13 +19,13 @@ ExecStart=/usr/bin/podman run \
   --replace \
   --detach \
   --network=host \
-  --volume=/etc/default/promtail.yml:/etc/promtail/promtail.yml \
+  --volume=/etc/default/promtail.yml:/etc/default/promtail.yml \
   --volume=oml_promtail:/tmp \
   --volume=django_logs:/var/log/django/:ro \
   --volume=nginx_logs:/var/log/nginx:ro \
   --name=promtail-server \
   --rm  \
-  {{ container_image_registry }}/grafana/promtail -config.file=/etc/promtail/promtail.yml -config.expand-env=true
+  {{ container_image_registry }}/grafana/promtail -config.file=/etc/default/promtail.yml -config.expand-env=true
 {% elif inventory_hostname in groups['omnileads_voice'] %}
 ExecStart=/usr/bin/podman run \
   --cidfile=%t/%n.ctr-id \
@@ -34,13 +34,13 @@ ExecStart=/usr/bin/podman run \
   --replace \
   --detach \
   --network=host \
-  --volume=/etc/default/promtail.yml:/etc/promtail/promtail.yml \
+  --volume=/etc/default/promtail.yml:/etc/default/promtail.yml \
   --volume=oml_promtail:/tmp \
   --volume=asterisk_logs:/var/log/asterisk/:ro \
   --volume=rtpengine_logs:/var/log/rtpengine:ro \
   --name=promtail-server \
   --rm  \
-  {{ container_image_registry }}/grafana/promtail -config.file=/etc/promtail/promtail.yml -config.expand-env=true
+  {{ container_image_registry }}/grafana/promtail -config.file=/etc/default/promtail.yml -config.expand-env=true
 {% elif inventory_hostname in groups['omnileads_data'] %}
 ExecStart=/usr/bin/podman run \
   --cidfile=%t/%n.ctr-id \
@@ -49,13 +49,13 @@ ExecStart=/usr/bin/podman run \
   --replace \
   --detach \
   --network=host \
-  --volume=/etc/default/promtail.yml:/etc/promtail/promtail.yml \
+  --volume=/etc/default/promtail.yml:/etc/default/promtail.yml \
   --volume=oml_promtail:/tmp \
   --volume=postgres_logs:/var/log/postgres/:ro \
   --volume=redis_logs:/var/log/redis:ro \
   --name=promtail-server \
   --rm  \
-  {{ container_image_registry }}/grafana/promtail -config.file=/etc/promtail/promtail.yml -config.expand-env=true
+  {{ container_image_registry }}/grafana/promtail -config.file=/etc/default/promtail.yml -config.expand-env=true
 {% else %}
 ExecStart=/usr/bin/podman run \
   --cidfile=%t/%n.ctr-id \
@@ -64,7 +64,7 @@ ExecStart=/usr/bin/podman run \
   --replace \
   --detach \
   --network=host \
-  --volume=/etc/default/promtail.yml:/etc/promtail/promtail.yml \
+  --volume=/etc/default/promtail.yml:/etc/default/promtail.yml \
   --volume=oml_promtail:/tmp \
   --volume=postgres_logs:/var/log/postgres/:ro \
   --volume=redis_logs:/var/log/redis:ro \
@@ -74,7 +74,7 @@ ExecStart=/usr/bin/podman run \
   --volume=asterisk_logs:/var/log/asterisk/:ro \
   --volume=rtpengine_logs:/var/log/rtpengine:ro \
   --rm  \
-  {{ container_image_registry }}/grafana/promtail -config.file=/etc/promtail/promtail.yml -config.expand-env=true
+  {{ container_image_registry }}/grafana/promtail -config.file=/etc/default/promtail.yml -config.expand-env=true
 {% endif %}     
 
 ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id

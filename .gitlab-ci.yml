@@ -45,12 +45,12 @@ deploy-aio-cloud:
     - cp inventory.yml instances/gitlab/inventory.yml
     - sed -i "s/190.19.150.18/$OML_IPADDR/g" ./instances/gitlab/inventory.yml
     - sed -i "s/172.16.101.44/$OML_IPADDR_APPLAN/g" ./instances/gitlab/inventory.yml
-    - sed -i "277 s/tenant_example_5_data/#tenant_example_5_data/g" ./instances/gitlab/inventory.yml
-    - sed -i "281 s/tenant_example_5_voice/#tenant_example_5_voice/g" ./instances/gitlab/inventory.yml
-    - sed -i "285 s/tenant_example_5_app/#tenant_example_5_app/g" ./instances/gitlab/inventory.yml
+    - sed -i "274 s/tenant_example_5_data/#tenant_example_5_data/g" ./instances/gitlab/inventory.yml
+    - sed -i "278 s/tenant_example_5_voice/#tenant_example_5_voice/g" ./instances/gitlab/inventory.yml
+    - sed -i "282 s/tenant_example_5_app/#tenant_example_5_app/g" ./instances/gitlab/inventory.yml
     - bash -x deploy.sh --action=install --tenant=gitlab
     - until curl -sk --head --request GET https://$OML_IPADDR|grep "302" > /dev/null; do echo "Environment still being installed, sleeping 60 seconds"; sleep 60; done; echo "Environment is up"
-    - sleep 120
+    - sleep 90
     - doctl compute droplet delete -f cicd-systemd.${CI_JOB_ID}
   tags:
     - deploy
@@ -83,10 +83,10 @@ deploy-ait-cloud:
     - sed -i "s/192.168.0.3/$OML_IPADDR_VOICELAN/g" ./instances/gitlab/inventory.yml
     - sed -i "s/190.134.62.33/$OML_IPADDR_APP/g" ./instances/gitlab/inventory.yml
     - sed -i "s/192.168.0.4/$OML_IPADDR_APPLAN/g" ./instances/gitlab/inventory.yml
-    - sed -i "270 s/tenant_example_1/#tenant_example_1/g" ./instances/gitlab/inventory.yml
-    - sed -i "277 s/tenant_example_5_data/tenant_example_6_data/g" ./instances/gitlab/inventory.yml
-    - sed -i "281 s/tenant_example_5_voice/tenant_example_6_voice/g" ./instances/gitlab/inventory.yml
-    - sed -i "285 s/tenant_example_5_app/tenant_example_6_app/g" ./instances/gitlab/inventory.yml
+    - sed -i "267 s/tenant_example_1/#tenant_example_1/g" ./instances/gitlab/inventory.yml
+    - sed -i "274 s/tenant_example_5_data/tenant_example_6_data/g" ./instances/gitlab/inventory.yml
+    - sed -i "278 s/tenant_example_5_voice/tenant_example_6_voice/g" ./instances/gitlab/inventory.yml
+    - sed -i "282 s/tenant_example_5_app/tenant_example_6_app/g" ./instances/gitlab/inventory.yml
     - bash -x deploy.sh --action=install --tenant=gitlab
     - until curl -sk --head --request GET https://$OML_IPADDR_APP |grep "302" > /dev/null; do echo "Environment still being installed, sleeping 60 seconds"; sleep 60; done; echo "Environment is up"
     - sleep 120
