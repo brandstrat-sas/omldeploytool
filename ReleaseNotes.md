@@ -1,18 +1,16 @@
-# Release Notes
-[230703.01] - 2023-07-03
+# Release Notes 
+2023-07-13
 
 ## Added
 
-* oml-298 - [ANSIBLE] Added new Asterisk & RTPengine ports scenario "all" to open all ports on 0.0.0.0
-* oml-296 - [ANSIBLE] Added Backup & Restore coverage
-
 ## Changed
 
-* oml-297 - [ALL] Migrate from Asterisk AGI to new FastAGI component 
+* oml-191 - [ANSIBLE] Migrate image tag to inventory.yml
 
 ## Fixed
 
-No fixes in this release.
+* oml-302 - [ANSIBLE] Fix promtail.yml config file
+* oml-191 - [ANSIBLE] Change task order for Postgres plperl in case of external postgres
 
 ## Removed
 
@@ -29,4 +27,5 @@ No removals in this release.
     websockets_version: 230204.01
     rtpengine_version: 230606.01
     postgres_version: 230624.01 
+    redis_version: 230704.01
 ```
