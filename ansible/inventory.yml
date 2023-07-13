@@ -202,9 +202,9 @@ all:
 
     # --- Observability integrations with Loki & Homer
     # --- Request by docker-compose & promtail:
-    #loki_host: 
+    #loki_host:
     # --- Request by Asterisk hep module:
-    #homer_host: 
+    #homer_host:
     
     # --- Request by Web-Video Inbound Calls 
     # --- Put here the JITSI host URL
@@ -234,11 +234,19 @@ all:
     # ---------------------------- Container IMG TAG customization ----------------------------------- #
     # ------------------------------------------------------------------------------------------------ #
     
-    # --- For each OML Deploy Tool release, a versioned stack with the latest stable images of each component is maintained (group_vars/all)
-    # --- However you can combine the versions as you like, also use your own TAGs, using the following TAG version variables
-    # --- versions of each image to deploy
-    # --- versions of each image to deploy
-
+    # --- For each OML Deploy Tool release, a versioned stack with the latest stable images of each component is maintained on inventory.yml
+    # --- You can combine the versions as you like, also use your own TAGs, using the following TAG version variables
+    
+    omnileads_version: 1.29.0
+    asterisk_version: 230703.01
+    fastagi_version: 230703.01
+    nginx_version: 230215.01    
+    websockets_version: 230204.01    
+    kamailio_version: 230204.01    
+    rtpengine_version: 230606.01
+    redis_version: 230704.01
+    postgres_version: 230624.01
+    
     # --- Activate the OMniLeads Enterprise Edition - with "AAAA" licensed.
     # --- on the contrary you will deploy OMniLeads OSS Edition with GPLV3 licensed. 
     enterprise_edition: false
@@ -246,17 +254,6 @@ all:
     # --- Docker Registry repository
     # --- If you are going to use another registry for the images, you must indicate here
     omlapp_repo: omnileads
-
-    #omnileads_version: 1.29.0
-    #asterisk_version: 230703.01
-    #fastagi_version: 230703.01
-    #nginx_version: 230215.01
-    #kamailio_version: 230204.01
-    #websockets_version: 230204.01
-    #rtpengine_version: 230606.01
-    #postgres_version: 230624.01
-    #centos_postgresql_version: 11
-
 
 #############################################################################################################
 # -- In this section the hosts are grouped based on the type of deployment (AIO, Cluster & Cluster HA).  -- #

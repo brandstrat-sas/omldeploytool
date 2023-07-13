@@ -6,19 +6,8 @@
 #                                                                                                          #
 ############################################################################################################
 
-################# Versiones de aplicaciones ####################
-
-omnileads_version: 1.29.0
-asterisk_version: 230703.01
-fastagi_version: 230703.01
-nginx_version: 230215.01
-websockets_version: 230204.01
-kamailio_version: 230204.01
-rtpengine_version: 230606.01
-postgres_version: 230624.01
-redis_version: 230704.01
-
 centos_postgresql_version: 11
+pstn_emulator_version: latest
 
 INSTALL_PREFIX: /opt/omnileads/
 USUARIO: omnileads
@@ -29,7 +18,7 @@ websocket_port: 8000
 uwsgi_port: 8098
 daphne_port: 8099
 redis_port: 6379
-fastagi_port: 
+fastagi_port: 4573
 postgres_port: 5432
 
 redis_ha_version: develop
@@ -68,7 +57,5 @@ ast_logs_location: /var/log/asterisk
 ast_sounds_location: /var/lib/asterisk/sounds
 asterisk_sounds_host_path: /var/lib/omnileads/asterisk/sounds
 certs_location: "/etc/omnileads/certs"
-
-#minio_persistent_path: /var/lib/omnileads/minio
 
 ANSIBLE_VERSION: 2.9.2

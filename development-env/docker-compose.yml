@@ -149,6 +149,7 @@ services:
       - REDIS_HOSTNAME=${REDIS_HOSTNAME}
     #volumes:
     #  - ${REPO_PATH}/omlfastagi/server:/fastagi/server
+    restart: on-failure
     networks:
       - omnileads  
     ports:
@@ -162,6 +163,7 @@ services:
       - AMI_USER=${AMI_USER}
       - AMI_PASSWORD=${AMI_PASSWORD}
       - REDIS_HOSTNAME=${REDIS_HOSTNAME}
+    restart: on-failure  
     #volumes:
     #  - ${REPO_PATH}/omlfastagi/server:/fastagi/server
     networks:

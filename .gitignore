@@ -4,7 +4,7 @@ development-env/omnileads-repos
 development-env/.env
 docker-compose/.env
 docker-compose/instances
-systemd/instances
 ansible/instances
 ansible/.inventory.yml
-systemd/.inventory.yml
+ansible/group_vars/aio_instances
+ansible/group_vars/cluster_instances
