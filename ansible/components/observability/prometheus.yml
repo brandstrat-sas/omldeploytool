@@ -31,7 +31,6 @@
       dest: /etc/default/{{ item }}
     with_items:
       - prometheus.yml
-      - bootstrap
     tags:
       - install
       - upgrade
