@@ -30,14 +30,6 @@ scrape_configs:
           arq: 'aio'
           component: 'asterisk'
 
-  - job_name: '{{ tenant_id }}_heplify-server'
-    static_configs:
-      - targets: ['localhost:9096']
-        labels:
-          tenant: '{{ tenant_id }}'
-          arq: 'aio'
-          component: 'heplify'  
-
 {% else %}
 
   - job_name: '{{ tenant_id }}_postgres'
@@ -71,14 +63,6 @@ scrape_configs:
           tenant: '{{ tenant_id }}'
           arq: 'cluster'
           component: 'os_data'
-
-  - job_name: '{{ tenant_id }}_heplify-server'
-    static_configs:
-      - targets: ['{{ voice_host }}:9096']
-        labels:
-          tenant: '{{ tenant_id }}'
-          arq: 'cluster'
-          component: 'heplify'
 
   - job_name: '{{ tenant_id }}_redis'
     static_configs:

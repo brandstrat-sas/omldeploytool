@@ -145,9 +145,3 @@
     - container_orchest == "systemd"
     - omnileads_ha is not defined
     - loki_host is defined
-
-- import_playbook: components/observability/homer.yml
-  when: 
-    - inventory_hostname in groups['omnileads_voice'] or inventory_hostname in groups['omnileads_aio']
-    - container_orchest == "systemd"
-    - omnileads_ha is not defined
