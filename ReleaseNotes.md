@@ -3,6 +3,10 @@
 
 ## Added
 
+* oml-302 - [ANSIBLE] Prometheus agent for Redis
+* oml-302 - [ANSIBLE] Prometheus agent for Postgres
+* oml-302 - [ANSIBLE] Homer SIP capture integration to extract SIP/RTP metrics from Asterisk
+
 ## Changed
 
 * oml-191 - [ANSIBLE] Migrate image version tags to inventory.yml
