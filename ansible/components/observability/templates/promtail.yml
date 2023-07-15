@@ -16,8 +16,7 @@ scrape_configs:
     - targets:
         - localhost
       labels:
-        job: uwsgi        
-        env: production
+        arq: cluster
         component: uwsgi
         tenant: {{ tenant_id }}
         __path__: /var/log/django/django.log
@@ -27,8 +26,7 @@ scrape_configs:
     - targets:
         - localhost
       labels:
-        job: nginx        
-        env: production
+        arq: cluster
         component: nginx
         tenant: {{ tenant_id }}
         __path__: /var/log/nginx/omnileads_access.log
@@ -38,8 +36,7 @@ scrape_configs:
     - targets:
         - localhost
       labels:
-        job: nginx        
-        env: production
+        arq: cluster
         component: nginx
         tenant: {{ tenant_id }}
         __path__: /var/log/nginx/omnileads_error.log
@@ -50,8 +47,7 @@ scrape_configs:
     - targets:
         - localhost
       labels:
-        job: asterisk        
-        env: production
+        arq: cluster
         component: asterisk
         tenant: {{ tenant_id }}
         __path__: /var/log/asterisk/full
@@ -61,8 +57,7 @@ scrape_configs:
     - targets:
         - localhost
       labels:
-        job: asterisk        
-        env: production
+        arq: cluster
         component: asterisk
         tenant: {{ tenant_id }}
         __path__: /var/log/asterisk/websockets.log
@@ -72,60 +67,55 @@ scrape_configs:
 
 {% elif inventory_hostname in groups['omnileads_aio'] %}
 
-- job_name: uwsgi
-  static_configs:
-  - targets:
-      - localhost
-    labels:
-      job: uwsgi      
-      env: production
-      component: uwsgi
-      tenant: {{ tenant_id }}
-      __path__: /var/log/django/django.log
+  - job_name: uwsgi
+    static_configs:
+    - targets:
+        - localhost
+      labels:
+        arq: aio
+        component: uwsgi
+        tenant: {{ tenant_id }}
+        __path__: /var/log/django/django.log
 
-- job_name: nginx_access
-  static_configs:
-  - targets:
-      - localhost
-    labels:
-      job: nginx      
-      env: production
-      component: nginx
-      tenant: {{ tenant_id }}
-      __path__: /var/log/nginx/omnileads_access.log
+  - job_name: nginx_access
+    static_configs:
+    - targets:
+        - localhost
+      labels:
+        arq: aio
+        component: nginx
+        tenant: {{ tenant_id }}
+        __path__: /var/log/nginx/omnileads_access.log
 
-- job_name: nginx_error
-  static_configs:
-  - targets:
-      - localhost
-    labels:
-      job: nginx      
-      env: production
-      component: nginx
-      tenant: {{ tenant_id }}
-      __path__: /var/log/nginx/omnileads_error.log
+  - job_name: nginx_error
+    static_configs:
+    - targets:
+        - localhost
+      labels:
+        arq: aio
+        component: nginx
+        tenant: {{ tenant_id }}
+        __path__: /var/log/nginx/omnileads_error.log
 
-- job_name: asterisk_full
-  static_configs:
-  - targets:
-      - localhost
-    labels:
-      job: asterisk      
-      env: production
-      component: asterisk
-      tenant: {{ tenant_id }}
-      __path__: /var/log/asterisk/full
+  - job_name: asterisk_full
+    static_configs:
+    - targets:
+        - localhost
+      labels:
+        arq: aio
+        component: asterisk
+        tenant: {{ tenant_id }}
+        __path__: /var/log/asterisk/full
 
-- job_name: asterisk_conf_provisioner
-  static_configs:
-  - targets:
-      - localhost
-    labels:
-      job: asterisk      
-      env: production
-      component: asterisk
-      tenant: {{ tenant_id }}
-      __path__: /var/log/asterisk/websockets.log
+  - job_name: asterisk_conf_provisioner
+    static_configs:
+    - targets:
+        - localhost
+      labels:
+        arq: aio
+        component: asterisk
+        tenant: {{ tenant_id }}
+        __path__: /var/log/asterisk/websockets.log
 
 {% else %}
 {% endif %}     

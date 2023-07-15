@@ -29,7 +29,7 @@
   vars:
     img_repo: '{{ container_image_registry }}/omnileads/redis'
     img_repo_ha: '{{ container_image_registry }}/omnileads/redis'
-    img_prometheus_repo: 'docker.io/oliver006/redis_exporter'
+    img_prometheus_repo: 'docker.io/oliver006/redis_exporter:latest'
   tasks:
 
   - name: REDIS Set Redis environment variables for this installation

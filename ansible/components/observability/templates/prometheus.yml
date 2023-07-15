@@ -2,16 +2,6 @@ global:
   scrape_interval:     10s
   evaluation_interval: 10s
 
-#   # Attach these labels to any time series or alerts when communicating with
-#   # external systems (federation, remote storage, Alertmanager).
-#   external_labels:
-#       monitor: 'docker-heplify-server'
-
-# # Load and evaluate rules in this file every 'evaluation_interval' seconds.
-# rule_files:
-#   - "alert.rules"
-
-# A scrape configuration containing exactly one endpoint to scrape.
 scrape_configs:  
 
 {% if inventory_hostname in groups['omnileads_aio'] %}
@@ -21,31 +11,32 @@ scrape_configs:
       - targets: ['localhost:9100']
         labels:
           tenant: '{{ tenant_id }}'
-          arq: aio
+          arq: 'aio'
           component: 'aio_os'
-          environment: 'production'
 
   - job_name: '{{ tenant_id }}_redis'
     static_configs:
       - targets: ['localhost:9121']
         labels:
           tenant: '{{ tenant_id }}'
-          arq: aio
+          arq: 'aio'
           component: 'redis'
-          environment: 'production'
 
   - job_name: '{{ tenant_id }}_asterisk'
     static_configs:
       - targets: ['localhost:7088']
         labels:
           tenant: '{{ tenant_id }}'
-          arq: aio
+          arq: 'aio'
           component: 'asterisk'
-          environment: 'production'
 
-  # - job_name: '{{ tenant_id }}_cadvisor'
-  #   static_configs:
-  #     - targets: ['localhost:8080']
+  - job_name: '{{ tenant_id }}_heplify-server'
+    static_configs:
+      - targets: ['localhost:9096']
+        labels:
+          tenant: '{{ tenant_id }}'
+          arq: 'aio'
+          component: 'heplify'  
 
 {% else %}
 
@@ -56,7 +47,6 @@ scrape_configs:
           tenant: '{{ tenant_id }}'
           arq: 'cluster'
           component: 'postgres'
-          environment: 'production'
   
   - job_name: '{{ tenant_id }}_app_host'
     static_configs:
@@ -65,7 +55,6 @@ scrape_configs:
           tenant: '{{ tenant_id }}'
           arq: 'cluster'
           component: 'os_app'
-          environment: 'production'
 
   - job_name: '{{ tenant_id }}_voice_host'
     static_configs:
@@ -74,7 +63,6 @@ scrape_configs:
           tenant: '{{ tenant_id }}'
           arq: 'cluster'
           component: 'os_voice'
-          environment: 'production'
 
   - job_name: '{{ tenant_id }}_data_host'
     static_configs:
@@ -83,7 +71,6 @@ scrape_configs:
           tenant: '{{ tenant_id }}'
           arq: 'cluster'
           component: 'os_data'
-          environment: 'production'
 
   - job_name: '{{ tenant_id }}_heplify-server'
     static_configs:
@@ -92,7 +79,6 @@ scrape_configs:
           tenant: '{{ tenant_id }}'
           arq: 'cluster'
           component: 'heplify'
-          environment: 'production'
 
   - job_name: '{{ tenant_id }}_redis'
     static_configs:
@@ -101,7 +87,6 @@ scrape_configs:
           tenant: '{{ tenant_id }}'
           arq: 'cluster'
           component: 'redis'
-          environment: 'production'
 
   - job_name: '{{ tenant_id }}_asterisk'
     static_configs:
@@ -110,11 +95,5 @@ scrape_configs:
           tenant: '{{ tenant_id }}'
           arq: 'cluster'
           component: 'asterisk'
-          environment: 'production'
 
 {% endif %}
-# alerting:
-#   alertmanagers:
-#   - scheme: http
-#     static_configs:
-#     - targets:
