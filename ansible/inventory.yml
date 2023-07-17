@@ -239,7 +239,7 @@ all:
     # --- You can combine the versions as you like, also use your own TAGs, using the following TAG version variables
     
     omnileads_version: 1.29.0
-    asterisk_version: 230703.01
+    asterisk_version: 230715.01
     fastagi_version: 230703.01
     nginx_version: 230215.01    
     websockets_version: 230204.01    

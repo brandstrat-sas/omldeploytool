@@ -155,19 +155,19 @@ services:
     ports:
       - "4573:4573"
   
-  ami: 
-    image: ${OMLAMI_IMG}
-    container_name: oml-ami
-    environment:
-      - ASTERISK_HOSTNAME=${ASTERISK_HOSTNAME}
-      - AMI_USER=${AMI_USER}
-      - AMI_PASSWORD=${AMI_PASSWORD}
-      - REDIS_HOSTNAME=${REDIS_HOSTNAME}
-    restart: on-failure  
-    #volumes:
-    #  - ${REPO_PATH}/omlfastagi/server:/fastagi/server
-    networks:
-      - omnileads  
+  # ami: 
+  #   image: ${OMLAMI_IMG}
+  #   container_name: oml-ami
+  #   environment:
+  #     - ASTERISK_HOSTNAME=${ASTERISK_HOSTNAME}
+  #     - AMI_USER=${AMI_USER}
+  #     - AMI_PASSWORD=${AMI_PASSWORD}
+  #     - REDIS_HOSTNAME=${REDIS_HOSTNAME}
+  #   restart: on-failure  
+  #   #volumes:
+  #   #  - ${REPO_PATH}/omlfastagi/server:/fastagi/server
+  #   networks:
+  #     - omnileads  
     
   acd:
     build:

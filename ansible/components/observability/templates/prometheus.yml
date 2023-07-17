@@ -2,16 +2,6 @@ global:
   scrape_interval:     10s
   evaluation_interval: 10s
 
-#   # Attach these labels to any time series or alerts when communicating with
-#   # external systems (federation, remote storage, Alertmanager).
-#   external_labels:
-#       monitor: 'docker-heplify-server'
-
-# # Load and evaluate rules in this file every 'evaluation_interval' seconds.
-# rule_files:
-#   - "alert.rules"
-
-# A scrape configuration containing exactly one endpoint to scrape.
 scrape_configs:  
 
 {% if inventory_hostname in groups['omnileads_aio'] %}
@@ -19,52 +9,83 @@ scrape_configs:
   - job_name: '{{ tenant_id }}_host'
     static_configs:
       - targets: ['localhost:9100']
+        labels:
+          tenant: '{{ tenant_id }}'
+          arq: 'aio'
+          component: 'aio_os'
 
   - job_name: '{{ tenant_id }}_redis'
     static_configs:
-      - targets: ['localhost:9121']
+      - targets: ['{{ omni_ip_lan }}:9121']
+        labels:
+          tenant: '{{ tenant_id }}'
+          arq: 'aio'
+          component: 'redis'
 
   - job_name: '{{ tenant_id }}_asterisk'
     static_configs:
       - targets: ['localhost:7088']
+        labels:
+          tenant: '{{ tenant_id }}'
+          arq: 'aio'
+          component: 'asterisk'
 
-  - job_name: '{{ tenant_id }}_cadvisor'
+  - job_name: '{{ tenant_id }}_postgres'
     static_configs:
-      - targets: ['localhost:8080']
+      - targets: ['{{ omni_ip_lan }}:9187']
+        labels:
+          tenant: '{{ tenant_id }}'
+          arq: 'cluster'
+          component: 'postgres'        
 
 {% else %}
 
   - job_name: '{{ tenant_id }}_postgres'
     static_configs:
       - targets: ['{{ data_host }}:9187']
+        labels:
+          tenant: '{{ tenant_id }}'
+          arq: 'cluster'
+          component: 'postgres'
   
   - job_name: '{{ tenant_id }}_app_host'
     static_configs:
       - targets: ['{{ application_host }}:9100']
+        labels:
+          tenant: '{{ tenant_id }}'
+          arq: 'cluster'
+          component: 'os_app'
 
   - job_name: '{{ tenant_id }}_voice_host'
     static_configs:
       - targets: ['{{ voice_host }}:9100']
+        labels:
+          tenant: '{{ tenant_id }}'
+          arq: 'cluster'
+          component: 'os_voice'
 
   - job_name: '{{ tenant_id }}_data_host'
     static_configs:
       - targets: ['{{ data_host }}:9100']
-
-  - job_name: '{{ tenant_id }}_heplify-server'
-    static_configs:
-      - targets: ['{{ voice_host }}:9096']
+        labels:
+          tenant: '{{ tenant_id }}'
+          arq: 'cluster'
+          component: 'os_data'
 
   - job_name: '{{ tenant_id }}_redis'
     static_configs:
       - targets: ['{{ data_host }}:9121']
+        labels:
+          tenant: '{{ tenant_id }}'
+          arq: 'cluster'
+          component: 'redis'
 
   - job_name: '{{ tenant_id }}_asterisk'
     static_configs:
       - targets: ['{{ voice_host }}:7088']
+        labels:
+          tenant: '{{ tenant_id }}'
+          arq: 'cluster'
+          component: 'asterisk'
 
 {% endif %}
-# alerting:
-#   alertmanagers:
-#   - scheme: http
-#     static_configs:
-#     - targets:

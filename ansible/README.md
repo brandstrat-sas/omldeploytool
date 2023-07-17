@@ -52,6 +52,7 @@ It is possible to group these containers on a single Linux instance or cluster t
 * [Deploy a backup](#backups)
 * [Deploy a restore](#restore)
 * [Observability](#observability)
+* [Container image & tag customizations](#components_img)
 
 
 # Bash + Ansible 📋 <a name="bash-ansible"></a>
@@ -543,13 +544,15 @@ Then indicate at the inventory.yml level within the corresponding tenant folder,
 desired.
 
 ```
-omnileads_version: 1.26.0
+omnileads_version: 1.29.0
 websockets_version: 230204.01
 nginx_version: 230215.01
 kamailio_version: 230204.01
 asterisk_version: 230204.01
+fastagi_version: 230204.01
 rtpengine_version: 230204.01
 postgres_version: 230204.01
+redis_version: 230204.01
 ```
 
 Then the deploy.sh script must be called with the --upgrade parameter.
@@ -617,6 +620,38 @@ Finally, you will be able to have an instance of Grafana and Prometheus that inv
 to them build dashboards, on the other hand Grafana must to invoke the Loki deployed on tenant like data-source for logs analisys.
 
 ![Diagrama deploy tool zoom](./png/observability_MT.png)
+
+
+# Use your own container images, container registry and omnileads enterprise <a name="components_img"></a>
+
+In the inventory file you can customize the tags of the images to display, as well as the registry from where to download them.
+
+```
+# ------------------------------------------------------------------------------------------------ #
+# ---------------------------- Container IMG TAG customization ----------------------------------- #
+# ------------------------------------------------------------------------------------------------ #
+
+# --- For each OML Deploy Tool release, a versioned stack with the latest stable images of each component is maintained on inventory.yml
+# --- You can combine the versions as you like, also use your own TAGs, using the following TAG version variables
+
+omnileads_version: 1.29.0
+asterisk_version: 230703.01
+fastagi_version: 230703.01
+nginx_version: 230215.01    
+websockets_version: 230204.01    
+kamailio_version: 230204.01    
+rtpengine_version: 230606.01
+redis_version: 230704.01
+postgres_version: 230624.01
+
+# --- Activate the OMniLeads Enterprise Edition - with "AAAA" licensed.
+# --- on the contrary you will deploy OMniLeads OSS Edition with GPLV3 licensed. 
+enterprise_edition: false
+
+# --- Docker Registry repository
+# --- If you are going to use another registry for the images, you must indicate here
+omlapp_repo: omnileads
+```
 
 # License & Copyright
 
