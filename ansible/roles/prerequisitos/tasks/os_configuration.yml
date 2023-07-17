@@ -227,3 +227,13 @@
      - postgres_host_ha is not defined
      - redis_host_ha is not defined
      - docker_compose is not defined
+
+- name: OS_CONF Copy CRON logs cleaner
+  template:
+    src: "templates/crones"
+    dest: /etc/cron.d/logs_cleaner.sh
+    mode: 0644
+  tags: 
+    - install
+    - upgrade
+  when: docker_compose is not defined  

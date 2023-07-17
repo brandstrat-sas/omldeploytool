@@ -16,7 +16,7 @@ scrape_configs:
 
   - job_name: '{{ tenant_id }}_redis'
     static_configs:
-      - targets: ['localhost:9121']
+      - targets: ['{{ omni_ip_lan }}:9121']
         labels:
           tenant: '{{ tenant_id }}'
           arq: 'aio'
@@ -29,6 +29,14 @@ scrape_configs:
           tenant: '{{ tenant_id }}'
           arq: 'aio'
           component: 'asterisk'
+
+  - job_name: '{{ tenant_id }}_postgres'
+    static_configs:
+      - targets: ['{{ omni_ip_lan }}:9187']
+        labels:
+          tenant: '{{ tenant_id }}'
+          arq: 'cluster'
+          component: 'postgres'        
 
 {% else %}
 
