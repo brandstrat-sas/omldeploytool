@@ -232,8 +232,8 @@
   template:
     src: "templates/crones"
     dest: /etc/cron.d/logs_cleaner.sh
-    mode: 0644
+    mode: 0755
   tags: 
     - install
     - upgrade
-  when: docker_compose is not defined  
+  when: docker_compose is not defined

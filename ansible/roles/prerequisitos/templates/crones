@@ -5,7 +5,7 @@
 
 {% elif inventory_hostname in groups['omnileads_voice'] %}
 0 22 * * * root cat /dev/null > /var/lib/containers/storage/volumes/asterisk_logs/_data/full
-0 22 * * * root cat /dev/null > /var/lib/containers/storage/volumes/asterisk_logs/_data/websockets
+0 22 * * * root cat /dev/null > /var/lib/containers/storage/volumes/asterisk_logs/_data/websockets.log
 0 22 * * * root cat /dev/null > /var/lib/containers/storage/volumes/asterisk_logs/_data/cdr-csv/Master.csv
 
 {% elif inventory_hostname in groups['omnileads_data'] %}
@@ -15,7 +15,7 @@
 0 22 * * * root cat /dev/null > /var/lib/containers/storage/volumes/nginx_logs/_data/omnileads_access.log
 0 22 * * * root cat /dev/null > /var/lib/containers/storage/volumes/nginx_logs/_data/omnileads_error.log
 0 22 * * * root cat /dev/null > /var/lib/containers/storage/volumes/asterisk_logs/_data/full
-0 22 * * * root cat /dev/null > /var/lib/containers/storage/volumes/asterisk_logs/_data/websockets
+0 22 * * * root cat /dev/null > /var/lib/containers/storage/volumes/asterisk_logs/_data/websockets.log
 0 22 * * * root cat /dev/null > /var/lib/containers/storage/volumes/asterisk_logs/_data/cdr-csv/Master.csv
 {% else %}
 
