@@ -203,11 +203,11 @@ services:
       - AMI_USER=${AMI_USER}
       - AMI_PASSWD=${AMI_PASSWORD}
       - AMI_PORT=5038
-      - POSTGRES_HOST=${PGHOST}
-      - POSTGRES_PORT=${PGPORT}
-      - POSTGRES_DB=${PGDATABASE}
-      - POSTGRES_USER=${PGUSER}
-      - POSTGRES_PASSWORD=${PGPASSWORD}
+      - PGHOST=${PGHOST}
+      - PGPORT=${PGPORT}
+      - PGDB=${PGDATABASE}
+      - PGUSER=${PGUSER}
+      - PGPASSWORD=${PGPASSWORD}
       - REDIS_HOSTNAME=${REDIS_HOSTNAME}
     networks:
       - omnileads  
