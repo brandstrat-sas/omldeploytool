@@ -28,7 +28,7 @@
     - postgres
 
   vars:
-    img_repo: '{{ container_image_registry }}/omnileads/postgres'
+    img_repo: '{{ container_image_registry }}/postgres'
     img_prometheus_repo: 'docker.io/prometheuscommunity/postgres-exporter'
 
   tasks:

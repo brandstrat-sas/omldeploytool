@@ -202,7 +202,7 @@ all:
     #rtpengine_host: 
 
     # --- Observability integrations with Loki & Homer
-    # --- Request by docker-compose & promtail:
+    # --- Request by promtail:
     #loki_host:
     # --- Request by Asterisk hep module:
     #homer_host:
@@ -246,7 +246,6 @@ all:
     kamailio_version: 230204.01    
     rtpengine_version: 230606.01
     redis_version: 230704.01
-    postgres_version: 230624.01
     
     # --- Activate the OMniLeads Enterprise Edition - with "AAAA" licensed.
     # --- on the contrary you will deploy OMniLeads OSS Edition with GPLV3 licensed. 
