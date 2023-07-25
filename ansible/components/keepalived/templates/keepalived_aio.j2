@@ -1,0 +1,37 @@
+global_defs {
+   notification_email {
+     {{ ha_notification_email }}
+   }
+   notification_email_from keepalived
+   smtp_server 127.0.0.1
+   smtp_connect_timeout 30
+   router_id LVS_DEVEL
+   vrrp_skip_check_adv_addr
+   vrrp_garp_interval 0
+   vrrp_gna_interval 0
+}
+
+vrrp_script check_component {
+   script "/usr/bin/check_ha.sh"
+   interval 5
+   weight 2 
+} 
+
+vrrp_instance oml_aio {
+   state {% if ha_rol == "main" %} MASTER {% else %} BACKUP {% endif %} 
+   interface {{ ha_vip_nic }}
+   virtual_router_id 51
+   priority {% if ha_rol == "main" %} 100 {% else %} 50 {% endif %} 
+   advert_int 1
+   notify_master "/usr/bin/aio_transition.sh"
+   authentication {
+      auth_type PASS
+      auth_pass 1111
+   }
+   virtual_ipaddress {
+      {{ aio_vip }}
+   }
+   track_script {
+      check_component
+   }
+}

@@ -1,0 +1,13 @@
+#!/bin/bash
+
+{% if ha_rol == "main" %}
+ping -c 5 {{ aio_2 }} > /dev/null
+{% else %}
+ping -c 5 {{ aio_1 }} > /dev/null
+{% endif %}
+
+if [ $? -eq 0 ]; then
+    exit 0  # Nodo en línea
+else
+    exit 1  # Nodo caído
+fi

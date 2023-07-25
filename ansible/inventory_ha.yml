@@ -145,55 +145,32 @@ all:
 # -- OMniLeads Common Variables                                                                                  #
 ##################################################################################################################
 
-  vars:    
+  vars:
     # --- ansible user auth connection
     ansible_user: root
     ansible_ssh_port: 22
-    # --- Activate the OMniLeads Enterprise Edition - with "AAAA" licensed.
-    # --- on the contrary you will deploy OMniLeads OSS Edition with GPLV3 licensed. 
-    enterprise_edition: false
-    # --- versions of each image to deploy
-    # --- versions of each image to deploy
-    omnileads_version: 1.28.0
-    websockets_version: 230204.01
-    nginx_version: 230215.01
-    kamailio_version: 230204.01
-    asterisk_version: 230604.01
-    rtpengine_version: 230524.01
-    postgres_version: 230204.01  
-    centos_postgresql_version: 11
+
+    # ------------------------------------------------------------------------------------------------ #
+    # ------------------------------ Generic OMniLeads runtime variables ----------------------------- #
+    # ------------------------------------------------------------------------------------------------ #
+
+    # --- Asterisk & RTPengine scenary for SIP & RTP
     # --- "cloud" instance (access through public IP)
-    # --- or "lan" instance (access through private IP)
-    # --- in order to set NAT or Publica ADDR for RTP voice packages
-    infra_env: ha
+    # --- "lan" instance (access through private IP)
+    # --- "nat" instance (access through Public NAT IP)    
+    # --- or "all" in order to access through all NICs
+    infra_env: cloud
     # --- If you have an DNS FQDN resolution, you must to uncomment and set this param
     # --- otherwise leave commented to work invoking through an IP address
     #fqdn: fts.sefirot.cloud
     # --- If you want to work with Dialer, then you must install Wombat Dialer on a separate host 
     # --- and indicate the IP address or FQDN of that host here (uncomment and set this param):
-    #dialer_host: 
-    # --- set postgres_host if you have your own postgres (standalone host or cloud service)
-    # --- otherwise leave commented to deploy PostgreSQL on Application Host instance
-    #postgres_host: 
-    # --- Read Only connection host address (in case of RW/RO postgres cluster):
-    #postgres_ro_host: 
-    # --- if you have your own bucket (standalone host or cloud service) put here the URL
-    # --- example VULTR: https://ewr1.vultrobjects.com
-    # --- example Digital Ocean: https://sfo3.digitaloceanspaces.com
-    # --- example onpremise: https://192.168.100.10
-    # --- if you want to deploy MinIO objects storage on application_host, you must to put '#' before
-    bucket_url: https://172.16.101.3:9000
-    # --- RTPEngine if you have your own instances put here the IP or hostname
-    #rtpengine_host: 
     # --- time zone (for example: America/Argentina/Cordoba)
     TZ: America/Argentina/Cordoba
     # --- TLS/SSL Certs configuration (selfsigned, custom or certbot letsencrypt)
     # --- if you have your own certs, put them into instances/tenant folder and
     # --- change this to *custom*
     certs: selfsigned
-    # --- if you object storage service use selfsigned TLS/SSL certs, you mus to put
-    # --- *callrec_device=s3-no-check-cert* in order to don't verify CA.
-    callrec_device: s3-no-check-cert
     # --- PostgreSQL    
     postgres_port: 5432
     postgres_user: omnileads
@@ -210,10 +187,9 @@ all:
     s3_http_admin_user: omnileads
     s3_http_admin_pass: jdhsgahkdgaskdasdhe2h4231hg4jjhgHJKG
     # --- bucket params    
-    
-    bucket_access_key: mYLcr7sx5vEbe7PO
-    bucket_secret_key: v1Dl34Q29Bv6ruaWS7cUAEvSVfAtvGkR
-    bucket_name: proxmox-deb
+    bucket_access_key: Hghjkdghjkdhasjdasdsada
+    bucket_secret_key: jknkjhkjh4523kjhcksjdhkjfdhKJHHKJGKJh786876876NBVJHB
+    bucket_name: omnileads
     # --- if your bucket doesn't need region, leave this value (us-east-1)
     bucket_region: us-east-1
     # --- Asterisk Manager Interface (AMI) user & password
@@ -250,31 +226,85 @@ all:
     #email_use_ssl:
     #email_use_tls:
 
-    # --- Docker Registry repo
-    # --- If you are going to use another registry for the images, you must indicate here
-    omlapp_repo: omnileads
+    # ------------------------------------------------------------------------------------------------ #
+    # ---------------------------- Integrations with external hosts ---------------------------------- #
+    # ------------------------------------------------------------------------------------------------ #
 
-    # --- Restore id request by restore filename
-    #restore_file_timestamp: 1681215859
+    # --- The Dialer Engine Host
+    #dialer_host: 
+    # --- set postgres_host if you have your own postgres (standalone host or cloud service)
+    # --- otherwise leave commented to deploy PostgreSQL on Application Host instance
+    #postgres_host: 
+    # --- Read Only connection host address (in case of RW/RO postgres cluster):
+    #postgres_ro_host: 
+    # --- if you have your own bucket (standalone host or cloud service) put here the URL
+    # --- example VULTR: https://ewr1.vultrobjects.com
+    # --- example Digital Ocean: https://sfo3.digitaloceanspaces.com
+    # --- example onpremise: https://192.168.100.10
+    # --- if you want to deploy MinIO objects storage on application_host, you must to put '#' before
+    #bucket_url: https://sfo3.digitaloceanspaces.com
+    # --- RTPEngine if you have your own instances put here the IP or hostname
+    #rtpengine_host: 
 
-    # --- Integrations with external hosts
-    # --- Request by docker-compose & promtail
-    loki_host: 190.19.150.222
-    # --- Request by Asterisk hep module
-    homer_host: 190.19.150.222
+    # --- Observability integrations with Loki & Homer
+    # --- Request by promtail:
+    #loki_host:
+    # --- Request by Asterisk hep module:
+    #homer_host:
+    
     # --- Request by Web-Video Inbound Calls 
+    # --- Put here the JITSI host URL
     #video_host: 
 
     # --- BACKUPs: in case of implementing a separate bucket for backups
     #backup_bucket: 
     # --- Restore: in case of implementing a separate bucket for restore
     #restore_bucket: 
-    omnileads_ha: true
 
     ha_notification_email: mr_robot@mr_robot.com
 
+    # ------------------------------------------------------------------------------------------------ #
+    # ------------------------------------ Backup & Restore ------------------------------------------ #
+    # ------------------------------------------------------------------------------------------------ #
+
+    # --- Restore filename id, request by restore filename
+    #restore_file_timestamp: 1681215859
+    # Backup / Restore centralized Bucket
+    # br_bucket_url: https://sfo3.digitaloceanspaces.com
+    # br_bucket_access_key: Hghjkdghjkdhasjdasdsada
+    # br_bucket_secret_key: jknkjhkjh4523kjhcksjdhkjfdhKJHHKJGKJh786876876NBVJHB
+    # --- Restore source object Storage SSL certs: custom or selfsigned
+    #restore_bucket_selfsigned_certs: true
+
+    # ------------------------------------------------------------------------------------------------ #
+    # ---------------------------- Container IMG TAG customization ----------------------------------- #
+    # ------------------------------------------------------------------------------------------------ #
+    
+    # --- For each OML Deploy Tool release, a versioned stack with the latest stable images of each component is maintained on inventory.yml
+    # --- You can combine the versions as you like, also use your own TAGs, using the following TAG version variables
+    
+    omnileads_version: oml-305
+    asterisk_version: oml-305
+    fastagi_version: oml-305
+    nginx_version: 230215.01    
+    websockets_version: 230204.01    
+    kamailio_version: 230204.01
+    rtpengine_version: 230606.01
+    redis_version: 230704.01
+    
+    # --- Activate the OMniLeads Enterprise Edition - with "AAAA" licensed.
+    # --- on the contrary you will deploy OMniLeads OSS Edition with GPLV3 licensed. 
+    enterprise_edition: false
+
+    # --- Docker Registry repository
+    # --- If you are going to use another registry for the images, you must indicate here
+    omlapp_repo: omnileads
+
 #############################################################################################################
-# -- In this section the hosts are grouped based on the type of deployment (AIO, Cluster & Cluster HA).     #
+# -- In this section the hosts are grouped based on the type of deployment (AIO, Cluster & Cluster HA).  -- #
+# -- here you can control which host the action deployed by the deploy.sh script will be applied to      -- #
+# -- The Ansible playbooks are applied on the hosts below declared and classified according to the       -- #
+# -- architecture of the instance on which they are deployed.                                            -- #
 #############################################################################################################
 
 omnileads_data:

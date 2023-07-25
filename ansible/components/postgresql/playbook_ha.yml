@@ -19,7 +19,7 @@
 ---
 
 - name: POSTGRES HA-Cluster CentOS7 installation and configuration
-  hosts: omnileads_data
+  hosts: ha_omnileads_sql
   tags:
     - all_components
     - postgres
