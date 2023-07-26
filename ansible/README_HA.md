@@ -1,72 +1,5 @@
 
-It should be invoked when deploying OMniLeads under an On-Premise High Availability scheme, based on two physical servers (hypervisors) with 8 VMs on which the components are distributed.
-
-![Diagrama deploy tool](./png/deploy-tool-tenant-ha.png)
-
-# Deploy an OMniLeads AIO or AIT instance with Postgres DB and Bucket Object Storage as the cloud provider service. 🚀 <a name="onpremise-deploy"></a>
-
-It is possible to deploy the application using external cloud services for both Postgres and Bucket. The majority of cloud infrastructure providers offer the possibility of requesting an instance with Postgres installed in addition to the Linux instances (VPS). Similarly, object storage can be requested as a service, generating a bucket for our deployment. This approach is very interesting because we consider the OMniLeads instance to be stateless, ephemeral, and fully viable within the perspective of immutable infrastructure.
-
-So, You must have a Linux instance , as Ansible needs to establish an SSH connection using the public key. Additionally, you will need to have access to the object storage bucket and its access keys, as well as the connection details for the PostgreSQL database instances.
-
-![Diagrama deploy](./png/deploy-tool-tenant-components-cloud-aio.png)
-
-We are going to propose a reference inventory, where the cloud provider is supposed to give us the connection data to Postgres.
-The parameter *postgres_host* must be assigned the corresponding connection string.
-Then it is simply a matter of adjusting the other connection parameters, according to whether we are going to need to establish an SSL connection, set the *postgres_ssl: true*
-If the PostgreSQL service involves a cluster with more than one node, then it can be activated by *postgres_ha: true* and *postgres_ro_host: X.X.X.X*
-to indicate that the queries are impacted on the cluster replica node.
-
-Regarding storage over Object Storage, the URL must be provided in *bucket_url*.
-Also the authentication parameters must be provided; *bucket_access_key* & *bucket_secret_key* as well as the *bucket_name*.
-Regarding the bucket_region, if you do not need to specify anything, you should leave it with the current value.
-
-Some cloud providers custom parameters:
-
-* Vultr example:
-
-```
-postgres_host: vultr-prod-04b0caa5-03fc-402d-95db-de5fb0bbeb1c-vultr-prod-a539.vultrdb.com
-bucket_url: https://sjc1.vultrobjects.com
-
-# --- PostgreSQL    
-postgres_port: 16751
-postgres_user: vultradmin
-# --- *postgres* or *defaultdb* depend ...
-postgres_maintenance_db: defaultdb
-postgres_ssl: true
-```
-
-* Digital Ocean example:
-
-
-```
-postgres_host: private-oml-pgsql-do-user-6023066-0.b.db.ondigitalocean.com
-bucket_url: https://sfo3.digitaloceanspaces.com
-
-# --- PostgreSQL    
-postgres_port: 25060
-postgres_user: doadmin
-# --- *postgres* or *defaultdb* depend ...
-postgres_maintenance_db: defaultdb
-postgres_ssl: true
-```
-
-Finally the deploy is launched:
-
-```
-./deploy.sh --action=install --tenant=tenant_name_folder
-```
-
-On OML App linux terminal, you must run reset_pass in order to perform a first login in the App.
-Once the URL is available with the App returning the login view,  we can log in with the user *admin*, password *admin*.
-
-```
-oml_manage --reset_pass
-```
-
 # Deploy High Availability onpremise instance 🚀 <a name="cloud-deploy"></a>
-
 
 We have an inventory file capable of materializing a high availability cluster on 2 Hypervisors (physical servers).  
 
@@ -208,7 +141,6 @@ the RO VIP, a recovery deploy of the postgres backup node must be executed.
 ```
 ./deploy.sh --action=pgsql_node_recovery_backup --tenant=tenant_name_folder
 ```
-
 
 # Post-installation steps :beer:
 

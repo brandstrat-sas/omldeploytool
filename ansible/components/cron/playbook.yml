@@ -74,9 +74,9 @@
   #     state: restarted
   #     enabled: yes
   #     daemon_reload: yes
-  #   #when: 
-  #   #  - omnileads_ha is defined  
-  #   #  - ha_rol == "main"
+  #   when: 
+  #     - omnileads_ha is defined  
+  #     - ha_rol == "main"
   #   tags:
   #     - install
   #     - upgrade

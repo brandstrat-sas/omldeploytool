@@ -224,7 +224,7 @@
     - install
     - upgrade
   when: 
-     - postgres_host_ha is not defined
+     - inventory_hostname not in groups['ha_omnileads_sql']
      - redis_host_ha is not defined
      - docker_compose is not defined
 
@@ -236,4 +236,5 @@
   tags: 
     - install
     - upgrade
-  when: docker_compose is not defined
+  when: 
+    - inventory_hostname not in groups['ha_omnileads_sql']

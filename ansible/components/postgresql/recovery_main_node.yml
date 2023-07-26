@@ -20,7 +20,7 @@
 ---
 
 - name: POSTGRES HA-Cluster Manager Playbook
-  hosts: sql_1
+  hosts: ha_omnileads_sql
   tags:
     - pgsql_node_recovery_main
   

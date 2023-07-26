@@ -65,6 +65,16 @@
     tags:
       - upgrade
 
+  - name: KEEPALIVED transition to master script
+    template: 
+      src: "{{ keepalived_repo_path }}templates/aio_transition.sh"
+      dest: /usr/bin/oml_cluster_transition.sh
+      mode: 755
+    when:
+      - inventory_hostname in groups['omnileads_aio']
+    tags:
+      - upgrade
+
   # - name: KEEPALIVED Keepalived Voice config provissioning
   #   template: 
   #     src: "{{ keepalived_repo_path }}templates/keepalived_asterisk.j2"
@@ -132,13 +142,13 @@
   #   tags:
   #     - upgrade
 
-  # - name: KEEPALIVED Start and enable Systemd High Availability TOOLs
-  #   systemd:
-  #     name: keepalived.service
-  #     state: restarted
-  #     enabled: yes
-  #     daemon_reload: yes
-  #   tags:
-  #     - install
-  #     - upgrade
+  - name: KEEPALIVED Start and enable Systemd High Availability TOOLs
+    systemd:
+      name: keepalived.service
+      state: restarted
+      enabled: yes
+      daemon_reload: yes
+    tags:
+      - install
+      - upgrade
 

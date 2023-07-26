@@ -76,8 +76,7 @@
         line: "listen_addresses = '{{ omni_ip_lan }}'"
         state: present
       when:
-        - postgres_host_ha is defined
-        - omnileads_ha is not defined
+        - omnileads_ha is defined
 
     #Se modifica el timezone de postgres, para postgres interno no hace falta
     - name: Modify postgresql timezone
@@ -86,7 +85,7 @@
         regexp: "^timezone ="
         line: "timezone = 'UTC'"
         state: present
-      when: postgres_host_ha is defined
+      when: omnileads_ha is defined
 
     #Se modifica el data_directory en el caso de usar algun NFS o volumen externo
     - name: Modify postgresql data directory
@@ -102,7 +101,7 @@
       template:
         src: templates/pg_hba.conf.j2
         dest: '{{ pg_lib_location }}/pg_hba.conf'
-      when: postgres_host_ha is not defined
+      when: omnileads_ha is not defined
 
     - name: Add line to pg_hba.conf host all omnileads subnet md5
       postgresql_pg_hba:
@@ -112,7 +111,7 @@
         source: '{{ netaddr }}'
         databases: all
         method: md5
-      when: postgres_host_ha is defined
+      when: omnileads_ha is defined
 
     - name: Add line to pg_hba.conf host all all 127.0.0.1 md5
       postgresql_pg_hba:
@@ -122,7 +121,7 @@
         source: 127.0.0.1/32
         databases: all
         method: md5
-      when: postgres_host_ha is defined
+      when: omnileads_ha is defined
 
     - name: Add line to pg_hba.conf host postgres all 127.0.0.1 trust
       postgresql_pg_hba:
@@ -132,7 +131,7 @@
         source: 127.0.0.1/32
         databases: all
         method: trust
-      when: postgres_host_ha is defined
+      when: omnileads_ha is defined
 
       # Restarteamos servicio
     - name: Restart postgres service HA

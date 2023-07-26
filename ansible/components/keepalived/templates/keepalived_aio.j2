@@ -1,14 +1,7 @@
 global_defs {
-   notification_email {
-     {{ ha_notification_email }}
-   }
-   notification_email_from keepalived
-   smtp_server 127.0.0.1
-   smtp_connect_timeout 30
+   script_security
    router_id LVS_DEVEL
    vrrp_skip_check_adv_addr
-   vrrp_garp_interval 0
-   vrrp_gna_interval 0
 }
 
 vrrp_script check_component {
@@ -23,7 +16,7 @@ vrrp_instance oml_aio {
    virtual_router_id 51
    priority {% if ha_rol == "main" %} 100 {% else %} 50 {% endif %} 
    advert_int 1
-   notify_master "/usr/bin/aio_transition.sh"
+   notify_master "/usr/bin/oml_cluster_transition.sh"
    authentication {
       auth_type PASS
       auth_pass 1111
