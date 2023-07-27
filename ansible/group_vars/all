@@ -23,7 +23,7 @@ postgres_port: 5432
 
 redis_ha_version: develop
 minio_version: latest
-postgres_version: 14-bullseye
+#postgres_version: 14-bullseye
 haproxy_version: 2.0-buster
 
 # temporal ... hay que buildear nueva img, en el repo omnileads y agregar todo al pipeline

@@ -112,38 +112,51 @@ all:
             application_host: 192.168.0.4
             infra_env: cloud
     # -----------------------------------------
-    # -----------------------------------------        
-    postgres_ha_instances:
+    # -----------------------------------------              
+    ha_instances:
       children:
         tenant_example_7:
           hosts:
-            tenant_example_7_data_A:
+            tenant_example_7_sql_A:
+              tenant_id: tenant_example_7_sql_A
               ansible_host: 172.16.101.101
-              omni_ip_lan: 172.16.101.101
-              tenant_id: tenant_example_7_SQL_A
-            tenant_example_7_data_B:
+              omni_ip_lan: 172.16.101.101              
+              ha_rol: main
+              ha_vip_nic: eth0
+            tenant_example_7_sql_B:
+              tenant_id: tenant_example_7_sql_B
               ansible_host: 172.16.101.102
               omni_ip_lan: 172.16.101.102
-              tenant_id: tenant_example_7_SQL_B        
+              ha_rol: backup
+              ha_vip_nic: eth0
+            tenant_example_7_aio_A:
+              tenant_id: tenant_example_7_aio_A
+              ansible_host: 172.16.101.109
+              omni_ip_lan: 172.16.101.109
+              ha_rol: main
+              ha_vip_nic: ens18
+            tenant_example_7_aio_B:
+              tenant_id: tenant_example_7_aio_B
+              ansible_host: 172.16.101.110
+              omni_ip_lan: 172.16.101.110
+              ha_rol: backup
+              ha_vip_nic: ens18
           vars:            
-            infra_env: lan
-            ha_vip_nic: eth0
-            postgres_host_ha: true            
+            infra_env: lan                        
+            omnileads_ha: true
             netaddr: 172.16.101.0/16
             netprefix: 24
             postgres_1: 172.16.101.101
             postgres_2: 172.16.101.102
             aio_1: 172.16.101.109
             aio_2: 172.16.101.110
-            infra_env: lan
-            ha_vip_nic: ens18
-            app_port: 443
+            aio_vip: 172.16.101.200
             postgres_host: 172.16.101.201
             postgres_ro_host: 172.16.101.202
             bucket_url: https://172.16.101.3:9000
             bucket_access_key: mYLcr7sx5vEbe7PO
             bucket_secret_key: v1Dl34Q29Bv6ruaWS7cUAEvSVfAtvGkR
-            bucket_name: tenant_7
+            bucket_name: tenant_example_7
 ##################################################################################################################
 # -- OMniLeads Common Variables                                                                                  #
 ##################################################################################################################
@@ -286,7 +299,7 @@ all:
     # --- For each OML Deploy Tool release, a versioned stack with the latest stable images of each component is maintained on inventory.yml
     # --- You can combine the versions as you like, also use your own TAGs, using the following TAG version variables
     
-    omnileads_version: oml-305
+    omnileads_version: 1.29.0
     asterisk_version: oml-305
     fastagi_version: oml-305
     nginx_version: 230215.01    
@@ -316,12 +329,13 @@ omnileads_aio:
     #tenant_example_2:
     #tenant_example_3:
     #tenant_example_4:
-    #tenant_example_7_A:
-    #tenant_example_7_B:
+    tenant_example_7_aio_A:
+    tenant_example_7_aio_B:
 
+################################################    
 omnileads_data:
   hosts:
-    tenant_example_5_data:    
+    tenant_example_5_data:  
     
 omnileads_voice:
   hosts:
@@ -331,13 +345,9 @@ omnileads_app:
   hosts:
     tenant_example_5_app:
 
-################
-ha_postgres:
+################################################
+ha_omnileads_sql:
   hosts:
-    tenant_aaa_sql_1:
-    #tenant_bbb_sql_1:
-    vars:
-      omldata: true
-      ha_rol: backup        
-      postgres_host_ha: true
+    tenant_example_7_sql_A:
+    tenant_example_7_sql_B:
     
