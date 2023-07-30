@@ -46,6 +46,7 @@
     name:
       - python3
       - python3-pip
+      - python3-psycopg2
       - jq
     state: latest
   when: ansible_facts['distribution'] == "Rocky" or ansible_facts['distribution'] == "AlmaLinux" 
