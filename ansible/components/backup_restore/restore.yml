@@ -59,59 +59,6 @@
         - inventory_hostname in groups['omnileads_data'] or inventory_hostname in groups['omnileads_aio']
         - container_orchest == "systemd"
 
-    # - name: RESTORE asterisk mv /etc/asterisk/custom to bk folder previus restore
-    #   command: "creates={{ asterisk_location_conf }}/custom_{{ restore_file_timestamp }} mv {{ asterisk_location_conf }}/custom/ {{ asterisk_location_conf }}/custom_{{ restore_file_timestamp }}"
-    #   when:
-    #     - inventory_hostname in groups['omnileads_voice'] or inventory_hostname in groups['omnileads_aio']
-    #     - container_orchest == "systemd"
-
-    - name: RESTORE asterisk from selfhosted BUCKET cluster
-      shell: "podman exec -it oml-asterisk-server aws --endpoint-url http://{{ data_host }}:9000 s3 sync s3://{{ bucket_name }}/backup/asterisk/{{ restore_file_timestamp }} {{ asterisk_location_conf }}/custom/ --delete"
-      when:       
-        - inventory_hostname in groups['omnileads_voice']
-        - container_orchest == "systemd"
-        - bucket_url is not defined
-
-    - name: RESTORE asterisk from selfhosted BUCKET AIO
-      shell: "podman exec -it oml-asterisk-server aws --endpoint-url http://localhost:9000 s3 sync s3://{{ bucket_name }}/backup/asterisk/{{ restore_file_timestamp }} {{ asterisk_location_conf }}/custom/ --delete"
-      when:       
-        - inventory_hostname in groups['omnileads_aio']
-        - container_orchest == "systemd"
-        - bucket_url is not defined
-
-    - name: RESTORE asterisk from insecure SSL external BUCKET
-      shell: "podman exec -it oml-asterisk-server aws --endpoint-url {{ bucket_url }} --no-verify-ssl s3 sync s3://{{ bucket_name }}/backup/asterisk/{{ restore_file_timestamp }} {{ asterisk_location_conf }}/custom/ --delete"
-      when:       
-        - inventory_hostname in groups['omnileads_voice'] or inventory_hostname in groups['omnileads_aio']
-        - container_orchest == "systemd"
-        - bucket_url is defined
-        - bucket_ssl_selfsigned is defined
-
-    - name: RESTORE asterisk from external BUCKET
-      shell: "podman exec -it oml-asterisk-server aws --endpoint-url {{ bucket_url }} s3 sync s3://{{ bucket_name }}/backup/asterisk/{{ restore_file_timestamp }} {{ asterisk_location_conf }}/custom/ --delete"
-      when:       
-        - inventory_hostname in groups['omnileads_voice'] or inventory_hostname in groups['omnileads_aio']
-        - container_orchest == "systemd"
-        - bucket_url is defined
-        - bucket_ssl_selfsigned is not defined
-
-    - name: RESTORE asterisk  Change file ownership /etc/asterisk/custom
-      file:
-        path: '{{ asterisk_location_conf }}/custom'
-        owner: omnileads
-        group: omnileads
-        mode: '0744'
-        recurse: true
-        state: directory
-      when:
-        - inventory_hostname in groups['omnileads_voice'] or inventory_hostname in groups['omnileads_aio']
-
-    - name: RESTORE asterisk reload config
-      shell: "podman exec -it oml-asterisk-server asterisk -rx 'dialplan reload'"
-      when:
-        - inventory_hostname in groups['omnileads_voice'] or inventory_hostname in groups['omnileads_aio']
-        - container_orchest == "systemd"
-
     - name: RESTORE postgres DB selfhosted bucket cluster
       shell: "podman run -e POSTGRES_RESTORE=True -e S3_ENDPOINT=http://{{ data_host }}:9000 -e S3_BUCKET_NAME={{ bucket_name }} -e BACKUP_FILENAME=pgsql-backup-{{ restore_file_timestamp }}.sql -e AWS_ACCESS_KEY_ID={{ bucket_access_key }}  -e AWS_SECRET_ACCESS_KEY={{ bucket_secret_key }} -e PGUSER={{ postgres_user }} -e PGPASSWORD={{ postgres_password }} -e PGDATABASE={{ postgres_database }} -e PGHOST={{ data_host }} -e PGPORT={{ postgres_port }} {{ img_repo }}:{{ omnileads_version }}"
       when:
@@ -199,3 +146,27 @@
       when:
         - inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_aio']
         - container_orchest == "systemd"
+
+    - name: RESTORE asterisk files and sounds
+      shell: "podman exec -it oml-asterisk-server python /opt/asterisk/scripts/asterisk_restore.py {{ restore_file_timestamp }}"
+      when:       
+        - inventory_hostname in groups['omnileads_voice'] or inventory_hostname in groups['omnileads_aio']
+        - container_orchest == "systemd"
+
+    - name: RESTORE asterisk  Change file ownership /etc/asterisk/custom
+      file:
+        path: '{{ asterisk_location_conf }}/custom'
+        owner: omnileads
+        group: omnileads
+        mode: '0744'
+        recurse: true
+        state: directory
+      when:
+        - inventory_hostname in groups['omnileads_voice'] or inventory_hostname in groups['omnileads_aio']
+
+    - name: RESTORE asterisk reload config
+      shell: "podman exec -it oml-asterisk-server asterisk -rx 'dialplan reload'"
+      when:
+        - inventory_hostname in groups['omnileads_voice'] or inventory_hostname in groups['omnileads_aio']
+        - container_orchest == "systemd"
+    
