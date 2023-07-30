@@ -79,7 +79,7 @@
         - bucket_url is defined
         - bucket_ssl_selfsigned is defined    
     
-    - name: BACKUP upload asterisk backup to selfhosted BUCKET cluster
+    - name: BACKUP asterisk files
       shell: "podman exec -it oml-asterisk-server /opt/asterisk/scripts/asterisk_backup.py {{ file_timestamp }}"
       when:        
         - inventory_hostname in groups['omnileads_voice'] or inventory_hostname in groups['omnileads_aio']

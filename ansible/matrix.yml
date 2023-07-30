@@ -32,61 +32,61 @@
     - prerequisitos
 
 
-- import_playbook: components/minio/playbook.yml
-  when: 
-    - bucket_url is not defined
+# - import_playbook: components/minio/playbook.yml
+#   when: 
+#     - bucket_url is not defined
 
 
-- import_playbook: components/postgresql/playbook.yml
-  when: 
-    - inventory_hostname in groups['omnileads_data'] or inventory_hostname in groups['omnileads_aio']    
-    - postgres_out == false
+# - import_playbook: components/postgresql/playbook.yml
+#   when: 
+#     - inventory_hostname in groups['omnileads_data'] or inventory_hostname in groups['omnileads_aio']    
+#     - postgres_out == false
 
 
-- import_playbook: components/postgresql/playbook_ha.yml
-  when: 
-    - inventory_hostname in groups['ha_omnileads_sql']
+# - import_playbook: components/postgresql/playbook_ha.yml
+#   when: 
+#     - inventory_hostname in groups['ha_omnileads_sql']
 
 
-- import_playbook: components/redis/playbook.yml
-  when: 
-    - inventory_hostname in groups['omnileads_data'] or inventory_hostname in groups['omnileads_aio']    
+# - import_playbook: components/redis/playbook.yml
+#   when: 
+#     - inventory_hostname in groups['omnileads_data'] or inventory_hostname in groups['omnileads_aio']    
 
 
-- import_playbook: components/rtpengine/playbook.yml
-  when: 
-    - inventory_hostname in groups['omnileads_voice'] or inventory_hostname in groups['omnileads_aio']    
-    - rtpengine_out == false
+# - import_playbook: components/rtpengine/playbook.yml
+#   when: 
+#     - inventory_hostname in groups['omnileads_voice'] or inventory_hostname in groups['omnileads_aio']    
+#     - rtpengine_out == false
 
 
-- import_playbook: components/asterisk/playbook.yml
-  when: 
-    - inventory_hostname in groups['omnileads_voice'] or inventory_hostname in groups['omnileads_aio']
+# - import_playbook: components/asterisk/playbook.yml
+#   when: 
+#     - inventory_hostname in groups['omnileads_voice'] or inventory_hostname in groups['omnileads_aio']
 
 
-- import_playbook: components/kamailio/playbook.yml
-  when: 
-    - inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_aio']
+# - import_playbook: components/kamailio/playbook.yml
+#   when: 
+#     - inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_aio']
 
 
-- import_playbook: components/fastagi/playbook.yml
-  when: 
-    - inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_aio']
+# - import_playbook: components/fastagi/playbook.yml
+#   when: 
+#     - inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_aio']
 
 
-- import_playbook: components/websockets/playbook.yml
-  when: 
-   - inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_aio']
+# - import_playbook: components/websockets/playbook.yml
+#   when: 
+#    - inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_aio']
 
 
-- import_playbook: components/daphne/playbook.yml
-  when: 
-    - inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_aio']
+# - import_playbook: components/daphne/playbook.yml
+#   when: 
+#     - inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_aio']
 
 
-- import_playbook: components/daphne/playbook.yml
-  when: 
-    - inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_aio']
+# - import_playbook: components/daphne/playbook.yml
+#   when: 
+#     - inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_aio']
 
 
 - import_playbook: components/django/playbook.yml

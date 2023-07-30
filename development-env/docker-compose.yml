@@ -215,7 +215,7 @@ services:
     volumes:
       - ./ast_custom_conf:/etc/asterisk/custom
       - ${REPO_PATH}/omlacd/source/astconf:/etc/asterisk/
-      - ${REPO_PATH}/omlacd/source/scripts:/etc/asterisk/virtualenv/scripts
+      - ${REPO_PATH}/omlacd/source/scripts:/opt/asterisk/scripts
     working_dir: /etc/asterisk
 
   kamailio:

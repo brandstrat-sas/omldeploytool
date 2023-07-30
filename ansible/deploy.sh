@@ -98,7 +98,7 @@ case ${oml_action} in
     ansible-playbook ./components/postgresql/recovery_main_node.yml --extra-vars \
     "pgsql_repo_path=$(pwd)/components/postgresql/
     tenant_folder=$oml_tenant \
-    commit=ascd " \
+    commit="$(git rev-parse HEAD)" " \
     --tags $oml_action \
     -i .inventory.yml
     Banner `echo $?`
@@ -107,7 +107,7 @@ case ${oml_action} in
     ansible-playbook ./components/postgresql/takeover_main_node.yml --extra-vars \
     "pgsql_repo_path=$(pwd)/components/postgresql/
     tenant_folder=$oml_tenant \
-    commit=ascd " \
+    commit="$(git rev-parse HEAD)" " \
     --tags $oml_action \
     -i .inventory.yml
     Banner `echo $?`
@@ -116,7 +116,7 @@ case ${oml_action} in
     ansible-playbook ./components/postgresql/recovery_backup_node.yml --extra-vars \
     "pgsql_repo_path=$(pwd)/components/postgresql/
     tenant_folder=$oml_tenant \
-    commit=ascd " \
+    commit="$(git rev-parse HEAD)" " \
     --tags $oml_action \
     -i .inventory.yml
     Banner `echo $?`
@@ -125,7 +125,7 @@ case ${oml_action} in
     ansible-playbook ./components/sentinel/takeover_main_node.yml --extra-vars \
     "pgsql_repo_path=$(pwd)/components/postgresql/
     tenant_folder=$oml_tenant \
-    commit=ascd " \
+    commit="$(git rev-parse HEAD)" " \
     --tags $oml_action \
     -i .inventory.yml
     Banner `echo $?`
@@ -169,7 +169,7 @@ case ${oml_action} in
     observability_repo_path=$(pwd)/components/observability/ \
     rebrand=false \
     tenant_folder=$oml_tenant \
-    commit=ascd \
+    commit="$(git rev-parse HEAD)" \
     build_date=\"$(env LC_hosts=C LC_TIME=C date)\"" \
     --tags "$oml_action" \
     -i .inventory.yml
