@@ -300,14 +300,15 @@ all:
     # --- You can combine the versions as you like, also use your own TAGs, using the following TAG version variables
     
     omnileads_version: 1.29.0
-    asterisk_version: oml-305
+    asterisk_version: oml-305.01
     fastagi_version: oml-305
     nginx_version: 230215.01    
     websockets_version: 230204.01    
     kamailio_version: 230204.01
     rtpengine_version: 230606.01
     redis_version: 230704.01
-    
+    postgres_version: 230624.01
+
     # --- Activate the OMniLeads Enterprise Edition - with "AAAA" licensed.
     # --- on the contrary you will deploy OMniLeads OSS Edition with GPLV3 licensed. 
     enterprise_edition: false
