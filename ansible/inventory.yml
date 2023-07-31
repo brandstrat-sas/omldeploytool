@@ -206,7 +206,7 @@ all:
     bucket_access_key: Hghjkdghjkdhasjdasdsada
     bucket_secret_key: jknkjhkjh4523kjhcksjdhkjfdhKJHHKJGKJh786876876NBVJHB
     bucket_name: omnileads
-    #bucket_selfsigned_certs: true
+    #bucket_ssl_selfsigned: true
     # --- if your bucket doesn't need region, leave this value (us-east-1)
     bucket_region: us-east-1
     # --- Asterisk Manager Interface (AMI) user & password
@@ -329,8 +329,8 @@ omnileads_aio:
     #tenant_example_2:
     #tenant_example_3:
     #tenant_example_4:
-    tenant_example_7_aio_A:
-    tenant_example_7_aio_B:
+    #tenant_example_7_aio_A:
+    #tenant_example_7_aio_B:
 
 ################################################    
 omnileads_data:
@@ -348,6 +348,6 @@ omnileads_app:
 ################################################
 ha_omnileads_sql:
   hosts:
-    tenant_example_7_sql_A:
-    tenant_example_7_sql_B:
+    #tenant_example_7_sql_A:
+    #tenant_example_7_sql_B:
     
