@@ -36,7 +36,7 @@
       state: present
     with_items:
       - keepalived
-    when: ansible_facts['distribution'] == "Rocky" or ansible_facts['distribution'] == "AlmaLinux"  or nsible_facts['distribution'] == "RedHat"
+    when: ansible_facts['distribution'] == "Rocky" or ansible_facts['distribution'] == "AlmaLinux"  or ansible_facts['distribution'] == "RedHat"
 
   - name: KEEPALIVED Install High Availability TOOLs
     apt:
