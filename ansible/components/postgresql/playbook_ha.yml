@@ -160,21 +160,6 @@
         - upgrade_from_oml_1 is not defined
         - ha_rol == "main"
 
-    # - name: POSTGRESQL Adds plperl extension to the database {{ postgres_database }}
-    #   postgresql_ext:
-    #     name: plperl
-    #     db: "{{ postgres_database }}"
-    #     login_host: "{{ omni_ip_lan }}"
-    #     login_password: "{{ postgres_password }}"
-    #     login_user: "{{ postgres_user }}"
-    #     port: "{{ postgres_port }}"
-    #   tags:
-    #     - install
-    #   when: 
-    #     - upgrade_from_oml_1 is not defined
-    #     - ha_rol == "main"
-    
-
     - name: POSTGRES HA Create postgres SSH directory
       file:
         mode: '0755'
@@ -298,7 +283,7 @@
 
     - name: Copy omlpgsql-ha service
       copy:
-        src: systemd/omlpgsql-ha.service
+        src: templates/omlpgsql-ha.service
         dest: /etc/systemd/system
         owner: root
         group: root
@@ -307,7 +292,7 @@
 
     - name: Copy repmgr11.service
       copy:
-        src: systemd/repmgr11.service
+        src: templates/repmgr11.service
         dest: /etc/systemd/system
         owner: root
         group: root
