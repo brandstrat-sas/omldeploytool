@@ -84,11 +84,6 @@
     - inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_aio']
 
 
-- import_playbook: components/daphne/playbook.yml
-  when: 
-    - inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_aio']
-
-
 - import_playbook: components/django/playbook.yml
   when: 
     - inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_aio']
