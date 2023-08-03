@@ -54,7 +54,7 @@
       state: directory
       owner: '{{ usuario }}'
       group: '{{ usuario }}'
-      mode: 0764
+      mode: 0777
     when: ast_custom_exists.rc == 0
     tags:
       - install

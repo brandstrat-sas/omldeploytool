@@ -142,7 +142,7 @@ all:
               ha_rol: backup
               ha_vip_nic: ens18
           vars:            
-            infra_env: lan                        
+            infra_env: ha               
             omnileads_ha: true
             netaddr: 172.16.101.0/16
             netprefix: 24
@@ -174,7 +174,6 @@ all:
     # --- "cloud" instance (access through public IP)
     # --- "lan" instance (access through private IP)
     # --- "nat" instance (access through Public NAT IP)    
-    # --- "ha" instance (access through Virtual cluster IP)    
     # --- or "all" in order to access through all NICs
     infra_env: cloud
     # --- If you have an DNS FQDN resolution, you must to uncomment and set this param
