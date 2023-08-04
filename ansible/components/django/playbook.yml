@@ -58,16 +58,16 @@
     tags:
       - install
       - upgrade
-    when: enterprise_edition == false
+ #   when: enterprise_edition == false
 
-  - name: DJANGO Enterprise Pull image
-    command: podman pull --quiet {{ img_repo }}:{{ omnileads_version }}-enterprise
-    register: podman_pull
-    until: podman_pull is success
-    tags:
-      - install
-      - upgrade
-    when: enterprise_edition == true
+  # - name: DJANGO Enterprise Pull image
+  #   command: podman pull --quiet {{ img_repo }}:{{ omnileads_version }}-enterprise
+  #   register: podman_pull
+  #   until: podman_pull is success
+  #   tags:
+  #     - install
+  #     - upgrade
+  #   when: enterprise_edition == true
 
   - name: POSTGRESQL Create a new database with name {{ postgres_database }}
     postgresql_db:

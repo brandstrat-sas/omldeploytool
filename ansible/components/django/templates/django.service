@@ -27,7 +27,7 @@ ExecStart=/usr/bin/podman run \
 --volume=/etc/omnileads/uwsgi.ini:/opt/omnileads/run/oml_uwsgi.ini \
 {% endif %}
 --rm  \
-{% if enterprise_edition == true %}
+{% if enterprise_edition == true or omlapp_repo != omnileads %}
 {{ container_image_registry }}/{{ omlapp_repo }}/omlapp:{{ omnileads_version }}-enterprise
 {% else %}
 {{ container_image_registry }}/{{ omlapp_repo }}/omlapp:{{ omnileads_version }}
