@@ -21,8 +21,8 @@ No removals in this release.
 
 ```
     omnileads_version: 1.29.0
-    asterisk_version: oml-305.02
-    fastagi_version: oml-305
+    asterisk_version: oml-305.03
+    fastagi_version: oml-305.01
     nginx_version: 230215.01
     websockets_version: 230204.01
     kamailio_version: 230204.01

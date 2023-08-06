@@ -84,7 +84,7 @@
       lineinfile:
         path: '{{ pg_lib_location }}/postgresql.conf'
         regexp: "^timezone ="
-        line: "timezone = 'UTC'"
+        line: "timezone = '{{ TZ }}'"
         state: present
       when: omnileads_ha is defined
 
