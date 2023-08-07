@@ -54,22 +54,6 @@ all:
           ansible_host: 172.16.101.109
           omni_ip_lan: 172.16.101.109
           infra_env: lan          
-        tenant_example_7_A:
-          tenant_id: tenant_example_7_A
-          ansible_host: 172.16.101.110
-          omni_ip_lan: 172.16.101.110
-          omnileads_ha: true
-          ha_rol: main
-          postgres_host: 172.16.101.201
-          postgres_ro_vip: 172.16.101.202
-        tenant_example_7_B:
-          tenant_id: tenant_example_7_B
-          ansible_host: 190.19.11.2
-          omni_ip_lan: 10.10.10.2    
-          omnileads_ha: true
-          ha_rol: backup
-          postgres_host: 172.16.101.201
-          postgres_ro_vip: 172.16.101.202
     # -----------------------------------------
     # -----------------------------------------
     cluster_instances:
