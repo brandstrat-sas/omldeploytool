@@ -124,6 +124,5 @@
       - ha_rol == "main"
       - upgrade_from_oml_1 is not defined 
       - restore_file_timestamp is not defined
-      - postgres_out == true
 
   
