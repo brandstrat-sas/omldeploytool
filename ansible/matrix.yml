@@ -41,6 +41,7 @@
   when: 
     - inventory_hostname in groups['omnileads_data'] or inventory_hostname in groups['omnileads_aio']    
     - postgres_out == false
+    - omnileads_ha is not defined
 
 
 - import_playbook: components/postgresql/playbook_ha.yml

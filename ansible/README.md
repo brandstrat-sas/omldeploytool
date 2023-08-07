@@ -395,9 +395,9 @@ Then you should work on the inventory.yml tenant file.
             postgres_2: 172.16.101.102
             aio_1: 172.16.101.109
             aio_2: 172.16.101.110
-            aio_vip: 172.16.101.200
+            omnileads_vip: 172.16.101.200
             postgres_host: 172.16.101.201
-            postgres_ro_host: 172.16.101.202
+            postgres_ro_vip: 172.16.101.202
             bucket_url: https://172.16.101.3:9000
             bucket_access_key: mYLcr7sx5vEbe7PO
             bucket_secret_key: v1Dl34Q29Bv6ruaWS7cUAEvSVfAtvGkR
@@ -425,12 +425,12 @@ These 2 parameters are used by the postgres cluster.
 
 These 4 parameters are used by the cluster managers keepalived and rempgr. to indicate the IP of the nodes.
 
-* aio_vip: 172.16.101.200
+* omnileads_vip: 172.16.101.200
 
 The Virtual IP used to https access.
 
 * postgres_host: 172.16.101.201
-* postgres_ro_host: 172.16.101.202
+* postgres_ro_vip: 172.16.101.202
 
 The virtual RW IP & RO IP for the cluster.
 

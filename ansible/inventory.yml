@@ -61,7 +61,7 @@ all:
           omnileads_ha: true
           ha_rol: main
           postgres_host: 172.16.101.201
-          postgres_ro_host: 172.16.101.202
+          postgres_ro_vip: 172.16.101.202
         tenant_example_7_B:
           tenant_id: tenant_example_7_B
           ansible_host: 190.19.11.2
@@ -69,7 +69,7 @@ all:
           omnileads_ha: true
           ha_rol: backup
           postgres_host: 172.16.101.201
-          postgres_ro_host: 172.16.101.202
+          postgres_ro_vip: 172.16.101.202
     # -----------------------------------------
     # -----------------------------------------
     cluster_instances:
@@ -122,37 +122,34 @@ all:
               ansible_host: 172.16.101.101
               omni_ip_lan: 172.16.101.101              
               ha_rol: main
-              ha_vip_nic: eth0
             tenant_example_7_sql_B:
               tenant_id: tenant_example_7_sql_B
               ansible_host: 172.16.101.102
               omni_ip_lan: 172.16.101.102
               ha_rol: backup
-              ha_vip_nic: eth0
             tenant_example_7_aio_A:
               tenant_id: tenant_example_7_aio_A
               ansible_host: 172.16.101.109
               omni_ip_lan: 172.16.101.109
               ha_rol: main
-              ha_vip_nic: ens18
             tenant_example_7_aio_B:
               tenant_id: tenant_example_7_aio_B
               ansible_host: 172.16.101.110
               omni_ip_lan: 172.16.101.110
-              ha_rol: backup
-              ha_vip_nic: ens18
+              ha_rol: backup              
           vars:            
-            infra_env: ha               
+            infra_env: lan
             omnileads_ha: true
             netaddr: 172.16.101.0/16
-            netprefix: 24
+            netprefix: 16
+            ha_vip_nic: ens18             
             postgres_1: 172.16.101.101
             postgres_2: 172.16.101.102
             aio_1: 172.16.101.109
             aio_2: 172.16.101.110
-            aio_vip: 172.16.101.200
-            postgres_host: 172.16.101.201
-            postgres_ro_host: 172.16.101.202
+            omnileads_vip: 172.16.101.200
+            postgres_rw_vip: 172.16.101.201
+            postgres_ro_vip: 172.16.101.202
             bucket_url: https://172.16.101.3:9000
             bucket_access_key: mYLcr7sx5vEbe7PO
             bucket_secret_key: v1Dl34Q29Bv6ruaWS7cUAEvSVfAtvGkR
@@ -253,7 +250,7 @@ all:
     # --- otherwise leave commented to deploy PostgreSQL on Application Host instance
     #postgres_host: 
     # --- Read Only connection host address (in case of RW/RO postgres cluster):
-    #postgres_ro_host: 
+    #postgres_ro_vip: 
     # --- if you have your own bucket (standalone host or cloud service) put here the URL
     # --- example VULTR: https://ewr1.vultrobjects.com
     # --- example Digital Ocean: https://sfo3.digitaloceanspaces.com

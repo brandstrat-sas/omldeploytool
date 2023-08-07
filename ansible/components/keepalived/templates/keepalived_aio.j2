@@ -22,7 +22,7 @@ vrrp_instance oml_aio {
       auth_pass 1111
    }
    virtual_ipaddress {
-      {{ aio_vip }}
+      {{ omnileads_vip }}
    }
    track_script {
       check_component
