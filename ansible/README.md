@@ -366,46 +366,48 @@ Then you should work on the inventory.yml tenant file.
               ansible_host: 172.16.101.101
               omni_ip_lan: 172.16.101.101              
               ha_rol: main
-              ha_vip_nic: eth0
             tenant_example_7_sql_B:
               tenant_id: tenant_example_7_sql_B
               ansible_host: 172.16.101.102
               omni_ip_lan: 172.16.101.102
               ha_rol: backup
-              ha_vip_nic: eth0
             tenant_example_7_aio_A:
               tenant_id: tenant_example_7_aio_A
               ansible_host: 172.16.101.109
               omni_ip_lan: 172.16.101.109
               ha_rol: main
-              ha_vip_nic: ens18
             tenant_example_7_aio_B:
               tenant_id: tenant_example_7_aio_B
               ansible_host: 172.16.101.110
               omni_ip_lan: 172.16.101.110
-              ha_rol: backup
-              ha_vip_nic: ens18
+              ha_rol: backup              
           vars:            
-            infra_env: lan                        
+            infra_env: lan
             omnileads_ha: true
-            postgres_host_ha: true
+            ha_vip_nic: ens18
             netaddr: 172.16.101.0/16
-            netprefix: 24
+            netprefix: 16
+            ha_vip_nic: ens18             
             postgres_1: 172.16.101.101
             postgres_2: 172.16.101.102
             aio_1: 172.16.101.109
             aio_2: 172.16.101.110
             omnileads_vip: 172.16.101.200
-            postgres_host: 172.16.101.201
+            postgres_rw_vip: 172.16.101.201
             postgres_ro_vip: 172.16.101.202
-            bucket_url: https://172.16.101.3:9000
-            bucket_access_key: mYLcr7sx5vEbe7PO
-            bucket_secret_key: v1Dl34Q29Bv6ruaWS7cUAEvSVfAtvGkR
+            bucket_url: https://172.16.101.100:9000
+            bucket_access_key: mYLcr7sdsahfaklsdx5vEbe7PO
+            bucket_secret_key: v1Dl34Q29Bv6ruaWSjkdhajskhdajks7cUAEvSVfAtvGkR
             bucket_name: tenant_example_7
 ```
+
 The parameter ansible_host refers to the IP or FQDN used to establish an SSH connection. The omni_ip_lan parameter refers to the private IP (LAN) that will be used when opening certain ports for components and when they connect with each other.
 
 The infra_env variable can be initialized as "lan" or "cloud", depending on whether the OMniLeads instance will be accessible via WAN access (IPADDR or FQDN) or via LAN access (IP or FQDN).
+
+* ha_vip_nic: 
+
+This parameter is used to assign the virtual IP
 
 In a high availability environment, we need to indicate to each cluster node its initial condition (ha_rol), and since the role of the node implies the assignment of a virtual IP address (ha_vip_nic), we also need to indicate the name of the NIC over which the VIP is going to be established.
 
@@ -429,7 +431,7 @@ These 4 parameters are used by the cluster managers keepalived and rempgr. to in
 
 The Virtual IP used to https access.
 
-* postgres_host: 172.16.101.201
+* postgres_rw_vip: 172.16.101.201
 * postgres_ro_vip: 172.16.101.202
 
 The virtual RW IP & RO IP for the cluster.
@@ -812,7 +814,7 @@ enterprise_edition: false
 omlapp_repo: omnileads
 ```
 
-### **Recovery Postgres main node**  :mag_right: <a name="">cluster_ha_recovery</a>
+# Recovery Postgres main node* <a name="">cluster_ha_recovery</a>
 
 When a Failover from Postgres Main to Postgres Backup occurs, then the Backup node takes the floating IP of the cluster and remains as the only RW/RO node with its corresponding IPs. 
 as the only RW/RO node with its corresponding IPs. 
