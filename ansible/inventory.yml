@@ -176,6 +176,7 @@ all:
     # --- *postgres* or *defaultdb* depend ...
     postgres_maintenance_db: postgres
     postgres_ssl: false
+    postgres_utc: false
     # --- If you have a PGSQL cluster you can activated cluster mode
     # --- in order to split INSERT (RW node) & QUERIES (RO node)
     postgres_ha: false
@@ -304,7 +305,6 @@ all:
 # -- The Ansible playbooks are applied on the hosts below declared and classified according to the       -- #
 # -- architecture of the instance on which they are deployed.                                            -- #
 #############################################################################################################
-
 omnileads_aio:
   hosts:
     tenant_example_1:
