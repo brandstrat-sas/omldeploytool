@@ -60,6 +60,10 @@
     - rtpengine_out == false
 
 
+- import_playbook: components/keepalived/playbook.yml
+  when: omnileads_ha is defined
+
+  
 - import_playbook: components/asterisk/playbook.yml
   when: 
     - inventory_hostname in groups['omnileads_voice'] or inventory_hostname in groups['omnileads_aio']
@@ -120,6 +124,3 @@
   when: 
     - loki_host is defined
     
-
-- import_playbook: components/keepalived/playbook.yml
-  when: omnileads_ha is defined
