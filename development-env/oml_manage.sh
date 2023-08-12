@@ -60,10 +60,10 @@ case $1 in
     echo "generate an ibound call through PSTN-Emulator container"
     docker exec -it oml-pstn-emulator sipp -sn uac 127.0.0.1:5060 -s stress -m 1 -r 1 -d 60000 -l 1
     ;;
-  --asterisk_CLI)
+  --asterisk_cli)
     docker exec -it oml-asterisk asterisk -rvvvv
     ;;
-  --asterisk_terminal)
+  --asterisk_bash)
     docker exec -it oml-asterisk bash
     ;;
   --asterisk_logs)

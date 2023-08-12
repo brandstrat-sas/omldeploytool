@@ -4,10 +4,11 @@
 ## Added
 
 * oml-307 - [ANSIBLE] Deploy HA onpremise scenary
+* oml-305 - [ANSIBLE] inventory.yml flag (postgres_utc), TZ or UTC mode
 
 ## Changed
 
-* oml-305 - Migrate from queue_log ARA to Fastagi python call logger
+* oml-305 - Migrate call logger logic from queue_log (ARA) to Fastagi call logger method
 
 ## Fixed
 
@@ -21,8 +22,8 @@ No removals in this release.
 
 ```
     omnileads_version: 1.29.0
-    asterisk_version: oml-305.03
-    fastagi_version: oml-305.01
+    asterisk_version: 230811.01
+    fastagi_version: 230811.02
     nginx_version: 230215.01
     websockets_version: 230204.01
     kamailio_version: 230204.01
