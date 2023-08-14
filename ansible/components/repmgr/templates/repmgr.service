@@ -1,5 +1,5 @@
 [Unit]
-Description=Podman kamailio.service
+Description=Podman container-oml-repmgr-server.service
 Documentation=man:podman-generate-systemd(1)
 Wants=network-online.target
 After=network-online.target
@@ -11,17 +11,17 @@ Restart=on-failure
 TimeoutStopSec=70
 ExecStartPre=/bin/rm -f %t/%n.ctr-id
 ExecStart=/usr/bin/podman run \
---cidfile=%t/%n.ctr-id \
---cgroups=no-conmon \
---rm \
---sdnotify=conmon \
---detach \
---replace \
---env-file=/etc/default/kamailio.env \
--v /etc/omnileads/certs:/etc/omnileads/certs \
---name=oml-kamailio-server \
---network=host \
-{{ container_image_registry }}/omnileads/kamailio:{{ kamailio_version }}
+  --cidfile=%t/%n.ctr-id \
+  --cgroups=no-conmon \
+  --sdnotify=conmon \
+  --replace \
+  --detach \
+  --network=host \
+  --env-file=/etc/default/repmgr.env \
+  --name=oml-repmgr-server \
+#  --volume=oml_repmgr:/data \
+  --rm \
+  docker.io/omnileads/repmgr:{{ repmgr_version }}
 ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
 ExecStopPost=/usr/bin/podman rm -f --ignore --cidfile=%t/%n.ctr-id
 Type=notify

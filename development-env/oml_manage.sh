@@ -60,10 +60,10 @@ case $1 in
     echo "generate an ibound call through PSTN-Emulator container"
     docker exec -it oml-pstn-emulator sipp -sn uac 127.0.0.1:5060 -s stress -m 1 -r 1 -d 60000 -l 1
     ;;
-  --asterisk_CLI)
+  --asterisk_cli)
     docker exec -it oml-asterisk asterisk -rvvvv
     ;;
-  --asterisk_terminal)
+  --asterisk_bash)
     docker exec -it oml-asterisk bash
     ;;
   --asterisk_logs)
@@ -75,15 +75,33 @@ case $1 in
   --django_logs)
     docker logs -f oml-django
     ;;
+  --django_bash)
+    docker exec -it oml-django bash
+    ;;  
+  --django_shell)
+    docker exec -it oml-django python3 manage.py shell
+    ;;    
+  --fastagi_bash)
+    docker exec -it oml-fastagi bash
+    ;;      
+  --fastagi_logs)
+    docker logs -f oml-fastagi
+    ;;
   --rtpengine_logs)
     docker logs -f oml-rtpengine
     ;;
+  --rtpengine_bash)
+    docker exec -it oml-rtpengine bash
+    ;;  
   --websockets_logs)
     docker logs -f oml-websockets
     ;;
   --rtpengine_conf)
     docker exec -it oml-rtpengine cat /etc/rtpengine.conf
     ;;
+  --pgsql_shell)
+    docker exec -it oml-django psql
+    ;;    
   --nginx_t)
     docker exec -it oml-nginx nginx -T
     ;;

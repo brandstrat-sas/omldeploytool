@@ -2,7 +2,7 @@
 
 HA_NIC={{ ha_vip_nic }}
 VIP_MAIN={{ postgres_host }}
-VIP_BACKUP={{ postgres_ro_host }}
+VIP_BACKUP={{ postgres_ro_vip }}
 
 export HA_NIC VIP_MAIN VIP_BACKUP
 
@@ -12,4 +12,4 @@ PGPORT={{ postgres_port }}
 PGUSER={{ postgres_user }}
 PGPASSWORD={{ postgres_password }}
 PGHOSTHA={{ postgres_ha }}
-PGHOSTRO={{ postgres_ro_host }}
+PGHOSTRO={{ postgres_ro_vip }}

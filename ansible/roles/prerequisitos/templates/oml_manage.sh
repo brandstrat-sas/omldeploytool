@@ -52,18 +52,33 @@ case $1 in
   --kamailio_logs)
     docker logs -f oml-kamailio-server
     ;;
-  --django_logs)
-    docker logs -f oml-django-server
+  --django_bash)
+    podman exec -it oml-django-server bash
+    ;;  
+  --django_shell)
+    docker exec -it oml-django-server python3 manage.py shell
+    ;;    
+  --fastagi_bash)
+    docker exec -it oml-fastagi-server bash
+    ;;      
+  --fastagi_logs)
+    docker logs -f oml-fastagi-server
     ;;
   --rtpengine_logs)
     docker logs -f oml-rtpengine-server
     ;;
-  --ws_logs)
+  --rtpengine_bash)
+    docker exec -it oml-rtpengine-server bash
+    ;;  
+  --websockets_logs)
     docker logs -f oml-websockets-server
     ;;
-  --redis_logs)
-    docker logs -f oml-redis-server
+  --rtpengine_conf)
+    docker exec -it oml-rtpengine-server cat /etc/rtpengine.conf
     ;;
+  --pgsql_shell)
+    docker exec -it oml-django-server psql
+    ;;    
   --sentinel_logs)
     docker logs -f oml-sentinel-server
     ;;
@@ -73,9 +88,6 @@ case $1 in
   --nginx_logs)
     docker logs -f oml-nginx-server
     ;;    
-  --rtpengine_conf)
-    docker exec -it oml-rtpengine-server cat /etc/rtpengine.conf
-    ;;
   --nginx_t)
     docker exec -it oml-nginx-server nginx -T
     ;;
@@ -87,10 +99,6 @@ case $1 in
   --init_env)
     echo "init Environment with some data"
     podman exec -it oml-django-server python3 /opt/omnileads/ominicontacto/manage.py inicializar_entorno
-    ;;
-  --init_env_devops)
-    echo "init Environment with some data"
-    podman exec -it oml-django-server python3 /opt/omnileads/ominicontacto/manage.py inicializar_entorno --qa-devops
     ;;
   --regenerar_asterisk)
     echo "regenerate redis asterisk data"
@@ -113,17 +121,17 @@ case $1 in
     ;;
   --show_bucket)
     podman exec -it oml-django-server aws --endpoint-url ${S3_ENDPOINT} s3 ls --recursive s3://${S3_BUCKET_NAME}
-    ;;
-  --asterisk_cli)
-    podman exec -it oml-asterisk-server asterisk -rvvvv
-    ;;
+    ;;  
   --psql)
     podman exec -it oml-django-server psql
     ;;
   --redis_cli)
     podman run -it --name oml-redis-cli docker.io/redis redis-cli -h $(cat /etc/default/django.env |grep REDIS | awk -F= '{print $2}')
     ;;
-  --asterisk_terminal)
+  --asterisk_cli)
+    podman exec -it oml-asterisk-server asterisk -rvvvv
+    ;;
+  --asterisk_bash)
     podman exec -it oml-asterisk-server bash
     ;;
   --asterisk_logs)
@@ -133,26 +141,29 @@ case $1 in
     podman logs -f oml-kamailio-server
     ;;
   --django_logs)
-    podman logs -f oml-django-server
+    podman logs -f oml-django-server 
+    ;;    
+  --django_bash)
+    podman exec -it oml-django-server bash
+    ;;  
+  --django_shell)
+    podman exec -it oml-django-server python3 manage.py shell
+    ;;    
+  --fastagi_bash)
+    podman exec -it oml-fastagi-server bash
+    ;;      
+  --fastagi_logs)
+    podman logs -f oml-fastagi-server
     ;;
   --rtpengine_logs)
     podman logs -f oml-rtpengine-server
     ;;
-  --ws_logs)
+  --rtpengine_bash)
+    podman exec -it oml-rtpengine-server bash
+    ;;  
+  --websockets_logs)
     podman logs -f oml-websockets-server
     ;;
-  --redis_logs)
-    podman logs -f oml-redis-server
-    ;;
-  --sentinel_logs)
-    podman logs -f oml-sentinel-server
-    ;;
-  --haproxy_logs)
-    podman logs -f oml-haproxy-server
-    ;;
-  --nginx_logs)
-    podman logs -f oml-nginx-server
-    ;;    
   --rtpengine_conf)
     podman exec -it oml-rtpengine-server cat /etc/rtpengine.conf
     ;;
@@ -169,21 +180,25 @@ OMniLeads cmd tool
 USAGE:
 ./manage.sh COMMAND
 
-  --reset_pass: reset admin password to admin admin (you should run on app_host)
-  --init_env: init some basic configs in order to test it (you should run on app_host)
-  --regenerar_asterisk: populate asterisk / redis config  (you should run on app_host)
-  --clean_redis: clean cache (you should run on data_host)
-  --asterisk_cli: launch asterisk CLI  (you should run on voice_host)
-  --redis_cli: launch redis CLI (you should run on app_host)
-  --psql: launch psql CLI (you should run on app_host) 
-  --asterisk_terminal: launch asterisk container bash shell (you should run on voice_host)
-  --asterisk_logs: show asterisk container logs (you should run on voice_host)
-  --kamailio_logs: show container logs (you should run on app_host)
-  --django_logs: show container logs (you should run on app_host)
-  --rtpengine_logs: show container logs (you should run on voice_host)
-  --websockets_logs: show container logs (you should run on app_host)
-  --nginx_t: print nginx container run config (you should run on app_host)
-  --generate_call: generate an ibound call from PSTN-Emulator container to OMniLeads ACD (you should run on app_host)
+  --reset_pass: reset admin password to admin admin 
+  --init_env: init some basic configs in order to test it
+  --regenerar_asterisk: populate asterisk / redis config 
+  --clean_redis: clean cache  
+  --redis_cli: launch redis CLI 
+  --psql: launch psql CLI 
+  --asterisk_cli: launch asterisk CLI 
+  --asterisk_bash: launch asterisk container bash shell 
+  --asterisk_logs: show asterisk container logs 
+  --kamailio_logs: show container logs 
+  --django_logs: show container logs 
+  --django_shell: init a django shell
+  --django_bash: init bash session on django container
+  --rtpengine_logs: show container logs
+  --rtpengine_bash: init bash session on
+  --rtpengine_config: show rtpengine config
+  --websockets_logs: show container logs 
+  --nginx_t: print nginx container run config 
+  --generate_call: generate an ibound call from PSTN-Emulator container to OMniLeads ACD 
 "
     shift
     exit 1

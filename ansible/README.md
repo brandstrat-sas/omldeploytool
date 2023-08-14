@@ -41,6 +41,7 @@ It is possible to group these containers on a single Linux instance or cluster t
 * [Subscriber tracking & TLS certs](#subscriber-traking)
 * [Deploy all in one (AIO) instance)](#aio-deploy)
 * [Deploy Cluster all in three (AIT) instance)](#ait-deploy)
+* [Deploy Onpremise Cluster HA)](#cluster-ha-deploy)
 * [OMniLeads Podman containers](#podman)
 * [Deploy with backend (Postgres y Object Storage) as cloud services](#cloud-deploy)
 * [Deploy High Availability on-premise instance](#onpremise-deploy)
@@ -53,6 +54,7 @@ It is possible to group these containers on a single Linux instance or cluster t
 * [Deploy a restore](#restore)
 * [Observability](#observability)
 * [Container image & tag customizations](#components_img)
+* [Cluster HA recovery tools](#cluster_ha_recovery)
 
 
 # Bash + Ansible 📋 <a name="bash-ansible"></a>
@@ -94,6 +96,9 @@ This tool is capable of deploying OMniLeads in two layouts:
 ![Diagrama deploy tool](./png/deploy-tool-tenant-ait.png)
 
 
+* OML  Cluster HA with Podman & Systemd:
+![Diagrama deploy tool](./png/deploy-tool-tenant-ha.png)
+
 The following is the generic version of inventory.yml file available in this repository.
 
 In the first section of the file you can list the different hosts grouped by tenant and by type of deployment (All in one or Cluster).
@@ -105,6 +110,10 @@ AIO instances:
 Cluster instances:
 
 ![inventory deploy 2 section](./png/inventory_cluster_section.png)
+
+Cluster HA instances:
+
+![inventory deploy 3 section](./png/inventory_cluster_ha_section.png)
 
 In the second section of the file you can parameterize the runtime variables. By default it affects ALL declared instances, unless the same variable is declared within the host or group specific variables section.
 
@@ -121,24 +130,31 @@ Then we have *omnileads_data*, *omnileads_voice*, *omnileads_app* where the inst
 omnileads_aio:
   hosts:
     #tenant_example_1:
+    #tenant_example_2:
     #tenant_example_3:
     #tenant_example_4:
-    #tenant_example_2:
+    #tenant_example_7_aio_A:
+    #tenant_example_7_aio_B:
 
+################################################    
 omnileads_data:
   hosts:
-    #tenant_example_5_data:
-    #tenant_example_6_data:
+    #tenant_example_5_data:  
     
 omnileads_voice:
   hosts:
     #tenant_example_5_voice:
-    #tenant_example_6_voice:
 
 omnileads_app:
   hosts:
     #tenant_example_5_app:
-    #tenant_example_6_app:
+
+################################################
+ha_omnileads_sql:
+  hosts:
+    #tenant_example_7_sql_A:
+    #tenant_example_7_sql_B:
+
 ```
 
 # Inventory file :office: <a name="subscriber-traking"></a>
@@ -327,6 +343,151 @@ Once the URL is available with the App returning the login view,  we can log in 
 ```
 oml_manage --reset_pass
 ```
+
+# Install on HA (Postgres & OML AIO) cluster instances. 🚀 <a name="ait-deploy"></a>
+
+You must have four Linux instances with Internet access and **your public key (ssh) available**, since
+Ansible needs to establish an SSH connection to deploy the actions.
+
+![Diagrama deploy cloud services](./png/deploy-tool-tenant-components-ha.png)
+
+
+Then you should work on the inventory.yml tenant file.
+
+```
+# -----------------------------------------
+# -----------------------------------------
+    ha_instances:
+      children:
+        tenant_example_7:
+          hosts:
+            tenant_example_7_sql_A:
+              tenant_id: tenant_example_7_sql_A
+              ansible_host: 172.16.101.101
+              omni_ip_lan: 172.16.101.101              
+              ha_rol: main
+            tenant_example_7_sql_B:
+              tenant_id: tenant_example_7_sql_B
+              ansible_host: 172.16.101.102
+              omni_ip_lan: 172.16.101.102
+              ha_rol: backup
+            tenant_example_7_aio_A:
+              tenant_id: tenant_example_7_aio_A
+              ansible_host: 172.16.101.109
+              omni_ip_lan: 172.16.101.109
+              ha_rol: main
+            tenant_example_7_aio_B:
+              tenant_id: tenant_example_7_aio_B
+              ansible_host: 172.16.101.110
+              omni_ip_lan: 172.16.101.110
+              ha_rol: backup              
+          vars:            
+            infra_env: lan
+            omnileads_ha: true
+            ha_vip_nic: ens18
+            netaddr: 172.16.101.0/16
+            netprefix: 16
+            ha_vip_nic: ens18             
+            postgres_1: 172.16.101.101
+            postgres_2: 172.16.101.102
+            aio_1: 172.16.101.109
+            aio_2: 172.16.101.110
+            omnileads_vip: 172.16.101.200
+            postgres_rw_vip: 172.16.101.201
+            postgres_ro_vip: 172.16.101.202
+            bucket_url: https://172.16.101.100:9000
+            bucket_access_key: mYLcr7sdsahfaklsdx5vEbe7PO
+            bucket_secret_key: v1Dl34Q29Bv6ruaWSjkdhajskhdajks7cUAEvSVfAtvGkR
+            bucket_name: tenant_example_7
+```
+
+The parameter ansible_host refers to the IP or FQDN used to establish an SSH connection. The omni_ip_lan parameter refers to the private IP (LAN) that will be used when opening certain ports for components and when they connect with each other.
+
+The infra_env variable can be initialized as "lan" or "cloud", depending on whether the OMniLeads instance will be accessible via WAN access (IPADDR or FQDN) or via LAN access (IP or FQDN).
+
+* ha_vip_nic: 
+
+This parameter is used to assign the virtual IP
+
+In a high availability environment, we need to indicate to each cluster node its initial condition (ha_rol), and since the role of the node implies the assignment of a virtual IP address (ha_vip_nic), we also need to indicate the name of the NIC over which the VIP is going to be established.
+
+* omnileads_ha: true
+
+This parameter is used to instruct Ansible to launch certain tasks inherent to the HA configuration.
+
+* netaddr: 172.16.101.0/16
+* netprefix: 24
+
+These 2 parameters are used by the postgres cluster. 
+
+* postgres_1: 172.16.101.101
+* postgres_2: 172.16.101.102
+* aio_1: 172.16.101.109
+* aio_2: 172.16.101.110
+
+These 4 parameters are used by the cluster managers keepalived and rempgr. to indicate the IP of the nodes.
+
+* omnileads_vip: 172.16.101.200
+
+The Virtual IP used to https access.
+
+* postgres_rw_vip: 172.16.101.201
+* postgres_ro_vip: 172.16.101.202
+
+The virtual RW IP & RO IP for the cluster.
+
+* bucket_url: https://172.16.101.3:9000
+
+The external bucket URL.
+
+The rest of the parameters can be customized as desired.
+
+Finally in the last section of the file, we must make sure that our tenant is listed in the omnileads_aio hosts group.
+
+```
+omnileads_aio:
+  hosts:
+    #tenant_example_1:
+    #tenant_example_2:
+    #tenant_example_3:
+    #tenant_example_4:
+    tenant_example_7_aio_A:
+    tenant_example_7_aio_B:
+
+################################################    
+omnileads_data:
+  hosts:
+    #tenant_example_5_data:  
+    
+omnileads_voice:
+  hosts:
+    #tenant_example_5_voice:
+
+omnileads_app:
+  hosts:
+    #tenant_example_5_app:
+
+################################################
+ha_omnileads_sql:
+  hosts:
+    tenant_example_7_sql_A:
+    tenant_example_7_sql_B:
+```
+
+it can be seen that at host grouping level, we have the 4 hosts that conform the HA cluster distributed in the groups: ha_omnileads_sql and omnileads_aio instances group.
+
+```
+./deploy.sh --action=install --tenant=tenant_name_folder
+```
+
+On OML App linux terminal, you must run reset_pass in order to perform a first login in the App.
+
+Once the URL is available with the App returning the login view,  we can log in with the user *admin*, password *admin*.
+
+```
+oml_manage --reset_pass
+```
+
 
 ## Systemd & Podman 🔧 <a name="podman-systemd"></a>
 
@@ -651,6 +812,40 @@ enterprise_edition: false
 # --- Docker Registry repository
 # --- If you are going to use another registry for the images, you must indicate here
 omlapp_repo: omnileads
+```
+
+# Recovery Postgres main node* <a name="">cluster_ha_recovery</a>
+
+When a Failover from Postgres Main to Postgres Backup occurs, then the Backup node takes the floating IP of the cluster and remains as the only RW/RO node with its corresponding IPs. 
+as the only RW/RO node with its corresponding IPs. 
+
+To return Postgres to the initial state two actions must be carried out:
+
+```
+./deploy.sh --action=pgsql_node_recovery_main --tenant=tenant_name_folder
+```
+
+This command is in charge of rejoining the Postgres Main node to the cluster. But if we only execute this action then 
+the Cluster will be inverted, i.e. Postgres B as main and Postgres A as backup.
+
+### **Takeover Postgres main node**
+
+
+This command implies that a Recovery has been previously executed as described in the previous step.
+
+```
+./deploy.sh --action=pgsql_node_takeover_main --tenant=tenant_name_folder
+```
+
+After the execution of the takeover we will have the cluster in the initial state, i.e. Postgres A as Main and Postgres B as backup.
+
+### **Recovery Postgres backup node**
+
+When the VM hosting the Postgres Backup node shuts down, the Main node takes the floating RO IP of the cluster and remains as the only RW/RO node with its corresponding IPs. as the only RW/RO node with its corresponding IPs. To rejoin the backup node to the cluster and in this way recover the RO's VIP, it is necessary to run a
+the RO VIP, a recovery deploy of the postgres backup node must be executed.
+
+```
+./deploy.sh --action=pgsql_node_recovery_backup --tenant=tenant_name_folder
 ```
 
 # License & Copyright

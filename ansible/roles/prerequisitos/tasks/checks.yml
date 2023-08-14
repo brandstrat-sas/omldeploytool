@@ -90,7 +90,7 @@
     - upgrade
 
 # Set dialer_host as localhost on App instance when dialer_host is not explicitly defined
-- name: CHECKS Setmientrating dialer_host
+- name: CHECKS Set dialer_host as localhost on App instance when dialer_host is not explicitly defined
   set_fact:
     dialer_host: localhost    
   changed_when: false
@@ -110,6 +110,7 @@
   when:
     - postgres_host is not defined
     - inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_voice'] or inventory_hostname in groups['omnileads_data']
+    - omnileads_ha is not defined
   tags: 
     - install
     - upgrade
@@ -122,6 +123,20 @@
   when:
     - postgres_host is not defined
     - inventory_hostname in groups['omnileads_aio']
+    - omnileads_ha is not defined
+  tags: 
+    - install
+    - upgrade
+
+# Set postgres_host as RW on HA instance when postgres_host is not explicitly defined
+- name: CHECKS Setting postgres_host HA
+  set_fact:
+    postgres_host: "{{ postgres_rw_vip }}"
+  changed_when: false
+  when:
+    - postgres_host is not defined
+    - inventory_hostname in groups['omnileads_aio'] or inventory_hostname in groups['ha_omnileads_sql']
+    - omnileads_ha is defined
   tags: 
     - install
     - upgrade
@@ -307,6 +322,17 @@
     - install
     - upgrade
 
+# Set fastagi_out as true when fastagi_host is defined on inventory
+- name: CHECKS Setting fastagi_out true
+  set_fact:
+    fastagi_out: true
+  when:
+    - fastagi_host is defined
+    - inventory_hostname in groups['omnileads_aio'] or inventory_hostname in groups['omnileads_app']
+  tags: 
+    - install
+    - upgrade
+    
 # Set fastagi_host as {{ app_host }} on Asterisk instance when fastagi_host is not explicitly defined
 - name: CHECKS Setting fastagi_host as voice_host
   set_fact:

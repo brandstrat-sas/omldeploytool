@@ -35,8 +35,8 @@ failover='automatic'
 
 #connection_check_type=ping
 
-reconnect_attempts=3
-reconnect_interval=4
+reconnect_attempts=2
+reconnect_interval=3
 
 promote_command='/usr/pgsql-11/bin/repmgr standby promote -f /var/lib/pgsql/repmgr.conf'
 
