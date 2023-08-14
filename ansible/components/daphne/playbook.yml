@@ -27,6 +27,7 @@
   vars:
     img_repo: '{{ container_image_registry }}/{{ omlapp_repo }}/omlapp'
     INSTALL_PREFIX: "/opt/omnileads"
+    
 
   tasks:
 

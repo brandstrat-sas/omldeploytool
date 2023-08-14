@@ -6,6 +6,50 @@ scrape_configs:
 
 {% if inventory_hostname in groups['omnileads_aio'] %}
 
+{% if omnileads_ha is defined %}
+
+  - job_name: '{{ tenant_id }}_host'
+    static_configs:
+      - targets: ['localhost:9100']
+        labels:
+          tenant: '{{ tenant_id }}'
+          arq: 'ha'
+          component: 'aio_os'
+
+  - job_name: '{{ tenant_id }}_redis'
+    static_configs:
+      - targets: ['{{ omni_ip_lan }}:9121']
+        labels:
+          tenant: '{{ tenant_id }}'
+          arq: 'ha'
+          component: 'redis'
+
+  - job_name: '{{ tenant_id }}_asterisk'
+    static_configs:
+      - targets: ['localhost:7088']
+        labels:
+          tenant: '{{ tenant_id }}'
+          arq: 'ha'
+          component: 'asterisk'
+
+  - job_name: '{{ tenant_id }}_postgres_main_host'
+    static_configs:
+      - targets: ['{{ postgres_1 }}:9100']
+        labels:
+          tenant: '{{ tenant_id }}'
+          arq: 'ha'
+          component: 'postgres_ha_1'
+
+  - job_name: '{{ tenant_id }}_postgres_backup_host'
+    static_configs:
+      - targets: ['{{ postgres_2 }}:9100']
+        labels:
+          tenant: '{{ tenant_id }}'
+          arq: 'ha'
+          component: 'postgres_ha_2'        
+
+{% else %}
+
   - job_name: '{{ tenant_id }}_host'
     static_configs:
       - targets: ['localhost:9100']
@@ -36,7 +80,9 @@ scrape_configs:
         labels:
           tenant: '{{ tenant_id }}'
           arq: 'cluster'
-          component: 'postgres'        
+          component: 'postgres'  
+
+{% endif %}
 
 {% else %}
 

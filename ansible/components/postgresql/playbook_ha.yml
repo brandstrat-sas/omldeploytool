@@ -19,7 +19,7 @@
 ---
 
 - name: POSTGRES HA-Cluster CentOS7 installation and configuration
-  hosts: omnileads_data
+  hosts: ha_omnileads_sql
   tags:
     - all_components
     - postgres
@@ -76,7 +76,7 @@
         line: "listen_addresses = '{{ omni_ip_lan }}'"
         state: present
       when:
-        - postgres_host_ha is defined
+        - omnileads_ha is defined
         - omnileads_ha is not defined
 
     #Se modifica el timezone de postgres, para postgres interno no hace falta
@@ -84,9 +84,9 @@
       lineinfile:
         path: '{{ pg_lib_location }}/postgresql.conf'
         regexp: "^timezone ="
-        line: "timezone = 'UTC'"
+        line: "timezone = '{{ TZ }}'"
         state: present
-      when: postgres_host_ha is defined
+      when: omnileads_ha is defined
 
     #Se modifica el data_directory en el caso de usar algun NFS o volumen externo
     - name: Modify postgresql data directory
@@ -102,7 +102,7 @@
       template:
         src: templates/pg_hba.conf.j2
         dest: '{{ pg_lib_location }}/pg_hba.conf'
-      when: postgres_host_ha is not defined
+      when: omnileads_ha is not defined
 
     - name: Add line to pg_hba.conf host all omnileads subnet md5
       postgresql_pg_hba:
@@ -112,7 +112,7 @@
         source: '{{ netaddr }}'
         databases: all
         method: md5
-      when: postgres_host_ha is defined
+      when: omnileads_ha is defined
 
     - name: Add line to pg_hba.conf host all all 127.0.0.1 md5
       postgresql_pg_hba:
@@ -122,7 +122,7 @@
         source: 127.0.0.1/32
         databases: all
         method: md5
-      when: postgres_host_ha is defined
+      when: omnileads_ha is defined
 
     - name: Add line to pg_hba.conf host postgres all 127.0.0.1 trust
       postgresql_pg_hba:
@@ -132,7 +132,7 @@
         source: 127.0.0.1/32
         databases: all
         method: trust
-      when: postgres_host_ha is defined
+      when: omnileads_ha is defined
 
       # Restarteamos servicio
     - name: Restart postgres service HA
@@ -159,21 +159,6 @@
       when: 
         - upgrade_from_oml_1 is not defined
         - ha_rol == "main"
-
-    # - name: POSTGRESQL Adds plperl extension to the database {{ postgres_database }}
-    #   postgresql_ext:
-    #     name: plperl
-    #     db: "{{ postgres_database }}"
-    #     login_host: "{{ omni_ip_lan }}"
-    #     login_password: "{{ postgres_password }}"
-    #     login_user: "{{ postgres_user }}"
-    #     port: "{{ postgres_port }}"
-    #   tags:
-    #     - install
-    #   when: 
-    #     - upgrade_from_oml_1 is not defined
-    #     - ha_rol == "main"
-    
 
     - name: POSTGRES HA Create postgres SSH directory
       file:
@@ -298,7 +283,7 @@
 
     - name: Copy omlpgsql-ha service
       copy:
-        src: systemd/omlpgsql-ha.service
+        src: templates/omlpgsql-ha.service
         dest: /etc/systemd/system
         owner: root
         group: root
@@ -307,7 +292,7 @@
 
     - name: Copy repmgr11.service
       copy:
-        src: systemd/repmgr11.service
+        src: templates/repmgr11.service
         dest: /etc/systemd/system
         owner: root
         group: root

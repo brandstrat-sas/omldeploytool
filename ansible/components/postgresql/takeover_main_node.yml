@@ -20,9 +20,9 @@
 ---
 
 - name: POSTGRES HA-Cluster Takeover Main Node
-  hosts: sql_2
+  hosts: ha_omnileads_sql #sql_1
   tags:
-    - pgsql_node_takeover_main  
+    - pgsql_node_takeover_main
 
   vars:
     repmgr_bin: /usr/local/bin/

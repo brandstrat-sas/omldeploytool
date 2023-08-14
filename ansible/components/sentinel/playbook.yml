@@ -20,8 +20,8 @@
 
 - name: REDIS OMniLeads Redis Sentinel component deploy
   hosts: 
-    - voice_1
-    - voice_2
+    - aio_1
+    - aio_2
     - app_2
     - haproxy_1
   tags:
