@@ -13,28 +13,30 @@ case $1 in
     ;;
   --clean_postgres_db)
     echo "echo drop all on PostgreSQL"
-    docker stop oml-postgres
+    docker stop oml-django
+    docker stop oml-django-cron
+    docker stop oml-asterisk
+    docker stop oml-fastagi
     docker stop oml-postgres
     docker rm oml-postgres
-    docker volume rm devenv_postgresql_persistent
-    docker-compose up -d --force-recreate --no-deps postgresql
-    docker-compose up -d --force-recreate --no-deps app
+    docker volume rm oml_postgresql_persistent
+    docker-compose up -d 
     until curl -sk --head  --request GET https://localhost |grep "302" > /dev/null; do echo "Environment still initializing , sleeping 10 seconds"; sleep 10; done; echo "Environment is up"
     docker exec -it oml-django python3 /opt/omnileads/ominicontacto/manage.py cambiar_admin_password
-    docker exec -it oml-django python3 /opt/omnileads/ominicontacto/manage.py inicializar_entorno
+    #docker exec -it oml-django python3 /opt/omnileads/ominicontacto/manage.py inicializar_entorno
     ;;
   --clean_redis)
     echo "echo drop all on REDIS"
     docker stop oml-redis
     docker rm oml-redis
-    docker volume rm devenv_redis_persistent
+    docker volume rm oml_redis_persistent
     docker-compose up -d --force-recreate --no-deps redis
     ;;
   --clean_bucket)
     echo "echo drop all on MINIO"
     docker stop oml-minio
     docker rm oml-minio
-    docker volume rm devenv_minio_persistent
+    docker volume rm oml_minio_persistent
     docker-compose up -d --force-recreate --no-deps minio
     echo "waiting for MINIO raiseup"
     sleep 10
