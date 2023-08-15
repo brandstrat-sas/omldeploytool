@@ -481,6 +481,25 @@ services:
     stop_grace_period: 1m30s
     tty: true
 
+  nginxcgi:
+    container_name: oml-nginx-cgi
+    hostname: nginxcgi
+    dns: 8.8.8.8
+    image: omnileads/nginxqa:latest
+    environment:
+      - PGHOST=${PGHOST}
+      - PGPASSWORD=${PGPASSWORD}
+      - PSTN_HOSTNAME=pbxemulator
+    networks: 
+      - omnileads
+    ports:
+      - 8081:8081
+    privileged: true
+    restart: on-failure
+    stdin_open: true
+    stop_grace_period: 1m30s
+    tty: true
+
 networks:
   omnileads:
     ipam:

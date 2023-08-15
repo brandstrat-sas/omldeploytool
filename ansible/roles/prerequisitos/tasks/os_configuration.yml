@@ -202,7 +202,19 @@
   tags: 
     - install
     - upgrade
-  when: docker_compose is not defined  
+  when: 
+    - inventory_hostname not in groups['ha_omnileads_sql']
+
+- name: OS_CONF Copy Prometheus CENTOS7 Node Exporter service
+  template:
+    src: "templates/prometheus_node_exporter_centos7.service"
+    dest: /etc/systemd/system/prometheus_node_exporter.service
+    mode: 0600
+  tags: 
+    - install
+    - upgrade
+  when: 
+    - inventory_hostname in groups['ha_omnileads_sql']
 
 - name: OS_CONF Copy Prometheus Node Exporter env
   template:
@@ -211,8 +223,7 @@
     mode: 0600
   tags: 
     - install
-    - upgrade
-  when: docker_compose is not defined  
+    - upgrade  
 
 - name: OS_CONF Enable and start systemd Prometheus Node Exporter service
   systemd:
@@ -224,7 +235,7 @@
     - install
     - upgrade
   when: 
-     - postgres_host_ha is not defined
+     #- inventory_hostname not in groups['ha_omnileads_sql']
      - redis_host_ha is not defined
      - docker_compose is not defined
 
@@ -236,4 +247,5 @@
   tags: 
     - install
     - upgrade
-  when: docker_compose is not defined
+  when: 
+    - inventory_hostname not in groups['ha_omnileads_sql']

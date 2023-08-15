@@ -47,17 +47,17 @@
         - install
         - upgrade
 
-    - name: KAMAILIO Copy kamailio.cfg Systemd file
-      template:
-        src: "{{ kamailio_repo_path }}templates/kamailio.cfg"
-        dest: /etc/omnileads/kamailio.cfg
-        mode: 664
-        owner: "{{ usuario }}"
-        group: "{{ usuario }}"
-      tags:
-        - install
-        - upgrade
-      when: omnileads_ha is defined  
+    # - name: KAMAILIO Copy kamailio.cfg Systemd file
+    #   template:
+    #     src: "{{ kamailio_repo_path }}templates/kamailio.cfg"
+    #     dest: /etc/omnileads/kamailio.cfg
+    #     mode: 664
+    #     owner: "{{ usuario }}"
+    #     group: "{{ usuario }}"
+    #   tags:
+    #     - install
+    #     - upgrade
+    #   when: omnileads_ha is defined
 
     - name: KAMAILIO Pull image
       command: podman pull --quiet {{ img_repo }}:{{ kamailio_version }}

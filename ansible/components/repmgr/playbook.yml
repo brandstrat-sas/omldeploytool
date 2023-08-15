@@ -2,7 +2,7 @@
 
 # This file is part of OMniLeads
 
-# This program is free software: you can redistribute it and/or modify
+# This program is free software: you can repmgrtribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
@@ -18,24 +18,23 @@
 
 ---
 
-- name: REDIS OMniLeads Redis component deploy
+- name: REPMGR OMniLeads repmgr component deploy
   hosts: 
     - omnileads_data
     - omnileads_aio
   tags:
     - all_components
-    - redis
+    - repmgr
     
   vars:
-    img_repo: '{{ container_image_registry }}/omnileads/redis'
-    img_repo_ha: '{{ container_image_registry }}/omnileads/redis'
-    img_prometheus_repo: 'docker.io/oliver006/redis_exporter:latest'
+    img_repo: '{{ container_image_registry }}/omnileads/repmgr'
+    img_repo_ha: '{{ container_image_registry }}/omnileads/repmgr'
   tasks:
 
-  - name: REDIS Set Redis environment variables for this installation
+  - name: REPMGR Set environment variables for this installation
     template:
-      src: "{{ redis_repo_path }}templates/redis.env"
-      dest: /etc/default/redis.env
+      src: "{{ repmgr_repo_path }}templates/repmgr.env"
+      dest: /etc/default/repmgr.env
       mode: 664
       owner: '{{ usuario }}'
       group: '{{ usuario }}'
@@ -43,36 +42,45 @@
       - install
       - upgrade
 
-  - name: REDIS Copy systemd service
+  - name: REPMGR Copy systemd service
     template:
-      src: "{{ redis_repo_path }}templates/redis.service"
-      dest: /etc/systemd/system/redis.service
+      src: "{{ repmgr_repo_path }}templates/repmgr.service"
+      dest: /etc/systemd/system/repmgr.service
     tags:
       - install
       - upgrade
-    #when: omnileads_ha is not defined  
+    when: omnileads_ha is not defined  
 
-  - name: REDIS Pull image
-    command: podman pull --quiet {{ img_repo }}:{{ redis_version }}
+  - name: REPMGR Copy systemd service
+    template:
+      src: "{{ repmgr_repo_path }}templates/repmgr_centos7.service"
+      dest: /etc/systemd/system/repmgr.service
+    tags:
+      - install
+      - upgrade
+    when: omnileads_ha is defined  
+
+  - name: REPMGR Pull image
+    command: podman pull --quiet {{ img_repo }}:{{ repmgr_version }}
     register: podman_pull
     until: podman_pull is success
     tags:
       - install
       - upgrade
-    #when: omnileads_ha is not defined   
+    when: omnileads_ha is not defined   
 
-  - name: REDIS Pull image
-    command: podman pull --quiet {{ img_repo_ha }}:{{ redis_ha_version }}
+  - name: REPMGR Pull image
+    command: podman pull --quiet {{ img_repo_ha }}:{{ repmgr_ha_version }}
     register: podman_pull
     until: podman_pull is success
     tags:
       - install
       - upgrade
-    #when: omnileads_ha is defined 
+    when: omnileads_ha is defined 
 
-  - name: REDIS Enable and start service
+  - name: REPMGR Enable and start service
     systemd:
-      name: redis.service
+      name: repmgr.service
       state: restarted
       enabled: yes
       daemon_reload: yes
@@ -81,10 +89,10 @@
       - upgrade
 
 ############################## PROMETHEUS ###################################
-  - name: REDIS prometheus Set environment variables for this installation
+  - name: REPMGR prometheus Set environment variables for this installation
     template:
-      src: "{{ redis_repo_path }}templates/prometheus.env"
-      dest: /etc/default/prometheus_redis.env
+      src: "{{ repmgr_repo_path }}templates/prometheus.env"
+      dest: /etc/default/prometheus_repmgr.env
       mode: 664
       owner: "{{ usuario }}"
       group: "{{ usuario }}"
@@ -92,15 +100,15 @@
       - install
       - upgrade
 
-  - name: REDIS prometheus Copy systemd file
+  - name: REPMGR prometheus Copy systemd file
     template:
-      src: "{{ redis_repo_path }}templates/prometheus.service"
-      dest: /etc/systemd/system/prometheus_redis.service
+      src: "{{ repmgr_repo_path }}templates/prometheus.service"
+      dest: /etc/systemd/system/prometheus_repmgr.service
     tags:
       - install
       - upgrade
 
-  - name: REDIS prometheus Pull image
+  - name: REPMGR prometheus Pull image
     command: podman pull --quiet {{ img_prometheus_repo }}
     register: podman_pull
     until: podman_pull is success
@@ -108,9 +116,9 @@
       - install
       - upgrade
 
-  - name: REDIS prometheus Enable and start service
+  - name: REPMGR prometheus Enable and start service
     systemd:
-      name: prometheus_redis.service
+      name: prometheus_repmgr.service
       state: restarted
       enabled: yes
       daemon_reload: yes

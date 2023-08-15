@@ -137,18 +137,19 @@ services:
     image: ${OMLFASTAGI_IMG}
     container_name: oml-fastagi
     environment:
+      - TZ=${TZ}
       - AMI_HOST=${ASTERISK_HOSTNAME}
       - AMI_USER=${AMI_USER}
       - AMI_PASSWD=${AMI_PASSWORD}
       - AMI_PORT=5038
-      - POSTGRES_HOST=${PGHOST}
-      - POSTGRES_PORT=${PGPORT}
-      - POSTGRES_DB=${PGDATABASE}
-      - POSTGRES_USER=${PGUSER}
-      - POSTGRES_PASSWORD=${PGPASSWORD}
+      - PGHOST=${PGHOST}
+      - PGPORT=${PGPORT}
+      - PGUSER=${PGUSER}
+      - PGDATABASE=${PGDATABASE}
+      - PGPASSWORD=${PGPASSWORD}
       - REDIS_HOSTNAME=${REDIS_HOSTNAME}
-    #volumes:
-    #  - ${REPO_PATH}/omlfastagi/server:/fastagi/server
+    volumes:
+      - ${REPO_PATH}/omlfastagi/server:/fastagi/server
     restart: on-failure
     networks:
       - omnileads  
@@ -170,9 +171,9 @@ services:
   #     - omnileads  
     
   acd:
-    build:
-      target: run
-      context: ${REPO_PATH}/omlacd
+    #build:
+    #  target: run
+    #  context: ${REPO_PATH}/omlacd
     container_name: oml-asterisk
     depends_on:
       - postgresql
@@ -215,8 +216,7 @@ services:
     volumes:
       - ./ast_custom_conf:/etc/asterisk/custom
       - ${REPO_PATH}/omlacd/source/astconf:/etc/asterisk/
-      - ${REPO_PATH}/omlacd/source/agis:/var/lib/asterisk/agi-bin/
-      - ${REPO_PATH}/omlacd/source/scripts:/etc/asterisk/virtualenv/scripts
+      - ${REPO_PATH}/omlacd/source/scripts:/opt/asterisk/scripts
     working_dir: /etc/asterisk
 
   kamailio:
@@ -416,11 +416,11 @@ services:
     tty: true
     container_name: oml-minio
     image: ${OMLMINIO_IMG}
-    command: server --console-address "localhost:9001" /data
+    command: server /data --console-address ":9001"
     environment:
       - MINIO_ROOT_USER=${S3_HTTP_ADMIN_USER}
       - MINIO_ROOT_PASSWORD=${S3_HTTP_ADMIN_PASS}
-      - MINIO_SERVER_URL=${S3_ENDPOINT}
+      #- MINIO_SERVER_URL=${S3_ENDPOINT}
       - MINIO_PROMETHEUS_AUTH_TYPE="public"
     networks:
       - omnileads
@@ -429,12 +429,30 @@ services:
       - 9000:9000
     volumes:
       - minio_persistent:/data
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
-      interval: 30s
-      timeout: 20s
-      retries: 3
+    # healthcheck:
+    #   test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+    #   interval: 30s
+    #   timeout: 20s
+    #   retries: 3
 
+  createbuckets:  
+    tty: true
+    image: minio/mc
+    container_name: oml-initminio
+    depends_on:
+      - minio
+    networks:
+      - omnileads
+    entrypoint: >
+      /bin/sh -c "
+      /usr/bin/mc config host rm local;
+      /usr/bin/mc config host add --quiet --api s3v4 local http://minio:9000 minio s3minio123;
+      /usr/bin/mc mb --quiet local/omnileads/;
+      /usr/bin/mc admin user add local omlminio s3omnileads123;
+      /usr/bin/mc admin policy attach local readwrite --user omlminio;
+      exit 0;
+      "
+      
   pbxemulator:
     container_name: oml-pstn-emulator
     hostname: pbxemulator

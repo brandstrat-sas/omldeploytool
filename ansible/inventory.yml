@@ -51,10 +51,9 @@ all:
           bucket_name: tenant_example_3
         tenant_example_4:          
           tenant_id: tenant_example_4
-          ansible_host: 190.19.150.19
-          omni_ip_lan: 172.16.101.45
-          infra_env: lan
-      vars:
+          ansible_host: 172.16.101.109
+          omni_ip_lan: 172.16.101.109
+          infra_env: lan          
     # -----------------------------------------
     # -----------------------------------------
     cluster_instances:
@@ -96,6 +95,49 @@ all:
             voice_host: 192.168.0.3
             application_host: 192.168.0.4
             infra_env: cloud
+    # -----------------------------------------
+    # -----------------------------------------              
+    ha_instances:
+      children:
+        tenant_example_7:
+          hosts:
+            tenant_example_7_sql_A:
+              tenant_id: tenant_example_7_sql_A
+              ansible_host: 172.16.101.101
+              omni_ip_lan: 172.16.101.101              
+              ha_rol: main
+            tenant_example_7_sql_B:
+              tenant_id: tenant_example_7_sql_B
+              ansible_host: 172.16.101.102
+              omni_ip_lan: 172.16.101.102
+              ha_rol: backup
+            tenant_example_7_aio_A:
+              tenant_id: tenant_example_7_aio_A
+              ansible_host: 172.16.101.109
+              omni_ip_lan: 172.16.101.109
+              ha_rol: main
+            tenant_example_7_aio_B:
+              tenant_id: tenant_example_7_aio_B
+              ansible_host: 172.16.101.110
+              omni_ip_lan: 172.16.101.110
+              ha_rol: backup              
+          vars:            
+            infra_env: lan
+            omnileads_ha: true
+            netaddr: 172.16.101.0/16
+            netprefix: 16
+            ha_vip_nic: ens18             
+            postgres_1: 172.16.101.101
+            postgres_2: 172.16.101.102
+            aio_1: 172.16.101.109
+            aio_2: 172.16.101.110
+            omnileads_vip: 172.16.101.200
+            postgres_rw_vip: 172.16.101.201
+            postgres_ro_vip: 172.16.101.202
+            bucket_url: https://172.16.101.3:9000
+            bucket_access_key: mYLcr7sx5vEbe7PO
+            bucket_secret_key: v1Dl34Q29Bv6ruaWS7cUAEvSVfAtvGkR
+            bucket_name: tenant_example_7
 ##################################################################################################################
 # -- OMniLeads Common Variables                                                                                  #
 ##################################################################################################################
@@ -134,6 +176,7 @@ all:
     # --- *postgres* or *defaultdb* depend ...
     postgres_maintenance_db: postgres
     postgres_ssl: false
+    postgres_utc: false
     # --- If you have a PGSQL cluster you can activated cluster mode
     # --- in order to split INSERT (RW node) & QUERIES (RO node)
     postgres_ha: false
@@ -145,6 +188,7 @@ all:
     bucket_access_key: Hghjkdghjkdhasjdasdsada
     bucket_secret_key: jknkjhkjh4523kjhcksjdhkjfdhKJHHKJGKJh786876876NBVJHB
     bucket_name: omnileads
+    #bucket_ssl_selfsigned: true
     # --- if your bucket doesn't need region, leave this value (us-east-1)
     bucket_region: us-east-1
     # --- Asterisk Manager Interface (AMI) user & password
@@ -191,7 +235,7 @@ all:
     # --- otherwise leave commented to deploy PostgreSQL on Application Host instance
     #postgres_host: 
     # --- Read Only connection host address (in case of RW/RO postgres cluster):
-    #postgres_ro_host: 
+    #postgres_ro_vip: 
     # --- if you have your own bucket (standalone host or cloud service) put here the URL
     # --- example VULTR: https://ewr1.vultrobjects.com
     # --- example Digital Ocean: https://sfo3.digitaloceanspaces.com
@@ -202,7 +246,7 @@ all:
     #rtpengine_host: 
 
     # --- Observability integrations with Loki & Homer
-    # --- Request by docker-compose & promtail:
+    # --- Request by promtail:
     #loki_host:
     # --- Request by Asterisk hep module:
     #homer_host:
@@ -229,8 +273,7 @@ all:
     # br_bucket_access_key: Hghjkdghjkdhasjdasdsada
     # br_bucket_secret_key: jknkjhkjh4523kjhcksjdhkjfdhKJHHKJGKJh786876876NBVJHB
     # --- Restore source object Storage SSL certs: custom or selfsigned
-    #restore_bucket_selfsigned_certs: true
-
+    
     # ------------------------------------------------------------------------------------------------ #
     # ---------------------------- Container IMG TAG customization ----------------------------------- #
     # ------------------------------------------------------------------------------------------------ #
@@ -239,15 +282,15 @@ all:
     # --- You can combine the versions as you like, also use your own TAGs, using the following TAG version variables
     
     omnileads_version: 1.29.0
-    asterisk_version: 230715.01
-    fastagi_version: 230703.01
+    asterisk_version: 230811.01
+    fastagi_version: 230811.02
     nginx_version: 230215.01    
     websockets_version: 230204.01    
-    kamailio_version: 230204.01    
+    kamailio_version: 230204.01
     rtpengine_version: 230606.01
     redis_version: 230704.01
     postgres_version: 230624.01
-    
+
     # --- Activate the OMniLeads Enterprise Edition - with "AAAA" licensed.
     # --- on the contrary you will deploy OMniLeads OSS Edition with GPLV3 licensed. 
     enterprise_edition: false
@@ -262,17 +305,19 @@ all:
 # -- The Ansible playbooks are applied on the hosts below declared and classified according to the       -- #
 # -- architecture of the instance on which they are deployed.                                            -- #
 #############################################################################################################
-
 omnileads_aio:
   hosts:
     tenant_example_1:
     #tenant_example_2:
     #tenant_example_3:
     #tenant_example_4:
+    #tenant_example_7_aio_A:
+    #tenant_example_7_aio_B:
 
+################################################    
 omnileads_data:
   hosts:
-    tenant_example_5_data:
+    tenant_example_5_data:  
     
 omnileads_voice:
   hosts:
@@ -281,3 +326,10 @@ omnileads_voice:
 omnileads_app:
   hosts:
     tenant_example_5_app:
+
+################################################
+ha_omnileads_sql:
+  hosts:
+    #tenant_example_7_sql_A:
+    #tenant_example_7_sql_B:
+    

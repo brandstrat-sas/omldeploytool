@@ -58,16 +58,16 @@
     tags:
       - install
       - upgrade
-    when: enterprise_edition == false
+ #   when: enterprise_edition == false
 
-  - name: DJANGO Enterprise Pull image
-    command: podman pull --quiet {{ img_repo }}:{{ omnileads_version }}-enterprise
-    register: podman_pull
-    until: podman_pull is success
-    tags:
-      - install
-      - upgrade
-    when: enterprise_edition == true
+  # - name: DJANGO Enterprise Pull image
+  #   command: podman pull --quiet {{ img_repo }}:{{ omnileads_version }}-enterprise
+  #   register: podman_pull
+  #   until: podman_pull is success
+  #   tags:
+  #     - install
+  #     - upgrade
+  #   when: enterprise_edition == true
 
   - name: POSTGRESQL Create a new database with name {{ postgres_database }}
     postgresql_db:
@@ -110,13 +110,19 @@
     tags:
       - install
     when: 
+      - omnileads_ha is not defined
       - upgrade_from_oml_1 is not defined 
       - restore_file_timestamp is not defined
       - postgres_out == true
 
-  # - name: Reset Admin Pass
-  #   shell: "oml_manage --reset_pass"
-  #   args:
-  #     executable: /bin/bash
-  #   tags:
-  #     - install
+  - name: POSTGRESQL Adds plperl extension to the database {{ postgres_database }}
+    shell: podman exec -it oml-django-server psql -U {{ postgres_user }} -d {{ postgres_database }} -c "CREATE EXTENSION IF NOT EXISTS plperl;" 
+    tags:
+      - install
+    when: 
+      - omnileads_ha is defined
+      - ha_rol == "main"
+      - upgrade_from_oml_1 is not defined 
+      - restore_file_timestamp is not defined
+
+  
