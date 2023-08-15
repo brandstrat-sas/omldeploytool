@@ -79,32 +79,8 @@
         - bucket_url is defined
         - bucket_ssl_selfsigned is defined    
     
-    - name: BACKUP upload asterisk backup to selfhosted BUCKET cluster
-      shell: "podman exec -it oml-asterisk-server aws --endpoint-url http://{{ data_host }}:9000 s3 sync {{ asterisk_location_conf }}/custom/ s3://{{ bucket_name }}/backup/asterisk/{{ file_timestamp }}/"
-      when:        
-        - inventory_hostname in groups['omnileads_voice']
-        - container_orchest == "systemd"
-        - bucket_url is not defined
-
-    - name: BACKUP upload asterisk backup to selfhosted BUCKET AIO
-      shell: "podman exec -it oml-asterisk-server aws --endpoint-url http://localhost:9000 --no-verify-ssl s3 sync {{ asterisk_location_conf }}/custom/ s3://{{ bucket_name }}/backup/asterisk/{{ file_timestamp }}/"
-      when:        
-        - inventory_hostname in groups['omnileads_aio']
-        - container_orchest == "systemd"
-        - bucket_url is not defined
-    
-    - name: BACKUP upload asterisk backup to external BUCKET
-      shell: "podman exec -it oml-asterisk-server aws --endpoint-url {{ bucket_url }} s3 sync {{ asterisk_location_conf }}/custom/ s3://{{ bucket_name }}/backup/asterisk/{{ file_timestamp }}/"
+    - name: BACKUP asterisk files
+      shell: "podman exec -it oml-asterisk-server /opt/asterisk/scripts/asterisk_backup.py {{ file_timestamp }}"
       when:        
         - inventory_hostname in groups['omnileads_voice'] or inventory_hostname in groups['omnileads_aio']
         - container_orchest == "systemd"
-        - bucket_url is defined
-        - bucket_ssl_selfsigned is not defined
-
-    - name: BACKUP upload asterisk backup to insecure SSL external BUCKET
-      shell: "podman exec -it oml-asterisk-server aws --endpoint-url {{ bucket_url }} --no-verify-ssl s3 sync {{ asterisk_location_conf }}/custom/ s3://{{ bucket_name }}/backup/asterisk/{{ file_timestamp }}/"
-      when:        
-        - inventory_hostname in groups['omnileads_aio'] or inventory_hostname in groups['omnileads_voice']
-        - container_orchest == "systemd"
-        - bucket_url is defined
-        - bucket_ssl_selfsigned is defined
