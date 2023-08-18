@@ -7,6 +7,27 @@
 
 ---
 
+# Index
+
+* [Bash + Ansible](#bash-ansible)
+* [Ansible + Inventory](#ansible-inventory)
+* [Bash Script deploy.sh](#bash-script-deploy)
+* [Subscriber tracking & TLS certs](#subscriber-traking)
+* [Deploy all in one (AIO) instance](#aio-deploy)
+* [Deploy Cluster all in three (AIT) instance](#ait-deploy)
+* [Deploy Onpremise Cluster HA](#cluster-ha-deploy)
+* [OMniLeads Podman containers](#podman-systemd)
+* [TLS Certs provisioning](#tls-cert-provisioning)
+* [Security](#security)
+* [Deploy an upgrade from CentOS7](#upgrade_from_centos7)
+* [Deploy an upgrade](#upgrades)
+* [Deploy a rollback](#rollback)
+* [Deploy a backup](#backups)
+* [Deploy a restore](#restore)
+* [Observability](#observability)
+* [Container image & tag customizations](#components_img)
+* [Cluster HA recovery tools](#cluster_ha_recovery)
+
 # OMniLeads automation your subscribers deploys with Ansible
 
 ```
@@ -24,7 +45,7 @@ It is possible to manage hundreds of OMniLeads instances with Ansible inventorie
 
 ![Diagrama deploy tool](./png/deploy-tool-ansible-deploy-instances-multiples.png)
 
-Then, for each running instance, a collection of components invoked as systemd services or docker-compose implement OMniLeads functionalities on the Linux instance (or set of instances).
+Then, for each running instance, a collection of components invoked as systemd services implement OMniLeads functionalities on the Linux instance (or set of instances).
 
 Each OMniLeads instance involves the following collection of components that are run on a container. 
 It is possible to group these containers on a single Linux instance or cluster them horizontally in a configuration.
@@ -33,33 +54,10 @@ It is possible to group these containers on a single Linux instance or cluster t
 
 ![Diagrama component Pods](./png/oml-pods.png)
 
-# Index
 
-* [Bash + Ansible](#bash-ansible)
-* [Ansible + Inventory](#ansible-inventory)
-* [Bash Script deploy.sh](#bash-script-deploy)
-* [Subscriber tracking & TLS certs](#subscriber-traking)
-* [Deploy all in one (AIO) instance)](#aio-deploy)
-* [Deploy Cluster all in three (AIT) instance)](#ait-deploy)
-* [Deploy Onpremise Cluster HA)](#cluster-ha-deploy)
-* [OMniLeads Podman containers](#podman)
-* [Deploy with backend (Postgres y Object Storage) as cloud services](#cloud-deploy)
-* [Deploy High Availability on-premise instance](#onpremise-deploy)
-* [TLS Certs provisioning](#tls-cert-provisioning)
-* [Security](#security)
-* [Deploy an upgrade from CentOS7](#upgrade_from_centos7)
-* [Deploy an upgrade](#upgrades)
-* [Deploy a rollback](#rollback)
-* [Deploy a backup](#backups)
-* [Deploy a restore](#restore)
-* [Observability](#observability)
-* [Container image & tag customizations](#components_img)
-* [Cluster HA recovery tools](#cluster_ha_recovery)
+## Bash + Ansible 📋 <a name="bash-ansible"></a>
 
-
-# Bash + Ansible 📋 <a name="bash-ansible"></a>
-
-An instance of OMniLeads is launched on a Linux server (using Systemd & Podman or docker-compose) by running a bash script (deploy.sh) along with its input parameters and a set of Ansible files (Playbooks + Templates) that are invoked by the script.
+An instance of OMniLeads is launched on a Linux server (using Systemd & Podman) by running a bash script (deploy.sh) along with its input parameters and a set of Ansible files (Playbooks + Templates) that are invoked by the script.
 
 ## Bash Script deploy.sh 📄 <a name="bash-script-deploy"></a>
 
@@ -86,17 +84,15 @@ for example:
 
 Ansible allows you to run a number of tasks on a set of hosts specified in your inventory file. Depending on the structure and variables of this file, OMniLeads instances based on docker or podman can be launched. 
 
-This tool is capable of deploying OMniLeads in two layouts: 
+This tool is capable of deploying OMniLeads in three layouts: 
 
-* OML All in One with Podman & Systemd:
+* **OML All in One with Podman & Systemd:**
 ![Diagrama deploy tool](./png/deploy-tool-tenant-aio.png)
 
-
-* OML  Cluster with Podman & Systemd:
+* **OML  Cluster with Podman & Systemd:**
 ![Diagrama deploy tool](./png/deploy-tool-tenant-ait.png)
 
-
-* OML  Cluster HA with Podman & Systemd:
+* **OML  Cluster HA with Podman & Systemd:**
 ![Diagrama deploy tool](./png/deploy-tool-tenant-ha.png)
 
 The following is the generic version of inventory.yml file available in this repository.
@@ -344,7 +340,7 @@ Once the URL is available with the App returning the login view,  we can log in 
 oml_manage --reset_pass
 ```
 
-# Install on HA (Postgres & OML AIO) cluster instances. 🚀 <a name="ait-deploy"></a>
+# Install on HA (Postgres & OML AIO) cluster instances. 🚀 <a name="cluster-ha-deploy"></a>
 
 You must have four Linux instances with Internet access and **your public key (ssh) available**, since
 Ansible needs to establish an SSH connection to deploy the actions.
@@ -744,7 +740,7 @@ Then the deploy.sh script must be called with the --upgrade parameter.
 ./deploy.sh --action=upgrade --tenant=tenant_name_folder
 ```
 
-# Restore :leftwards_arrow_with_hook: <a name="restore"></a>
+# Restore :clock9: <a name="restore"></a>
 
 
 You can proceed with a restore on a fresh installation as well as on a productive instance. 
@@ -760,7 +756,7 @@ Run restore deploy:
 ./deploy.sh --action=restore --tenant=digitalocean_deb
 ```
 
-# Observability :mag_right: <a name="observability"></a>
+# Observability :mag_right: :bar_chart: <a name="observability"></a>
 
 Inside each subscriber linux instance the deployer put some containers in order to not only be able to 
 to observe metrics at the operating system level but also to obtain specific metrics of components such as redis, postgres or asterisk, 
@@ -780,10 +776,11 @@ while Loki and Promtail implement the centralization of logs.
 Finally, you will be able to have an instance of Grafana and Prometheus that invoke this Prometheus deployed on tenat like data-source in order
 to them build dashboards, on the other hand Grafana must to invoke the Loki deployed on tenant like data-source for logs analisys.
 
-![Diagrama deploy tool zoom](./png/observability_MT.png)
+![Diagrama deploy tool zoom](./png/observability_MT.png).
 
+Centralized observability.
 
-# Use your own container images, container registry and omnileads enterprise <a name="components_img"></a>
+# Use your own container registry & images. OMniLeads-enterprise :office: <a name="components_img"></a>
 
 In the inventory file you can customize the tags of the images to display, as well as the registry from where to download them.
 
@@ -799,7 +796,7 @@ omnileads_version: 1.29.0
 asterisk_version: 230703.01
 fastagi_version: 230703.01
 nginx_version: 230215.01    
-websockets_version: 230204.01    
+websockets_version: 230204.01
 kamailio_version: 230204.01    
 rtpengine_version: 230606.01
 redis_version: 230704.01
@@ -814,7 +811,9 @@ enterprise_edition: false
 omlapp_repo: omnileads
 ```
 
-# Recovery Postgres main node* <a name="">cluster_ha_recovery</a>
+## Postgres Cluster actions :arrows_clockwise: <a name="cluster_ha_recovery"></a>
+
+### **Recovery Postgres main node**
 
 When a Failover from Postgres Main to Postgres Backup occurs, then the Backup node takes the floating IP of the cluster and remains as the only RW/RO node with its corresponding IPs. 
 as the only RW/RO node with its corresponding IPs. 
@@ -847,7 +846,3 @@ the RO VIP, a recovery deploy of the postgres backup node must be executed.
 ```
 ./deploy.sh --action=pgsql_node_recovery_backup --tenant=tenant_name_folder
 ```
-
-# License & Copyright
-
-This project is released under the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.

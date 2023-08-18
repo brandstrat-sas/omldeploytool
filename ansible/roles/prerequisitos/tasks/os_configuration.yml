@@ -148,7 +148,6 @@
     - install
     - upgrade
   when:
-    - certs == "custom"
     - cert_file_name is defined
 
 - name: OS_CONF Copy custom SSL key.pem
@@ -176,7 +175,6 @@
     - install
     - upgrade
   when:
-    - certs == "custom"
     - key_file_name is defined
 
 - name: OS_CONF Copy oml_manage script

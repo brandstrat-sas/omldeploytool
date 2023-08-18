@@ -13,6 +13,7 @@ services:
       - TZ=${TZ}
       - DJANGO_HOSTNAME=${DJANGO_HOSTNAME}
       - UWSGI_PORT=8099
+      - OML_BRANCH=${OMLAPP_IMG}
       - ASTERISK_HOSTNAME=${ASTERISK_HOSTNAME}
       - AMI_USER=${AMI_USER}
       - AMI_PASSWORD=${AMI_PASSWORD}
@@ -59,6 +60,7 @@ services:
       #- SURVEY_VERSION=develop
       #- WALLBOARD_VERSION=develop
       #- PREMIUM_REPORTS_VERSION=develop
+      #- WEBPHONE_CLIENT_VERSION=develop
     image: ${OMLAPP_IMG}
     networks:
       - omnileads
@@ -199,6 +201,7 @@ services:
     image: ${OMLFASTAGI_IMG}
     container_name: oml-fastagi
     environment:
+      - TZ=${TZ}
       - AMI_HOST=${ASTERISK_HOSTNAME}
       - AMI_USER=${AMI_USER}
       - AMI_PASSWD=${AMI_PASSWORD}
@@ -339,9 +342,10 @@ services:
     dns: 8.8.8.8
     environment:
       - TZ=${TZ}
+      - BIND_IP=0.0.0.0
     networks:
       - omnileads
-    image: ${OMLREDISGEARS_IMG}
+    image: ${OMLREDIS_IMG}
     privileged: true
     restart: on-failure
     stop_grace_period: 1m30s
@@ -480,6 +484,8 @@ services:
     stdin_open: true
     stop_grace_period: 1m30s
     tty: true
+
+
 
 networks:
   omnileads:

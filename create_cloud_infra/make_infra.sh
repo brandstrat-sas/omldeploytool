@@ -124,11 +124,11 @@ case $oml_cloud in
   do)
     case $oml_action in
       ubuntu)
-        img=ubuntu-22-04-x64
+        img=ubuntu-23-04-x64
         action=do-instance
       ;;
       debian)
-        img=debian-11-x64
+        img=debian-12-x64
         action=do-instance
       ;;
       rocky)
