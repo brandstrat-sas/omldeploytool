@@ -36,6 +36,7 @@ CX_SURVEY_REDIS2PGSQL_IMG=freetechsolutions/omlredis2pgsql:develop
 ################################
 TZ=America/Argentina/Cordoba
 
+
 #####################################################################################
 #  s3-minio is the default option and use the stack bucket                          #
 # s3 in order to use an external bucket service                                     #

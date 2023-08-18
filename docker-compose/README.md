@@ -85,6 +85,7 @@ The user-data.sh script can be used to deploy to a debian-based clean instance.
 For example:
 
 ```
+curl -o user-data.sh -L "https://gitlab.com/omnileads/omldeploytool/-/raw/main/docker-compose/user-data.sh" && chmod +x user-data.sh
 export NIC=eth0 ENV=lan && bash -x user-data.sh
 ```
 
