@@ -80,24 +80,24 @@ Below are the Firewall rules to be applied on All In One instance:
 
 >  Note: If working on a VPS with a public IP address, it is a mandatory requirement that it also has a network interface with the ability to associate a private IP address.
 
-The user-data.sh script can be used to deploy to a debian-based clean instance.
+The first_boot_installer.sh script can be used to deploy to a debian-based clean instance.
 
 For example:
 
 ```
-curl -o user-data.sh -L "https://gitlab.com/omnileads/omldeploytool/-/raw/main/docker-compose/user-data.sh" && chmod +x user-data.sh
+curl -o first_boot_installer.sh -L "https://gitlab.com/omnileads/omldeploytool/-/raw/main/docker-compose/first_boot_installer.sh" && chmod +x first_boot_installer.sh
 ```
 
 Without dialer:
 
 ```
-export NIC=eth0 ENV=lan && bash -x user-data.sh
+export NIC=eth0 ENV=lan && bash -x first_boot_installer.sh
 ```
 
 With dialer:
 
 ```
-export NIC=eth0 ENV=lan DIALER_HOST=X.X.X.X DIALER_USER=demo DIALER_PASS=demoadmin && bash -x user-data.sh
+export NIC=eth0 ENV=lan DIALER_HOST=X.X.X.X DIALER_USER=demo DIALER_PASS=demoadmin && bash -x first_boot_installer.sh
 ```
 
 You must to specify the private ipv4 NIC and scenario (ENV) we'll be working with, which will be cloud if we're working on a VPS (cloud), and lan if we're using an on-premise Virtual Machine (lan).
@@ -140,24 +140,24 @@ S3_ENDPOINT_MINIO=http://localhost:9000
 
 >  Note: If working on a VPS with a public IP address, it is a mandatory requirement that it also has a network interface with the ability to associate a private IP address.
 
-The user-data.sh script can be used to deploy to a debian-based clean instance.
+The first_boot_installer.sh script can be used to deploy to a debian-based clean instance.
 
 For example:
 
 ```
-curl -o user-data.sh -L "https://gitlab.com/omnileads/omldeploytool/-/raw/main/docker-compose/user-data.sh" && chmod +x user-data.sh
+curl -o first_boot_installer.sh -L "https://gitlab.com/omnileads/omldeploytool/-/raw/main/docker-compose/first_boot_installer.sh" && chmod +x first_boot_installer.sh
 ```
 
 Without dialer:
 
 ```
-export NIC=eth1 ENV=cloud BUCKET_URL=https://sfo1.digitaloceanspaces.com BUCKET_ACCESS_KEY=mbXUfdsjlh3424R9XY BUCKET_SECRET_KEY=iicHG76O+CIbRZ432iugdsa BUCKET_REGION=NULL BUCKET_NAME=curso-oml && bash -x user-data.sh
+export NIC=eth1 ENV=cloud BUCKET_URL=https://sfo1.digitaloceanspaces.com BUCKET_ACCESS_KEY=mbXUfdsjlh3424R9XY BUCKET_SECRET_KEY=iicHG76O+CIbRZ432iugdsa BUCKET_REGION=NULL BUCKET_NAME=curso-oml && bash -x first_boot_installer.sh
 ```
 
 With dialer:
 
 ```
-export NIC=eth1 ENV=cloud BUCKET_URL=https://sfo1.digitaloceanspaces.com BUCKET_ACCESS_KEY=mbXUfdsjlh3424R9XY BUCKET_SECRET_KEY=iicHG76O+CIbRZ432iugdsa BUCKET_REGION=NULL BUCKET_NAME=curso-oml DIALER_HOST=X.X.X.X DIALER_USER=demo DIALER_PASS=demoadmin && bash -x user-data.sh
+export NIC=eth1 ENV=cloud BUCKET_URL=https://sfo1.digitaloceanspaces.com BUCKET_ACCESS_KEY=mbXUfdsjlh3424R9XY BUCKET_SECRET_KEY=iicHG76O+CIbRZ432iugdsa BUCKET_REGION=NULL BUCKET_NAME=curso-oml DIALER_HOST=X.X.X.X DIALER_USER=demo DIALER_PASS=demoadmin && bash -x first_boot_installer.sh
 ```
 
 You must to specify the private ipv4 NIC and scenario (ENV) we'll be working with, which will be cloud if we're working on a VPS (cloud), and lan if we're using an on-premise Virtual Machine (lan).
