@@ -58,6 +58,7 @@ services:
       #- SURVEY_VERSION=develop
       #- WALLBOARD_VERSION=develop
       #- PREMIUM_REPORTS_VERSION=develop
+      #- WEBPHONE_CLIENT_VERSION=develop
     image: ${OMLAPP_IMG}
     network_mode: host
     privileged: true
