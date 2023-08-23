@@ -11,8 +11,8 @@ bucket_secret_key=${BUCKET_SECRET_KEY}
 bucket_region=${BUCKET_REGION}
 bucket_name=${BUCKET_NAME}
 dialer_host=${DIALER_HOST}
-dialer_user=demoadmin
-dialer_pass=demo
+dialer_user=${DIALER_USER}
+dialer_pass=${DIALER_PASS}
 
 PRIVATE_IPV4=$(ip addr show $oml_nic | grep "inet\b" | awk '{print $2}' | cut -d/ -f1)
 PUBLIC_IPV4=$(curl ifconfig.co)
