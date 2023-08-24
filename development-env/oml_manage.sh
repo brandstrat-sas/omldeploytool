@@ -13,6 +13,7 @@ case $1 in
     ;;
   --clean_postgres_db)
     echo "echo drop all on PostgreSQL"
+    docker stop oml-nginx
     docker stop oml-django
     docker stop oml-django-cron
     docker stop oml-asterisk

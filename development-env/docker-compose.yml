@@ -57,10 +57,10 @@ services:
       - OML_LOGGING_SLOWSQL_ENABLED=
       - OML_LOGGING_SLOWSQL_OUTPUT="-"
       - OML_LOGGING_SLOWSQL_DURATION=1
-      #- SURVEY_VERSION=develop
+      - SURVEY_VERSION=develop
       #- WALLBOARD_VERSION=develop
-      #- PREMIUM_REPORTS_VERSION=develop
-      #- WEBPHONE_CLIENT_VERSION=develop
+      - PREMIUM_REPORTS_VERSION=develop
+      - WEBPHONE_CLIENT_VERSION=develop
     image: ${OMLAPP_IMG}
     networks:
       - omnileads
@@ -73,9 +73,9 @@ services:
     volumes:      
       - django_callrec_zip:/opt/omnileads/asterisk/var/spool/asterisk/monitor
       - ${REPO_PATH}/omlapp/:/opt/omnileads/ominicontacto/
-      #- ${REPO_PATH}/survey_app/:/opt/omnileads/ominicontacto/survey_app
-      #- ${REPO_PATH}/wallboard_app/:/opt/omnileads/ominicontacto/wallboard_app
-      #- ${REPO_PATH}/premium_reports_app/:/opt/omnileads/ominicontacto/premium_reports_app
+      - ${REPO_PATH}/survey_app/:/opt/omnileads/ominicontacto/survey_app
+      - ${REPO_PATH}/wallboard_app/:/opt/omnileads/ominicontacto/wallboard_app
+      - ${REPO_PATH}/premium_reports_app/:/opt/omnileads/ominicontacto/premium_reports_app
       - ${REPO_PATH}/webphone_client_app/:/opt/omnileads/ominicontacto/webphone_client_app
 
   crones:
