@@ -8,7 +8,7 @@ COMPOSE_PROJECT_NAME=devenv
 #               Components image version                    #
 #############################################################
 
-OMLAPP_IMG=omnileads/omlapp:1.28.0
+OMLAPP_IMG=omnileads/omlapp:1.30.0
 OMLWS_IMG=omnileads/websockets:230204.01
 OMLPGSQL_IMG=omnileads/postgres:230204.01
 OMLACD_IMG=omnileads/asterisk:230606.01
