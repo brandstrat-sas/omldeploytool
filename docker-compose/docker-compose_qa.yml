@@ -340,6 +340,7 @@ services:
     dns: 8.8.8.8
     environment:
       - TZ=${TZ}
+      - BIND_IP=0.0.0.0
     networks:
       - omnileads
     image: ${OMLREDIS_IMG}
