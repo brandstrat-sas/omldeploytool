@@ -28,7 +28,7 @@ case $1 in
       docker stop oml-fastagi
       docker stop oml-postgres
       docker rm oml-postgres
-      docker volume rm oml_postgresql_persistent
+      docker volume rm oml_postgresql
       docker-compose up -d 
       until curl -sk --head  --request GET https://localhost |grep "302" > /dev/null; do echo "Environment still initializing , sleeping 10 seconds"; sleep 10; done; echo "Environment is up"
       docker exec -it oml-django python3 /opt/omnileads/ominicontacto/manage.py cambiar_admin_password
@@ -62,7 +62,7 @@ case $1 in
       echo "echo drop all on REDIS"
       docker stop oml-redis
       docker rm oml-redis
-      docker volume rm oml_redis_persistent
+      docker volume rm oml_redis
       docker-compose up -d --force-recreate --no-deps redis
     else
       echo "Cancel action"
@@ -138,7 +138,7 @@ NAME:
 OMniLeads docker-compose cmd tool
 
 USAGE:
-./manage.sh COMMAND
+./oml_manage.sh COMMAND
 
 --reset_pass: reset admin password to admin admin
 --init_env: init some basic configs in order to test it

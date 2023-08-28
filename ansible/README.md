@@ -94,9 +94,6 @@ This tool is capable of deploying OMniLeads in three layouts:
 * **OML  Cluster HA with Podman & Systemd:**
 ![Diagrama deploy tool](./png/deploy-tool-tenant-ha.png)
 
-* OML  Cluster HA with Podman & Systemd:
-![Diagrama deploy tool](./png/deploy-tool-tenant-ha.png)
-
 The following is the generic version of inventory.yml file available in this repository.
 
 In the first section of the file you can list the different hosts grouped by tenant and by type of deployment (All in one or Cluster).
