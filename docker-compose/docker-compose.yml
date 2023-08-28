@@ -228,6 +228,7 @@ services:
       - ENV=${ENV}
       - FASTAGI=${FASTAGI_HOSTNAME}
       - TZ=${TZ}
+      - UTC_LOGS=false
       - ASTERISK_LOCATION=
       - AMI_USER=${AMI_USER}
       - AMI_PASSWORD=${AMI_PASSWORD}
@@ -446,6 +447,15 @@ services:
     stop_grace_period: 1m30s
     volumes:
       - mariadb_data:/bitnami
+
+  # redis2pgsql:
+  #   tty: true
+  #   stdin_open: true
+  #   container_name: redis2pgsql
+  #   image: freetechsolutions/omlredis2pgsql:develop
+  #   env_file: .env
+  #   networks:
+  #     - omnileads
 
   wombat:
     command: >
