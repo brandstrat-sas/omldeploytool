@@ -1,9 +1,8 @@
 vagrant/debian/.vagrant
 vagrant/redhat/.vagrant
-development-env/omnileads-repos
-development-env/.env
+devenv/omnileads-repos
+devenv/.env
 docker-compose/.env
-docker-compose/instances
 ansible/instances
 ansible/.inventory.yml
 ansible/group_vars/aio_instances

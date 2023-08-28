@@ -76,7 +76,7 @@ case $1 in
   --rtpengine_conf)
     docker exec -it oml-rtpengine-server cat /etc/rtpengine.conf
     ;;
-  --pgsql_shell)
+  --pgsql)
     docker exec -it oml-django-server psql
     ;;    
   --sentinel_logs)
@@ -100,11 +100,15 @@ case $1 in
     echo "init Environment with some data"
     podman exec -it oml-django-server python3 /opt/omnileads/ominicontacto/manage.py inicializar_entorno
     ;;
-  --regenerar_asterisk)
+  --dialer_sync)
+    echo "regenerate redis asterisk data"
+    podman exec -it oml-django-server python3 /opt/omnileads/ominicontacto/manage.py sincronizar_wombat
+    ;;  
+  --redis_sync)
     echo "regenerate redis asterisk data"
     podman exec -it oml-django-server python3 /opt/omnileads/ominicontacto/manage.py regenerar_asterisk
     ;;
-  --clean_redis)
+  --redis_clean)
     echo "drop all on REDIS"
     systemctl stop oml-redis-server
     sleep 2
