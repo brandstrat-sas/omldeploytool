@@ -13,7 +13,6 @@ services:
       - TZ=${TZ}
       - DJANGO_HOSTNAME=${DJANGO_HOSTNAME}
       - UWSGI_PORT=8099
-      - OML_BRANCH=${OMLAPP_IMG}
       - ASTERISK_HOSTNAME=${ASTERISK_HOSTNAME}
       - AMI_USER=${AMI_USER}
       - AMI_PASSWORD=${AMI_PASSWORD}
@@ -48,7 +47,7 @@ services:
       - GOOGLE_MAPS_API_KEY=${GOOGLE_MAPS_API_KEY}
       - GOOGLE_MAPS_CENTER='${GOOGLE_MAPS_CENTER}'
       - EMAIL_BACKEND=django.core.mail.backends.dummy.EmailBackend
-      - OML_BRANCH=${OML_BRANCH}
+      - OML_BRANCH=${OMLAPP_IMG}
       - OML_COMMIT=${OML_COMMIT}
       - OML_BUILD_DATE=${OML_BUILD_DATE}
       - WOMBAT_HOSTNAME=${WOMBAT_HOSTNAME}
@@ -75,6 +74,8 @@ services:
       - django_callrec_zip:/opt/omnileads/asterisk/var/spool/asterisk/monitor
 
   channels:
+    depends_on:
+      - redis
     container_name: oml-django-channels
     dns: 8.8.8.8
     environment:
@@ -136,6 +137,11 @@ services:
     working_dir: /opt/omnileads/ominicontacto
 
   crones:
+    depends_on:
+      - postgresql
+      - acd 
+      - minio
+      - redis
     container_name: oml-django-cron
     dns: 8.8.8.8
     environment:
@@ -296,6 +302,7 @@ services:
       - app
       - kamailio
       - websockets
+      - channels
     dns: 8.8.8.8
     environment:
       - TZ=${TZ}
@@ -411,6 +418,8 @@ services:
       retries: 3
 
   createbuckets:  
+    depends_on:
+      - minio
     tty: true
     image: minio/mc
     container_name: oml-initminio
@@ -447,13 +456,12 @@ services:
     volumes:
       - mariadb_data:/bitnami
 
-  wombat:
+  wombat:  
     command: >
       bash -c "sed -i '/JDBC_URL/c\JDBC_URL=jdbc:mariadb:\/\/${MYSQL_HOST}\/${WOMBAT_DB}?user=${WOMBAT_DB_USER}&password=${WOMBAT_DB_PASS}&autoReconnect=true' /usr/local/tomcat/webapps/wombat/WEB-INF/tpf.properties && catalina.sh run"
     container_name: oml-wombat
     depends_on:
       - mariadb
-      - acd
     dns: 8.8.8.8
     environment:
       - TZ=${TZ}
@@ -485,8 +493,6 @@ services:
     stop_grace_period: 1m30s
     tty: true
 
-
-
 networks:
   omnileads:
     ipam:
@@ -501,4 +507,3 @@ volumes:
   django_static:
   django_callrec_zip:
   mariadb_data:
-
