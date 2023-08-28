@@ -76,7 +76,7 @@ case $1 in
   --rtpengine_conf)
     docker exec -it oml-rtpengine-server cat /etc/rtpengine.conf
     ;;
-  --pgsql_shell)
+  --pgsql)
     docker exec -it oml-django-server psql
     ;;    
   --sentinel_logs)
@@ -100,11 +100,15 @@ case $1 in
     echo "init Environment with some data"
     podman exec -it oml-django-server python3 /opt/omnileads/ominicontacto/manage.py inicializar_entorno
     ;;
-  --regenerar_asterisk)
+  --dialer_sync)
+    echo "regenerate redis asterisk data"
+    podman exec -it oml-django-server python3 /opt/omnileads/ominicontacto/manage.py sincronizar_wombat
+    ;;  
+  --redis_sync)
     echo "regenerate redis asterisk data"
     podman exec -it oml-django-server python3 /opt/omnileads/ominicontacto/manage.py regenerar_asterisk
     ;;
-  --clean_redis)
+  --redis_clean)
     echo "drop all on REDIS"
     systemctl stop oml-redis-server
     sleep 2
@@ -182,8 +186,8 @@ USAGE:
 
   --reset_pass: reset admin password to admin admin 
   --init_env: init some basic configs in order to test it
-  --regenerar_asterisk: populate asterisk / redis config 
-  --clean_redis: clean cache  
+  --redis_sync: populate django config redis
+  --redis_clean: clean cache  
   --redis_cli: launch redis CLI 
   --psql: launch psql CLI 
   --asterisk_cli: launch asterisk CLI 
@@ -198,7 +202,7 @@ USAGE:
   --rtpengine_config: show rtpengine config
   --websockets_logs: show container logs 
   --nginx_t: print nginx container run config 
-  --generate_call: generate an ibound call from PSTN-Emulator container to OMniLeads ACD 
+  --call_generate: generate an ibound call from PSTN-Emulator container to OMniLeads ACD 
 "
     shift
     exit 1

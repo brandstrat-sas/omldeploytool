@@ -1,9 +1,6 @@
-version: '3.8'
+version: '3.3'
 services:
   app:
-    build:
-      target: run
-      context: ${REPO_PATH}/omlapp
     container_name: oml-django
     depends_on:
       - postgresql
@@ -14,6 +11,8 @@ services:
     environment:
       - CRON_ENABLE=false
       - TZ=${TZ}
+      - DJANGO_HOSTNAME=${DJANGO_HOSTNAME}
+      - UWSGI_PORT=8099
       - ASTERISK_HOSTNAME=${ASTERISK_HOSTNAME}
       - AMI_USER=${AMI_USER}
       - AMI_PASSWORD=${AMI_PASSWORD}
@@ -51,15 +50,15 @@ services:
       - OML_BRANCH=${OML_BRANCH}
       - OML_COMMIT=${OML_COMMIT}
       - OML_BUILD_DATE=${OML_BUILD_DATE}
-      - WOMBAT_HOSTNAME=wombat
+      - WOMBAT_HOSTNAME=${WOMBAT_HOSTNAME}
       - WOMBAT_USER=${WOMBAT_USER}
       - WOMBAT_PASSWORD=${WOMBAT_PASSWORD}
       - OML_LOGGING_SLOWSQL_ENABLED=
       - OML_LOGGING_SLOWSQL_OUTPUT="-"
       - OML_LOGGING_SLOWSQL_DURATION=1
-      #- SURVEY_VERSION=develop
+      - SURVEY_VERSION=develop
       #- WALLBOARD_VERSION=develop
-      #- PREMIUM_REPORTS_VERSION=develop
+      - PREMIUM_REPORTS_VERSION=develop
       #- WEBPHONE_CLIENT_VERSION=develop
     image: ${OMLAPP_IMG}
     networks:
@@ -70,13 +69,70 @@ services:
     stop_grace_period: 1m30s
     tty: true
     working_dir: /opt/omnileads/ominicontacto
-    volumes:      
+    volumes:
+      - django_static:/opt/omnileads/static
       - django_callrec_zip:/opt/omnileads/asterisk/var/spool/asterisk/monitor
-      - ${REPO_PATH}/omlapp/:/opt/omnileads/ominicontacto/
-      - ${REPO_PATH}/survey_app/:/opt/omnileads/ominicontacto/survey_app
-      - ${REPO_PATH}/wallboard_app/:/opt/omnileads/ominicontacto/wallboard_app
-      - ${REPO_PATH}/premium_reports_app/:/opt/omnileads/ominicontacto/premium_reports_app
-      - ${REPO_PATH}/webphone_client_app/:/opt/omnileads/ominicontacto/webphone_client_app
+
+  channels:
+    container_name: oml-django-channels
+    dns: 8.8.8.8
+    environment:
+      - DAPHNE_ENABLE=True
+      - TZ=${TZ}
+      - DJANGO_HOSTNAME=${DJANGO_HOSTNAME}
+      - DAPHNE_PORT=8098
+      - ASTERISK_HOSTNAME=${ASTERISK_HOSTNAME}
+      - AMI_USER=${AMI_USER}
+      - AMI_PASSWORD=${AMI_PASSWORD}
+      - KAMAILIO_HOSTNAME=${KAMAILIO_HOSTNAME}
+      - PGHOST=${PGHOST}
+      - PGDATABASE=${PGDATABASE}
+      - PGPORT=${PGPORT}
+      - PGUSER=${PGUSER}
+      - PGPASSWORD=${PGPASSWORD}
+      - PGHOSTHA=${PGHOSTHA}
+      - PGHOSTRO=${PGHOSTRO}
+      - REDIS_HOSTNAME=${REDIS_HOSTNAME}
+      - WEBSOCKET_HOST=${WEBSOCKET_HOSTNAME}
+      - WEBSOCKET_PORT=${WEBSOCKET_PORT}
+      - CALIFICACION_REAGENDA=${CALIFICACION_REAGENDA}
+      - DJANGO_SETTINGS_MODULE=${DJANGO_SETTINGS_MODULE}
+      - EPHEMERAL_USER_TTL=${EPHEMERAL_USER_TTL}
+      - INSTALL_PREFIX=${INSTALL_PREFIX}
+      - LOGIN_FAILURE_LIMIT=${LOGIN_FAILURE_LIMIT}
+      - OMNILEADS_HOSTNAME=${OMNILEADS_HOSTNAME}
+      - PYTHONPATH=${PYTHONPATH}
+      - SESSION_COOKIE_AGE=${SESSION_COOKIE_AGE}
+      - CALLREC_DEVICE=${CALLREC_DEVICE}
+      - MONITORFORMAT=mp3
+      - S3_STORAGE_ENABLED=true
+      - S3_BUCKET_NAME=${S3_BUCKET_NAME}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - S3_ENDPOINT=${S3_ENDPOINT}
+      - S3_ENDPOINT_MINIO=${S3_ENDPOINT_MINIO}
+      - AWS_DEFAULT_REGION=us-east-1
+      - GOOGLE_MAPS_API_KEY=${GOOGLE_MAPS_API_KEY}
+      - GOOGLE_MAPS_CENTER='${GOOGLE_MAPS_CENTER}'
+      - EMAIL_BACKEND=django.core.mail.backends.dummy.EmailBackend
+      - OML_BRANCH=${OML_BRANCH}
+      - OML_COMMIT=${OML_COMMIT}
+      - OML_BUILD_DATE=${OML_BUILD_DATE}
+      - WOMBAT_HOSTNAME=localhost
+      - WOMBAT_USER=${WOMBAT_USER}
+      - WOMBAT_PASSWORD=${WOMBAT_PASSWORD}
+      - OML_LOGGING_SLOWSQL_ENABLED=
+      - OML_LOGGING_SLOWSQL_OUTPUT="-"
+      - OML_LOGGING_SLOWSQL_DURATION=1
+    image: ${OMLAPP_IMG}
+    networks:
+      - omnileads
+    privileged: true
+    restart: on-failure
+    stdin_open: true
+    stop_grace_period: 1m30s
+    tty: true
+    working_dir: /opt/omnileads/ominicontacto
 
   crones:
     container_name: oml-django-cron
@@ -86,6 +142,8 @@ services:
       - ASTERISK_HOSTNAME=${ASTERISK_HOSTNAME}
       - AMI_USER=${AMI_USER}
       - AMI_PASSWORD=${AMI_PASSWORD}
+      - DJANGO_HOSTNAME=${DJANGO_HOSTNAME}
+      - UWSGI_PORT=8097
       - KAMAILIO_HOSTNAME=${KAMAILIO_HOSTNAME}
       - PGHOST=${PGHOST}
       - PGDATABASE=${PGDATABASE}
@@ -133,9 +191,12 @@ services:
     stdin_open: true
     stop_grace_period: 1m30s
     tty: true
-    working_dir: /opt/omnileads/
+    working_dir: /opt/omnileads
 
   fastagi:
+    depends_on:
+      - postgresql
+      - redis
     image: ${OMLFASTAGI_IMG}
     container_name: oml-fastagi
     environment:
@@ -146,43 +207,24 @@ services:
       - AMI_PORT=5038
       - PGHOST=${PGHOST}
       - PGPORT=${PGPORT}
+      - PGDB=${PGDATABASE}
       - PGUSER=${PGUSER}
-      - PGDATABASE=${PGDATABASE}
       - PGPASSWORD=${PGPASSWORD}
       - REDIS_HOSTNAME=${REDIS_HOSTNAME}
-    volumes:
-      - ${REPO_PATH}/omlfastagi/server:/fastagi/server
-    restart: on-failure
     networks:
       - omnileads  
-    ports:
-      - "4573:4573"
-  
-  # ami: 
-  #   image: ${OMLAMI_IMG}
-  #   container_name: oml-ami
-  #   environment:
-  #     - ASTERISK_HOSTNAME=${ASTERISK_HOSTNAME}
-  #     - AMI_USER=${AMI_USER}
-  #     - AMI_PASSWORD=${AMI_PASSWORD}
-  #     - REDIS_HOSTNAME=${REDIS_HOSTNAME}
-  #   restart: on-failure  
-  #   #volumes:
-  #   #  - ${REPO_PATH}/omlfastagi/server:/fastagi/server
-  #   networks:
-  #     - omnileads  
     
   acd:
-    #build:
-    #  target: run
-    #  context: ${REPO_PATH}/omlacd
     container_name: oml-asterisk
     depends_on:
       - postgresql
       - redis
+      - websockets
       - minio
+      - fastagi
     dns: 8.8.8.8
     environment:
+      - ENV=${ENV}
       - FASTAGI=${FASTAGI_HOSTNAME}
       - TZ=${TZ}
       - ASTERISK_LOCATION=
@@ -203,28 +245,23 @@ services:
       - AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION}
       - HOMERHOST=${HOMERHOST}
       - HOMERPORT=${HOMERPORT}
-      - HOMER_ENABLE=True
+      - HOMER_ENABLE=${HOMER_ENABLE}
       - NETWORK_MODE=bridge
-      - ENV=devenv
     image: ${OMLACD_IMG}
     networks:
       - omnileads
+    expose:
+        - 40000-40999/udp
     ports:
       - ${SIP_EXT_PORT}:5060/udp
-      - 7088:7088
     privileged: true
     restart: on-failure
     stop_grace_period: 1m30s
     volumes:
       - ./ast_custom_conf:/etc/asterisk/custom
-      - ${REPO_PATH}/omlacd/source/astconf:/etc/asterisk/
-      - ${REPO_PATH}/omlacd/source/scripts:/opt/asterisk/scripts
     working_dir: /etc/asterisk
 
   kamailio:
-    build:
-      target: run
-      context: ${REPO_PATH}/omlkamailio
     command:
       - /bin/bash
     container_name: oml-kamailio
@@ -251,12 +288,8 @@ services:
     stop_grace_period: 1m30s
     volumes:
       - ./certs:/${KAMAILIO_CERTS_LOCATION}
-      - ${REPO_PATH}/omlkamailio/source:/etc/kamailio
 
   nginx:
-    build:
-      target: run
-      context: ${REPO_PATH}/omlnginx
     container_name: oml-nginx
     depends_on:
       - app
@@ -264,14 +297,14 @@ services:
       - websockets
     dns: 8.8.8.8
     environment:
-      - CALLREC_DEVICE=${CALLREC_DEVICE}
       - TZ=${TZ}
-      - ENV=devenv
+      - ENV=prodenv
       - DJANGO_HOSTNAME=${DJANGO_HOSTNAME}
-      - DAPHNE_HOSTNAME=${DJANGO_HOSTNAME}
+      - DAPHNE_HOSTNAME=${DAPHNE_HOSTNAME}
       - KAMAILIO_HOSTNAME=${KAMAILIO_HOSTNAME}
       - WEBSOCKETS_HOSTNAME=${WEBSOCKET_HOSTNAME}
       - S3_ENDPOINT=${S3_ENDPOINT_MINIO}
+      - CALLREC_DEVICE=${CALLREC_DEVICE}
     image: ${OMLNGINX_IMG}
     networks:
       - omnileads
@@ -282,13 +315,9 @@ services:
     stop_grace_period: 1m30s
     volumes:
       - django_static:/opt/omnileads/static
-      - ${REPO_PATH}/omlnginx/source/conf:/etc/nginx/
       - django_callrec_zip:/opt/omnileads/asterisk/var/spool/asterisk/monitor
 
   postgresql:
-    build:
-      target: run
-      context: ${REPO_PATH}/omlpgsql
     container_name: oml-postgres
     dns: 8.8.8.8
     environment:
@@ -323,14 +352,11 @@ services:
       - redis:/data
 
   rtpengine:
-    build:
-      target: run
-      context: ${REPO_PATH}/omlrtpengine
     container_name: oml-rtpengine
     dns: 8.8.8.8
     environment:
-      - ENV=devenv
       - TZ=${TZ}
+      - ENV=${ENV}
     image: ${OMLRTPENGINE_IMG}
     networks:
       - omnileads
@@ -359,9 +385,48 @@ services:
       interval: 1s
       timeout: 10s
       retries: 10
-    volumes:
-      - ${REPO_PATH}/omlwebsockets/source/:/opt/services/webapp/src/
 
+  minio:
+    tty: true
+    container_name: oml-minio
+    image: ${OMLMINIO_IMG}
+    command: server --console-address "localhost:9001" /data
+    environment:
+      - MINIO_ROOT_USER=${S3_HTTP_ADMIN_USER}
+      - MINIO_ROOT_PASSWORD=${S3_HTTP_ADMIN_PASS}
+      - MINIO_SERVER_URL=${S3_ENDPOINT}
+      - MINIO_PROMETHEUS_AUTH_TYPE="public"
+    networks:
+      - omnileads
+    ports:
+      - 9001:9001
+      - 9000:9000
+    volumes:
+      - minio:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+  createbuckets:  
+    tty: true
+    image: minio/mc
+    container_name: oml-initminio
+    depends_on:
+      - minio
+    networks:
+      - omnileads
+    entrypoint: >
+      /bin/sh -c "
+      /usr/bin/mc config host rm local;
+      /usr/bin/mc config host add --quiet --api s3v4 local http://minio:9000 minio s3minio123;
+      /usr/bin/mc mb --quiet local/omnileads/;
+      /usr/bin/mc admin user add local omlminio s3omnileads123;
+      /usr/bin/mc admin policy attach local readwrite --user omlminio;
+      exit 0;
+      "
+      
   mariadb:
     container_name: oml-mariadb
     dns: 8.8.8.8
@@ -369,7 +434,7 @@ services:
       - ALLOW_EMPTY_PASSWORD=yes
       - TZ=${TZ}
       - MARIADB_ROOT_PASSWORD=${MYSQL_ROOT_PASS}
-      - MARIADB_DATABASE=${WOMBAT_DB}
+      - MARIADBBASE=${WOMBAT_DB}
       - MARIADB_USER=${WOMBAT_DB_USER}
       - MARIADB_PASSWORD=${WOMBAT_DB_PASS}
     image: ${MARIADB_IMG}
@@ -401,61 +466,6 @@ services:
     restart: on-failure
     stop_grace_period: 1m30s
 
-  vue-cli:
-    tty: true
-    container_name: oml-vuejs-cli
-    image: ${OMLVUEJS_IMG}
-    ports:
-      - 8080:8080
-    networks:
-      - omnileads
-    volumes:
-      - ${REPO_PATH}/omlapp/omnileads_ui/:/home/app/
-      #- ${REPO_PATH}/survey_app/:/home/survey/
-      #- ${REPO_PATH}/wallboard_app/:/home/wallboard/
-      - vuejs:/home/app/supervision/node_modules/
-
-  minio:
-    tty: true
-    container_name: oml-minio
-    image: ${OMLMINIO_IMG}
-    command: server /data --console-address ":9001"
-    environment:
-      - MINIO_ROOT_USER=${S3_HTTP_ADMIN_USER}
-      - MINIO_ROOT_PASSWORD=${S3_HTTP_ADMIN_PASS}
-      #- MINIO_SERVER_URL=${S3_ENDPOINT}
-      - MINIO_PROMETHEUS_AUTH_TYPE="public"
-    networks:
-      - omnileads
-    ports:
-      - 9001:9001
-      - 9000:9000
-    volumes:
-      - minio:/data
-    # healthcheck:
-    #   test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
-    #   interval: 30s
-    #   timeout: 20s
-    #   retries: 3
-
-  createbuckets:  
-    tty: true
-    image: minio/mc
-    container_name: oml-initminio
-    depends_on:
-      - minio
-    networks:
-      - omnileads
-    entrypoint: >
-      /bin/sh -c "
-      /usr/bin/mc config host rm local;
-      /usr/bin/mc config host add --quiet --api s3v4 local http://minio:9000 minio s3minio123;
-      /usr/bin/mc mb --quiet local/omnileads/;
-      /usr/bin/mc admin user add local omlminio s3omnileads123;
-      /usr/bin/mc admin policy attach local readwrite --user omlminio;
-      exit 0;
-      "
-      
   pbxemulator:
     container_name: oml-pstn-emulator
     hostname: pbxemulator
@@ -466,7 +476,7 @@ services:
     networks:
       - omnileads
     ports:
-      - 6060:5060/udp
+      - 6060:6060/udp
       - 10000-10020:10000-10020/udp
     privileged: true
     restart: on-failure
@@ -492,7 +502,7 @@ services:
     stdin_open: true
     stop_grace_period: 1m30s
     tty: true
-    
+
 networks:
   omnileads:
     ipam:
@@ -502,12 +512,9 @@ networks:
 
 volumes:
   postgresql:
-  mariadb:
   redis:
   minio:
   django_static:
   django_callrec_zip:
-  vuejs:
-  ast_conf:
-  ast_sounds:
-  ast_moh:
+  mariadb:
+

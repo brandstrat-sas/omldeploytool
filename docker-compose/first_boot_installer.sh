@@ -10,9 +10,14 @@ bucket_access_key=${BUCKET_ACCESS_KEY}
 bucket_secret_key=${BUCKET_SECRET_KEY}
 bucket_region=${BUCKET_REGION}
 bucket_name=${BUCKET_NAME}
+dialer_host=${DIALER_HOST}
+dialer_user=${DIALER_USER}
+dialer_pass=${DIALER_PASS}
 
 PRIVATE_IPV4=$(ip addr show $oml_nic | grep "inet\b" | awk '{print $2}' | cut -d/ -f1)
 PUBLIC_IPV4=$(curl ifconfig.co)
+
+apt update && apt install -y git
 
 curl -fsSL https://get.docker.com -o ~/get-docker.sh
 bash ~/get-docker.sh
@@ -31,7 +36,7 @@ sed -i "s/DJANGO_HOSTNAME=app/DJANGO_HOSTNAME=localhost/g" .env
 sed -i "s/PUBLIC_IP=/PUBLIC_IP=$PUBLIC_IPV4/g" .env
 sed -i "s/DAPHNE_HOSTNAME=channels/DAPHNE_HOSTNAME=localhost/g" .env
 sed -i "s/ASTERISK_HOSTNAME=acd/ASTERISK_HOSTNAME=$PRIVATE_IPV4/g" .env
-sed -i "s/FASTAGI_HOSTNAME=fastagi/FASTAGI_HOSTNAME=$PRIVATE_IPV4/g" .env
+sed -i "s/FASTAGI_HOSTNAME=fastagi/FASTAGI_HOSTNAME=localhost/g" .env
 sed -i "s/PGHOST=postgresql/PGHOST=localhost/g" .env
 sed -i "s/WEBSOCKET_HOSTNAME=websockets/WEBSOCKET_HOSTNAME=localhost/g" .env
 sed -i "s/KAMAILIO_HOSTNAME=kamailio/KAMAILIO_HOSTNAME=localhost/g" .env
@@ -60,6 +65,12 @@ else
             sed -i "s/bucket_region: us-east-1/bucket_region: ${aws_region}/g" .env
         fi
     /usr/libexec/docker/cli-plugins/docker-compose -f docker-compose_prod_external_bucket.yml up -d
+fi
+
+if [ -z "$dialer_host" ];then
+    sed -i "s/WOMBAT_HOSTNAME=wombat/WOMBAT_HOSTNAME=$dialer_host/g" .env
+    sed -i "s/WOMBAT_USER=demoadmin/WOMBAT_USER=$dialer_user/g" .env
+    sed -i "s/WOMBAT_PASSWORD=demo/WOMBAT_PASSWORD=$dialer_pass/g" .env    
 fi
 
 ln -s ./omldeploytool/docker-compose/oml_manage /usr/local/bin/
