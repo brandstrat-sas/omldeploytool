@@ -54,27 +54,6 @@ It is possible to group these containers on a single Linux instance or cluster t
 
 ![Diagrama component Pods](./png/oml-pods.png)
 
-
-* [Bash + Ansible](#bash-ansible)
-* [Ansible + Inventory](#ansible-inventory)
-* [Bash Script deploy.sh](#bash-script-deploy)
-* [Subscriber tracking & TLS certs](#subscriber-traking)
-* [Deploy all in one (AIO) instance)](#aio-deploy)
-* [Deploy Cluster all in three (AIT) instance)](#ait-deploy)
-* [Deploy Onpremise Cluster HA)](#cluster-ha-deploy)
-* [OMniLeads Podman containers](#podman)
-* [Deploy with backend (Postgres y Object Storage) as cloud services](#cloud-deploy)
-* [Deploy High Availability on-premise instance](#onpremise-deploy)
-* [TLS Certs provisioning](#tls-cert-provisioning)
-* [Security](#security)
-* [Deploy an upgrade from CentOS7](#upgrade_from_centos7)
-* [Deploy an upgrade](#upgrades)
-* [Deploy a rollback](#rollback)
-* [Deploy a backup](#backups)
-* [Deploy a restore](#restore)
-* [Observability](#observability)
-* [Container image & tag customizations](#components_img)
-* [Cluster HA recovery tools](#cluster_ha_recovery)
 ## Bash + Ansible 📋 <a name="bash-ansible"></a>
 
 An instance of OMniLeads is launched on a Linux server (using Systemd & Podman) by running a bash script (deploy.sh) along with its input parameters and a set of Ansible files (Playbooks + Templates) that are invoked by the script.
@@ -113,9 +92,6 @@ This tool is capable of deploying OMniLeads in three layouts:
 ![Diagrama deploy tool](./png/deploy-tool-tenant-ait.png)
 
 * **OML  Cluster HA with Podman & Systemd:**
-![Diagrama deploy tool](./png/deploy-tool-tenant-ha.png)
-
-* OML  Cluster HA with Podman & Systemd:
 ![Diagrama deploy tool](./png/deploy-tool-tenant-ha.png)
 
 The following is the generic version of inventory.yml file available in this repository.

@@ -1,5 +1,5 @@
 # Release Notes 
-[2023-08-24]
+[2023-09-04]
 
 ## Added
 
@@ -8,7 +8,7 @@
 
 ## Improvments
 
-* oml-300 - first_boot_installer.sh for docker-compose deploy on Linux Server
+* oml-329 - Quick install bash script: docker-compose/first_boot_install.sh 
 * oml-300 - oml_manage new actions
 
 ## Fixed
@@ -24,7 +24,7 @@ No removals in this release.
 ```
     omnileads_version: 1.30.0
     asterisk_version: 230811.01
-    fastagi_version: 230811.02
+    fastagi_version: 230830.01
     nginx_version: 230215.01
     websockets_version: 230204.01
     kamailio_version: 230204.01
