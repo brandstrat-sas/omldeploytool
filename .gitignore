@@ -1,7 +1,7 @@
 vagrant/debian/.vagrant
 vagrant/redhat/.vagrant
-devenv/omnileads-repos
-devenv/.env
+development-env/omnileads-repos
+development-env/.env
 docker-compose/.env
 ansible/instances
 ansible/.inventory.yml
