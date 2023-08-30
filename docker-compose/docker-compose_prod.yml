@@ -314,6 +314,7 @@ services:
       - POSTGRES_USER=${PGUSER}
       - POSTGRES_PASSWORD=${PGPASSWORD}
       - POSTGRES_DB=${PGDATABASE}
+      - PGHOST=${PGHOST}
     image: ${OMLPGSQL_IMG}
     command: postgres -c listen_addresses=${PGHOST}
     network_mode: host

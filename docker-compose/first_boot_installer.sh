@@ -3,7 +3,7 @@
 oml_nic=${NIC}
 env=${ENV}
 
-version=${BRANCH}
+branch=${BRANCH}
 
 bucket_url=${BUCKET_URL}
 bucket_access_key=${BUCKET_ACCESS_KEY}
@@ -22,10 +22,10 @@ apt update && apt install -y git
 curl -fsSL https://get.docker.com -o ~/get-docker.sh
 bash ~/get-docker.sh
 
-if [ -z "$version" ];then
+if [ -z "$branch" ];then
     git clone https://gitlab.com/omnileads/omldeploytool.git
 else
-    git -b $version clone https://gitlab.com/omnileads/omldeploytool.git
+    git clone -b $branch https://gitlab.com/omnileads/omldeploytool.git
 fi
 
 cd ./omldeploytool/docker-compose
@@ -36,7 +36,7 @@ sed -i "s/DJANGO_HOSTNAME=app/DJANGO_HOSTNAME=localhost/g" .env
 sed -i "s/PUBLIC_IP=/PUBLIC_IP=$PUBLIC_IPV4/g" .env
 sed -i "s/DAPHNE_HOSTNAME=channels/DAPHNE_HOSTNAME=localhost/g" .env
 sed -i "s/ASTERISK_HOSTNAME=acd/ASTERISK_HOSTNAME=$PRIVATE_IPV4/g" .env
-sed -i "s/FASTAGI_HOSTNAME=fastagi/FASTAGI_HOSTNAME=localhost/g" .env
+sed -i "s/FASTAGI_HOSTNAME=fastagi/FASTAGI_HOSTNAME=$PRIVATE_IPV4/g" .env
 sed -i "s/PGHOST=postgresql/PGHOST=localhost/g" .env
 sed -i "s/WEBSOCKET_HOSTNAME=websockets/WEBSOCKET_HOSTNAME=localhost/g" .env
 sed -i "s/KAMAILIO_HOSTNAME=kamailio/KAMAILIO_HOSTNAME=localhost/g" .env
