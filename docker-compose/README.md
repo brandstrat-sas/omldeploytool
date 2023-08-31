@@ -90,13 +90,13 @@ curl -o first_boot_installer.sh -L "https://gitlab.com/omnileads/omldeploytool/-
 Without dialer:
 
 ```
-export BRANCH=main NIC=eth0 ENV=lan && bash -x first_boot_installer.sh
+export BRANCH=main NIC=eth0 ENV=lan && ./first_boot_installer.sh
 ```
 
 With dialer:
 
 ```
-export BRANCH=main NIC=eth0 ENV=lan DIALER_HOST=X.X.X.X DIALER_USER=demo DIALER_PASS=demoadmin && bash -x first_boot_installer.sh
+export BRANCH=main NIC=eth0 ENV=lan DIALER_HOST=X.X.X.X DIALER_USER=demo DIALER_PASS=demoadmin && ./first_boot_installer.sh
 ```
 
 You must to specify the private ipv4 NIC and scenario (ENV) we'll be working with, which will be cloud if we're working on a VPS (cloud), and lan if we're using an on-premise Virtual Machine (lan).
@@ -150,13 +150,13 @@ curl -o first_boot_installer.sh -L "https://gitlab.com/omnileads/omldeploytool/-
 Without dialer:
 
 ```
-export NIC=eth1 ENV=cloud BUCKET_URL=https://sfo1.digitaloceanspaces.com BUCKET_ACCESS_KEY=mbXUfdsjlh3424R9XY BUCKET_SECRET_KEY=iicHG76O+CIbRZ432iugdsa BUCKET_REGION=NULL BUCKET_NAME=curso-oml && bash -x first_boot_installer.sh
+export NIC=eth1 ENV=cloud BUCKET_URL=https://sfo1.digitaloceanspaces.com BUCKET_ACCESS_KEY=mbXUfdsjlh3424R9XY BUCKET_SECRET_KEY=iicHG76O+CIbRZ432iugdsa BUCKET_REGION=NULL BUCKET_NAME=curso-oml && ./first_boot_installer.sh
 ```
 
 With dialer:
 
 ```
-export NIC=eth1 ENV=cloud BUCKET_URL=https://sfo1.digitaloceanspaces.com BUCKET_ACCESS_KEY=mbXUfdsjlh3424R9XY BUCKET_SECRET_KEY=iicHG76O+CIbRZ432iugdsa BUCKET_REGION=NULL BUCKET_NAME=curso-oml DIALER_HOST=X.X.X.X DIALER_USER=demo DIALER_PASS=demoadmin && bash -x first_boot_installer.sh
+export NIC=eth1 ENV=cloud BUCKET_URL=https://sfo1.digitaloceanspaces.com BUCKET_ACCESS_KEY=mbXUfdsjlh3424R9XY BUCKET_SECRET_KEY=iicHG76O+CIbRZ432iugdsa BUCKET_REGION=NULL BUCKET_NAME=curso-oml DIALER_HOST=X.X.X.X DIALER_USER=demo DIALER_PASS=demoadmin && ./first_boot_installer.sh
 ```
 
 You must to specify the private ipv4 NIC and scenario (ENV) we'll be working with, which will be cloud if we're working on a VPS (cloud), and lan if we're using an on-premise Virtual Machine (lan).
