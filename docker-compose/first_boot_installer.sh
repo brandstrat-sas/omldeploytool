@@ -45,6 +45,12 @@ sed -i "s/^REDIS_HOSTNAME=redis/REDIS_HOSTNAME=localhost/g" .env
 sed -i "s/RTPENGINE_HOSTNAME=rtpengine/RTPENGINE_HOSTNAME=$PRIVATE_IPV4/g" .env
 sed -i "s/redis:6379/localhost:6379/g" .env
 
+if [ -z "$dialer_host" ];then
+    sed -i "s/WOMBAT_HOSTNAME=wombat/WOMBAT_HOSTNAME=$dialer_host/g" .env
+    sed -i "s/WOMBAT_USER=demoadmin/WOMBAT_USER=$dialer_user/g" .env
+    sed -i "s/WOMBAT_PASSWORD=demo/WOMBAT_PASSWORD=$dialer_pass/g" .env    
+fi
+
 if [ -z "$bucket_url" ];then
     if [[ "$ENV" == "cloud" ]];then
         sed -i "s%\S3_ENDPOINT=https://localhost%S3_ENDPOINT=https://$PUBLIC_IPV4%g" .env
@@ -65,12 +71,6 @@ else
             sed -i "s/bucket_region: us-east-1/bucket_region: ${aws_region}/g" .env
         fi
     /usr/libexec/docker/cli-plugins/docker-compose -f docker-compose_prod_external_bucket.yml up -d
-fi
-
-if [ -z "$dialer_host" ];then
-    sed -i "s/WOMBAT_HOSTNAME=wombat/WOMBAT_HOSTNAME=$dialer_host/g" .env
-    sed -i "s/WOMBAT_USER=demoadmin/WOMBAT_USER=$dialer_user/g" .env
-    sed -i "s/WOMBAT_PASSWORD=demo/WOMBAT_PASSWORD=$dialer_pass/g" .env    
 fi
 
 ln -s ./omldeploytool/docker-compose/oml_manage /usr/local/bin/
