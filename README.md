@@ -17,7 +17,7 @@ the application practically without configuration.
 
 #### Ansible automation :office: :ok:
 
-To launch the application using Ansible on any modern Linux instance with [Podman](https://docs.podman.io/en/latest/) or [Docker-Engine](https://docker.com/) support.
+To launch the application using Ansible on any modern Linux instance with [Podman](https://docs.podman.io/en/latest/) support.
 Under this format, hundreds of instances of the application can be managed using Ansible.
 
 [Ansible](ansible/README.md)
@@ -27,3 +27,7 @@ Under this format, hundreds of instances of the application can be managed using
 To lanunch the OMniLeads development stack and  start coding !  
 
 [DevEnv](develoment-env/README.md)
+
+#### License & Copyright :black_nib: :clipboard:
+
+This project is released under the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.

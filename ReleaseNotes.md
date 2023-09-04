@@ -1,29 +1,30 @@
 # Release Notes 
-[2023-07-17]
+[2023-09-04]
 
 ## Added
 
-* oml-307 - [ANSIBLE] Deploy HA onpremise scenary
-* oml-305 - [ANSIBLE] inventory.yml flag (postgres_utc), TZ or UTC mode
+* oml-300 - Inbound video call campaigns
+* oml-238 - QA environment
 
-## Changed
+## Improvments
 
-* oml-305 - Migrate call logger logic from queue_log (ARA) to Fastagi call logger method
+* oml-329 - Quick install bash script: docker-compose/first_boot_install.sh 
+* oml-300 - oml_manage new actions
 
 ## Fixed
 
-* oml-244 - [ANSIBLE] Backup & Restore
+No fixes in this release.
 
 ## Removed
 
 No removals in this release.
 
-# Compatibility versions
+# OMniLeads Component versions
 
 ```
-    omnileads_version: 1.29.0
+    omnileads_version: 1.30.0
     asterisk_version: 230811.01
-    fastagi_version: 230811.02
+    fastagi_version: 230830.01
     nginx_version: 230215.01
     websockets_version: 230204.01
     kamailio_version: 230204.01

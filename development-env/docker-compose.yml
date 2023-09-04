@@ -37,7 +37,7 @@ services:
       - PYTHONPATH=${PYTHONPATH}
       - SESSION_COOKIE_AGE=${SESSION_COOKIE_AGE}
       - CALLREC_DEVICE=${CALLREC_DEVICE}
-      - MONITORFORMAT=${MONITORFORMAT}
+      - MONITORFORMAT=mp3
       - S3_STORAGE_ENABLED=true
       - S3_BUCKET_NAME=${S3_BUCKET_NAME}
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
@@ -57,9 +57,10 @@ services:
       - OML_LOGGING_SLOWSQL_ENABLED=
       - OML_LOGGING_SLOWSQL_OUTPUT="-"
       - OML_LOGGING_SLOWSQL_DURATION=1
-      #- SURVEY_VERSION=develop
-      #- WALLBOARD_VERSION=develop
-      #- PREMIUM_REPORTS_VERSION=develop
+      - SURVEY_VERSION=develop
+    #- WALLBOARD_VERSION=develop
+      - PREMIUM_REPORTS_VERSION=develop
+      - WEBPHONE_CLIENT_VERSION=develop
     image: ${OMLAPP_IMG}
     networks:
       - omnileads
@@ -72,9 +73,10 @@ services:
     volumes:      
       - django_callrec_zip:/opt/omnileads/asterisk/var/spool/asterisk/monitor
       - ${REPO_PATH}/omlapp/:/opt/omnileads/ominicontacto/
-      #- ${REPO_PATH}/survey_app/:/opt/omnileads/ominicontacto/survey_app
-      #- ${REPO_PATH}/wallboard_app/:/opt/omnileads/ominicontacto/wallboard_app
-      #- ${REPO_PATH}/premium_reports_app/:/opt/omnileads/ominicontacto/premium_reports_app
+      - ${REPO_PATH}/survey_app/:/opt/omnileads/ominicontacto/survey_app
+      - ${REPO_PATH}/wallboard_app/:/opt/omnileads/ominicontacto/wallboard_app
+      - ${REPO_PATH}/premium_reports_app/:/opt/omnileads/ominicontacto/premium_reports_app
+      - ${REPO_PATH}/webphone_client_app/:/opt/omnileads/ominicontacto/webphone_client_app
 
   crones:
     container_name: oml-django-cron
@@ -104,7 +106,7 @@ services:
       - PYTHONPATH=${PYTHONPATH}
       - SESSION_COOKIE_AGE=${SESSION_COOKIE_AGE}
       - CALLREC_DEVICE=${CALLREC_DEVICE}
-      - MONITORFORMAT=${MONITORFORMAT}
+      - MONITORFORMAT=mp3
       - S3_STORAGE_ENABLED=true
       - S3_BUCKET_NAME=${S3_BUCKET_NAME}
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
@@ -183,7 +185,7 @@ services:
     environment:
       - FASTAGI=${FASTAGI_HOSTNAME}
       - TZ=${TZ}
-      - ASTERISK_LOCATION=${ASTERISK_LOCATION}
+      - ASTERISK_LOCATION=
       - AMI_USER=${AMI_USER}
       - AMI_PASSWORD=${AMI_PASSWORD}
       - OMNILEADS_HOSTNAME=${OMNILEADS_HOSTNAME}
@@ -303,21 +305,22 @@ services:
     restart: on-failure
     stop_grace_period: 1m30s
     volumes:
-      - postgresql_persistent:/var/lib/postgresql/data
+      - postgresql:/var/lib/postgresql/data
 
   redis:
     container_name: oml-redis
     dns: 8.8.8.8
     environment:
       - TZ=${TZ}
+      - BIND_IP=0.0.0.0
     networks:
       - omnileads
-    image: ${OMLREDISGEARS_IMG}
+    image: ${OMLREDIS_IMG}
     privileged: true
     restart: on-failure
     stop_grace_period: 1m30s
     volumes:
-      - redis_persistent:/data
+      - redis:/data
 
   rtpengine:
     build:
@@ -376,7 +379,7 @@ services:
     restart: on-failure
     stop_grace_period: 1m30s
     volumes:
-      - mariadb_persistent:/bitnami
+      - mariadb:/bitnami
 
   wombat:
     command: >
@@ -410,7 +413,7 @@ services:
       - ${REPO_PATH}/omlapp/omnileads_ui/:/home/app/
       #- ${REPO_PATH}/survey_app/:/home/survey/
       #- ${REPO_PATH}/wallboard_app/:/home/wallboard/
-      - vuejs_persistent:/home/app/supervision/node_modules/
+      - vuejs:/home/app/supervision/node_modules/
 
   minio:
     tty: true
@@ -428,7 +431,7 @@ services:
       - 9001:9001
       - 9000:9000
     volumes:
-      - minio_persistent:/data
+      - minio:/data
     # healthcheck:
     #   test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
     #   interval: 30s
@@ -471,6 +474,25 @@ services:
     stop_grace_period: 1m30s
     tty: true
 
+  nginxcgi:
+    container_name: oml-nginx-cgi
+    hostname: nginxcgi
+    dns: 8.8.8.8
+    image: omnileads/nginxqa:latest
+    environment:
+      - PGHOST=${PGHOST}
+      - PGPASSWORD=${PGPASSWORD}
+      - PSTN_HOSTNAME=pbxemulator
+    networks: 
+      - omnileads
+    ports:
+      - 8888:8888
+    privileged: true
+    restart: on-failure
+    stdin_open: true
+    stop_grace_period: 1m30s
+    tty: true
+    
 networks:
   omnileads:
     ipam:
@@ -479,13 +501,13 @@ networks:
         - subnet: "${SUBNET}"
 
 volumes:
-  postgresql_persistent:
-  mariadb_persistent:
-  redis_persistent:
-  minio_persistent:
+  postgresql:
+  mariadb:
+  redis:
+  minio:
   django_static:
   django_callrec_zip:
-  vuejs_persistent:
+  vuejs:
   ast_conf:
   ast_sounds:
   ast_moh:

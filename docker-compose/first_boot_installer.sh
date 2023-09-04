@@ -3,24 +3,29 @@
 oml_nic=${NIC}
 env=${ENV}
 
-version=${BRANCH}
+branch=${BRANCH}
 
 bucket_url=${BUCKET_URL}
 bucket_access_key=${BUCKET_ACCESS_KEY}
 bucket_secret_key=${BUCKET_SECRET_KEY}
 bucket_region=${BUCKET_REGION}
 bucket_name=${BUCKET_NAME}
+dialer_host=${DIALER_HOST}
+dialer_user=${DIALER_USER}
+dialer_pass=${DIALER_PASS}
 
 PRIVATE_IPV4=$(ip addr show $oml_nic | grep "inet\b" | awk '{print $2}' | cut -d/ -f1)
 PUBLIC_IPV4=$(curl ifconfig.co)
 
+apt update && apt install -y git
+
 curl -fsSL https://get.docker.com -o ~/get-docker.sh
 bash ~/get-docker.sh
 
-if [ -z "$version" ];then
+if [ -z "$branch" ];then
     git clone https://gitlab.com/omnileads/omldeploytool.git
 else
-    git -b $version clone https://gitlab.com/omnileads/omldeploytool.git
+    git clone -b $branch https://gitlab.com/omnileads/omldeploytool.git
 fi
 
 cd ./omldeploytool/docker-compose
@@ -39,6 +44,12 @@ sed -i "s/OMNILEADS_HOSTNAME=nginx/OMNILEADS_HOSTNAME=$PRIVATE_IPV4/g" .env
 sed -i "s/^REDIS_HOSTNAME=redis/REDIS_HOSTNAME=localhost/g" .env
 sed -i "s/RTPENGINE_HOSTNAME=rtpengine/RTPENGINE_HOSTNAME=$PRIVATE_IPV4/g" .env
 sed -i "s/redis:6379/localhost:6379/g" .env
+
+if [ -z "$dialer_host" ];then
+    sed -i "s/WOMBAT_HOSTNAME=wombat/WOMBAT_HOSTNAME=$dialer_host/g" .env
+    sed -i "s/WOMBAT_USER=demoadmin/WOMBAT_USER=$dialer_user/g" .env
+    sed -i "s/WOMBAT_PASSWORD=demo/WOMBAT_PASSWORD=$dialer_pass/g" .env    
+fi
 
 if [ -z "$bucket_url" ];then
     if [[ "$ENV" == "cloud" ]];then
@@ -73,4 +84,4 @@ else
     until curl -sk --head  --request GET https://$PUBLIC_IPV4 |grep "302" > /dev/null; do echo "Environment still initializing , sleeping 10 seconds"; sleep 10; done; echo "Environment is up"
 fi
 
-bash -x oml_manage --reset_pass
+./oml_manage --reset_pass

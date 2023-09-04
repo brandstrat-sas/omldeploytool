@@ -47,7 +47,7 @@ services:
       - GOOGLE_MAPS_API_KEY=${GOOGLE_MAPS_API_KEY}
       - GOOGLE_MAPS_CENTER='${GOOGLE_MAPS_CENTER}'
       - EMAIL_BACKEND=django.core.mail.backends.dummy.EmailBackend
-      - OML_BRANCH=${OML_BRANCH}
+      - OML_BRANCH=${OMLAPP_IMG}
       - OML_COMMIT=${OML_COMMIT}
       - OML_BUILD_DATE=${OML_BUILD_DATE}
       - WOMBAT_HOSTNAME=${WOMBAT_HOSTNAME}
@@ -59,6 +59,7 @@ services:
       #- SURVEY_VERSION=develop
       #- WALLBOARD_VERSION=develop
       #- PREMIUM_REPORTS_VERSION=develop
+      #- WEBPHONE_CLIENT_VERSION=develop
     image: ${OMLAPP_IMG}
     network_mode: host
     privileged: true
@@ -73,6 +74,8 @@ services:
 
   channels:
     container_name: oml-django-channels
+    depends_on:
+      - redis
     dns: 8.8.8.8
     environment:
       - DAPHNE_ENABLE=True
@@ -133,6 +136,11 @@ services:
 
   crones:
     container_name: oml-django-cron
+    depends_on:
+      - postgresql
+      - redis
+      - acd
+      - minio
     dns: 8.8.8.8
     environment:
       - TZ=${TZ}
@@ -282,6 +290,7 @@ services:
       - app
       - kamailio
       - websockets
+      - channels
     dns: 8.8.8.8
     environment:
       - TZ=${TZ}
@@ -350,9 +359,9 @@ services:
   websockets:
     tty: true
     container_name: oml-websockets
-    image: ${OMLWS_IMG}
     depends_on:
       - redis
+    image: ${OMLWS_IMG}
     environment:
       - BIND_ADDRESS=${WEBSOCKET_HOSTNAME}:8000
       - EVENT_LOOP=uvloop
@@ -401,43 +410,6 @@ services:
       /usr/bin/mc admin policy attach local readwrite --user omlminio;
       exit 0;
       "
-
-####################################### WOMBAT Dialer ######################################
-
-  # mariadb:
-  #   container_name: oml-mariadb
-  #   dns: 8.8.8.8
-  #   environment:
-  #     - ALLOW_EMPTY_PASSWORD=yes
-  #     - TZ=${TZ}
-  #     - MARIADB_ROOT_PASSWORD=${MYSQL_ROOT_PASS}
-  #     - MARIADB_DATABASE=${WOMBAT_DB}
-  #     - MARIADB_USER=${WOMBAT_DB_USER}
-  #     - MARIADB_PASSWORD=${WOMBAT_DB_PASS}
-  #   image: ${MARIADB_IMG}
-  #   network_mode: host
-  #   privileged: true
-  #   restart: on-failure
-  #   stop_grace_period: 1m30s
-  #   volumes:
-  #     - mariadb_data:/bitnami
-
-  # wombat:
-  #   command: >
-  #     bash -c "sed -i '/JDBC_URL/c\JDBC_URL=jdbc:mariadb:\/\/${MYSQL_HOST}\/${WOMBAT_DB}?user=${WOMBAT_DB_USER}&password=${WOMBAT_DB_PASS}&autoReconnect=true' /usr/local/tomcat/webapps/wombat/WEB-INF/tpf.properties && catalina.sh run"
-  #   container_name: oml-wombat
-  #   depends_on:
-  #     - mariadb
-  #     - acd
-  #   dns: 8.8.8.8
-  #   environment:
-  #     - TZ=${TZ}
-  #     - MYSQL_PWD=${MYSQL_ROOT_PASS}
-  #   image: ${WOMBAT_IMG}
-  #   network_mode: host
-  #   privileged: true
-  #   restart: on-failure
-  #   stop_grace_period: 1m30s
 
 ####################################### OBSERVABILITY #######################################
 
@@ -516,5 +488,4 @@ volumes:
   minio_data:
   django_static:
   django_callrec_zip:
-  #mariadb_data:
   #prometheus_data:
