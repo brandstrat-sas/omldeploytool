@@ -84,4 +84,4 @@ else
     until curl -sk --head  --request GET https://$PUBLIC_IPV4 |grep "302" > /dev/null; do echo "Environment still initializing , sleeping 10 seconds"; sleep 10; done; echo "Environment is up"
 fi
 
-bash -x oml_manage --reset_pass
+./oml_manage --reset_pass

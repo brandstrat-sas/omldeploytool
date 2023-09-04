@@ -12,8 +12,7 @@ services:
       - CRON_ENABLE=false
       - TZ=${TZ}
       - DJANGO_HOSTNAME=${DJANGO_HOSTNAME}
-      - UWSGI_PORT=8099
-      - OML_BRANCH=${OMLAPP_IMG}
+      - UWSGI_PORT=8099      
       - ASTERISK_HOSTNAME=${ASTERISK_HOSTNAME}
       - AMI_USER=${AMI_USER}
       - AMI_PASSWORD=${AMI_PASSWORD}
@@ -48,7 +47,7 @@ services:
       - GOOGLE_MAPS_API_KEY=${GOOGLE_MAPS_API_KEY}
       - GOOGLE_MAPS_CENTER='${GOOGLE_MAPS_CENTER}'
       - EMAIL_BACKEND=django.core.mail.backends.dummy.EmailBackend
-      - OML_BRANCH=${OML_BRANCH}
+      - OML_BRANCH=${OMLAPP_IMG}
       - OML_COMMIT=${OML_COMMIT}
       - OML_BUILD_DATE=${OML_BUILD_DATE}
       - WOMBAT_HOSTNAME=${WOMBAT_HOSTNAME}
@@ -314,7 +313,6 @@ services:
       - POSTGRES_USER=${PGUSER}
       - POSTGRES_PASSWORD=${PGPASSWORD}
       - POSTGRES_DB=${PGDATABASE}
-      - PGHOST=${PGHOST}
     image: ${OMLPGSQL_IMG}
     command: postgres -c listen_addresses=${PGHOST}
     network_mode: host
