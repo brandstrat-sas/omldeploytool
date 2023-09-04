@@ -15,8 +15,7 @@
 * [First login](#post_install)
 * [Simulate calls](#pstn_emulator)
 * [Predictive dialer](#wombat_dialer)
-
-
+* [OMniLeads interaction tool](#oml_manage)
 
 You need docker installed (on Linux, Mac or Windows) and this reposotory cloned <a name="requirements"></a>
 
@@ -80,12 +79,24 @@ Below are the Firewall rules to be applied on All In One instance:
 
 >  Note: If working on a VPS with a public IP address, it is a mandatory requirement that it also has a network interface with the ability to associate a private IP address.
 
-The user-data.sh script can be used to deploy to a debian-based clean instance.
+The first_boot_installer.sh script can be used to deploy to a debian-based clean instance.
 
 For example:
 
 ```
-export NIC=eth0 ENV=lan && bash -x user-data.sh
+curl -o first_boot_installer.sh -L "https://gitlab.com/omnileads/omldeploytool/-/raw/main/docker-compose/first_boot_installer.sh" && chmod +x first_boot_installer.sh
+```
+
+Without dialer:
+
+```
+export BRANCH=main NIC=eth0 ENV=lan && ./first_boot_installer.sh
+```
+
+With dialer:
+
+```
+export BRANCH=main NIC=eth0 ENV=lan DIALER_HOST=X.X.X.X DIALER_USER=demo DIALER_PASS=demoadmin && ./first_boot_installer.sh
 ```
 
 You must to specify the private ipv4 NIC and scenario (ENV) we'll be working with, which will be cloud if we're working on a VPS (cloud), and lan if we're using an on-premise Virtual Machine (lan).
@@ -128,12 +139,24 @@ S3_ENDPOINT_MINIO=http://localhost:9000
 
 >  Note: If working on a VPS with a public IP address, it is a mandatory requirement that it also has a network interface with the ability to associate a private IP address.
 
-The user-data.sh script can be used to deploy to a debian-based clean instance.
+The first_boot_installer.sh script can be used to deploy to a debian-based clean instance.
 
 For example:
 
 ```
-export NIC=eth1 ENV=cloud BUCKET_URL=https://sfo1.digitaloceanspaces.com BUCKET_ACCESS_KEY=mbXUfdsjlh3424R9XY BUCKET_SECRET_KEY=iicHG76O+CIbRZ432iugdsa BUCKET_REGION=NULL BUCKET_NAME=curso-oml && bash -x user-data.sh
+curl -o first_boot_installer.sh -L "https://gitlab.com/omnileads/omldeploytool/-/raw/main/docker-compose/first_boot_installer.sh" && chmod +x first_boot_installer.sh
+```
+
+Without dialer:
+
+```
+export NIC=eth1 ENV=cloud BUCKET_URL=https://sfo1.digitaloceanspaces.com BUCKET_ACCESS_KEY=mbXUfdsjlh3424R9XY BUCKET_SECRET_KEY=iicHG76O+CIbRZ432iugdsa BUCKET_REGION=NULL BUCKET_NAME=curso-oml && ./first_boot_installer.sh
+```
+
+With dialer:
+
+```
+export NIC=eth1 ENV=cloud BUCKET_URL=https://sfo1.digitaloceanspaces.com BUCKET_ACCESS_KEY=mbXUfdsjlh3424R9XY BUCKET_SECRET_KEY=iicHG76O+CIbRZ432iugdsa BUCKET_REGION=NULL BUCKET_NAME=curso-oml DIALER_HOST=X.X.X.X DIALER_USER=demo DIALER_PASS=demoadmin && ./first_boot_installer.sh
 ```
 
 You must to specify the private ipv4 NIC and scenario (ENV) we'll be working with, which will be cloud if we're working on a VPS (cloud), and lan if we're using an on-premise Virtual Machine (lan).
@@ -206,11 +229,18 @@ This is used to launch some administration actions like, read containers logs, d
 ./oml_manage --init_env
 ```
 
-Default Agent User & Pass:
+Users:
 
 ```
-agent
-agent1*
+ag1
+ag2
+gerente
+```
+
+For all users the pass is:
+
+```
+usuario0*
 ```
 
 ## Simulate calls from/to PSTN (Only on Docker-Desktop scenary) <a name="pstn_emulator"></a>
@@ -231,7 +261,7 @@ as well as generate calls from the command line to OMniLeads inbound routes.
 ##### Generate inbound calls to omnileads stack:
 
 ```
-./oml_manage --generate_call
+./oml_manage --call_generate
 ```
 
 This actions will make an inbound call to the default inbound campaign created from testing data. 
@@ -264,5 +294,12 @@ The **production** scenarios do not implement Wombat Dialer by default, so if yo
 
 Check our official documentation to check this: https://www.wombatdialer.com/installation.jsp
 
+## OMniLeads interaction tool <a name="oml_manage"></a>
 
+In this directory, we have the script "oml_manage," which allows us to perform various actions such as clearing cache, deleting the database, launching the Django shell, invoking the Asterisk CLI, etc.
 
+For more options:
+
+```
+./oml_manage --help
+```

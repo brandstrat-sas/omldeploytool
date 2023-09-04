@@ -8,59 +8,78 @@ case $1 in
   --init_env)
     docker exec -it oml-django python3 /opt/omnileads/ominicontacto/manage.py inicializar_entorno
     ;;
-  --regenerar_asterisk)
-    docker exec -it oml-django python3 /opt/omnileads/ominicontacto/manage.py regenerar_asterisk
-    ;;
-  --clean_postgres_db)
-    echo "echo drop all on PostgreSQL"
-    docker stop oml-django
-    docker stop oml-django-cron
-    docker stop oml-asterisk
-    docker stop oml-fastagi
-    docker stop oml-postgres
-    docker rm oml-postgres
-    docker volume rm oml_postgresql_persistent
-    docker-compose up -d 
-    until curl -sk --head  --request GET https://localhost |grep "302" > /dev/null; do echo "Environment still initializing , sleeping 10 seconds"; sleep 10; done; echo "Environment is up"
-    docker exec -it oml-django python3 /opt/omnileads/ominicontacto/manage.py cambiar_admin_password
-    #docker exec -it oml-django python3 /opt/omnileads/ominicontacto/manage.py inicializar_entorno
-    ;;
-  --clean_redis)
-    echo "echo drop all on REDIS"
-    docker stop oml-redis
-    docker rm oml-redis
-    docker volume rm oml_redis_persistent
-    docker-compose up -d --force-recreate --no-deps redis
-    ;;
-  --clean_bucket)
-    echo "echo drop all on MINIO"
-    docker stop oml-minio
-    docker rm oml-minio
-    docker volume rm oml_minio_persistent
-    docker-compose up -d --force-recreate --no-deps minio
-    echo "waiting for MINIO raiseup"
-    sleep 10
-    mc alias set MINIO http://localhost:9000 minio s3minio123
-    mc mb MINIO/omnileads
-    mc admin user add MINIO devenv s3omnileads123
-    mc admin policy set MINIO readwrite user=devenv
-    ;;
-  --clean_postgres_tables)
-    echo "drop calls and agent count tables PostgreSQL"
-    docker exec -it oml-django psql -c 'DELETE FROM queue_log'
-    docker exec -it oml-django psql -c 'DELETE FROM reportes_app_llamadalog'
-    docker exec -it oml-django psql -c 'DELETE FROM reportes_app_actividadagentelog'
-    docker exec -it oml-django psql -c 'DELETE FROM ominicontacto_app_respuestaformulariogestion'
-    docker exec -it oml-django psql -c 'DELETE FROM ominicontacto_app_auditoriacalificacion'
-    docker exec -it oml-django psql -c 'DELETE FROM ominicontacto_app_calificacioncliente'
-    ;;
-  --show_bucket)
-    mc alias set MINIO http://localhost:9000 minio s3minio123
-    mc ls --recursive MINIO/omnileads
-    ;;
-  --generate_call)
+  --call_generate)
     echo "generate an ibound call through PSTN-Emulator container"
     docker exec -it oml-pstn-emulator sipp -sn uac 127.0.0.1:5060 -s stress -m 1 -r 1 -d 60000 -l 1
+    ;;
+  --backup)
+    docker run -e POSTGRES_BACKUP=True --env-file .env omnileads/omlapp:1.30.0
+    docker exec -it oml-asterisk /opt/asterisk/scripts/asterisk_backup.py $(date +'%y%m%d.%H%M')
+    ;;
+  --postgres_drop_db)
+    echo "¿Are you sure you want to delete the database? yes or no"
+    read confirmacion
+    if [[ $confirmacion == "yes" ]]; then
+      echo "echo drop all on PostgreSQL"
+      docker stop oml-nginx
+      docker stop oml-django
+      docker stop oml-django-cron
+      docker stop oml-asterisk
+      docker stop oml-fastagi
+      docker stop oml-postgres
+      docker rm oml-postgres
+      docker volume rm oml_postgresql
+      docker-compose up -d 
+      until curl -sk --head  --request GET https://localhost |grep "302" > /dev/null; do echo "Environment still initializing , sleeping 10 seconds"; sleep 10; done; echo "Environment is up"
+      docker exec -it oml-django python3 /opt/omnileads/ominicontacto/manage.py cambiar_admin_password
+    else
+      echo "Operación cancelada."
+    fi
+    ;;
+  --postgres_clean_tables)
+    echo "¿Are you sure you want to delete the database? yes or no"
+    read confirmacion
+    if [[ $confirmacion == "yes" ]]; then
+      echo "drop calls and agent count tables PostgreSQL"
+      docker exec -it oml-django psql -c 'DELETE FROM queue_log'
+      docker exec -it oml-django psql -c 'DELETE FROM reportes_app_llamadalog'
+      docker exec -it oml-django psql -c 'DELETE FROM reportes_app_actividadagentelog'
+      docker exec -it oml-django psql -c 'DELETE FROM ominicontacto_app_respuestaformulariogestion'
+      docker exec -it oml-django psql -c 'DELETE FROM ominicontacto_app_auditoriacalificacion'
+      docker exec -it oml-django psql -c 'DELETE FROM ominicontacto_app_calificacioncliente'
+    else
+      echo "Operación cancelada."
+    fi
+    ;;
+  --postgres_psql)
+    docker exec -it oml-django psql
+    ;;      
+  --redis_clean)
+      echo "¿Are you sure you want to delete all redis cache? yes or no"
+    read confirmacion
+    if [[ $confirmacion == "yes" ]]; then
+      echo "redis cleaning"
+      echo "echo drop all on REDIS"
+      docker stop oml-redis
+      docker rm oml-redis
+      docker volume rm oml_redis
+      docker-compose up -d --force-recreate --no-deps redis
+    else
+      echo "Cancel action"
+    fi
+    ;;  
+   --redis_sync)
+    docker exec -it oml-django python3 /opt/omnileads/ominicontacto/manage.py sincronizar_wombat
+    ;;
+  --redis_cli)
+    docker run -it --name oml-redis-cli --network omnileads docker.io/redis redis-cli -h redis
+    ;;  
+  --dialer_sync)
+    docker exec -it oml-django python3 /opt/omnileads/ominicontacto/manage.py regenerar_asterisk
+    ;; 
+  --bucket_show)
+    mc alias set MINIO http://localhost:9000 minio s3minio123
+    mc ls --recursive MINIO/omnileads
     ;;
   --asterisk_cli)
     docker exec -it oml-asterisk asterisk -rvvvv
@@ -101,35 +120,47 @@ case $1 in
   --rtpengine_conf)
     docker exec -it oml-rtpengine cat /etc/rtpengine.conf
     ;;
-  --pgsql_shell)
-    docker exec -it oml-django psql
-    ;;    
   --nginx_t)
     docker exec -it oml-nginx nginx -T
     ;;
+  --nginx_bash)
+    docker exec -it oml-nginx bash
+    ;;  
+  --nginx_logs_access)
+    docker exec -it oml-nginx tail -f /var/log/niginx/omnileads_access
+    ;;    
+  --nginx_logs_error)
+    docker exec -it oml-nginx tail -f /var/log/niginx/omnileads_error
+    ;;      
   --help)
     echo "
 NAME:
 OMniLeads docker-compose cmd tool
 
 USAGE:
-./manage.sh COMMAND
+./oml_manage.sh COMMAND
 
 --reset_pass: reset admin password to admin admin
 --init_env: init some basic configs in order to test it
---regenerar_asterisk: populate asterisk / redis config
---clean_postgres_db: delete all PostgreSQL databases
---clean_redis: delete cache
---asterisk_CLI: launch asterisk CLI
---asterisk_terminal: launch asterisk container bash shell
+--call_generate: generate an ibound call through PSTN-Emulator container
+--backup: take a postgres & asterisk backup and send to external bucket
+--postgres_drop_db: delete all PostgreSQL databases
+--postgres_clean_logs: drop calls and agent count tables PostgreSQL 
+--redis_clean: clean App redis cache
+--redis_sync: sync django & redis
+--redis_cli: launch redis cli
+--asterisk_cli: launch asterisk CLI
+--asterisk_bash: launch asterisk container bash shell
 --asterisk_logs: show asterisk container logs
 --kamailio_logs: show container logs
 --django_logs: show container logs
+--django_bash: launch django container bash promt
+--django_shell: launch django shell 
 --rtpengine_logs: show container logs
 --websockets_logs: show container logs
 --nginx_t: print nginx container run config
---generate_call: generate an ibound call through PSTN-Emulator container
---clean_postgres_tables: drop calls and agent count tables PostgreSQL
+--nginx_logs_access
+--nginx_logs_error
 "
     shift
     exit 1
