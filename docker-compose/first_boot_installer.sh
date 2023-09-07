@@ -45,7 +45,7 @@ sed -i "s/^REDIS_HOSTNAME=redis/REDIS_HOSTNAME=localhost/g" .env
 sed -i "s/RTPENGINE_HOSTNAME=rtpengine/RTPENGINE_HOSTNAME=$PRIVATE_IPV4/g" .env
 sed -i "s/redis:6379/localhost:6379/g" .env
 
-if [ -z "$dialer_host" ];then
+if [ ! -z "$dialer_host" ];then
     sed -i "s/WOMBAT_HOSTNAME=wombat/WOMBAT_HOSTNAME=$dialer_host/g" .env
     sed -i "s/WOMBAT_USER=demoadmin/WOMBAT_USER=$dialer_user/g" .env
     sed -i "s/WOMBAT_PASSWORD=demo/WOMBAT_PASSWORD=$dialer_pass/g" .env    

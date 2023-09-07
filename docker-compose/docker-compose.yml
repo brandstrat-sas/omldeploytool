@@ -491,6 +491,23 @@ services:
     stop_grace_period: 1m30s
     tty: true
 
+  videocalls:
+    container_name: oml-videocalls-widget
+    dns: 8.8.8.8
+    image: ${OMLVIDEOCALLS_WIDGET_IMG}
+    environment:
+      - CLIENT_USERNAME=${VIDEOCALLS_USERNAME}
+      - CLIENT_PASSWORD=${VIDEOCALLS_PASSWORD}
+    networks: 
+      - omnileads
+    ports:
+      - 8889:5000
+    privileged: true
+    restart: on-failure
+    stdin_open: true
+    stop_grace_period: 1m30s
+    tty: true
+  
 networks:
   omnileads:
     ipam:
