@@ -12,7 +12,6 @@ services:
       - TZ=${TZ}
       - DJANGO_HOSTNAME=${DJANGO_HOSTNAME}
       - UWSGI_PORT=8099
-      - OML_BRANCH=${OMLAPP_IMG}
       - ASTERISK_HOSTNAME=${ASTERISK_HOSTNAME}
       - AMI_USER=${AMI_USER}
       - AMI_PASSWORD=${AMI_PASSWORD}
@@ -42,12 +41,11 @@ services:
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
       - S3_ENDPOINT=${S3_ENDPOINT}
-      - S3_ENDPOINT_MINIO=${S3_ENDPOINT_MINIO}
       - AWS_DEFAULT_REGION=us-east-1
       - GOOGLE_MAPS_API_KEY=${GOOGLE_MAPS_API_KEY}
       - GOOGLE_MAPS_CENTER='${GOOGLE_MAPS_CENTER}'
       - EMAIL_BACKEND=django.core.mail.backends.dummy.EmailBackend
-      - OML_BRANCH=${OML_BRANCH}
+      - OML_BRANCH=${OMLAPP_IMG}
       - OML_COMMIT=${OML_COMMIT}
       - OML_BUILD_DATE=${OML_BUILD_DATE}
       - WOMBAT_HOSTNAME=${WOMBAT_HOSTNAME}
@@ -73,10 +71,9 @@ services:
       - django_callrec_zip:/opt/omnileads/asterisk/var/spool/asterisk/monitor
 
   channels:
+    container_name: oml-django-channels
     depends_on:
       - redis
-      - acd
-    container_name: oml-django-channels
     dns: 8.8.8.8
     environment:
       - DAPHNE_ENABLE=True
@@ -112,7 +109,6 @@ services:
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
       - S3_ENDPOINT=${S3_ENDPOINT}
-      - S3_ENDPOINT_MINIO=${S3_ENDPOINT_MINIO}
       - AWS_DEFAULT_REGION=us-east-1
       - GOOGLE_MAPS_API_KEY=${GOOGLE_MAPS_API_KEY}
       - GOOGLE_MAPS_CENTER='${GOOGLE_MAPS_CENTER}'
@@ -136,10 +132,11 @@ services:
     working_dir: /opt/omnileads/ominicontacto
 
   crones:
+    container_name: oml-django-cron
     depends_on:
+      - postgresql
       - redis
       - acd
-    container_name: oml-django-cron
     dns: 8.8.8.8
     environment:
       - TZ=${TZ}
@@ -173,7 +170,6 @@ services:
       - S3_BUCKET_NAME=${S3_BUCKET_NAME}
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
-      - S3_ENDPOINT=${S3_ENDPOINT_MINIO}
       - AWS_DEFAULT_REGION=us-east-1
       - GOOGLE_MAPS_API_KEY=${GOOGLE_MAPS_API_KEY}
       - GOOGLE_MAPS_CENTER='${GOOGLE_MAPS_CENTER}'
@@ -215,7 +211,7 @@ services:
       - PGPASSWORD=${PGPASSWORD}
       - REDIS_HOSTNAME=${REDIS_HOSTNAME}
     network_mode: host
-
+    
   acd:
     container_name: oml-asterisk
     depends_on:
@@ -227,7 +223,6 @@ services:
       - ENV=${ENV}
       - FASTAGI=${FASTAGI_HOSTNAME}
       - TZ=${TZ}
-      - UTC_LOGS=false
       - ASTERISK_LOCATION=
       - AMI_USER=${AMI_USER}
       - AMI_PASSWORD=${AMI_PASSWORD}
@@ -290,6 +285,7 @@ services:
       - app
       - kamailio
       - websockets
+      - channels
     dns: 8.8.8.8
     environment:
       - TZ=${TZ}
@@ -318,7 +314,6 @@ services:
       - POSTGRES_USER=${PGUSER}
       - POSTGRES_PASSWORD=${PGPASSWORD}
       - POSTGRES_DB=${PGDATABASE}
-      - PGHOST=${PGHOST}
     image: ${OMLPGSQL_IMG}
     command: postgres -c listen_addresses=${PGHOST}
     network_mode: host
@@ -359,9 +354,9 @@ services:
   websockets:
     tty: true
     container_name: oml-websockets
-    image: ${OMLWS_IMG}
     depends_on:
       - redis
+    image: ${OMLWS_IMG}
     environment:
       - BIND_ADDRESS=${WEBSOCKET_HOSTNAME}:8000
       - EVENT_LOOP=uvloop
@@ -374,8 +369,7 @@ services:
       interval: 1s
       timeout: 10s
       retries: 10
-
-
+  
 ####################################### OBSERVABILITY #######################################
 
   # prometheus:
@@ -447,12 +441,10 @@ services:
   #     - REDIS_USER=null
   #     - REDIS_PASSWORD=null
 
-
 volumes:
-  redis_data:
   postgresql_data:
+  redis_data:
+  minio_data:
   django_static:
   django_callrec_zip:
-  prometheus_data:
-  loki_data:
   #prometheus_data:
