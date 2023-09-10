@@ -391,7 +391,7 @@ services:
       options:
         max-size: "50m"
     volumes:
-      - ./obsprometheus.yml/:/etc/prometheus/prometheus.yml
+      - ./obs/prometheus.yml/:/etc/prometheus/prometheus.yml
       - prometheus_data:/prometheus
 
   nodeexporter:
