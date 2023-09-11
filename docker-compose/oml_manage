@@ -13,8 +13,27 @@ case $1 in
     docker exec -it oml-pstn-emulator sipp -sn uac 127.0.0.1:5060 -s stress -m 1 -r 1 -d 60000 -l 1
     ;;
   --backup)
-    docker run -e POSTGRES_BACKUP=True --env-file .env omnileads/omlapp:1.30.0
-    docker exec -it oml-asterisk /opt/asterisk/scripts/asterisk_backup.py $(date +'%y%m%d.%H%M')
+    file_date=$(date +'%y%m%d.%H%M')
+    docker run --network=host --env-file .env -e POSTGRES_BACKUP=True -e BACKUP_FILENAME=pgsql-backup-$file_date.sql omnileads/omlapp:1.30.0
+    docker exec -it oml-asterisk /opt/asterisk/scripts/asterisk_backup.py $file_date
+    ;;
+  --restore)
+    file_date=$2
+    echo "¿Are you sure you want to delete the database & restore backup DB? yes or no"
+    read confirmacion
+    if [[ $confirmacion == "yes" ]]; then
+      echo "echo drop all on PostgreSQL"
+      docker stop oml-postgres
+      docker rm oml-postgres
+      docker volume rm oml_postgresql_data
+      docker-compose -f docker-compose_prod_external_bucket.yml up -d
+      until curl -sk --head  --request GET https://localhost |grep "302" > /dev/null; do echo "Environment still initializing , sleeping 10 seconds"; sleep 10; done; echo "Environment is up"
+      docker run --network=host -e POSTGRES_RESTORE=True -e BACKUP_FILENAME=pgsql-backup-$file_date.sql --env-file .env omnileads/omlapp:1.30.0
+      docker exec -it oml-asterisk python /opt/asterisk/scripts/asterisk_restore.py $file_date
+      docker exec -it oml-asterisk asterisk -rx 'dialplan reload'
+    else
+      echo "Operación cancelada."
+    fi  
     ;;
   --postgres_drop_db)
     echo "¿Are you sure you want to delete the database? yes or no"
