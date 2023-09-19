@@ -21,7 +21,7 @@ You need docker installed (on Linux, Mac or Windows) and this reposotory cloned 
 
 ```
 git clone https://gitlab.com/omnileads/omldeploytool.git
-cd omldeploytool/docker-compose
+cd omldeploytool/docker-compose-qa
 ```
 
 ## Setup your environment
