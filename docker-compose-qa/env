@@ -15,7 +15,7 @@ PUBLIC_IP=
 #           versions of each image to deploy                #
 #############################################################
 
-OMLAPP_IMG=omnileads/omlapp:1.30.0
+OMLAPP_IMG=omnileads/omlapp:1.30.0-enterprise
 OMLACD_IMG=omnileads/asterisk:230811.01
 OMLFASTAGI_IMG=omnileads/fastagi:230918.01
 OMLAMI_IMG=omnileads/astami:230917.01
