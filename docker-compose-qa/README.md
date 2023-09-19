@@ -24,14 +24,6 @@ git clone https://gitlab.com/omnileads/omldeploytool.git
 cd omldeploytool/docker-compose
 ```
 
-# OMniLeads & Docker Compose 
-
-In this folder, we will find three Docker Compose files.
-
-* **docker-compose.yml**: is used to launch the stack on the workstation with Docker Desktop.
-* **docker-compose_prod.yml**: is used to launch the stack on a VPS or VM."
-* **docker-compose_prod_external_bucket.yml**: is used to launch the stack on a VPS or VM and using an external bucket
-
 ## Setup your environment
 
 You need to create a .env file by using (cp) the environment file provided here.
@@ -159,3 +151,5 @@ For more options:
 
 
 ## Video calls <a name="oml_video"></a>
+
+https://localhost
