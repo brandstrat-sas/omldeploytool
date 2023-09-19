@@ -211,7 +211,7 @@ services:
       - "4573:4573"
   
   ami: 
-    image: omnileads/astami:230917.01
+    image: ${OMLAMI_IMG}
     container_name: oml-astami
     environment:
       - TZ=${TZ}
