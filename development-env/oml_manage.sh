@@ -10,7 +10,7 @@ case $1 in
     ;;
   --call_generate)
     echo "generate an ibound call through PSTN-Emulator container"
-    docker exec -it oml-pstn-emulator sipp -sn uac 127.0.0.1:5060 -s stress -m 1 -r 1 -d 60000 -l 1
+    docker exec -it oml-pstn-emulator sipp -sn uac localhost:5060 -s stress -m 1 -r 1 -d 60000 -l 1
     ;;
   --backup)
     docker run -e POSTGRES_BACKUP=True --env-file .env omnileads/omlapp:1.30.0

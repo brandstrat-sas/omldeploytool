@@ -208,10 +208,6 @@ services:
     container_name: oml-fastagi
     environment:
       - TZ=${TZ}
-      - AMI_HOST=${ASTERISK_HOSTNAME}
-      - AMI_USER=${AMI_USER}
-      - AMI_PASSWD=${AMI_PASSWORD}
-      - AMI_PORT=5038
       - PGHOST=${PGHOST}
       - PGPORT=${PGPORT}
       - PGDB=${PGDATABASE}
@@ -220,7 +216,20 @@ services:
       - REDIS_HOSTNAME=${REDIS_HOSTNAME}
     networks:
       - omnileads  
-    
+  
+  ami:
+    image: ${OMLAMI_IMG}
+    container_name: oml-astami
+    environment:
+      - TZ=${TZ}
+      - ASTERISK_HOSTNAME=${ASTERISK_HOSTNAME}
+      - AMI_USER=${AMI_USER}
+      - AMI_PASSWORD=${AMI_PASSWORD}
+      - REDIS_HOSTNAME=${REDIS_HOSTNAME}
+    restart: on-failure  
+    networks:
+      - omnileads
+
   acd:
     container_name: oml-asterisk
     depends_on:
@@ -342,7 +351,7 @@ services:
     restart: on-failure
     stop_grace_period: 1m30s
     volumes:
-      - postgresql_data:/var/lib/postgresql/data
+      - postgresql:/var/lib/postgresql/data
 
   redis:
     container_name: oml-redis
@@ -352,12 +361,14 @@ services:
       - BIND_IP=0.0.0.0
     networks:
       - omnileads
+    ports:
+      - 16379:6379  
     image: ${OMLREDIS_IMG}
     privileged: true
     restart: on-failure
     stop_grace_period: 1m30s
     volumes:
-      - redis_data:/data
+      - redis:/data
 
   rtpengine:
     container_name: oml-rtpengine
@@ -410,7 +421,7 @@ services:
       - 9001:9001
       - 9000:9000
     volumes:
-      - minio_data:/data
+      - minio:/data
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
       interval: 30s
@@ -452,7 +463,7 @@ services:
     restart: on-failure
     stop_grace_period: 1m30s
     volumes:
-      - mariadb_data:/bitnami
+      - mariadb:/bitnami
 
   wombat:  
     command: >
@@ -516,9 +527,10 @@ networks:
         - subnet: "${SUBNET}"
 
 volumes:
-  postgresql_data:
-  redis_data:
-  minio_data:
-  django_static:
+  postgresql:
+  redis:
+  minio:
+  django:
   django_callrec_zip:
-  mariadb_data:
+  django_static:
+  mariadb:

@@ -194,23 +194,32 @@ services:
     working_dir: /opt/omnileads
 
   fastagi:
-    depends_on:
-      - postgresql
-      - redis
     image: ${OMLFASTAGI_IMG}
     container_name: oml-fastagi
     environment:
       - TZ=${TZ}
-      - AMI_HOST=${ASTERISK_HOSTNAME}
-      - AMI_USER=${AMI_USER}
-      - AMI_PASSWD=${AMI_PASSWORD}
-      - AMI_PORT=5038
       - PGHOST=${PGHOST}
       - PGPORT=${PGPORT}
-      - PGDB=${PGDATABASE}
       - PGUSER=${PGUSER}
+      - PGDATABASE=${PGDATABASE}
       - PGPASSWORD=${PGPASSWORD}
       - REDIS_HOSTNAME=${REDIS_HOSTNAME}
+    restart: on-failure
+    networks:
+      - omnileads  
+    ports:
+      - "4573:4573"
+  
+  ami: 
+    image: omnileads/astami:230917.01
+    container_name: oml-astami
+    environment:
+      - TZ=${TZ}
+      - ASTERISK_HOSTNAME=${ASTERISK_HOSTNAME}
+      - AMI_USER=${AMI_USER}
+      - AMI_PASSWORD=${AMI_PASSWORD}
+      - REDIS_HOSTNAME=${REDIS_HOSTNAME}
+    restart: on-failure  
     networks:
       - omnileads  
     
