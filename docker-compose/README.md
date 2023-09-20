@@ -10,6 +10,8 @@
 
 * [Requirements](#requirements)
 * [Docker Desktop](#docker_desktop)
+* [Cloud VPS or Onpremise VM](#vps_vm)
+* [Security](#security)
 * [First login](#post_install)
 * [Simulate calls](#pstn_emulator)
 * [Predictive dialer](#wombat_dialer)
@@ -73,6 +75,63 @@ Below are the Firewall rules to be applied on All In One instance:
 
 * 3100/TCP Loki (optional, only if you are going to centralize container logs with grafana and loki): this is where the connections coming from the monitoring center are processed, more precisely from Grafana, are processed. This port can be opened by restricting by origin on the IP of the monitoring center.
 
+### **Onpremise Virtual Machine or Cloud VPS** <a name="vps_vm"></a>
+
+>  Note: If working on a VPS with a public IP address, it is a mandatory requirement that it also has a network interface with the ability to associate a private IP address.
+
+The first_boot_installer.sh script can be used to deploy to a debian-based clean instance.
+
+For example:
+
+```
+curl -o first_boot_installer.sh -L "https://gitlab.com/omnileads/omldeploytool/-/raw/main/docker-compose/first_boot_installer.sh" && chmod +x first_boot_installer.sh
+```
+
+Without dialer:
+
+```
+export BRANCH=main NIC=eth0 ENV=lan && ./first_boot_installer.sh
+```
+
+With dialer:
+
+```
+export BRANCH=main NIC=eth0 ENV=lan DIALER_HOST=X.X.X.X DIALER_USER=demo DIALER_PASS=demoadmin && ./first_boot_installer.sh
+```
+
+You must to specify the private ipv4 NIC and scenario (ENV) we'll be working with, which will be cloud if we're working on a VPS (cloud), and lan if we're using an on-premise Virtual Machine (lan).
+The BUCKE_NAME=NULL is necesary in order to work with the minio (localhost) object storage.
+
+If we look at the .env file, we will see that the variables corresponding to the hostname of each component have been modified:
+
+```
+DJANGO_HOSTNAME=localhost
+DAPHNE_HOSTNAME=localhost
+ASTERISK_HOSTNAME=$PRIVATE_IPV4
+WEBSOCKET_HOSTNAME=localhosts
+WEBSOCKET_REDIS_HOSTNAME=redis://localhost:6379
+PGHOST=localhost
+OMNILEADS_HOSTNAME=$PRIVATE_IPV4
+RTPENGINE_HOSTNAME=$PRIVATE_IPV4
+REDIS_HOSTNAME=localhost
+KAMAILIO_HOSTNAME=localhost
+```
+
+depending on the scenario (lan or cloud), the .env in terms of bucket, should look like this:
+
+if ENV=lan:
+```
+S3_ENDPOINT=https://$PRIVATE_IPV4
+S3_ENDPOINT_MINIO=http://localhost:9000
+```
+
+if ENV=cloud:
+```
+S3_ENDPOINT=https://$PUBLIC_IPV4 or S3_ENDPOINT=https://$FQDN
+S3_ENDPOINT_MINIO=http://localhost:9000
+```
+
+![Diagrama deploy tool](../ansible/png/deploy-tool-tenant-compose-vps.png)
 
 ### **Onpremise Virtual Machine and VPS Cloud deploy with external bucket**
 

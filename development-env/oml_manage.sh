@@ -60,10 +60,11 @@ case $1 in
     if [[ $confirmacion == "yes" ]]; then
       echo "redis cleaning"
       echo "echo drop all on REDIS"
-      docker stop oml-redis
-      docker rm oml-redis
-      docker volume rm oml_redis
-      docker-compose up -d --force-recreate --no-deps redis
+      docker exec -it oml-redis redis-cli -n 1 FLUSHDB
+      docker-compose up -d --force-recreate --no-deps app
+      docker-compose up -d --force-recreate --no-deps kamailio
+      docker-compose up -d --force-recreate --no-deps nginx
+      docker-compose up -d --force-recreate --no-deps ami
     else
       echo "Cancel action"
     fi

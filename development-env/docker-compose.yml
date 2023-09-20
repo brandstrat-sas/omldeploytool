@@ -311,6 +311,8 @@ services:
       - BIND_IP=0.0.0.0
     networks:
       - omnileads
+    ports:
+      - 16379:6379  
     image: ${OMLREDIS_IMG}
     privileged: true
     restart: on-failure
