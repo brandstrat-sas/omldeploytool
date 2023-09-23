@@ -56,10 +56,10 @@ services:
       - OML_LOGGING_SLOWSQL_ENABLED=
       - OML_LOGGING_SLOWSQL_OUTPUT="-"
       - OML_LOGGING_SLOWSQL_DURATION=1
-      #- SURVEY_VERSION=develop
-      #- WALLBOARD_VERSION=develop
-      #- PREMIUM_REPORTS_VERSION=develop
-      #- WEBPHONE_CLIENT_VERSION=develop
+      - SURVEY_VERSION=develop
+      - WALLBOARD_VERSION=develop
+      - PREMIUM_REPORTS_VERSION=develop
+      - WEBPHONE_CLIENT_VERSION=develop
     image: ${OMLAPP_IMG}
     networks:
       - omnileads

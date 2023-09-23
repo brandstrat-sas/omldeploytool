@@ -1,0 +1,67 @@
+# Copyright (C) 2022 Freetech Solutions
+
+# This file is part of OMniLeads
+
+# This program is free software: You can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY, without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see http://www.gnu.org/licenses/.
+
+---
+
+- name: AMI OMniLeads application installation
+  hosts: 
+    - omnileads_app
+    - omnileads_aio
+  tags:
+    - asterisk
+    - ami
+  vars:
+    img_repo: '{{ container_image_registry }}/omnileads/ami'
+
+  tasks:
+
+  - name: AMI environment variables
+    template:
+      src: "{{ ami_repo_path }}templates/ami.env"
+      dest: /etc/default/ami.env
+      mode: 666
+      owner: "{{ usuario }}"
+      group: "{{ usuario }}"
+    tags:
+      - install
+      - upgrade
+
+  - name: AMI Copy systemd service file
+    template:
+      src: "{{ ami_repo_path }}templates/ami.service"
+      dest: /etc/systemd/system/ami.service
+    tags:
+      - install
+      - upgrade
+
+  - name: AMI Pull image
+    command: podman pull --quiet {{ img_repo }}:{{ ami_version }}
+    register: podman_pull
+    until: podman_pull is success
+    tags:
+      - install
+      - upgrade
+
+  - name: AMI Enable and start systemd service
+    systemd:
+      name: ami.service
+      state: restarted
+      enabled: yes
+      daemon_reload: yes
+    tags:
+      - install
+      - upgrade

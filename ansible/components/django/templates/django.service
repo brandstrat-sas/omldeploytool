@@ -24,7 +24,7 @@ ExecStart=/usr/bin/podman run \
 --volume=django_callrec_zip:/opt/omnileads/asterisk/var/spool/asterisk/monitor \
 --volume=django_logs:/opt/omnileads/log:rw \
 {% if scalable_tunings is defined %}
---volume=/etc/omnileads/uwsgi.ini:/opt/omnileads/run/oml_uwsgi.ini \
+--volume=/etc/omnileads/uwsgi.ini:/opt/omnileads/run/oml_uwsgi.ini:ro \
 {% endif %}
 --rm  \
 {{ container_image_registry }}/{{ omlapp_repo }}/omlapp:{{ omnileads_version }}
