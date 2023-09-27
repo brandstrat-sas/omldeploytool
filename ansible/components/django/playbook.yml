@@ -84,16 +84,25 @@
       - upgrade_from_oml_1 is not defined 
       - postgres_out == true
       
-  - name: Scalable Tunings; UWSGI Copy custom uwsgi.ini
+  - name: DJANGO Scalable tunings custom uwsgi.ini
     template:
       src: "{{ django_repo_path }}templates/uwsgi.ini"
       dest: /etc/omnileads/uwsgi.ini
-      mode: 666
+      mode: 0777
       owner: "{{ usuario }}"
       group: "{{ usuario }}"
+    tags:
+      - install
+      - upgrade  
     when: 
       - scalable_tunings is defined
 
+  # - name: DJANGO run django commands
+  #   shell: "podman run --network=host -e DJANGO_COMMANDS=True --env-file /etc/default/django.env {{ img_repo }}:{{ omnileads_version }}"
+  #   tags:
+  #     - install
+  #     - upgrade
+    
   - name: DJANGO Enable and start systemd service
     systemd:
       name: omnileads.service

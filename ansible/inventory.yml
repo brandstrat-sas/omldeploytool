@@ -28,8 +28,8 @@ all:
         tenant_example_1:
           #container_orchest: docker_compose (by default systemd)
           tenant_id: tenant_example_1
-          ansible_host: 190.19.150.18
-          omni_ip_lan: 172.16.101.44
+          ansible_host: 64.176.7.248
+          omni_ip_lan: 10.53.96.3
         tenant_example_2:
           tenant_id: tenant_example_2
           ansible_host: 190.19.11.2
@@ -281,14 +281,14 @@ all:
     # --- For each OML Deploy Tool release, a versioned stack with the latest stable images of each component is maintained on inventory.yml
     # --- You can combine the versions as you like, also use your own TAGs, using the following TAG version variables
     
-    omnileads_version: 1.30.0
-    asterisk_version: 230811.01
+    omnileads_version: 1.30.1
+    asterisk_version: 230925.02
     fastagi_version: 230920.01
     astami_version: 230920.01
-    nginx_version: 230215.01
+    nginx_version: 230923.01
     websockets_version: 230204.01
-    kamailio_version: 230204.01
-    rtpengine_version: 230921.01
+    kamailio_version: 230925.01
+    rtpengine_version: 230925.01
     redis_version: 230704.01
     postgres_version: 230624.01
 
@@ -318,15 +318,15 @@ omnileads_aio:
 ################################################    
 omnileads_data:
   hosts:
-    tenant_example_5_data:  
+    #tenant_example_5_data:  
     
 omnileads_voice:
   hosts:
-    tenant_example_5_voice:
+    #tenant_example_5_voice:
 
 omnileads_app:
   hosts:
-    tenant_example_5_app:
+    #tenant_example_5_app:
 
 ################################################
 ha_omnileads_sql:

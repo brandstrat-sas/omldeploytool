@@ -17,18 +17,20 @@ ExecStart=/usr/bin/podman run \
   --replace \
   --detach \
   --network=host \
+  --log-driver=journald \
   --env-file=/etc/default/nginx.env \
   --name=oml-nginx-server \
   --volume=/etc/omnileads/certs:/etc/omnileads/certs \
   --volume=django_static:/opt/omnileads/static \
   --volume=django_callrec_zip:/opt/omnileads/asterisk/var/spool/asterisk/monitor \
-  --volume=nginx_logs:/var/log/nginx/ \
-  --rm  \
+  --rm  \  
   {{ container_image_registry }}/omnileads/nginx:{{ nginx_version }}
 ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
 ExecStopPost=/usr/bin/podman rm -f --ignore --cidfile=%t/%n.ctr-id
 Type=notify
 NotifyAccess=all
+StandardOutput=journal
+StandardError=journal
 
 [Install]
 WantedBy=default.target

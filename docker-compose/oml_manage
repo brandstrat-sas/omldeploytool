@@ -21,7 +21,8 @@
     ;;
   --call_generate)
     echo "generate an ibound call through PSTN-Emulator container"
-    docker exec -it oml-pstn-emulator sipp -sn uac 127.0.0.1:5060 -s stress -m 1 -r 1 -d 60000 -l 1
+    #docker exec -it oml-pstn-emulator sipp -sn uac 127.0.0.1:5060 -s stress -m 1 -r 1 -d 60000 -l 1
+    docker exec -it oml-pstn-emulator sipp -sn uac 127.0.0.1:5060 -s stress -m $2 -r 20 -rp $3 -d 60000
     ;;
   --backup)
     file_date=$(date +'%y%m%d.%H%M')
@@ -138,6 +139,9 @@
   --fastagi_logs)
     docker logs -f oml-fastagi
     ;;
+  --astami_logs)
+    docker logs -f oml-fastagi
+    ;;  
   --rtpengine_logs)
     docker logs -f oml-rtpengine
     ;;

@@ -17,6 +17,7 @@ ExecStart=/usr/bin/podman run \
   --replace \
   --detach \
   --network=host \
+  --log-driver=journald \
   --env-file=/etc/default/postgres.env \
   --name=oml-postgresql-server \
   --volume=oml_postgres:/var/lib/postgresql/data \
@@ -26,6 +27,8 @@ ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
 ExecStopPost=/usr/bin/podman rm -f --ignore --cidfile=%t/%n.ctr-id
 Type=notify
 NotifyAccess=all
+StandardOutput=journal
+StandardError=journal
 
 [Install]
 WantedBy=default.target
