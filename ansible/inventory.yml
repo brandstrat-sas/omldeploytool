@@ -27,8 +27,8 @@ all:
         tenant_example_1:
           #container_orchest: docker_compose (by default systemd)
           tenant_id: tenant_example_1
-          ansible_host: 64.176.7.248
-          omni_ip_lan: 10.53.96.3
+          ansible_host: 190.19.150.18
+          omni_ip_lan: 172.16.101.44
         tenant_example_2:
           tenant_id: tenant_example_2
           ansible_host: 190.19.11.2
