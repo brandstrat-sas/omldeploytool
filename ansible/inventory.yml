@@ -317,15 +317,15 @@ omnileads_aio:
 ################################################    
 omnileads_data:
   hosts:
-    #tenant_example_5_data:  
+    tenant_example_5_data:  
     
 omnileads_voice:
   hosts:
-    #tenant_example_5_voice:
+    tenant_example_5_voice:
 
 omnileads_app:
   hosts:
-    #tenant_example_5_app:
+    tenant_example_5_app:
 
 ################################################
 ha_omnileads_sql:
