@@ -1,34 +1,38 @@
-# Release Notes 
-[2023-09-04]
+# Release Notes - OMniLeads 1.31.0
+[2023-09-29]
 
 ## Added
 
-* oml-300 - Inbound video call campaigns
-* oml-238 - QA environment
+* oml-304 - New component ASTAMI in order to interact with Asterisk AMI
+* oml-304 - Daily statistics on agents and campaigns in Redis Hash for real-time views
+* oml-328 - Now it's possible to have OML ACD on a network and Wombat Dialer in another network segment or external network
 
 ## Improvments
 
-* oml-329 - Quick install bash script: docker-compose/first_boot_install.sh 
-* oml-300 - oml_manage new actions
+* oml-304 - [ANSIBLE] setting high performance uwsgi.ini
+* oml-345 - [ANSIBLE] send container logs from stdout/sterror to journald
 
 ## Fixed
 
-No fixes in this release.
+* oml-355 - RTPengine scenary for NAT onpremise deploys
+* oml-35 - kamailio fix antiflood inboubd calls 
+* oml-310 - There is default Music On Hold (MOH) available for inbound campaigns
 
 ## Removed
 
-No removals in this release.
+* oml-345 All types of containers file logging have been removed
 
 # OMniLeads Component versions
 
 ```
-    omnileads_version: 1.30.0
-    asterisk_version: 230811.01
-    fastagi_version: 230830.01
+    omnileads_version: 230928.01
+    asterisk_version: 230925.02
+    fastagi_version: 230920.01
+    astami_version: 230920.01
     nginx_version: 230215.01
     websockets_version: 230204.01
-    kamailio_version: 230204.01
-    rtpengine_version: 230606.01
+    kamailio_version: 230925.01
+    rtpengine_version: 230921.01
     redis_version: 230704.01
     postgres_version: 230624.01
 ```

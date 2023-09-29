@@ -18,14 +18,16 @@ ExecStart=/usr/bin/podman run \
   --replace \
   --detach \
   --network=host \
+  --log-driver=journald \
   --env-file=/etc/default/asterisk.env \
   --volume=/etc/asterisk/custom/:/etc/asterisk/custom \
-  --volume=asterisk_logs:/var/log/asterisk:rw \
   --name=oml-asterisk-server \
   --rm  \
   {{ container_image_registry }}/omnileads/asterisk:{{ asterisk_version }}
 ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
 ExecStopPost=/usr/bin/podman rm -f --ignore --cidfile=%t/%n.ctr-id
+StandardOutput=journal
+StandardError=journal
 Type=notify
 NotifyAccess=all
 
