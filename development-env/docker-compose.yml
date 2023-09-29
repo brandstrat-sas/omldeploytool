@@ -58,7 +58,7 @@ services:
       - OML_LOGGING_SLOWSQL_OUTPUT="-"
       - OML_LOGGING_SLOWSQL_DURATION=1
       - SURVEY_VERSION=develop
-    #- WALLBOARD_VERSION=develop
+      #- WALLBOARD_VERSION=develop
       - PREMIUM_REPORTS_VERSION=develop
       - WEBPHONE_CLIENT_VERSION=develop
     image: ${OMLAPP_IMG}
@@ -140,10 +140,6 @@ services:
     container_name: oml-fastagi
     environment:
       - TZ=${TZ}
-      - AMI_HOST=${ASTERISK_HOSTNAME}
-      - AMI_USER=${AMI_USER}
-      - AMI_PASSWD=${AMI_PASSWORD}
-      - AMI_PORT=5038
       - PGHOST=${PGHOST}
       - PGPORT=${PGPORT}
       - PGUSER=${PGUSER}
@@ -151,31 +147,29 @@ services:
       - PGPASSWORD=${PGPASSWORD}
       - REDIS_HOSTNAME=${REDIS_HOSTNAME}
     volumes:
-      - ${REPO_PATH}/omlfastagi/server:/fastagi/server
+      - ${REPO_PATH}/omlfastagi:/app
     restart: on-failure
     networks:
       - omnileads  
     ports:
       - "4573:4573"
   
-  # ami: 
-  #   image: ${OMLAMI_IMG}
-  #   container_name: oml-ami
-  #   environment:
-  #     - ASTERISK_HOSTNAME=${ASTERISK_HOSTNAME}
-  #     - AMI_USER=${AMI_USER}
-  #     - AMI_PASSWORD=${AMI_PASSWORD}
-  #     - REDIS_HOSTNAME=${REDIS_HOSTNAME}
-  #   restart: on-failure  
-  #   #volumes:
-  #   #  - ${REPO_PATH}/omlfastagi/server:/fastagi/server
-  #   networks:
-  #     - omnileads  
+  ami: 
+    image: ${OMLAMI_IMG}
+    container_name: oml-astami
+    environment:
+      - TZ=${TZ}
+      - ASTERISK_HOSTNAME=${ASTERISK_HOSTNAME}
+      - AMI_USER=${AMI_USER}
+      - AMI_PASSWORD=${AMI_PASSWORD}
+      - REDIS_HOSTNAME=${REDIS_HOSTNAME}
+    restart: on-failure  
+    volumes:
+     - ${REPO_PATH}/omlami:/app
+    networks:
+      - omnileads  
     
   acd:
-    #build:
-    #  target: run
-    #  context: ${REPO_PATH}/omlacd
     container_name: oml-asterisk
     depends_on:
       - postgresql
@@ -212,11 +206,13 @@ services:
     ports:
       - ${SIP_EXT_PORT}:5060/udp
       - 7088:7088
+      - 5038:5038
     privileged: true
     restart: on-failure
     stop_grace_period: 1m30s
     volumes:
       - ./ast_custom_conf:/etc/asterisk/custom
+      - ast_db:/var/lib/asterisk/astdb
       - ${REPO_PATH}/omlacd/source/astconf:/etc/asterisk/
       - ${REPO_PATH}/omlacd/source/scripts:/opt/asterisk/scripts
     working_dir: /etc/asterisk
@@ -315,6 +311,8 @@ services:
       - BIND_IP=0.0.0.0
     networks:
       - omnileads
+    ports:
+      - 16379:6379  
     image: ${OMLREDIS_IMG}
     privileged: true
     restart: on-failure
@@ -530,3 +528,4 @@ volumes:
   ast_conf:
   ast_sounds:
   ast_moh:
+  ast_db:

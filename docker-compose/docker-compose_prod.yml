@@ -216,7 +216,19 @@ services:
       - PGPASSWORD=${PGPASSWORD}
       - REDIS_HOSTNAME=${REDIS_HOSTNAME}
     network_mode: host
-    
+
+  ami:
+    image: ${OMLAMI_IMG}
+    container_name: oml-astami
+    environment:
+      - TZ=${TZ}
+      - ASTERISK_HOSTNAME=${ASTERISK_HOSTNAME}
+      - AMI_USER=${AMI_USER}
+      - AMI_PASSWORD=${AMI_PASSWORD}
+      - REDIS_HOSTNAME=${REDIS_HOSTNAME}
+    restart: on-failure  
+    network_mode: host
+
   acd:
     container_name: oml-asterisk
     depends_on:
