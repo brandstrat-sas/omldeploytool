@@ -17,7 +17,6 @@ ExecStart=/usr/bin/podman run \
   --replace \
   --detach \
   --network=host \
-  --log-driver=journald \
   --env-file=/etc/default/nginx.env \
   --name=oml-nginx-server \
   --volume=/etc/omnileads/certs:/etc/omnileads/certs \
