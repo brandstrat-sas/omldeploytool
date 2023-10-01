@@ -287,7 +287,7 @@ all:
     nginx_version: 230215.01
     websockets_version: 230204.01
     kamailio_version: 230925.01
-    rtpengine_version: 230921.01
+    rtpengine_version: 230925.01
     redis_version: 230704.01
     postgres_version: 230624.01
 
