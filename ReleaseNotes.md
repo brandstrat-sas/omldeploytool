@@ -29,7 +29,7 @@
     asterisk_version: 230925.02
     fastagi_version: 230920.01
     astami_version: 230920.01
-    nginx_version: 230215.01
+    nginx_version: 230923.01
     websockets_version: 230204.01
     kamailio_version: 230925.01
     rtpengine_version: 230925.01

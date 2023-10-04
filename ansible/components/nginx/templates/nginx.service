@@ -17,6 +17,7 @@ ExecStart=/usr/bin/podman run \
   --replace \
   --detach \
   --network=host \
+  --log-driver=journald \
   --env-file=/etc/default/nginx.env \
   --name=oml-nginx-server \
   --volume=/etc/omnileads/certs:/etc/omnileads/certs \
@@ -28,6 +29,8 @@ ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
 ExecStopPost=/usr/bin/podman rm -f --ignore --cidfile=%t/%n.ctr-id
 Type=notify
 NotifyAccess=all
+StandardOutput=journal
+StandardError=journal
 
 [Install]
 WantedBy=default.target
