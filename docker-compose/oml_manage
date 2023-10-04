@@ -86,21 +86,16 @@
     docker exec -it oml-uwsgi psql
     ;;      
   --redis_clean)
-      echo "¿Are you sure you want to delete all redis cache? yes or no"
+    echo "¿Are you sure you want to delete all redis cache? yes or no"
     read confirmacion
     if [[ $confirmacion == "yes" ]]; then
-      echo "redis cleaning"
-      echo "echo drop all on REDIS"
-      docker stop oml-redis
-      docker rm oml-redis
-      docker volume rm oml_redis_data
-      docker-compose up -d --force-recreate --no-deps redis
+      docker exec -it oml-redis redis-cli flushall
     else
       echo "Cancel action"
     fi
     ;;  
    --redis_sync)
-    docker exec -it oml-uwsgi python3 /opt/omnileads/ominicontacto/manage.py sincronizar_wombat
+    docker exec -it oml-uwsgi python3 /opt/omnileads/ominicontacto/manage.py regenerar_asterisk
     ;;
   --redis_cli)
     docker exec -it oml-redis redis-cli
@@ -160,12 +155,13 @@
   --nginx_bash)
     docker exec -it oml-nginx bash
     ;;  
-  --nginx_logs_access)
-    docker exec -it oml-nginx tail -f /var/log/niginx/omnileads_access
+  --nginx_logs)
+    docker logs -f oml-nginx
     ;;    
-  --nginx_logs_error)
-    docker exec -it oml-nginx tail -f /var/log/niginx/omnileads_error
+  --dialer_sync)
+    docker exec -it oml-uwsgi python3 /opt/omnileads/ominicontacto/manage.py sincronizar_wombat
     ;;      
+
   --help)
     echo "
 NAME:

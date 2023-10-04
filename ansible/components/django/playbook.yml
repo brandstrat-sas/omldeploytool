@@ -58,16 +58,6 @@
     tags:
       - install
       - upgrade
- #   when: enterprise_edition == false
-
-  # - name: DJANGO Enterprise Pull image
-  #   command: podman pull --quiet {{ img_repo }}:{{ omnileads_version }}-enterprise
-  #   register: podman_pull
-  #   until: podman_pull is success
-  #   tags:
-  #     - install
-  #     - upgrade
-  #   when: enterprise_edition == true
 
   - name: POSTGRESQL Create a new database with name {{ postgres_database }}
     postgresql_db:
@@ -97,13 +87,14 @@
     when: 
       - scalable_tunings is defined
 
-  # - name: DJANGO run django commands
-  #   shell: "podman run --network=host -e DJANGO_COMMANDS=True --env-file /etc/default/django.env {{ img_repo }}:{{ omnileads_version }}"
-  #   tags:
-  #     - install
-  #     - upgrade
-    
-  - name: DJANGO Enable and start systemd service
+  - name: DJANGO run migrations collectstatic & others commands
+    shell: "podman run --network=host --env-file /etc/default/django.env --volume=django_static:/opt/omnileads/static  {{ img_repo }}:{{ omnileads_version }} /opt/omnileads/bin/django_commands.sh"
+    tags:
+      - install
+      - upgrade
+    when: django_commands == true  
+
+  - name: DJANGO Enable and start systemd UWSGI service
     systemd:
       name: omnileads.service
       state: restarted

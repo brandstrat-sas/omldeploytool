@@ -196,13 +196,13 @@ services:
       - OML_BRANCH=${OML_BRANCH}
       - OML_COMMIT=${OML_COMMIT}
       - OML_BUILD_DATE=${OML_BUILD_DATE}
-      - WOMBAT_HOSTNAME=localhost
+      - WOMBAT_HOSTNAME=${WOMBAT_HOSTNAME}
       - WOMBAT_USER=${WOMBAT_USER}
       - WOMBAT_PASSWORD=${WOMBAT_PASSWORD}
       - OML_LOGGING_SLOWSQL_ENABLED=
       - OML_LOGGING_SLOWSQL_OUTPUT="-"
       - OML_LOGGING_SLOWSQL_DURATION=1
-    image: ${OMLAPP_IMG_NEW}
+    image: ${OMLAPP_IMG}
     command: /opt/omnileads/bin/init_daphne.sh
     networks:
       - omnileads
@@ -261,13 +261,13 @@ services:
       - OML_BRANCH=${OML_BRANCH}
       - OML_COMMIT=${OML_COMMIT}
       - OML_BUILD_DATE=${OML_BUILD_DATE}
-      - WOMBAT_HOSTNAME=localhost
+      - WOMBAT_HOSTNAME=${WOMBAT_HOSTNAME}
       - WOMBAT_USER=${WOMBAT_USER}
       - WOMBAT_PASSWORD=${WOMBAT_PASSWORD}
       - OML_LOGGING_SLOWSQL_ENABLED=
       - OML_LOGGING_SLOWSQL_OUTPUT="-"
       - OML_LOGGING_SLOWSQL_DURATION=1
-    image: ${OMLAPP_IMG_NEW}
+    image: ${OMLAPP_IMG} #omnileads/omlapp:230928.01 #${OMLAPP_IMG}
     command: /opt/omnileads/bin/init_cronos.sh
     networks:
       - omnileads
@@ -296,6 +296,9 @@ services:
       - omnileads  
   
   ami:
+    depends_on:
+      - acd
+      - redis
     image: ${OMLAMI_IMG}
     container_name: oml-astami
     environment:
