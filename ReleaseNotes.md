@@ -15,7 +15,7 @@
 ## Fixed
 
 * oml-355 - RTPengine scenary for NAT onpremise deploys
-* oml-35 - kamailio fix antiflood inboubd calls 
+* oml-35 - kamailio fix antiflood inboubd calls
 * oml-310 - There is default Music On Hold (MOH) available for inbound campaigns
 
 ## Removed
@@ -25,7 +25,7 @@
 # OMniLeads Component versions
 
 ```
-    omnileads_version: 230928.01
+    omnileads_version: 230928.oml346
     asterisk_version: 230925.02
     fastagi_version: 230920.01
     astami_version: 230920.01
