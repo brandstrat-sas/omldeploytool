@@ -227,7 +227,7 @@ do
     --action=keepalived|--action=kamailio|--action=rtpengine|--action=asterisk|--action=sentinel|\
     --action=redis|--action=pgsql_node_recovery_main|--action=pgsql_node_takeover_main|\
     --action=redis_node_takeover_main|--action=pgsql_node_recovery_backup|--action=minio|\
-    --action=restart|--action=restart_django|--action=restart_asterisk)
+    --action=restart|--action=restart_django|--action=restart_asterisk|--action=restart_core)
       oml_action="${i#*=}"
       shift
     ;;

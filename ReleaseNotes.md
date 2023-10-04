@@ -33,8 +33,8 @@
 # OMniLeads Component versions
 
 ```
-    omnileads_version: 230928.01
-    asterisk_version: 231006.01
+    omnileads_version: 230928.oml346
+    asterisk_version: 230925.02
     fastagi_version: 230920.01
     astami_version: 230920.01
     nginx_version: 230923.01
