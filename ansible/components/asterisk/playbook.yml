@@ -165,3 +165,5 @@
       daemon_reload: yes
     tags:
       - restart
+      - restart_django
+      - restart_core
