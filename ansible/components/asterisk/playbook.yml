@@ -150,10 +150,18 @@
   - name: ASTERISK Enable and start systemd service
     systemd:
       name: asterisk.service
-      state: restarted
+      state: started
       enabled: yes
       daemon_reload: yes
     tags:
       - install
       - upgrade
     
+  - name: ASTERISK Rstart systemd service
+    systemd:
+      name: asterisk.service
+      state: started
+      enabled: yes
+      daemon_reload: yes
+    tags:
+      - restart

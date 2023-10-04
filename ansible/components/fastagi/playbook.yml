@@ -22,7 +22,6 @@
     - omnileads_app
     - omnileads_aio
   tags:
-    - asterisk
     - fastagi
   vars:
     img_repo: '{{ container_image_registry }}/omnileads/fastagi'
@@ -59,9 +58,18 @@
   - name: FASTAGI Enable and start systemd service
     systemd:
       name: fastagi.service
-      state: restarted
+      state: started
       enabled: yes
       daemon_reload: yes
     tags:
       - install
       - upgrade
+
+  - name: FASTAGI ReStart systemd service
+    systemd:
+      name: fastagi.service
+      state: restarted
+      enabled: yes
+      daemon_reload: yes
+    tags:
+      - restart

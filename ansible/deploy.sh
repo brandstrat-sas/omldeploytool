@@ -24,6 +24,9 @@ case ${oml_action} in
   upgrade)
     echo "deploy: $oml_action"
   ;;
+  restart)
+    echo "deploy: $oml_action"
+  ;;
   backup)
     echo "deploy: $oml_action"
   ;;
@@ -219,7 +222,12 @@ fi
 for i in "$@"
 do
   case $i in
-    --action=upgrade|--action=install|--action=backup|--action=restore|--action=voice|--action=app|--action=observability|--action=postgres|--action=haproxy|--action=cron|--action=keepalived|--action=kamailio|--action=rtpengine|--action=asterisk|--action=sentinel|--action=redis|--action=pgsql_node_recovery_main|--action=pgsql_node_takeover_main|--action=redis_node_takeover_main|--action=pgsql_node_recovery_backup|--action=minio)
+    --action=upgrade|--action=install|--action=backup|--action=restore|--action=voice|\
+    --action=app|--action=observability|--action=postgres|--action=haproxy|--action=cron|\
+    --action=keepalived|--action=kamailio|--action=rtpengine|--action=asterisk|--action=sentinel|\
+    --action=redis|--action=pgsql_node_recovery_main|--action=pgsql_node_takeover_main|\
+    --action=redis_node_takeover_main|--action=pgsql_node_recovery_backup|--action=minio|\
+    --action=restart)
       oml_action="${i#*=}"
       shift
     ;;

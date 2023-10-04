@@ -60,7 +60,7 @@
   - name: CRON Crones Enable and start systemd service
     systemd:
       name: omlcron.service
-      state: restarted
+      state: started
       enabled: yes
       daemon_reload: yes
     #when: omnileads_ha is not defined  
@@ -68,15 +68,27 @@
       - install
       - upgrade
 
-  # - name: CRON Crones Enable and start systemd service
-  #   systemd:
-  #     name: omlcron.service
-  #     state: restarted
-  #     enabled: yes
-  #     daemon_reload: yes
-  #   when: 
-  #     - omnileads_ha is defined  
-  #     - ha_rol == "main"
-  #   tags:
-  #     - install
-  #     - upgrade
+  - name: CRON Crones Enable and start systemd service
+    systemd:
+      name: omlcron.service
+      state: started
+      enabled: yes
+      daemon_reload: yes
+    when: 
+      - omnileads_ha is defined  
+      - ha_rol == "main"
+    tags:
+      - install
+      - upgrade
+
+  - name: CRON Crones Restart systemd service
+    systemd:
+      name: omlcron.service
+      state: restarted
+      enabled: yes
+      daemon_reload: yes
+    when: 
+      - omnileads_ha is defined  
+      - ha_rol == "main"
+    tags:
+      - restart

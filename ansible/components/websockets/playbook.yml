@@ -59,9 +59,19 @@
   - name: WEBSOCKETS Enable and start Websockets service
     systemd:
       name: websockets.service
-      state: restarted
+      state: started
       enabled: yes
       daemon_reload: yes
     tags:
       - install
       - upgrade
+
+  - name: WEBSOCKETS Restart Websockets service
+    systemd:
+      name: websockets.service
+      state: restarted
+      enabled: yes
+      daemon_reload: yes
+    tags:
+      - restart
+      - restart_websockets

@@ -61,9 +61,18 @@
   - name: DAPHNE Channels Enable and start Daphne systemd service
     systemd:
       name: daphne.service
-      state: restarted
+      state: started
       enabled: yes
       daemon_reload: yes
     tags:
       - install
       - upgrade
+
+  - name: DAPHNE Restart systemd service
+    systemd:
+      name: daphne.service
+      state: started
+      enabled: yes
+      daemon_reload: yes
+    tags:
+      - restart

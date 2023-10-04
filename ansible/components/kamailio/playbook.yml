@@ -70,9 +70,18 @@
     - name: KAMAILIO Enable and start service
       systemd:
         name: kamailio.service
-        state: restarted
+        state: started
         enabled: yes
         daemon_reload: yes
       tags:
         - install
         - upgrade
+
+    - name: KAMAILIO ReStart service
+      systemd:
+        name: kamailio.service
+        state: restarted
+        enabled: yes
+        daemon_reload: yes
+      tags:
+        - restart

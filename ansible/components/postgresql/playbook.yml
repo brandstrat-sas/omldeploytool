@@ -17,7 +17,6 @@
 #
 ---
 
-
 - name: POSTGRESQL component delpoy
   hosts: 
     - omnileads_data
@@ -26,7 +25,7 @@
     - all_components
     - data
     - postgres
-
+    - install
   vars:
     img_repo: '{{ container_image_registry }}/omnileads/postgres'
     img_prometheus_repo: 'docker.io/prometheuscommunity/postgres-exporter'
@@ -41,7 +40,6 @@
         owner: "{{ usuario }}"
         group: "{{ usuario }}"
       tags:
-        - install
         - upgrade
 
     - name: POSTGRESQL Copy systemd file
@@ -49,7 +47,6 @@
         src: "{{ pgsql_repo_path }}templates/postgresql.service"
         dest: /etc/systemd/system/postgresql.service
       tags:
-        - install
         - upgrade
 
     - name: POSTGRESQL Pull image
@@ -57,18 +54,24 @@
       register: podman_pull
       until: podman_pull is success
       tags:
-        - install
         - upgrade
 
     - name: POSTGRESQL Enable and start service
       systemd:
         name: postgresql.service
-        state: restarted
+        state: started
         enabled: yes
         daemon_reload: yes
       tags:
-        - install
         - upgrade
+
+    - name: POSTGRESQL Restart Service
+      systemd:
+        name: postgresql.service
+        state: restarted
+        daemon_reload: yes
+      tags:
+        - restart
 
     - name: POSTGRESQL prometheus Set environment variables for this installation
       template:
@@ -78,7 +81,6 @@
         owner: "{{ usuario }}"
         group: "{{ usuario }}"
       tags:
-        - install
         - upgrade
 
     - name: POSTGRESQL prometheus Copy systemd file
@@ -86,7 +88,6 @@
         src: "{{ pgsql_repo_path }}templates/prometheus.service"
         dest: /etc/systemd/system/prometheus_postgres.service
       tags:
-        - install
         - upgrade
 
     - name: POSTGRESQL prometheus Pull image
@@ -94,15 +95,10 @@
       register: podman_pull
       until: podman_pull is success
       tags:
-        - install
         - upgrade
 
     - name: POSTGRESQL prometheus Enable and start service
       systemd:
         name: prometheus_postgres.service
-        state: restarted
-        enabled: yes
+        state: started
         daemon_reload: yes
-      tags:
-        - install
-        - upgrade

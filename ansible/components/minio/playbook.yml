@@ -57,13 +57,23 @@
   - name: MINIO Enable and start oml minio service
     systemd:
       name: minio.service
-      state: restarted
+      state: started
       enabled: yes
       daemon_reload: yes
     register: minio_run
     until: minio_run is success
     tags:
       - upgrade
+
+  - name: MINIO Restart service
+    systemd:
+      name: minio.service
+      state: restarted
+      daemon_reload: yes
+    register: minio_run
+    until: minio_run is success
+    tags:
+      - restart
 
   - name: MINIO install command line client
     get_url:
