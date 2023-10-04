@@ -73,3 +73,5 @@
       daemon_reload: yes
     tags:
       - restart
+      - restart_fastagi
+      - restart_core
