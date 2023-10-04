@@ -20,14 +20,14 @@ ExecStart=/usr/bin/podman run \
 --log-driver=journald \
 --env-file=/etc/default/django.env \
 -e GOOGLE_MAPS_CENTER='{{ google_maps_center }}' \
---name=oml-django-server \
+--name=oml-uwsgi-server \
 --volume=django_static:/opt/omnileads/static \
 --volume=django_callrec_zip:/opt/omnileads/asterisk/var/spool/asterisk/monitor \
 {% if scalable_tunings is defined %}
 --volume=/etc/omnileads/uwsgi.ini:/opt/omnileads/run/oml_uwsgi.ini:ro \
 {% endif %}
 --rm  \
-{{ container_image_registry }}/{{ omlapp_repo }}/omlapp:{{ omnileads_version }}
+{{ container_image_registry }}/{{ omlapp_repo }}/omlapp:{{ omnileads_version }} /opt/omnileads/bin/init_uwsgi.sh
 ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
 ExecStopPost=/usr/bin/podman rm -f --ignore --cidfile=%t/%n.ctr-id
 Type=notify
