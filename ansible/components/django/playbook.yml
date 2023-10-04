@@ -104,6 +104,15 @@
       - install
       - upgrade
 
+  - name: DJANGO Restart systemd UWSGI service
+    systemd:
+      name: omnileads.service
+      state: restarted
+      enabled: yes
+      daemon_reload: yes
+    tags:
+      - restart
+
   - name: POSTGRESQL Adds plperl extension to the database {{ postgres_database }}
     shell: podman exec -it oml-django-server psql -U {{ postgres_user }} -d {{ postgres_database }} -c "CREATE EXTENSION IF NOT EXISTS plperl;" 
     tags:

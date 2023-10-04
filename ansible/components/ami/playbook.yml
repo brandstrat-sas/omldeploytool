@@ -59,9 +59,18 @@
   - name: AMI Enable and start systemd service
     systemd:
       name: ami.service
-      state: restarted
+      state: started
       enabled: yes
       daemon_reload: yes
     tags:
       - install
       - upgrade
+
+  - name: AMI ReStart systemd service
+    systemd:
+      name: ami.service
+      state: restarted
+      enabled: yes
+      daemon_reload: yes
+    tags:
+      - restart

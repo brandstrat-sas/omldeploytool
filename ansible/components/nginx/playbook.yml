@@ -60,9 +60,18 @@
   - name: NGINX Enable and start oml nginx service
     systemd:
       name: nginx.service
-      state: restarted
+      state: started
       enabled: yes
       daemon_reload: yes
     tags:
       - install
       - upgrade
+
+  - name: NGINX ReStart oml nginx service
+    systemd:
+      name: nginx.service
+      state: restarted
+      enabled: yes
+      daemon_reload: yes
+    tags:
+      - restart

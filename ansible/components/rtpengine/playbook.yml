@@ -60,9 +60,20 @@
   - name: RTPENGINE Enable and start service
     systemd:
       name: rtpengine.service
-      state: restarted
+      state: started
       enabled: yes
       daemon_reload: yes
     tags:
       - install
       - upgrade
+
+  - name: RTPENGINE Rstart service
+    systemd:
+      name: rtpengine.service
+      state: restarted
+      enabled: yes
+      daemon_reload: yes
+    tags:
+      - restart
+      - restart_rtpengine
+      
