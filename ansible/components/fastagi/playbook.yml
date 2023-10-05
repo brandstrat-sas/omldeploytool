@@ -54,6 +54,7 @@
     tags:
       - install
       - upgrade
+      - update
 
   - name: FASTAGI Enable and start systemd service
     systemd:
@@ -72,6 +73,7 @@
       enabled: yes
       daemon_reload: yes
     tags:
+      - upgrade
       - restart
       - restart_fastagi
       - restart_core

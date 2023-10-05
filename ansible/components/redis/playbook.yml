@@ -80,6 +80,7 @@
       state: restarted
       daemon_reload: yes
     tags:
+      - upgrade
       - restart
 
 ############################## PROMETHEUS ###################################
