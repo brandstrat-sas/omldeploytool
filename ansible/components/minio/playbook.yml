@@ -39,6 +39,7 @@
       group: "{{ usuario }}"
     tags:
       - upgrade
+      - update
 
   - name: MINIO Copy systemd service
     template:
@@ -46,6 +47,7 @@
       dest: /etc/systemd/system/minio.service
     tags:
       - upgrade
+      - update
 
   - name: MINIO Pull image
     command: podman pull --quiet {{ img_repo }}:{{ minio_version }}

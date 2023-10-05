@@ -41,6 +41,7 @@
     tags:
       - install
       - upgrade
+      - update
       
   - name: DAPHNE Copy Daphne systemd service
     template:
@@ -49,7 +50,8 @@
     tags:
       - install
       - upgrade
-    
+      - update
+       
   - name: DAPHNE Pull image
     command: podman pull --quiet {{ img_repo }}:{{ omnileads_version }}
     register: podman_pull

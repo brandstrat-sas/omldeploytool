@@ -41,6 +41,7 @@
         group: "{{ usuario }}"
       tags:
         - upgrade
+        - update
 
     - name: POSTGRESQL Copy systemd file
       template:
@@ -48,6 +49,7 @@
         dest: /etc/systemd/system/postgresql.service
       tags:
         - upgrade
+        - update
 
     - name: POSTGRESQL Pull image
       command: podman pull --quiet {{ img_repo }}:{{ postgres_version }}

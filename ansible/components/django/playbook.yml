@@ -42,6 +42,7 @@
     tags:
       - install
       - upgrade
+      - update
 
   - name: DJANGO Copy systemd service
     template:
@@ -50,6 +51,7 @@
     tags:
       - install
       - upgrade
+      - update
     
   - name: DJANGO Pull image
     command: podman pull --quiet {{ img_repo }}:{{ omnileads_version }}

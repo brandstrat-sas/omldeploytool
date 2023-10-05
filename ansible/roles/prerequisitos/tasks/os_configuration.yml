@@ -247,3 +247,26 @@
     - upgrade
   when: 
     - inventory_hostname not in groups['ha_omnileads_sql']
+
+
+- name: OS_CONF Copy CRON logs cleaner
+  template:
+    src: "templates/crones"
+    dest: /etc/cron.d/logs_cleaner.sh
+    mode: 0755
+  tags: 
+    - install
+    - upgrade
+  when: 
+    - inventory_hostname not in groups['ha_omnileads_sql']
+
+
+
+- name: OS_CONF stop OMniLeads App for Upgrade
+  systemd:
+    name: asterisk.service
+    state: restarted
+    enabled: yes
+    daemon_reload: yes
+  tags:
+    - upgrade

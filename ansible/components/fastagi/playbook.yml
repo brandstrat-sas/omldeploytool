@@ -38,6 +38,7 @@
     tags:
       - install
       - upgrade
+      - update
 
   - name: FASTAGI Copy systemd service file
     template:
@@ -46,6 +47,7 @@
     tags:
       - install
       - upgrade
+      - update
 
   - name: FASTAGI Pull image
     command: podman pull --quiet {{ img_repo }}:{{ fastagi_version }}

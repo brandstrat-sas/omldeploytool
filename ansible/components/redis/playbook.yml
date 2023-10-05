@@ -94,6 +94,7 @@
     tags:
       - observability
       - upgrade
+      - update
 
   - name: REDIS prometheus Copy systemd file
     template:
@@ -102,6 +103,7 @@
     tags:
       - observability
       - upgrade
+      - update
 
   - name: REDIS prometheus Pull image
     command: podman pull --quiet {{ img_prometheus_repo }}

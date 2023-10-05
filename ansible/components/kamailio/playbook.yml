@@ -38,6 +38,7 @@
       tags:
         - install
         - upgrade
+        - update
 
     - name: KAMAILIO Copy kamailio.service Systemd file
       template:
@@ -46,6 +47,7 @@
       tags:
         - install
         - upgrade
+        - update
 
     # - name: KAMAILIO Copy kamailio.cfg Systemd file
     #   template:
