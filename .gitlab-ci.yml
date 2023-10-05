@@ -1,7 +1,7 @@
 stages:
   - deploy
-  - deploy_norm
-
+  
+  
 deploy-docker-compose-cloud:
   stage: deploy
   environment: CLOUD_DOCKER_AIO
@@ -30,33 +30,8 @@ deploy-docker-compose-cloud:
   rules:
     - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"'
     - if: '$CI_PIPELINE_SOURCE == "web"'
-
-
-deploy-docker-compose-cloud-norm:
-  stage: deploy_norm
-  environment: CLOUD_DOCKER_AIO
-  image: omnileads/doctl:230427.01
-  variables: 
-    DIGITALOCEAN_ACCESS_TOKEN: $DIGITALOCEAN_ACCESS_TOKEN
-    DIGITALOCEAN_DROPLET_IMG: $DIGITALOCEAN_DROPLET_IMG
-    DIGITALOCEAN_DROPLET_SIZE: $DIGITALOCEAN_DROPLET_SIZE
-    DIGITALOCEAN_REGION: $DIGITALOCEAN_REGION
-    DIGITALOCEAN_SSH_KEY: $DIGITALOCEAN_SSH_KEY
-    CI_JOB_ID: $CI_JOB_ID
-    BRANCH: $CI_COMMIT_REF_NAME
-  script:
-    - doctl auth init -t ${DIGITALOCEAN_ACCESS_TOKEN}
-    - git clone -b $CI_COMMIT_REF_NAME https://gitlab.com/omnileads/omldeploytool.git
-    - sed -i "s/\${NIC}/eth1/g" ./omldeploytool/docker-compose/first_boot_installer.sh
-    - sed -i "s/\${ENV}/cloud/g" ./omldeploytool/docker-compose/first_boot_installer.sh
-    - sed -i "s/\${BRANCH}/$CI_COMMIT_REF_NAME/g" ./omldeploytool/docker-compose/first_boot_installer.sh
-    - doctl compute droplet create --image ${DIGITALOCEAN_DROPLET_IMG} --size ${DIGITALOCEAN_DROPLET_SIZE} --region ${DIGITALOCEAN_REGION} --ssh-keys ${DIGITALOCEAN_SSH_KEY} --user-data-file ./omldeploytool/docker-compose/first_boot_installer.sh cicd-docker-compose.${CI_JOB_ID}
-    - sleep 60
-    - OML_IPADDR=$(doctl compute droplet list |grep cicd-docker-compose.${CI_JOB_ID} |awk '{print $3}') && echo "$OML_IPADDR to run tests"
-    - until curl -sk --head --request GET https://$OML_IPADDR |grep "302" > /dev/null; do echo "Environment still being installed, sleeping 60 seconds"; sleep 60; done; echo "Environment is up"
-  rules:
-    - if: '$RUN_MANUAL_DEPLOY == "true"'
-    - if: '$CI_PIPELINE_SOURCE == "web"'
+    - if: '$RUN_RM_DEPLOY == "true"'
+    
 
 deploy-aio-cloud:
   stage: deploy
@@ -86,6 +61,8 @@ deploy-aio-cloud:
   rules:
     - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"'
     - if: '$CI_PIPELINE_SOURCE == "web"'
+    - if: '$RUN_RM_DEPLOY == "true"'
+
 
 deploy-ait-cloud:
   stage: deploy
@@ -127,10 +104,11 @@ deploy-ait-cloud:
   rules:
     - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"'
     - if: '$CI_PIPELINE_SOURCE == "web"'
+    - if: '$RUN_RM_DEPLOY == "true"'
 
 
 deploy-docker-compose-cloud-norm:
-  stage: deploy_norm
+  stage: deploy
   environment: CLOUD_DOCKER_AIO
   image: omnileads/doctl:230427.01
   variables: 
@@ -152,7 +130,5 @@ deploy-docker-compose-cloud-norm:
     - OML_IPADDR=$(doctl compute droplet list |grep cicd-docker-compose.${CI_JOB_ID} |awk '{print $3}') && echo "$OML_IPADDR to run tests"
     - until curl -sk --head --request GET https://$OML_IPADDR |grep "302" > /dev/null; do echo "Environment still being installed, sleeping 60 seconds"; sleep 60; done; echo "Environment is up"
   rules:
-    - if: '$RUN_MANUAL_DEPLOY == "true"'
+    - if: '$RUN_NORM_DEPLOY == "true"'
     - if: '$CI_PIPELINE_SOURCE == "web"'
-
-    
