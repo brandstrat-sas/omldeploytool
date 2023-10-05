@@ -11,6 +11,7 @@
 
 * oml-304 - [ANSIBLE] setting high performance uwsgi.ini
 * oml-345 - [ANSIBLE] send container logs from stdout/sterror to journald
+* oml-346 - [ANSIBLE] the upgrade and component restart are separated, allowing them to be executed separately
 
 ## Fixed
 
@@ -25,7 +26,7 @@
 # OMniLeads Component versions
 
 ```
-    omnileads_version: 230928.oml346
+    omnileads_version: 231005.01
     asterisk_version: 230925.02
     fastagi_version: 230920.01
     astami_version: 230920.01

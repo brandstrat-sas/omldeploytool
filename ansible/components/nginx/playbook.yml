@@ -76,4 +76,4 @@
     tags:
       - restart
       - restart_django
-      - restart_django
+      - restart_core
