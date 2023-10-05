@@ -39,6 +39,7 @@
     tags:
       - install
       - upgrade
+      - update
       
   - name: AMI Copy systemd service file
     template:
@@ -47,6 +48,7 @@
     tags:
       - install
       - upgrade
+      - update
       
   - name: AMI Pull image
     command: podman pull --quiet {{ img_repo }}:{{ ami_version }}

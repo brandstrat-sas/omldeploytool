@@ -40,6 +40,7 @@
     tags:
       - install
       - upgrade
+      - update
 
   - name: RTPENGINE Copy Systemd .service file
     template:
@@ -48,6 +49,7 @@
     tags:
       - install
       - upgrade
+      - update
 
   - name: RTPENGINE Pull image
     command: podman pull --quiet {{ img_repo }}:{{ rtpengine_version }}
@@ -56,6 +58,7 @@
     tags:
       - install
       - upgrade
+      - update
 
   - name: RTPENGINE Enable and start service
     systemd:
@@ -65,7 +68,6 @@
       daemon_reload: yes
     tags:
       - install
-      - upgrade
 
   - name: RTPENGINE Rstart service
     systemd:
@@ -74,6 +76,7 @@
       enabled: yes
       daemon_reload: yes
     tags:
+      - upgrade
       - restart
       - restart_rtpengine
       

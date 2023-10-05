@@ -174,7 +174,7 @@ case ${oml_action} in
     tenant_folder=$oml_tenant \
     commit="$(git rev-parse HEAD)" \
     build_date=\"$(env LC_hosts=C LC_TIME=C date)\"" \
-    --tags "$oml_action" \
+    --tags "$oml_action"  -vvvv \
     -i .inventory.yml
     Banner `echo $?`
   ;;
@@ -227,7 +227,8 @@ do
     --action=keepalived|--action=kamailio|--action=rtpengine|--action=asterisk|--action=sentinel|\
     --action=redis|--action=pgsql_node_recovery_main|--action=pgsql_node_takeover_main|\
     --action=redis_node_takeover_main|--action=pgsql_node_recovery_backup|--action=minio|\
-    --action=restart|--action=restart_django|--action=restart_asterisk|--action=restart_core)
+    --action=restart|--action=restart_django|--action=restart_asterisk|--action=restart_core|\
+    --action=update)
       oml_action="${i#*=}"
       shift
     ;;

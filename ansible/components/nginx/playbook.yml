@@ -40,6 +40,7 @@
     tags:
       - install
       - upgrade
+      - update
 
   - name: NGINX Copy nginx systemd service
     template:
@@ -48,6 +49,7 @@
     tags:
       - install
       - upgrade
+      - update
 
   - name: NGINX Pull oml-nginx image
     command: podman pull --quiet {{ img_repo }}:{{ nginx_version }}

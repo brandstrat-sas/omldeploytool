@@ -77,6 +77,7 @@
   tags: 
     - install
     - upgrade
+    - update
 
 # Set postgres_out as false when postgres_host is not defined on inventory
 - name: CHECKS Setting postgres_out false
@@ -88,7 +89,8 @@
   tags: 
     - install
     - upgrade
-    - restart
+    - update
+    - restart    
     
 # Set dialer_host as localhost on App instance when dialer_host is not explicitly defined
 - name: CHECKS Set dialer_host as localhost on App instance when dialer_host is not explicitly defined
@@ -101,6 +103,7 @@
   tags: 
     - install
     - upgrade
+    - update
     - dialer
 
 # Set postgres_host as {{ data_host }} when postgres_host is not explicitly defined on cluster scenary
@@ -115,6 +118,7 @@
   tags: 
     - install
     - upgrade
+    - update
 
 # Set postgres_host as localhost on AIO instance when postgres_host is not explicitly defined
 - name: CHECKS Setting postgres_host AIO
@@ -128,6 +132,7 @@
   tags: 
     - install
     - upgrade
+    - update
 
 # Set postgres_host as RW on HA instance when postgres_host is not explicitly defined
 - name: CHECKS Setting postgres_host HA
@@ -141,6 +146,7 @@
   tags: 
     - install
     - upgrade
+    - update
 
 # Set minio_host as {{ data_host }} on App instance when minios_host is not explicitly defined
 - name: CHECKS Setting minio_host Cluster
@@ -153,6 +159,7 @@
   tags: 
     - install
     - upgrade
+    - update
     
 # Set minio_host as localhost on App instance when minios_host is not explicitly defined
 - name: CHECKS Setting minio_host AIO
@@ -165,6 +172,7 @@
   tags: 
     - install
     - upgrade
+    - update
 
 # Set websockets_host as localhost on App or AIO instance when websockets_host is not explicitly defined
 - name: CHECKS Setting websockets_host as localhost
@@ -176,6 +184,7 @@
   tags: 
     - install
     - upgrade
+    - update
 
 # Set kamailio_host as {{ omni_ip_lan }} on App instance when kamailio_host is not explicitly defined
 - name: CHECKS Setting kamailio_host as application_host
@@ -188,6 +197,7 @@
   tags: 
     - install
     - upgrade
+    - update
 
 # Set kamailio_host as localhost on AIO instance when kamailio_host is not explicitly defined
 - name: CHECKS Setting kamailio_host as localhost
@@ -200,6 +210,7 @@
   tags: 
     - install
     - upgrade
+    - update
     - app
 
 # Set redis_host as {{ redis_host }} on App instance when redis_host is not explicitly defined
@@ -213,6 +224,7 @@
   tags: 
     - install
     - upgrade
+    - update
     - app
     - asterisk
 
@@ -227,6 +239,7 @@
   tags: 
     - install
     - upgrade
+    - update
     
 # Set prometheus_host as {{ application_host }} on Voice-Homer instance when prometheus_host is not explicitly defined
 - name: CHECKS Setting prometheus_host as application_host
@@ -239,6 +252,7 @@
   tags: 
     - install
     - upgrade
+    - update
 
 # Set prometheus_host as localhost on AIO-Homer instance
 - name: CHECKS Setting prometheus_host as localhost
@@ -250,6 +264,7 @@
   tags: 
     - install
     - upgrade
+    - update
     
 # Set asterisk_host as {{ voice_host }} on App instance when asterisk_host is not explicitly defined
 - name: CHECKS Setting asterisk_host as voice_host
@@ -262,6 +277,7 @@
   tags: 
     - install
     - upgrade
+    - update
     - app
 
 # Set asterisk_host as omni_ip_lan on AIO instance when asterisk_host is not explicitly defined
@@ -275,6 +291,7 @@
   tags: 
     - install
     - upgrade
+    - update
     - app
 
 # Set rtpengine_out as true when postgres_host is defined on inventory
@@ -287,6 +304,7 @@
   tags: 
     - install
     - upgrade
+    - update
 
 # Set rtpengine_out as true when postgres_host is defined on inventory
 - name: CHECKS Setting rtpengine_host & set rtpengine_out true
@@ -298,6 +316,7 @@
   tags: 
     - install
     - upgrade
+    - update
     - restart
 
 # Set rtpengine_host as {{ voice_host }} on App instance when rtpengine_host is not explicitly defined
@@ -311,6 +330,7 @@
   tags: 
     - install
     - upgrade
+    - update
 
 # Set rtpengine_host as {{ omni_ip_lan }} on App instance when rtpengine_host is not explicitly defined
 - name: CHECKS Setting rtpengine_host as private_ipv4_addr
@@ -323,6 +343,7 @@
   tags: 
     - install
     - upgrade
+    - update
 
 # Set fastagi_out as true when fastagi_host is defined on inventory
 - name: CHECKS Setting fastagi_out true
@@ -334,6 +355,7 @@
   tags: 
     - install
     - upgrade
+    - update
     
 # Set fastagi_host as {{ app_host }} on Asterisk instance when fastagi_host is not explicitly defined
 - name: CHECKS Setting fastagi_host as voice_host
@@ -347,6 +369,7 @@
   tags: 
     - install
     - upgrade
+    - update
     - restart
 
 # Set fastagi_host as localhost on AIO instance when fastagi_host is not explicitly defined
@@ -361,6 +384,7 @@
   tags: 
     - install
     - upgrade
+    - update
     - restart
 
 # Set nginx_host as {{ applicacion_host }} on App instance when minios_host is not explicitly defined
@@ -374,6 +398,7 @@
   tags: 
     - install
     - upgrade
+    - update
 
 # Set nginx_host as {{ omni_ip_lan }} on AIO instance when minios_host is not explicitly defined
 - name: CHECKS Setting nginx_host as application_host
@@ -386,6 +411,7 @@
   tags: 
     - install
     - upgrade
+    - update
 
 # --- IMPORTANT: aqui controlo las variables que sean *requisito* para el deploy
 # --- si no está declarada entonces puedo escapar con un fail
@@ -409,6 +435,7 @@
   tags: 
     - install
     - upgrade
+    - update
 
 
 - name: CHECKS Check if websockets_version variable is defined
@@ -418,6 +445,7 @@
   tags: 
     - install
     - upgrade
+    - update
 
 
 - name: CHECKS Check if nginx_version variable is defined
@@ -427,6 +455,7 @@
   tags: 
     - install
     - upgrade
+    - update
 
 
 - name: CHECKS Check if kamailio_version variable is defined
@@ -436,6 +465,7 @@
   tags: 
     - install
     - upgrade
+    - update
 
 
 - name: CHECKS Check if asterisk_version variable is defined
@@ -445,6 +475,7 @@
   tags: 
     - install
     - upgrade
+    - update
 
 
 - name: CHECKS Check if rtpengine_version variable is defined
@@ -454,6 +485,7 @@
   tags: 
     - install
     - upgrade
+    - update
 
 
 - name: CHECKS Check if postgres_version variable is defined
@@ -463,6 +495,7 @@
   tags: 
     - install
     - upgrade
+    - update
 
 
 - name: CHECKS Check if infra_env variable is defined
@@ -472,6 +505,7 @@
   tags: 
     - install
     - upgrade
+    - update
 
 
 - name: CHECKS Check if TimeZone variable is defined
@@ -487,18 +521,8 @@
   tags: 
     - install 
     - upgrade
+    - update
 
-
-# - name: CHECKS Check if callrec_device variable is defined
-#   fail:
-#     msg: callrec_device variable undefined, edit callrec_device variable in inventory file
-#   when: callrec_device is not defined and assert_callrec_device.rc == 1
-#   tags: 
-#     - install 
-#     - upgrade
-#     - app
-#     - voice
-#     - asterisk
     
 - name: CHECKS Check if postgres user variable is defined
   fail:
@@ -507,6 +531,7 @@
   tags: 
     - install
     - upgrade
+    - update
 
 
 - name: CHECKS Check if postgres password variable is defined
@@ -516,6 +541,7 @@
   tags: 
     - install
     - upgrade
+    - update
 
 
 - name: CHECKS Check if postgres port variable is defined
@@ -525,6 +551,7 @@
   tags: 
     - install
     - upgrade
+    - update
 
 
 - name: CHECKS Check if AMI user variable is defined
@@ -534,6 +561,7 @@
   tags: 
     - install
     - upgrade
+    - update
 
 
 - name: CHECKS Check if AMI password variable is defined
@@ -543,6 +571,7 @@
   tags: 
     - install
     - upgrade
+    - update
     - app
     - voice
     - asterisk
@@ -554,6 +583,7 @@
   tags: 
     - install
     - upgrade
+    - update
 
 
 - name: CHECKS Check if WD pass variable is defined
@@ -563,6 +593,7 @@
   tags: 
     - install
     - upgrade
+    - update
 
 
 - name: CHECKS Check if bucket_access_key variable is defined
@@ -572,6 +603,7 @@
   tags: 
     - install
     - upgrade
+    - update
 
 
 - name: CHECKS Check if bucket_secret_key variable is defined
@@ -581,6 +613,7 @@
   tags: 
     - install
     - upgrade
+    - update
 
 
 - name: CHECKS Check if bucket_name variable is defined
@@ -590,6 +623,7 @@
   tags: 
     - install
     - upgrade
+    - update
 
 
 # --- IMPORTANT: aqui controlo la integridad de algunas variables

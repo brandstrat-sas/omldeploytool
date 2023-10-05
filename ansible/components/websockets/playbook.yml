@@ -39,6 +39,7 @@
     tags:
       - install
       - upgrade
+      - update
 
   - name: WEBSOCKETS Copy systemd service
     template:
@@ -47,6 +48,7 @@
     tags:
       - install
       - upgrade
+      - update
 
   - name: WEBSOCKETS Pull image
     command: podman pull --quiet {{ img_repo }}:{{ websockets_version }}
@@ -55,6 +57,7 @@
     tags:
       - install
       - upgrade
+      - update
 
   - name: WEBSOCKETS Enable and start Websockets service
     systemd:
@@ -64,7 +67,6 @@
       daemon_reload: yes
     tags:
       - install
-      - upgrade
 
   - name: WEBSOCKETS Restart Websockets service
     systemd:
@@ -73,5 +75,6 @@
       enabled: yes
       daemon_reload: yes
     tags:
+      - upgrade
       - restart
       - restart_websockets
