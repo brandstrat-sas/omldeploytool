@@ -53,6 +53,7 @@
     until: podman_pull is success
     tags:
       - upgrade
+      - update
 
   - name: MINIO Enable and start oml minio service
     systemd:
@@ -73,6 +74,7 @@
     register: minio_run
     until: minio_run is success
     tags:
+      - upgrade
       - restart
 
   - name: MINIO install command line client

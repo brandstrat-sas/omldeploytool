@@ -138,6 +138,7 @@
     tags:
       - install
       - upgrade
+      - update
 
   - name: ASTERISK Pull image
     command: podman pull --quiet {{ img_repo }}:{{ asterisk_version }}
@@ -146,6 +147,7 @@
     tags:
       - install
       - upgrade
+      - update
 
   - name: ASTERISK Enable and start systemd service
     systemd:
@@ -160,10 +162,10 @@
   - name: ASTERISK Rstart systemd service
     systemd:
       name: asterisk.service
-      state: started
+      state: restarted
       enabled: yes
       daemon_reload: yes
     tags:
+      - upgrade
       - restart
-      - restart_django
       - restart_core

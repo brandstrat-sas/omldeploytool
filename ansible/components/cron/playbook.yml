@@ -47,7 +47,6 @@
       dest: /etc/systemd/system/omlcron.service
     tags:
       - install
-      - upgrade
 
   - name: CRON Pull image
     command: podman pull --quiet {{ img_repo }}:{{ omnileads_version }}
@@ -56,6 +55,7 @@
     tags:
       - install
       - upgrade
+      - update
 
   - name: CRON Crones Enable and start systemd service
     systemd:
@@ -91,4 +91,5 @@
       - omnileads_ha is defined  
       - ha_rol == "main"
     tags:
+      - upgrade
       - restart

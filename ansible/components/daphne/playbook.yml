@@ -57,6 +57,7 @@
     tags:
       - install
       - upgrade
+      - update
 
   - name: DAPHNE Channels Enable and start Daphne systemd service
     systemd:
@@ -75,6 +76,7 @@
       enabled: yes
       daemon_reload: yes
     tags:
+      - upgrade
       - restart
       - restart_django
       - restart_core

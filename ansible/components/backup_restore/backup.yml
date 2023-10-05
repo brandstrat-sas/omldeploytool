@@ -39,7 +39,6 @@
         - inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_aio']
             
     - name: BACKUP asterisk files
-      #shell: "podman run --name acd_bk_{{ file_timestamp }} -v /etc/asterisk/custom:/etc/asterisk/custom:ro --network=host --env-file /etc/default/asterisk.env {{ img_repo }}:{{ asterisk_version }} bash -x /opt/asterisk/scripts/asterisk_backup.py {{ file_timestamp }}"
       shell: "podman exec -it oml-asterisk-server /opt/asterisk/scripts/asterisk_backup.py {{ file_timestamp }}"
       when:        
         - inventory_hostname in groups['omnileads_voice'] or inventory_hostname in groups['omnileads_aio']

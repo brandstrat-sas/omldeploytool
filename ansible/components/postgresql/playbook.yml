@@ -55,6 +55,7 @@
       until: podman_pull is success
       tags:
         - upgrade
+        - update
 
     - name: POSTGRESQL Enable and start service
       systemd:
@@ -64,6 +65,7 @@
         daemon_reload: yes
       tags:
         - upgrade
+        - update
 
     - name: POSTGRESQL Restart Service
       systemd:
@@ -71,6 +73,7 @@
         state: restarted
         daemon_reload: yes
       tags:
+        - upgrade
         - restart
 
     - name: POSTGRESQL prometheus Set environment variables for this installation
@@ -102,3 +105,5 @@
         name: prometheus_postgres.service
         state: started
         daemon_reload: yes
+      tags:
+        - upgrade
