@@ -26,7 +26,7 @@
     ;;
   --backup)
     file_date=$(date +'%y%m%d.%H%M')
-    docker run --network=host --env-file .env -e POSTGRES_BACKUP=True -e BACKUP_FILENAME=pgsql-backup-$file_date.sql omnileads/omlapp:1.30.0
+    docker run --network=host --env-file .env -e POSTGRES_BACKUP=True -e BACKUP_FILENAME=pgsql-backup-$file_date.sql omnileads/omlapp:231005.01 /opt/omnileads/bin/init_pgsql_backup.sh
     docker exec -it oml-asterisk /opt/asterisk/scripts/asterisk_backup.py $file_date
     ;;
   --restore)
