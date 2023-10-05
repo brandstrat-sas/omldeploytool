@@ -31,7 +31,7 @@
 
     - name: BACKUP generate file_timestamp
       set_fact:
-        file_timestamp: "{{ ansible_date_time.epoch | strftime('%y%m%d.%S') }}"
+        file_timestamp: "{{ ansible_date_time.epoch }}"
 
     - name: BACKUP postgres DB selfhosted bucket cluster
       shell: "podman run -e POSTGRES_BACKUP=True -e S3_ENDPOINT=http://{{ data_host }}:9000 -e S3_BUCKET_NAME={{ bucket_name }} -e BACKUP_FILENAME=pgsql-backup-{{ file_timestamp }}.sql -e AWS_ACCESS_KEY_ID={{ bucket_access_key }}  -e AWS_SECRET_ACCESS_KEY={{ bucket_secret_key }} -e PGUSER={{ postgres_user }} -e PGPASSWORD={{ postgres_password }} -e PGDATABASE={{ postgres_database }} -e PGHOST={{ data_host }} -e PGPORT={{ postgres_port }} {{ img_repo }}:{{ omnileads_version }} /opt/omnileads/bin/init_pgsql_backup.sh"
