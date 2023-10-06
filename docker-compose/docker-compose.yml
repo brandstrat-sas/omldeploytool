@@ -267,7 +267,7 @@ services:
       - OML_LOGGING_SLOWSQL_ENABLED=
       - OML_LOGGING_SLOWSQL_OUTPUT="-"
       - OML_LOGGING_SLOWSQL_DURATION=1
-    image: ${OMLAPP_IMG} #omnileads/omlapp:231005.01 #${OMLAPP_IMG}
+    image: ${OMLAPP_IMG}
     command: /opt/omnileads/bin/init_cronos.sh
     networks:
       - omnileads
