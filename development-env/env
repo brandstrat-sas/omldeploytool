@@ -23,7 +23,7 @@ REPO_PATH=./omnileads-repos
 #############################################################
 
 OMLAPP_IMG=omnileads/omlapp:230928.01
-OMLACD_IMG=omnileads/asterisk:230925.02
+OMLACD_IMG=omnileads/asterisk:231006.01
 OMLFASTAGI_IMG=omnileads/fastagi:230920.01
 OMLAMI_IMG=omnileads/astami:230920.01
 OMLNGINX_IMG=omnileads/nginx:230923.01
