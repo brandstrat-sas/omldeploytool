@@ -174,7 +174,7 @@ case ${oml_action} in
     tenant_folder=$oml_tenant \
     commit="$(git rev-parse HEAD)" \
     build_date=\"$(env LC_hosts=C LC_TIME=C date)\"" \
-    --tags "$oml_action"  -vvvv \
+    --tags "$oml_action"\
     -i .inventory.yml
     Banner `echo $?`
   ;;
