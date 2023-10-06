@@ -29,7 +29,6 @@ deploy-docker-compose-cloud:
     - rm -rf ./omldeploytool
   rules:
     - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"'
-    - if: '$CI_PIPELINE_SOURCE == "web"'
     - if: '$RUN_RM_DEPLOY == "true"'
     
 
@@ -60,7 +59,6 @@ deploy-aio-cloud:
     - deploy
   rules:
     - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"'
-    - if: '$CI_PIPELINE_SOURCE == "web"'
     - if: '$RUN_RM_DEPLOY == "true"'
 
 
@@ -103,7 +101,6 @@ deploy-ait-cloud:
     - deploy
   rules:
     - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"'
-    - if: '$CI_PIPELINE_SOURCE == "web"'
     - if: '$RUN_RM_DEPLOY == "true"'
 
 
@@ -131,4 +128,3 @@ deploy-docker-compose-cloud-norm:
     - until curl -sk --head --request GET https://$OML_IPADDR |grep "302" > /dev/null; do echo "Environment still being installed, sleeping 60 seconds"; sleep 60; done; echo "Environment is up"
   rules:
     - if: '$RUN_NORM_DEPLOY == "true"'
-    - if: '$CI_PIPELINE_SOURCE == "web"'
