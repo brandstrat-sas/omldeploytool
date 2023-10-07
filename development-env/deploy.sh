@@ -41,6 +41,14 @@ else
   git clone https://gitlab.com/omnileads/ominicontacto omlapp
 fi
 
+# Addons
+if [ "$gitlab_clone" == "ssh" ]; then
+  git clone git@gitlab.com:omnileads/premium_reports_app.git
+  git clone git@gitlab.com:omnileads/wallboard_app.git
+  git clone git@gitlab.com:omnileads/survey_app.git
+  git clone git@gitlab.com:omnileads/webphone_client_app.git
+fi
+
 echo "***[OML devenv] All repositories were cloned in $(pwd)"
 
 repositories=("acd" "kamailio" "nginx" "rtpengine" "websockets" "app")
@@ -50,9 +58,9 @@ done
 
 cd ../
 cp env .env
-#docker-compose pull
-#docker-compose up -d --no-build
-#docker-compose up -d --force-recreate --no-deps app acd
+docker-compose pull
+docker-compose up -d --no-build
+
 }
 
 #############################################################################

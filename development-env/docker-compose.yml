@@ -57,10 +57,10 @@ services:
       - OML_LOGGING_SLOWSQL_ENABLED=
       - OML_LOGGING_SLOWSQL_OUTPUT="-"
       - OML_LOGGING_SLOWSQL_DURATION=1
-      - SURVEY_VERSION=develop
+      #- SURVEY_VERSION=develop
       #- WALLBOARD_VERSION=develop
-      - PREMIUM_REPORTS_VERSION=develop
-      - WEBPHONE_CLIENT_VERSION=develop
+      #- PREMIUM_REPORTS_VERSION=develop
+      #- WEBPHONE_CLIENT_VERSION=develop
     image: ${OMLAPP_IMG}
     command: /opt/omnileads/bin/docker-entrypoint.sh
     networks:
@@ -127,6 +127,7 @@ services:
       - OML_LOGGING_SLOWSQL_OUTPUT="-"
       - OML_LOGGING_SLOWSQL_DURATION=1
     image: ${OMLAPP_IMG}
+    command: /opt/omnileads/bin/init_cronos.sh
     networks:
       - omnileads
     privileged: true
@@ -171,22 +172,22 @@ services:
     networks:
       - omnileads  
 
-  # ari: 
-  #   image: ${OMLFASTAGI_IMG}
-  #   container_name: oml-astari
-  #   command: python /app/astari.py
-  #   environment:
-  #     - TZ=${TZ}
-  #     - ASTERISK_HOSTNAME=${ASTERISK_HOSTNAME}
-  #     - ARI_PORT=7088
-  #     - ARI_USERNAME=user
-  #     - ARI_PASSWORD=5_MeO_DMT
-  #     - REDIS_HOSTNAME=${REDIS_HOSTNAME}
-  #   restart: on-failure  
-  #   volumes:
-  #    - ${REPO_PATH}/omlfastagi:/app
-  #   networks:
-  #     - omnileads  
+  ari: 
+    image: ${OMLFASTAGI_IMG}
+    container_name: oml-astari
+    command: python /app/astari.py
+    environment:
+      - TZ=${TZ}
+      - ASTERISK_HOSTNAME=${ASTERISK_HOSTNAME}
+      - ARI_PORT=7088
+      - ARI_USERNAME=user
+      - ARI_PASSWORD=5_MeO_DMT
+      - REDIS_HOSTNAME=${REDIS_HOSTNAME}
+    restart: on-failure  
+    volumes:
+     - ${REPO_PATH}/omlfastagi:/app
+    networks:
+      - omnileads  
 
   acd:
     container_name: oml-asterisk
@@ -232,7 +233,7 @@ services:
     volumes:
       - ./ast_custom_conf:/etc/asterisk/custom
       #- ast_db:/var/lib/asterisk/astdb
-      - ${REPO_PATH}/omlacd/source/astconf:/etc/asterisk
+      #- ${REPO_PATH}/omlacd/source/astconf:/etc/asterisk:rw
       - ${REPO_PATH}/omlacd/source/scripts:/opt/asterisk/scripts
     working_dir: /etc/asterisk
 
@@ -265,8 +266,7 @@ services:
     restart: on-failure
     stop_grace_period: 1m30s
     volumes:
-      - ./certs:/${KAMAILIO_CERTS_LOCATION}
-      - ${REPO_PATH}/omlkamailio/source:/etc/kamailio
+      - ${REPO_PATH}/omlkamailio/source:/etc/kamailio:ro
 
   nginx:
     container_name: oml-nginx
@@ -282,6 +282,7 @@ services:
       - DJANGO_HOSTNAME=${DJANGO_HOSTNAME}
       - DAPHNE_HOSTNAME=${DJANGO_HOSTNAME}
       - KAMAILIO_HOSTNAME=${KAMAILIO_HOSTNAME}
+      - KAMAILIO_WS_PORT=${KAMAILIO_WS_PORT}
       - WEBSOCKETS_HOSTNAME=${WEBSOCKET_HOSTNAME}
       - S3_ENDPOINT=${S3_ENDPOINT_MINIO}
     image: ${OMLNGINX_IMG}
@@ -497,24 +498,24 @@ services:
     stop_grace_period: 1m30s
     tty: true
 
-  nginxcgi:
-    container_name: oml-nginx-cgi
-    hostname: nginxcgi
-    dns: 8.8.8.8
-    image: omnileads/nginxqa:latest
-    environment:
-      - PGHOST=${PGHOST}
-      - PGPASSWORD=${PGPASSWORD}
-      - PSTN_HOSTNAME=pbxemulator
-    networks: 
-      - omnileads
-    ports:
-      - 8888:8888
-    privileged: true
-    restart: on-failure
-    stdin_open: true
-    stop_grace_period: 1m30s
-    tty: true
+  # nginxcgi:
+  #   container_name: oml-nginx-cgi
+  #   hostname: nginxcgi
+  #   dns: 8.8.8.8
+  #   image: omnileads/nginxqa:latest
+  #   environment:
+  #     - PGHOST=${PGHOST}
+  #     - PGPASSWORD=${PGPASSWORD}
+  #     - PSTN_HOSTNAME=pbxemulator
+  #   networks: 
+  #     - omnileads
+  #   ports:
+  #     - 8888:8888
+  #   privileged: true
+  #   restart: on-failure
+  #   stdin_open: true
+  #   stop_grace_period: 1m30s
+  #   tty: true
 
   videocalls:
     container_name: oml-videocalls-widget
@@ -532,8 +533,8 @@ services:
     stdin_open: true
     stop_grace_period: 1m30s
     tty: true
-    volumes:
-      - ${REPO_PATH}/webphone_client_app/demo/:/usr/src/app
+    # volumes:
+    #   - ${REPO_PATH}/webphone_client_app/demo/:/usr/src/app
     
 networks:
   omnileads:
@@ -552,5 +553,4 @@ volumes:
   vuejs:
   ast_conf:
   ast_sounds:
-  ast_moh:
   ast_db:
