@@ -103,6 +103,9 @@ case $1 in
   --django_shell)
     docker exec -it oml-django python3 manage.py shell
     ;;    
+  --django_commands)
+    docker exec -it oml-django /opt/omnileads/bin/django_commands.sh
+    ;;      
   --fastagi_bash)
     docker exec -it oml-fastagi bash
     ;;      
@@ -127,12 +130,9 @@ case $1 in
   --nginx_bash)
     docker exec -it oml-nginx bash
     ;;  
-  --nginx_logs_access)
-    docker exec -it oml-nginx tail -f /var/log/niginx/omnileads_access
+  --nginx_logs)
+    docker logs -f oml-nginx
     ;;    
-  --nginx_logs_error)
-    docker exec -it oml-nginx tail -f /var/log/niginx/omnileads_error
-    ;;      
   --help)
     echo "
 NAME:

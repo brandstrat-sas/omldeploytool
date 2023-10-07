@@ -62,6 +62,7 @@ services:
       - PREMIUM_REPORTS_VERSION=develop
       - WEBPHONE_CLIENT_VERSION=develop
     image: ${OMLAPP_IMG}
+    command: /opt/omnileads/bin/docker-entrypoint.sh
     networks:
       - omnileads
     privileged: true
@@ -138,6 +139,7 @@ services:
   fastagi:
     image: ${OMLFASTAGI_IMG}
     container_name: oml-fastagi
+    command: python /app/fastagi.py
     environment:
       - TZ=${TZ}
       - PGHOST=${PGHOST}
@@ -162,13 +164,30 @@ services:
       - ASTERISK_HOSTNAME=${ASTERISK_HOSTNAME}
       - AMI_USER=${AMI_USER}
       - AMI_PASSWORD=${AMI_PASSWORD}
-      - REDIS_HOSTNAME=${REDIS_HOSTNAME}
+      - REDIS_HOSTNAME=${REDIS_HOSTNAME}      
     restart: on-failure  
     volumes:
      - ${REPO_PATH}/omlami:/app
     networks:
       - omnileads  
-    
+
+  # ari: 
+  #   image: ${OMLFASTAGI_IMG}
+  #   container_name: oml-astari
+  #   command: python /app/astari.py
+  #   environment:
+  #     - TZ=${TZ}
+  #     - ASTERISK_HOSTNAME=${ASTERISK_HOSTNAME}
+  #     - ARI_PORT=7088
+  #     - ARI_USERNAME=user
+  #     - ARI_PASSWORD=5_MeO_DMT
+  #     - REDIS_HOSTNAME=${REDIS_HOSTNAME}
+  #   restart: on-failure  
+  #   volumes:
+  #    - ${REPO_PATH}/omlfastagi:/app
+  #   networks:
+  #     - omnileads  
+
   acd:
     container_name: oml-asterisk
     depends_on:
@@ -212,8 +231,8 @@ services:
     stop_grace_period: 1m30s
     volumes:
       - ./ast_custom_conf:/etc/asterisk/custom
-      - ast_db:/var/lib/asterisk/astdb
-      - ${REPO_PATH}/omlacd/source/astconf:/etc/asterisk/
+      #- ast_db:/var/lib/asterisk/astdb
+      - ${REPO_PATH}/omlacd/source/astconf:/etc/asterisk
       - ${REPO_PATH}/omlacd/source/scripts:/opt/asterisk/scripts
     working_dir: /etc/asterisk
 
@@ -250,9 +269,6 @@ services:
       - ${REPO_PATH}/omlkamailio/source:/etc/kamailio
 
   nginx:
-    build:
-      target: run
-      context: ${REPO_PATH}/omlnginx
     container_name: oml-nginx
     depends_on:
       - app
@@ -412,6 +428,15 @@ services:
       #- ${REPO_PATH}/survey_app/:/home/survey/
       #- ${REPO_PATH}/wallboard_app/:/home/wallboard/
       - vuejs:/home/app/supervision/node_modules/
+
+  # rabbitmq:
+  #   container_name: oml-rabbit-mq
+  #   image: "rabbitmq:management"
+  #   networks:
+  #     - omnileads
+  #   ports:
+  #     - "15672:15672"
+  #     - "5672:5672"
 
   minio:
     tty: true
