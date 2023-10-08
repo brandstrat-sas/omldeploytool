@@ -19,19 +19,19 @@ fi
 
 cd omnileads-repos
 
-echo "***[OML devenv] Cloning the repositories of modules"
-repositories=("acd" "kamailio" "nginx" "pgsql" "rtpengine" "fastagi" "ami")
-for i in "${repositories[@]}"; do
-  if [ ! -d "oml${i}" ]; then
-    if [ "$gitlab_clone" == "ssh" ]; then
-      git clone git@gitlab.com:omnileads/oml$i.git
-    else
-      git clone https://gitlab.com/omnileads/oml$i.git
-    fi
-  else
-    echo "***[OML devenv] $i repository already cloned"
-  fi
-done
+# echo "***[OML devenv] Cloning the repositories of modules"
+# repositories=("acd" "kamailio" "nginx" "pgsql" "rtpengine" "fastagi" "ami" "redis" "pgsql")
+# for i in "${repositories[@]}"; do
+#   if [ ! -d "oml${i}" ]; then
+#     if [ "$gitlab_clone" == "ssh" ]; then
+#       git clone git@gitlab.com:omnileads/oml$i.git
+#     else
+#       git clone https://gitlab.com/omnileads/oml$i.git
+#     fi
+#   else
+#     echo "***[OML devenv] $i repository already cloned"
+#   fi
+# done
 
 if [ "$gitlab_clone" == "ssh" ]; then
   git clone git@gitlab.com:omnileads/omnileads-websockets.git omlwebsockets
@@ -49,7 +49,8 @@ if [ "$gitlab_clone" == "ssh" ]; then
   git clone git@gitlab.com:omnileads/webphone_client_app.git
 fi
 
-echo "***[OML devenv] All repositories were cloned in $(pwd)"
+echo "********* [OML devenv] All repositories were cloned in $(pwd)"
+sleep 5
 
 repositories=("acd" "kamailio" "nginx" "rtpengine" "websockets" "app")
 for i in "${repositories[@]}"; do
