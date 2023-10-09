@@ -10,7 +10,7 @@ case $1 in
     ;;
   --call_generate)
     echo "generate an ibound call through PSTN-Emulator container"
-    docker exec -it oml-pstn-emulator sipp -sn uac 127.0.0.1:5060 -s stress -m 1 -r 1 -d 60000 -l 1
+    docker exec -it oml-pstn-emulator sipp -sn uac localhost:5060 -s stress -m 1 -r 1 -d 60000 -l 1
     ;;
   --backup)
     docker run -e POSTGRES_BACKUP=True --env-file .env omnileads/omlapp:1.30.0
@@ -60,10 +60,11 @@ case $1 in
     if [[ $confirmacion == "yes" ]]; then
       echo "redis cleaning"
       echo "echo drop all on REDIS"
-      docker stop oml-redis
-      docker rm oml-redis
-      docker volume rm oml_redis
-      docker-compose up -d --force-recreate --no-deps redis
+      docker exec -it oml-redis redis-cli -n 1 FLUSHDB
+      docker-compose up -d --force-recreate --no-deps app
+      docker-compose up -d --force-recreate --no-deps kamailio
+      docker-compose up -d --force-recreate --no-deps nginx
+      docker-compose up -d --force-recreate --no-deps ami
     else
       echo "Cancel action"
     fi
