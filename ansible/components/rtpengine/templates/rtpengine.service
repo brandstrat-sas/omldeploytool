@@ -25,11 +25,14 @@ ExecStart=/usr/bin/podman run \
   --name=oml-rtpengine-server \
   --env-file=/etc/default/rtpengine.env \
   --network=host \
+  --log-driver=journald \
   {{ container_image_registry }}/omnileads/rtpengine:{{ rtpengine_version }}
 ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
 ExecStopPost=/usr/bin/podman rm -f --ignore --cidfile=%t/%n.ctr-id
 Type=notify
 NotifyAccess=all
+StandardOutput=journal
+StandardError=journal
 
 [Install]
 WantedBy=default.target
