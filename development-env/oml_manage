@@ -52,7 +52,7 @@ case $1 in
     fi
     ;;
   --postgres_psql)
-    docker exec -it oml-django psql
+    docker exec -it oml-postgresql psql -U omnileads
     ;;      
   --redis_clean)
       echo "¿Are you sure you want to delete all redis cache? yes or no"

@@ -57,10 +57,10 @@ services:
       - OML_LOGGING_SLOWSQL_ENABLED=
       - OML_LOGGING_SLOWSQL_OUTPUT="-"
       - OML_LOGGING_SLOWSQL_DURATION=1
-      #- SURVEY_VERSION=develop
-      #- WALLBOARD_VERSION=develop
-      #- PREMIUM_REPORTS_VERSION=develop
-      #- WEBPHONE_CLIENT_VERSION=develop
+      - SURVEY_VERSION=develop
+      - WALLBOARD_VERSION=develop
+      - PREMIUM_REPORTS_VERSION=develop
+      - WEBPHONE_CLIENT_VERSION=develop
     image: ${OMLAPP_IMG}
     command: /opt/omnileads/bin/docker-entrypoint.sh
     networks:
@@ -129,7 +129,7 @@ services:
     image: ${OMLAPP_IMG}
     command: /opt/omnileads/bin/init_cronos.sh
     networks:
-      - omnileads
+      - omnileads 
     privileged: true
     restart: on-failure
     stdin_open: true
@@ -154,8 +154,6 @@ services:
     restart: on-failure
     networks:
       - omnileads  
-    ports:
-      - "4573:4573"
   
   ami: 
     image: ${OMLAMI_IMG}
@@ -172,24 +170,27 @@ services:
     networks:
       - omnileads  
 
-  ari: 
-    image: ${OMLFASTAGI_IMG}
-    container_name: oml-astari
-    command: python /app/astari.py
-    environment:
-      - TZ=${TZ}
-      - ASTERISK_HOSTNAME=${ASTERISK_HOSTNAME}
-      - ARI_PORT=7088
-      - ARI_USERNAME=user
-      - ARI_PASSWORD=5_MeO_DMT
-      - REDIS_HOSTNAME=${REDIS_HOSTNAME}
-    restart: on-failure  
-    volumes:
-     - ${REPO_PATH}/omlfastagi:/app
-    networks:
-      - omnileads  
+  # ari:
+  #   image: ${OMLFASTAGI_IMG}
+  #   container_name: oml-astari
+  #   command: python /app/app_queue.py
+  #   environment:
+  #     - TZ=${TZ}
+  #     - ARI_HOST=acd
+  #     - ARI_PORT=7088
+  #     - ARI_USER=omnileads
+  #     - ARI_PASS=5_MeO_DMT
+  #     - REDIS_HOSTNAME=${REDIS_HOSTNAME}
+  #   restart: on-failure  
+  #   volumes:
+  #    - ${REPO_PATH}/omlfastagi:/app
+  #   networks:
+  #     - omnileads  
 
   acd:
+    build:
+      target: run
+      context: ${REPO_PATH}/omlacd
     container_name: oml-asterisk
     depends_on:
       - postgresql
@@ -232,8 +233,7 @@ services:
     stop_grace_period: 1m30s
     volumes:
       - ./ast_custom_conf:/etc/asterisk/custom
-      #- ast_db:/var/lib/asterisk/astdb
-      #- ${REPO_PATH}/omlacd/source/astconf:/etc/asterisk:rw
+      - ${REPO_PATH}/omlacd/source/astconf:/etc/asterisk
       - ${REPO_PATH}/omlacd/source/scripts:/opt/asterisk/scripts
     working_dir: /etc/asterisk
 
@@ -280,10 +280,13 @@ services:
       - TZ=${TZ}
       - ENV=devenv
       - DJANGO_HOSTNAME=${DJANGO_HOSTNAME}
+      - DJANGO_PORT=8099
       - DAPHNE_HOSTNAME=${DJANGO_HOSTNAME}
+      - DAPHNE_PORT=8099
       - KAMAILIO_HOSTNAME=${KAMAILIO_HOSTNAME}
-      - KAMAILIO_WS_PORT=${KAMAILIO_WS_PORT}
+      - KAMAILIO_WS_PORT=14443
       - WEBSOCKETS_HOSTNAME=${WEBSOCKET_HOSTNAME}
+      - WEBSOCKETS_PORT:8000
       - S3_ENDPOINT=${S3_ENDPOINT_MINIO}
     image: ${OMLNGINX_IMG}
     networks:
@@ -365,8 +368,6 @@ services:
       - LOGGERS=${WEBSOCKET_LOGGER}
       - REDIS_HOST=${WEBSOCKET_REDIS_HOSTNAME}
       - PYTHONUNBUFFERED=1
-    ports:
-      - "${WEBSOCKET_EXT_PORT}:8000"
     networks:
       - omnileads
     healthcheck:
@@ -426,8 +427,8 @@ services:
       - omnileads
     volumes:
       - ${REPO_PATH}/omlapp/omnileads_ui/:/home/app/
-      #- ${REPO_PATH}/survey_app/:/home/survey/
-      #- ${REPO_PATH}/wallboard_app/:/home/wallboard/
+      - ${REPO_PATH}/survey_app/:/home/survey/
+      - ${REPO_PATH}/wallboard_app/:/home/wallboard/
       - vuejs:/home/app/supervision/node_modules/
 
   # rabbitmq:
@@ -533,8 +534,8 @@ services:
     stdin_open: true
     stop_grace_period: 1m30s
     tty: true
-    # volumes:
-    #   - ${REPO_PATH}/webphone_client_app/demo/:/usr/src/app
+    volumes:
+      - ${REPO_PATH}/webphone_client_app/demo/:/usr/src/app
     
 networks:
   omnileads:
