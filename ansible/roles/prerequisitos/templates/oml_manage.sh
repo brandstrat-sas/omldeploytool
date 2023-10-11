@@ -96,6 +96,32 @@ case $1 in
     echo "reset django admin password"
     podman exec -it oml-uwsgi-server python3 /opt/omnileads/ominicontacto/manage.py cambiar_admin_password
     ;;
+  --restart_core)
+    echo "Restart core components"
+    systemctl restart fastagi
+    systemctl restart asterisk
+    systemctl restart omnileads
+    systemctl restart daphne
+    systemctl restart nginx
+    ;;
+  --restart_all)
+    echo "¿Are you sure you want to restart all componentes ? yes or no"
+    read confirmacion
+    if [[ $confirmacion == "yes" ]]; then    
+      systemctl restart rtpengine
+      systemctl restart redis
+      systemctl restart minio
+      systemctl restart omlcron
+      systemctl restart fastagi
+      systemctl restart asterisk
+      systemctl restart kamailio
+      systemctl restart omnileads
+      systemctl restart daphne
+      systemctl restart nginx
+    else
+      echo "exit"
+    fi  
+    ;;    
   --init_env)
     echo "init Environment with some data"
     podman exec -it oml-uwsgi-server python3 /opt/omnileads/ominicontacto/manage.py inicializar_entorno

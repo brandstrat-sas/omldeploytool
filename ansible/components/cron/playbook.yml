@@ -64,7 +64,7 @@
       state: started
       enabled: yes
       daemon_reload: yes
-    #when: omnileads_ha is not defined  
+    when: omnileads_ha is not defined  
     tags:
       - install
       - upgrade
