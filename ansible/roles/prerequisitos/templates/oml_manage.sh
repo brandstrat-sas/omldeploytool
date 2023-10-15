@@ -98,25 +98,38 @@ case $1 in
     ;;
   --restart_core)
     echo "Restart core components"
+    echo "Restart fastagi"
     systemctl restart fastagi
+    echo "Restart asterisk"
     systemctl restart asterisk
+    echo "Restart uwsgi"
     systemctl restart omnileads
+    echo "Restart daphne"
     systemctl restart daphne
+    echo "Restart nginx"
     systemctl restart nginx
     ;;
   --restart)
     echo "¿Are you sure you want to restart all componentes ? yes or no"
     read confirmacion
     if [[ $confirmacion == "yes" ]]; then    
+      echo "Restart rtpengine"
       systemctl restart rtpengine
-      systemctl restart redis
-      systemctl restart minio
+      echo "Restart redis"
+      systemctl restart redis      
+      echo "Restart omlcron"
       systemctl restart omlcron
+      echo "Restart fastagi"
       systemctl restart fastagi
+      echo "Restart asterisk"
       systemctl restart asterisk
+      echo "Restart kamailio"
       systemctl restart kamailio
+      echo "Restart omnileads"
       systemctl restart omnileads
+      echo "Restart daphne"
       systemctl restart daphne
+      echo "Restart nginx"
       systemctl restart nginx
     else
       echo "exit"

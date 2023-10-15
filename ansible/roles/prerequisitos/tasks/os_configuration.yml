@@ -185,6 +185,7 @@
   tags: 
     - install
     - upgrade
+    - update
 
 - name: OS_CONF Set timezone of server
   timezone: name={{ TZ }}
