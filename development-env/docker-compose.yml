@@ -170,22 +170,22 @@ services:
     networks:
       - omnileads  
 
-  ari:
-    image: ${OMLFASTAGI_IMG}
-    container_name: oml-astari
-    command: python /app/app_queue.py
-    environment:
-      - TZ=${TZ}
-      - ARI_HOST=acd
-      - ARI_PORT=7088
-      - ARI_USER=omnileads
-      - ARI_PASS=5_MeO_DMT
-      - REDIS_HOSTNAME=${REDIS_HOSTNAME}
-    restart: on-failure  
-    volumes:
-     - ${REPO_PATH}/omlfastagi:/app
-    networks:
-      - omnileads  
+  # ari:
+  #   image: ${OMLFASTAGI_IMG}
+  #   container_name: oml-astari
+  #   command: python /app/app_queue.py
+  #   environment:
+  #     - TZ=${TZ}
+  #     - ARI_HOST=acd
+  #     - ARI_PORT=7088
+  #     - ARI_USER=omnileads
+  #     - ARI_PASS=5_MeO_DMT
+  #     - REDIS_HOSTNAME=${REDIS_HOSTNAME}
+  #   restart: on-failure  
+  #   volumes:
+  #    - ${REPO_PATH}/omlfastagi:/app
+  #   networks:
+  #     - omnileads  
 
   acd:
     build:
@@ -491,7 +491,8 @@ services:
     networks:
       - omnileads
     ports:
-      - 6060:5060/udp
+      - 4569:4569/udp
+      - 6060:6060/udp
       - 10000-10020:10000-10020/udp
     privileged: true
     restart: on-failure
