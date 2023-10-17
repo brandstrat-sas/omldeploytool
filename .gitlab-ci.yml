@@ -59,7 +59,7 @@ deploy-aio-cloud:
     - deploy
   rules:
     - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"'
-    - if: '$RUN_RM_DEPLOY == "true"'
+    - if: '$RUN_RM_DEPLOY_AIO == "true"'
 
 
 deploy-ait-cloud:
@@ -101,7 +101,7 @@ deploy-ait-cloud:
     - deploy
   rules:
     - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"'
-    - if: '$RUN_RM_DEPLOY == "true"'
+    - if: '$RUN_RM_DEPLOY_AIT == "true"'
 
 
 deploy-aio-cloud-norm:
@@ -126,7 +126,6 @@ deploy-aio-cloud-norm:
     - bash -x deploy.sh --action=install --tenant=gitlab
     - until curl -sk --head --request GET https://$OML_IPADDR|grep "302" > /dev/null; do echo "Environment still being installed, sleeping 60 seconds"; sleep 60; done; echo "Environment is up"
     - sleep 90
-    - doctl compute droplet delete -f cicd-systemd.${CI_JOB_ID}
   tags:
     - deploy
   rules:
