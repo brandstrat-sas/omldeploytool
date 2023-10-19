@@ -39,7 +39,8 @@
     tags:
       - install
       - upgrade
-
+      - update
+      
   - name: AMI Copy systemd service file
     template:
       src: "{{ ami_repo_path }}templates/ami.service"
@@ -47,7 +48,8 @@
     tags:
       - install
       - upgrade
-
+      - update
+      
   - name: AMI Pull image
     command: podman pull --quiet {{ img_repo }}:{{ ami_version }}
     register: podman_pull
@@ -55,13 +57,26 @@
     tags:
       - install
       - upgrade
+      - update
 
   - name: AMI Enable and start systemd service
+    systemd:
+      name: ami.service
+      state: started
+      enabled: yes
+      daemon_reload: yes
+    tags:
+      - install
+      - upgrade
+      
+  - name: AMI ReStart systemd service
     systemd:
       name: ami.service
       state: restarted
       enabled: yes
       daemon_reload: yes
     tags:
-      - install
       - upgrade
+      - restart
+    when:       
+      - inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_aio']  

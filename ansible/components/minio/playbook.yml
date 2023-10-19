@@ -39,6 +39,7 @@
       group: "{{ usuario }}"
     tags:
       - upgrade
+      - update
 
   - name: MINIO Copy systemd service
     template:
@@ -46,6 +47,7 @@
       dest: /etc/systemd/system/minio.service
     tags:
       - upgrade
+      - update
 
   - name: MINIO Pull image
     command: podman pull --quiet {{ img_repo }}:{{ minio_version }}
@@ -53,17 +55,29 @@
     until: podman_pull is success
     tags:
       - upgrade
+      - update
 
   - name: MINIO Enable and start oml minio service
     systemd:
       name: minio.service
-      state: restarted
+      state: started
       enabled: yes
       daemon_reload: yes
     register: minio_run
     until: minio_run is success
     tags:
       - upgrade
+
+  - name: MINIO Restart service
+    systemd:
+      name: minio.service
+      state: restarted
+      daemon_reload: yes
+    register: minio_run
+    until: minio_run is success
+    tags:
+      - upgrade
+      - restart
 
   - name: MINIO install command line client
     get_url:

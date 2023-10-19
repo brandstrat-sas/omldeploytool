@@ -1,5 +1,3 @@
-vagrant/debian/.vagrant
-vagrant/redhat/.vagrant
 development-env/omnileads-repos
 development-env/.env
 docker-compose/.env

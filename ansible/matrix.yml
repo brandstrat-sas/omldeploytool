@@ -63,7 +63,12 @@
 - import_playbook: components/keepalived/playbook.yml
   when: omnileads_ha is defined
 
-  
+
+- import_playbook: components/fastagi/playbook.yml
+  when: 
+    - inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_aio']
+
+
 - import_playbook: components/asterisk/playbook.yml
   when: 
     - inventory_hostname in groups['omnileads_voice'] or inventory_hostname in groups['omnileads_aio']
@@ -74,17 +79,17 @@
     - inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_aio']
 
 
-- import_playbook: components/fastagi/playbook.yml
-  when: 
-    - inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_aio']
-
-
 - import_playbook: components/websockets/playbook.yml
   when: 
    - inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_aio']
 
 
 - import_playbook: components/daphne/playbook.yml
+  when: 
+    - inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_aio']
+
+
+- import_playbook: components/cron/playbook.yml
   when: 
     - inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_aio']
 
@@ -100,17 +105,7 @@
     - enterprise_edition == true
 
 
-- import_playbook: components/cron/playbook.yml
-  when: 
-    - inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_aio']
-
-
 - import_playbook: components/nginx/playbook.yml
-  when: 
-    - inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_aio']
-
-
-- import_playbook: components/pstn_emulator/playbook.yml
   when: 
     - inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_aio']
 

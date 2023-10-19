@@ -40,6 +40,7 @@
     tags:
       - install
       - upgrade
+      - update
 
   - name: CRON Copy CRONES systemd service
     template:
@@ -47,7 +48,6 @@
       dest: /etc/systemd/system/omlcron.service
     tags:
       - install
-      - upgrade
 
   - name: CRON Pull image
     command: podman pull --quiet {{ img_repo }}:{{ omnileads_version }}
@@ -56,27 +56,56 @@
     tags:
       - install
       - upgrade
+      - update
 
   - name: CRON Crones Enable and start systemd service
+    systemd:
+      name: omlcron.service
+      state: started
+      enabled: yes
+      daemon_reload: yes
+    when: omnileads_ha is not defined  
+    tags:
+      - install
+      - upgrade
+
+  - name: CRON Crones Restart systemd service
     systemd:
       name: omlcron.service
       state: restarted
       enabled: yes
       daemon_reload: yes
-    #when: omnileads_ha is not defined  
+    when: omnileads_ha is not defined  
+    tags:
+      - restart
+      - upgrade
+    when:       
+      - inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_aio']  
+
+  - name: CRON Crones Enable and start systemd service
+    systemd:
+      name: omlcron.service
+      state: started
+      enabled: yes
+      daemon_reload: yes
+    when: 
+      - omnileads_ha is defined  
+      - ha_rol == "main"
     tags:
       - install
       - upgrade
 
-  # - name: CRON Crones Enable and start systemd service
-  #   systemd:
-  #     name: omlcron.service
-  #     state: restarted
-  #     enabled: yes
-  #     daemon_reload: yes
-  #   when: 
-  #     - omnileads_ha is defined  
-  #     - ha_rol == "main"
-  #   tags:
-  #     - install
-  #     - upgrade
+  - name: CRON Crones Restart systemd service
+    systemd:
+      name: omlcron.service
+      state: restarted
+      enabled: yes
+      daemon_reload: yes
+    when: 
+      - omnileads_ha is defined  
+      - ha_rol == "main"
+    tags:
+      - upgrade
+      - restart
+    when:       
+      - inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_aio']  

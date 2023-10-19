@@ -40,6 +40,7 @@
     tags:
       - install
       - upgrade
+      - update
 
   - name: RTPENGINE Copy Systemd .service file
     template:
@@ -48,6 +49,7 @@
     tags:
       - install
       - upgrade
+      - update
 
   - name: RTPENGINE Pull image
     command: podman pull --quiet {{ img_repo }}:{{ rtpengine_version }}
@@ -56,13 +58,26 @@
     tags:
       - install
       - upgrade
+      - update
 
   - name: RTPENGINE Enable and start service
+    systemd:
+      name: rtpengine.service
+      state: started
+      enabled: yes
+      daemon_reload: yes
+    tags:
+      - install
+
+  - name: RTPENGINE Rstart service
     systemd:
       name: rtpengine.service
       state: restarted
       enabled: yes
       daemon_reload: yes
     tags:
-      - install
       - upgrade
+      - restart
+      - restart_rtpengine
+    when:       
+      - inventory_hostname in groups['omnileads_voice'] or inventory_hostname in groups['omnileads_aio']      

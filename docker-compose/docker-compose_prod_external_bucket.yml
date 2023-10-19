@@ -1,7 +1,7 @@
 version: '3.3'
 services:
   app:
-    container_name: oml-django
+    container_name: oml-uwsgi
     depends_on:
       - postgresql
       - redis
@@ -71,7 +71,7 @@ services:
       - django_callrec_zip:/opt/omnileads/asterisk/var/spool/asterisk/monitor
 
   channels:
-    container_name: oml-django-channels
+    container_name: oml-uwsgi-channels
     depends_on:
       - redis
     dns: 8.8.8.8
@@ -132,7 +132,7 @@ services:
     working_dir: /opt/omnileads/ominicontacto
 
   crones:
-    container_name: oml-django-cron
+    container_name: oml-uwsgi-cron
     depends_on:
       - postgresql
       - redis

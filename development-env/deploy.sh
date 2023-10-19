@@ -19,27 +19,8 @@ fi
 
 cd omnileads-repos
 
-case ${os_host} in
-  mac)
-    brew install minio/stable/mc
-  ;;
-  linux)
-    curl https://dl.min.io/client/mc/release/linux-amd64/mc --create-dirs -o $HOME/minio-binaries/mc
-    chmod +x $HOME/minio-binaries/mc
-    export PATH=$PATH:$HOME/minio-binaries/
-  ;;
-  win)
-    echo "la ventanita del amor"
-  ;;
-  *)
-    curl https://dl.min.io/client/mc/release/linux-amd64/mc --create-dirs -o $HOME/minio-binaries/mc
-    chmod +x $HOME/minio-binaries/mc
-    export PATH=$PATH:$HOME/minio-binaries/
-  ;;
-esac
-
 echo "***[OML devenv] Cloning the repositories of modules"
-repositories=("acd" "kamailio" "nginx" "pgsql" "rtpengine")
+repositories=("acd" "kamailio" "nginx" "pgsql" "rtpengine" "fastagi" "ami" "redis" "pgsql")
 for i in "${repositories[@]}"; do
   if [ ! -d "oml${i}" ]; then
     if [ "$gitlab_clone" == "ssh" ]; then
@@ -60,11 +41,20 @@ else
   git clone https://gitlab.com/omnileads/ominicontacto omlapp
 fi
 
-echo "***[OML devenv] All repositories were cloned in $(pwd)"
+# Addons
+if [ "$gitlab_clone" == "ssh" ]; then
+  git clone git@gitlab.com:omnileads/premium_reports_app.git
+  git clone git@gitlab.com:omnileads/wallboard_app.git
+  git clone git@gitlab.com:omnileads/survey_app.git
+  git clone git@gitlab.com:omnileads/webphone_client_app.git
+fi
 
-repositories=("acd" "kamailio" "nginx" "rtpengine" "websockets" "app" "pgsql")
+echo "********* [OML devenv] All repositories were cloned in $(pwd)"
+sleep 5
+
+repositories=("acd" "kamailio" "nginx" "rtpengine" "websockets" "app")
 for i in "${repositories[@]}"; do
-cd oml${i} && git checkout oml-dev-2.0 && cd ..
+cd oml${i} && git checkout master-2.0 && cd ..
 done
 
 cd ../
@@ -72,12 +62,6 @@ cp env .env
 docker-compose pull
 docker-compose up -d --no-build
 
-mc alias set MINIO http://localhost:9000 minio s3minio123
-mc mb MINIO/devenv
-mc admin user add MINIO devenv s3devenv123
-mc admin policy set MINIO readwrite user=devenv
-
-docker-compose up -d --force-recreate --no-deps app acd
 }
 
 #############################################################################
@@ -86,10 +70,6 @@ docker-compose up -d --force-recreate --no-deps app acd
 for i in "$@"
 do
   case $i in
-    --os_host=mac|--os_host=linux|--os_host=win)
-      os_host="${i#*=}"
-      shift
-    ;;
     --gitlab_clone=ssh|--gitlab_clone=https)
       gitlab_clone="${i#*=}"
       shift
@@ -98,12 +78,8 @@ do
       echo "
 How to use it:
 
-./deploy.sh --os_hos= --gitlab_clone=
+./deploy.sh --gitlab_clone=
 
---os_host=
-        linux
-        mac
-        win
 --gitlab_clone=
         ssh
         https
@@ -117,6 +93,4 @@ How to use it:
   esac
 done
 
-
-#UserValidation
 Deploy
