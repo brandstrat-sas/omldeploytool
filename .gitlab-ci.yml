@@ -125,8 +125,6 @@ deploy-aio-cloud-norm:
     - sed -i "328 s/tenant_example_5_app/#tenant_example_5_app/g" ./instances/gitlab/inventory.yml
     - bash -x deploy.sh --action=install --tenant=gitlab
     - until curl -sk --head --request GET https://$OML_IPADDR|grep "302" > /dev/null; do echo "Environment still being installed, sleeping 60 seconds"; sleep 60; done; echo "Environment is up"
-    - sleep 90
-    - doctl compute droplet delete -f cicd-systemd.${CI_JOB_ID}
   tags:
     - deploy
   rules:
