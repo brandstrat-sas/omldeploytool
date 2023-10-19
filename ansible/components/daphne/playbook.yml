@@ -41,6 +41,7 @@
     tags:
       - install
       - upgrade
+      - update
       
   - name: DAPHNE Copy Daphne systemd service
     template:
@@ -49,7 +50,8 @@
     tags:
       - install
       - upgrade
-    
+      - update
+       
   - name: DAPHNE Pull image
     command: podman pull --quiet {{ img_repo }}:{{ omnileads_version }}
     register: podman_pull
@@ -57,13 +59,28 @@
     tags:
       - install
       - upgrade
+      - update
 
   - name: DAPHNE Channels Enable and start Daphne systemd service
+    systemd:
+      name: daphne.service
+      state: started
+      enabled: yes
+      daemon_reload: yes
+    tags:
+      - install
+      - upgrade
+
+  - name: DAPHNE Restart systemd service
     systemd:
       name: daphne.service
       state: restarted
       enabled: yes
       daemon_reload: yes
     tags:
-      - install
       - upgrade
+      - restart
+      - restart_django
+      - restart_core
+    when:       
+      - inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_aio']  

@@ -44,13 +44,6 @@
         - container_orchest == "systemd"
       ignore_errors: yes  
 
-    - name: RESTORE postgres drop database docker
-      shell: "docker volume rm {{ tenant_id }}_oml_postgres"
-      when:
-        - inventory_hostname in groups['omnileads_aio']
-        - container_orchest == "docker_compose"
-      ignore_errors: yes  
-
     - name: RESTORE postgres Start postgresql systemd service
       service:
         name: postgresql
@@ -59,54 +52,14 @@
         - inventory_hostname in groups['omnileads_data'] or inventory_hostname in groups['omnileads_aio']
         - container_orchest == "systemd"
 
-    - name: RESTORE postgres DB selfhosted bucket cluster
-      shell: "podman run -e POSTGRES_RESTORE=True -e S3_ENDPOINT=http://{{ data_host }}:9000 -e S3_BUCKET_NAME={{ bucket_name }} -e BACKUP_FILENAME=pgsql-backup-{{ restore_file_timestamp }}.sql -e AWS_ACCESS_KEY_ID={{ bucket_access_key }}  -e AWS_SECRET_ACCESS_KEY={{ bucket_secret_key }} -e PGUSER={{ postgres_user }} -e PGPASSWORD={{ postgres_password }} -e PGDATABASE={{ postgres_database }} -e PGHOST={{ data_host }} -e PGPORT={{ postgres_port }} {{ img_repo }}:{{ omnileads_version }}"
+    - name: RESTORE postgres DB pg_restore
+      shell: "podman run --name pgsql_bk_{{ restore_file_timestamp }} --network=host --env-file /etc/default/django.env -e BACKUP_FILENAME=pgsql-backup-{{ restore_file_timestamp }}.sql {{ img_repo }}:{{ omnileads_version }} bash -x /opt/omnileads/bin/init_pgsql_restore.sh"
       when:
-        - inventory_hostname in groups['omnileads_app']
+        - inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_aio']
         - container_orchest == "systemd"
-        - bucket_url is not defined
         
-    - name: RESTORE postgres DB selfhosted bucket AIO
-      shell: "podman run --network=host -e POSTGRES_RESTORE=True -e S3_ENDPOINT=http://localhost:9000 -e S3_BUCKET_NAME={{ bucket_name }} -e BACKUP_FILENAME=pgsql-backup-{{ restore_file_timestamp }}.sql -e AWS_ACCESS_KEY_ID={{ bucket_access_key }}  -e AWS_SECRET_ACCESS_KEY={{ bucket_secret_key }} -e PGUSER={{ postgres_user }} -e PGPASSWORD={{ postgres_password }} -e PGDATABASE={{ postgres_database }} -e PGHOST=localhost -e PGPORT={{ postgres_port }} {{ img_repo }}:{{ omnileads_version }}"
-      when:
-        - inventory_hostname in groups['omnileads_aio']
-        - container_orchest == "systemd"
-        - bucket_url is not defined
-
-    - name: RESTORE postgres DB external bucket cluster
-      shell: "podman run -e POSTGRES_RESTORE=True -e S3_ENDPOINT={{ bucket_url }} -e S3_BUCKET_NAME={{ bucket_name }} -e BACKUP_FILENAME=pgsql-backup-{{ restore_file_timestamp }}.sql -e AWS_ACCESS_KEY_ID={{ bucket_access_key }}  -e AWS_SECRET_ACCESS_KEY={{ bucket_secret_key }} -e PGUSER={{ postgres_user }} -e PGPASSWORD={{ postgres_password }} -e PGDATABASE={{ postgres_database }} -e PGHOST={{ data_host }} -e PGPORT={{ postgres_port }} {{ img_repo }}:{{ omnileads_version }}"
-      when:
-        - inventory_hostname in groups['omnileads_app']
-        - container_orchest == "systemd"
-        - bucket_url is defined
-        - bucket_ssl_selfsigned is not defined
-
-    - name: RESTORE postgres DB external bucket AIO
-      shell: "podman run --network=host -e POSTGRES_RESTORE=True -e S3_ENDPOINT={{ bucket_url }} -e S3_BUCKET_NAME={{ bucket_name }} -e BACKUP_FILENAME=pgsql-backup-{{ restore_file_timestamp }}.sql -e AWS_ACCESS_KEY_ID={{ bucket_access_key }}  -e AWS_SECRET_ACCESS_KEY={{ bucket_secret_key }} -e PGUSER={{ postgres_user }} -e PGPASSWORD={{ postgres_password }} -e PGDATABASE={{ postgres_database }} -e PGHOST=localhost -e PGPORT={{ postgres_port }} {{ img_repo }}:{{ omnileads_version }}"
-      when:
-        - inventory_hostname in groups['omnileads_aio']
-        - container_orchest == "systemd"
-        - bucket_url is defined
-        - bucket_ssl_selfsigned is not defined
-
-    - name: RESTORE postgres DB external bucket ssl selfsigned cluster
-      shell: "podman run -e SSL_SELFSIGNED=true -e POSTGRES_RESTORE=True -e S3_ENDPOINT={{ bucket_url }} -e S3_BUCKET_NAME={{ bucket_name }} -e BACKUP_FILENAME=pgsql-backup-{{ restore_file_timestamp }}.sql -e AWS_ACCESS_KEY_ID={{ bucket_access_key }}  -e AWS_SECRET_ACCESS_KEY={{ bucket_secret_key }} -e PGUSER={{ postgres_user }} -e PGPASSWORD={{ postgres_password }} -e PGDATABASE={{ postgres_database }} -e PGHOST={{ data_host }} -e PGPORT={{ postgres_port }} {{ img_repo }}:{{ omnileads_version }}"
-      when:
-        - inventory_hostname in groups['omnileads_app']
-        - container_orchest == "systemd"
-        - bucket_url is defined
-        - bucket_ssl_selfsigned is defined
-
-    - name: RESTORE postgres DB external bucket ssl selfsigned AIO
-      shell: "podman run --network=host -e SSL_SELFSIGNED=true -e POSTGRES_RESTORE=True -e S3_ENDPOINT={{ bucket_url }} -e S3_BUCKET_NAME={{ bucket_name }} -e BACKUP_FILENAME=pgsql-backup-{{ restore_file_timestamp }}.sql -e AWS_ACCESS_KEY_ID={{ bucket_access_key }}  -e AWS_SECRET_ACCESS_KEY={{ bucket_secret_key }} -e PGUSER={{ postgres_user }} -e PGPASSWORD={{ postgres_password }} -e PGDATABASE={{ postgres_database }} -e PGHOST=localhost -e PGPORT={{ postgres_port }} {{ img_repo }}:{{ omnileads_version }}"
-      when:
-        - inventory_hostname in groups['omnileads_aio']
-        - container_orchest == "systemd"
-        - bucket_url is defined
-        - bucket_ssl_selfsigned is defined
-
     - name: RESTORE django media_root from selfhosted BUCKET cluster
-      shell: "podman exec -it oml-django-server aws --endpoint http://{{ data_host }}:9000 s3 sync s3://{{ bucket_name }}/media_root {{ INSTALL_PREFIX }}/media_root/"
+      shell: "podman exec -it oml-uwsgi-server aws --endpoint http://{{ data_host }}:9000 s3 sync s3://{{ bucket_name }}/media_root/ {{ INSTALL_PREFIX }}media_root/"
       when:
         - inventory_hostname in groups['omnileads_app']
         - container_orchest == "systemd"
@@ -114,7 +67,7 @@
         - bucket_ssl_selfsigned is not defined
 
     - name: RESTORE django media_root from selfhosted BUCKET AIO
-      shell: "podman exec -it oml-django-server aws --endpoint http://localhost:9000 s3 sync s3://{{ bucket_name }}/media_root {{ INSTALL_PREFIX }}/media_root/"
+      shell: "podman exec -it oml-uwsgi-server aws --endpoint http://localhost:9000 s3 sync s3://{{ bucket_name }}/media_root {{ INSTALL_PREFIX }}media_root/"
       when:
         - inventory_hostname in groups['omnileads_aio']
         - container_orchest == "systemd"
@@ -122,7 +75,7 @@
         - bucket_ssl_selfsigned is not defined
     
     - name: RESTORE django media_root from external BUCKET 
-      shell: "podman exec -it oml-django-server aws --endpoint {{ bucket_url }} s3 sync s3://{{ bucket_name }}/media_root {{ INSTALL_PREFIX }}/media_root/"
+      shell: "podman exec -it oml-uwsgi-server aws --endpoint {{ bucket_url }} s3 sync s3://{{ bucket_name }}/media_root {{ INSTALL_PREFIX }}media_root/"
       when:
         - inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_aio']
         - container_orchest == "systemd"
@@ -130,16 +83,29 @@
         - bucket_ssl_selfsigned is not defined
 
     - name: RESTORE django media_root from SSL selfsigned BUCKET
-      shell: "podman exec -it oml-django-server aws --endpoint {{ bucket_url }} --no-verify-ssl s3 sync s3://{{ bucket_name }}/media_root {{ INSTALL_PREFIX }}/media_root/"
+      shell: "podman exec -it oml-uwsgi-server aws --endpoint {{ bucket_url }} --no-verify-ssl s3 sync s3://{{ bucket_name }}/media_root {{ INSTALL_PREFIX }}media_root/"
       when:
         - inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_aio']
         - container_orchest == "systemd"
         - bucket_url is defined
         - bucket_ssl_selfsigned is defined
 
+    # - name: RESTORE DJANGO run migrations collectstatic & others commands
+    #   shell: "podman run --network=host --env-file /etc/default/django.env --volume=django_static:/opt/omnileads/static  {{ img_repo }}:{{ omnileads_version }} /opt/omnileads/bin/django_commands.sh"
+
     - name: RESTORE DJANGO Restart systemd service
       systemd:
         name: omnileads.service
+        state: restarted
+        enabled: yes
+        daemon_reload: yes
+      when:
+        - inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_aio']
+        - container_orchest == "systemd"
+
+    - name: RESTORE DJANGO nginx
+      systemd:
+        name: nginx.service
         state: restarted
         enabled: yes
         daemon_reload: yes
@@ -163,9 +129,13 @@
         state: directory
       when:
         - inventory_hostname in groups['omnileads_voice'] or inventory_hostname in groups['omnileads_aio']
-
-    - name: RESTORE asterisk reload config
-      shell: "podman exec -it oml-asterisk-server asterisk -rx 'dialplan reload'"
+    
+    - name: RESTORE asterisk Restart systemd service
+      systemd:
+        name: asterisk.service
+        state: restarted
+        enabled: yes
+        daemon_reload: yes
       when:
         - inventory_hostname in groups['omnileads_voice'] or inventory_hostname in groups['omnileads_aio']
         - container_orchest == "systemd"

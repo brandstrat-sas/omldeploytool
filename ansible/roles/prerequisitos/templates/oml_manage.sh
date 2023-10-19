@@ -6,15 +6,15 @@ case $1 in
 {% if container_orchest == "docker_compose" %}
   --reset_pass)
     echo "reset django admin password"
-    docker exec -it oml-django-server python3 /opt/omnileads/ominicontacto/manage.py cambiar_admin_password
+    docker exec -it oml-uwsgi-server python3 /opt/omnileads/ominicontacto/manage.py cambiar_admin_password
     ;;
   --init_env)
     echo "init Environment with some data"
-    docker exec -it oml-django-server python3 /opt/omnileads/ominicontacto/manage.py inicializar_entorno
+    docker exec -it oml-uwsgi-server python3 /opt/omnileads/ominicontacto/manage.py inicializar_entorno
     ;;
 --regenerar_asterisk)
     echo "regenerate redis asterisk data"
-    docker exec -it oml-django-server python3 /opt/omnileads/ominicontacto/manage.py regenerar_asterisk
+    docker exec -it oml-uwsgi-server python3 /opt/omnileads/ominicontacto/manage.py regenerar_asterisk
     ;;
   --clean_redis)
     echo "drop all on REDIS"
@@ -25,20 +25,20 @@ case $1 in
     sleep 2
     systemctl start oml-redis-server
     sleep 5
-    docker exec -it oml-django-server python3 /opt/omnileads/ominicontacto/manage.py regenerar_asterisk
+    docker exec -it oml-uwsgi-server python3 /opt/omnileads/ominicontacto/manage.py regenerar_asterisk
     ;;
   --generate_call)
     echo "generate an ibound call through PSTN-Emulator container"
     docker exec -it oml-pstn-server sipp -sn uac 127.0.0.1:5060 -s stress -m 1 -r 1 -d 60000 -l 1
     ;;
   --show_bucket)
-    docker exec -it oml-django-server aws --endpoint-url ${S3_ENDPOINT} s3 ls --recursive s3://${S3_BUCKET_NAME}
+    docker exec -it oml-uwsgi-server aws --endpoint-url ${S3_ENDPOINT} s3 ls --recursive s3://${S3_BUCKET_NAME}
     ;;
   --asterisk_cli)
     docker exec -it oml-asterisk-server asterisk -rvvvv
     ;;
   --psql)
-    docker exec -it oml-django-server psql
+    docker exec -it oml-uwsgi-server psql
     ;;
   --redis_cli)
     docker run -it --name oml-redis-cli docker.io/redis redis-cli -h $(cat /etc/default/django.env |grep REDIS | awk -F= '{print $2}')
@@ -53,10 +53,10 @@ case $1 in
     docker logs -f oml-kamailio-server
     ;;
   --django_bash)
-    podman exec -it oml-django-server bash
+    podman exec -it oml-uwsgi-server bash
     ;;  
   --django_shell)
-    docker exec -it oml-django-server python3 manage.py shell
+    docker exec -it oml-uwsgi-server python3 manage.py shell
     ;;    
   --fastagi_bash)
     docker exec -it oml-fastagi-server bash
@@ -77,7 +77,7 @@ case $1 in
     docker exec -it oml-rtpengine-server cat /etc/rtpengine.conf
     ;;
   --pgsql)
-    docker exec -it oml-django-server psql
+    docker exec -it oml-uwsgi-server psql
     ;;    
   --sentinel_logs)
     docker logs -f oml-sentinel-server
@@ -94,40 +94,77 @@ case $1 in
 {% else %}
   --reset_pass)
     echo "reset django admin password"
-    podman exec -it oml-django-server python3 /opt/omnileads/ominicontacto/manage.py cambiar_admin_password
+    podman exec -it oml-uwsgi-server python3 /opt/omnileads/ominicontacto/manage.py cambiar_admin_password
     ;;
+  --restart_core)
+    echo "Restart core components"
+    echo "Restart fastagi"
+    systemctl restart fastagi
+    echo "Restart asterisk"
+    systemctl restart asterisk
+    echo "Restart uwsgi"
+    systemctl restart omnileads
+    echo "Restart daphne"
+    systemctl restart daphne
+    echo "Restart nginx"
+    systemctl restart nginx
+    ;;
+  --restart)
+    echo "¿Are you sure you want to restart all componentes ? yes or no"
+    read confirmacion
+    if [[ $confirmacion == "yes" ]]; then    
+      echo "Restart rtpengine"
+      systemctl restart rtpengine
+      echo "Restart redis"
+      systemctl restart redis      
+      echo "Restart omlcron"
+      systemctl restart omlcron
+      echo "Restart fastagi"
+      systemctl restart fastagi
+      echo "Restart asterisk"
+      systemctl restart asterisk
+      echo "Restart kamailio"
+      systemctl restart kamailio
+      echo "Restart omnileads"
+      systemctl restart omnileads
+      echo "Restart daphne"
+      systemctl restart daphne
+      echo "Restart nginx"
+      systemctl restart nginx
+    else
+      echo "exit"
+    fi  
+    ;;    
   --init_env)
     echo "init Environment with some data"
-    podman exec -it oml-django-server python3 /opt/omnileads/ominicontacto/manage.py inicializar_entorno
+    podman exec -it oml-uwsgi-server python3 /opt/omnileads/ominicontacto/manage.py inicializar_entorno
     ;;
   --dialer_sync)
     echo "regenerate redis asterisk data"
-    podman exec -it oml-django-server python3 /opt/omnileads/ominicontacto/manage.py sincronizar_wombat
+    podman exec -it oml-uwsgi-server python3 /opt/omnileads/ominicontacto/manage.py sincronizar_wombat
     ;;  
   --redis_sync)
     echo "regenerate redis asterisk data"
-    podman exec -it oml-django-server python3 /opt/omnileads/ominicontacto/manage.py regenerar_asterisk
+    podman exec -it oml-uwsgi-server python3 /opt/omnileads/ominicontacto/manage.py regenerar_asterisk
     ;;
   --redis_clean)
-    echo "drop all on REDIS"
-    systemctl stop oml-redis-server
-    sleep 2
-    podman rm oml-redis-server
-    podman volume rm oml_redis
-    sleep 2
-    systemctl start oml-redis-server
-    sleep 5
-    podman exec -it oml-django-server python3 /opt/omnileads/ominicontacto/manage.py regenerar_asterisk
+    echo "¿Are you sure you want to delete all redis cache? yes or no"
+    read confirmacion
+    if [[ $confirmacion == "yes" ]]; then
+      podman exec -it oml-redis-server redis-cli flushall      
+    else
+      echo "Cancel action"
+    fi    
     ;;
   --generate_call)
     echo "generate an ibound call through PSTN-Emulator container"
-    podman exec -it oml-pstn-server sipp -sn uac 127.0.0.1:5060 -s stress -m 1 -r 1 -d 60000 -l 1
+    podman run -it docker.io/omnileads:pstn_emulator:latest sipp -sn uac 127.0.0.1:5060 -s stress -m 1 -r 1 -d 60000 -l 1
     ;;
   --show_bucket)
-    podman exec -it oml-django-server aws --endpoint-url ${S3_ENDPOINT} s3 ls --recursive s3://${S3_BUCKET_NAME}
+    podman exec -it oml-uwsgi-server aws --endpoint-url ${S3_ENDPOINT} s3 ls --recursive s3://${S3_BUCKET_NAME}
     ;;  
   --psql)
-    podman exec -it oml-django-server psql
+    podman exec -it oml-uwsgi-server psql
     ;;
   --redis_cli)
     podman run -it --name oml-redis-cli docker.io/redis redis-cli -h $(cat /etc/default/django.env |grep REDIS | awk -F= '{print $2}')
@@ -138,36 +175,25 @@ case $1 in
   --asterisk_bash)
     podman exec -it oml-asterisk-server bash
     ;;
-  --asterisk_logs)
-    podman logs -f oml-asterisk-server
-    ;;
   --kamailio_logs)
     podman logs -f oml-kamailio-server
     ;;
-  --django_logs)
-    podman logs -f oml-django-server 
-    ;;    
   --django_bash)
-    podman exec -it oml-django-server bash
+    podman exec -it oml-uwsgi-server bash
     ;;  
   --django_shell)
-    podman exec -it oml-django-server python3 manage.py shell
+    podman exec -it oml-uwsgi-server python3 manage.py shell
     ;;    
+  --django_commands)
+    echo "the 2nd argument must be the omlapp img tag: $2"
+    podman run --network=host --env-file /etc/default/django.env docker.io/omnileads:omlapp:$2 /opt/omnileads/bin/django_commands.sh
+    ;;
   --fastagi_bash)
     podman exec -it oml-fastagi-server bash
-    ;;      
-  --fastagi_logs)
-    podman logs -f oml-fastagi-server
-    ;;
-  --rtpengine_logs)
-    podman logs -f oml-rtpengine-server
     ;;
   --rtpengine_bash)
     podman exec -it oml-rtpengine-server bash
     ;;  
-  --websockets_logs)
-    podman logs -f oml-websockets-server
-    ;;
   --rtpengine_conf)
     podman exec -it oml-rtpengine-server cat /etc/rtpengine.conf
     ;;
@@ -192,16 +218,15 @@ USAGE:
   --psql: launch psql CLI 
   --asterisk_cli: launch asterisk CLI 
   --asterisk_bash: launch asterisk container bash shell 
-  --asterisk_logs: show asterisk container logs 
   --kamailio_logs: show container logs 
-  --django_logs: show container logs 
   --django_shell: init a django shell
   --django_bash: init bash session on django container
-  --rtpengine_logs: show container logs
   --rtpengine_bash: init bash session on
   --rtpengine_config: show rtpengine config
   --websockets_logs: show container logs 
   --nginx_t: print nginx container run config 
+  --restart: restart all components
+  --restart_core: restart fatagi, asterisk, daphne, uwsgi & nginx
   --call_generate: generate an ibound call from PSTN-Emulator container to OMniLeads ACD 
 "
     shift

@@ -25,7 +25,6 @@ all:
     aio_instances:
       hosts:
         tenant_example_1:
-          #container_orchest: docker_compose (by default systemd)
           tenant_id: tenant_example_1
           ansible_host: 190.19.150.18
           omni_ip_lan: 172.16.101.44
@@ -199,6 +198,7 @@ all:
     # ---  kamailio shm & pkg memory params
     shm_size: 64
     pkg_size: 8
+    django_commands: true
     # --- is the time in seconds that will last the https session when inactivity
     SCA: 3600
     # --- Ephemeral Credentials TTL (ECTTL) is the time in seconds            #
@@ -280,11 +280,11 @@ all:
     # --- For each OML Deploy Tool release, a versioned stack with the latest stable images of each component is maintained on inventory.yml
     # --- You can combine the versions as you like, also use your own TAGs, using the following TAG version variables
     
-    omnileads_version: 230928.01
-    asterisk_version: 231006.01
+    omnileads_version: 231018.pre
+    asterisk_version: 231019.01
     fastagi_version: 230920.01
     astami_version: 230920.01
-    nginx_version: 230923.01
+    nginx_version: 230215.01
     websockets_version: 230204.01
     kamailio_version: 230925.01
     rtpengine_version: 230925.01

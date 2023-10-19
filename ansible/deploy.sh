@@ -24,6 +24,9 @@ case ${oml_action} in
   upgrade)
     echo "deploy: $oml_action"
   ;;
+  restart)
+    echo "deploy: $oml_action"
+  ;;
   backup)
     echo "deploy: $oml_action"
   ;;
@@ -82,8 +85,8 @@ case ${oml_action} in
     echo "deploy: $oml_action"
   ;;
   *)
-    echo "ERROR oml_action var is unset";
-    exit 1
+    echo "deploy: $oml_action";
+
   ;;
 esac
 
@@ -171,7 +174,7 @@ case ${oml_action} in
     tenant_folder=$oml_tenant \
     commit="$(git rev-parse HEAD)" \
     build_date=\"$(env LC_hosts=C LC_TIME=C date)\"" \
-    --tags "$oml_action" \
+    --tags "$oml_action"\
     -i .inventory.yml
     Banner `echo $?`
   ;;
@@ -219,7 +222,13 @@ fi
 for i in "$@"
 do
   case $i in
-    --action=upgrade|--action=install|--action=backup|--action=restore|--action=voice|--action=app|--action=observability|--action=postgres|--action=haproxy|--action=cron|--action=keepalived|--action=kamailio|--action=rtpengine|--action=asterisk|--action=sentinel|--action=redis|--action=pgsql_node_recovery_main|--action=pgsql_node_takeover_main|--action=redis_node_takeover_main|--action=pgsql_node_recovery_backup|--action=minio)
+    --action=upgrade|--action=install|--action=backup|--action=restore|--action=voice|\
+    --action=app|--action=observability|--action=postgres|--action=haproxy|--action=cron|\
+    --action=keepalived|--action=kamailio|--action=rtpengine|--action=asterisk|--action=sentinel|\
+    --action=redis|--action=pgsql_node_recovery_main|--action=pgsql_node_takeover_main|\
+    --action=redis_node_takeover_main|--action=pgsql_node_recovery_backup|--action=minio|\
+    --action=restart|--action=restart_django|--action=restart_asterisk|--action=restart_core|\
+    --action=update)
       oml_action="${i#*=}"
       shift
     ;;

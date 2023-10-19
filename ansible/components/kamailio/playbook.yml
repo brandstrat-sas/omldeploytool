@@ -38,6 +38,7 @@
       tags:
         - install
         - upgrade
+        - update
 
     - name: KAMAILIO Copy kamailio.service Systemd file
       template:
@@ -46,6 +47,7 @@
       tags:
         - install
         - upgrade
+        - update
 
     # - name: KAMAILIO Copy kamailio.cfg Systemd file
     #   template:
@@ -66,13 +68,26 @@
       tags:
         - install
         - upgrade
+        - update
 
     - name: KAMAILIO Enable and start service
+      systemd:
+        name: kamailio.service
+        state: started
+        enabled: yes
+        daemon_reload: yes
+      tags:
+        - install
+        - upgrade
+
+    - name: KAMAILIO ReStart service
       systemd:
         name: kamailio.service
         state: restarted
         enabled: yes
         daemon_reload: yes
       tags:
-        - install
         - upgrade
+        - restart
+      when:       
+        - inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_aio']    
