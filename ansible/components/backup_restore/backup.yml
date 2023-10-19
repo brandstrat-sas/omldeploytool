@@ -34,51 +34,10 @@
         file_timestamp: "{{ ansible_date_time.epoch }}"
 
     - name: BACKUP postgres DB selfhosted bucket cluster
-      shell: "podman run -e POSTGRES_BACKUP=True -e S3_ENDPOINT=http://{{ data_host }}:9000 -e S3_BUCKET_NAME={{ bucket_name }} -e BACKUP_FILENAME=pgsql-backup-{{ file_timestamp }}.sql -e AWS_ACCESS_KEY_ID={{ bucket_access_key }}  -e AWS_SECRET_ACCESS_KEY={{ bucket_secret_key }} -e PGUSER={{ postgres_user }} -e PGPASSWORD={{ postgres_password }} -e PGDATABASE={{ postgres_database }} -e PGHOST={{ data_host }} -e PGPORT={{ postgres_port }} {{ img_repo }}:{{ omnileads_version }}"
+      shell: "podman run --name pgsql_bk_{{ file_timestamp }} --network=host --env-file /etc/default/django.env -e BACKUP_FILENAME=pgsql-backup-{{ file_timestamp }}.sql {{ img_repo }}:{{ omnileads_version }} bash -x /opt/omnileads/bin/init_pgsql_backup.sh"
       when:
-        - inventory_hostname in groups['omnileads_app']
-        - container_orchest == "systemd"
-        - bucket_url is not defined
-        
-    - name: BACKUP postgres DB selfhosted bucket AIO
-      shell: "podman run --network=host -e POSTGRES_BACKUP=True -e S3_ENDPOINT=http://localhost:9000 -e S3_BUCKET_NAME={{ bucket_name }} -e BACKUP_FILENAME=pgsql-backup-{{ file_timestamp }}.sql -e AWS_ACCESS_KEY_ID={{ bucket_access_key }}  -e AWS_SECRET_ACCESS_KEY={{ bucket_secret_key }} -e PGUSER={{ postgres_user }} -e PGPASSWORD={{ postgres_password }} -e PGDATABASE={{ postgres_database }} -e PGHOST=localhost -e PGPORT={{ postgres_port }} {{ img_repo }}:{{ omnileads_version }}"
-      when:
-        - inventory_hostname in groups['omnileads_aio']
-        - container_orchest == "systemd"
-        - bucket_url is not defined
-
-    - name: BACKUP postgres DB external bucket cluster
-      shell: "podman run -e POSTGRES_BACKUP=True -e S3_ENDPOINT={{ bucket_url }} -e S3_BUCKET_NAME={{ bucket_name }} -e BACKUP_FILENAME=pgsql-backup-{{ file_timestamp }}.sql -e AWS_ACCESS_KEY_ID={{ bucket_access_key }}  -e AWS_SECRET_ACCESS_KEY={{ bucket_secret_key }} -e PGUSER={{ postgres_user }} -e PGPASSWORD={{ postgres_password }} -e PGDATABASE={{ postgres_database }} -e PGHOST={{ data_host }} -e PGPORT={{ postgres_port }} {{ img_repo }}:{{ omnileads_version }}"
-      when:
-        - inventory_hostname in groups['omnileads_app']
-        - container_orchest == "systemd"
-        - bucket_url is defined
-        - bucket_ssl_selfsigned is not defined
-
-    - name: BACKUP postgres DB external bucket AIO
-      shell: "podman run --network=host -e POSTGRES_BACKUP=True -e S3_ENDPOINT={{ bucket_url }} -e S3_BUCKET_NAME={{ bucket_name }} -e BACKUP_FILENAME=pgsql-backup-{{ file_timestamp }}.sql -e AWS_ACCESS_KEY_ID={{ bucket_access_key }}  -e AWS_SECRET_ACCESS_KEY={{ bucket_secret_key }} -e PGUSER={{ postgres_user }} -e PGPASSWORD={{ postgres_password }} -e PGDATABASE={{ postgres_database }} -e PGHOST=localhost -e PGPORT={{ postgres_port }} {{ img_repo }}:{{ omnileads_version }}"
-      when:
-        - inventory_hostname in groups['omnileads_aio']
-        - container_orchest == "systemd"
-        - bucket_url is defined
-        - bucket_ssl_selfsigned is not defined
-
-    - name: BACKUP postgres DB external bucket ssl selfsigned cluster
-      shell: "podman run -e SSL_SELFSIGNED=true -e POSTGRES_BACKUP=True -e S3_ENDPOINT={{ bucket_url }} -e S3_BUCKET_NAME={{ bucket_name }} -e BACKUP_FILENAME=pgsql-backup-{{ file_timestamp }}.sql -e AWS_ACCESS_KEY_ID={{ bucket_access_key }}  -e AWS_SECRET_ACCESS_KEY={{ bucket_secret_key }} -e PGUSER={{ postgres_user }} -e PGPASSWORD={{ postgres_password }} -e PGDATABASE={{ postgres_database }} -e PGHOST={{ data_host }} -e PGPORT={{ postgres_port }} {{ img_repo }}:{{ omnileads_version }}"
-      when:
-        - inventory_hostname in groups['omnileads_app']
-        - container_orchest == "systemd"
-        - bucket_url is defined
-        - bucket_ssl_selfsigned is defined
-
-    - name: BACKUP postgres DB external bucket ssl selfsigned AIO
-      shell: "podman run --network=host -e SSL_SELFSIGNED=true -e POSTGRES_BACKUP=True -e S3_ENDPOINT={{ bucket_url }} -e S3_BUCKET_NAME={{ bucket_name }} -e BACKUP_FILENAME=pgsql-backup-{{ file_timestamp }}.sql -e AWS_ACCESS_KEY_ID={{ bucket_access_key }}  -e AWS_SECRET_ACCESS_KEY={{ bucket_secret_key }} -e PGUSER={{ postgres_user }} -e PGPASSWORD={{ postgres_password }} -e PGDATABASE={{ postgres_database }} -e PGHOST=localhost -e PGPORT={{ postgres_port }} {{ img_repo }}:{{ omnileads_version }}"
-      when:
-        - inventory_hostname in groups['omnileads_aio']
-        - container_orchest == "systemd"
-        - bucket_url is defined
-        - bucket_ssl_selfsigned is defined    
-    
+        - inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_aio']
+            
     - name: BACKUP asterisk files
       shell: "podman exec -it oml-asterisk-server /opt/asterisk/scripts/asterisk_backup.py {{ file_timestamp }}"
       when:        

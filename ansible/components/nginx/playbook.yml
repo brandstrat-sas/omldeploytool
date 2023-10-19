@@ -40,6 +40,7 @@
     tags:
       - install
       - upgrade
+      - update
 
   - name: NGINX Copy nginx systemd service
     template:
@@ -48,6 +49,7 @@
     tags:
       - install
       - upgrade
+      - update
 
   - name: NGINX Pull oml-nginx image
     command: podman pull --quiet {{ img_repo }}:{{ nginx_version }}
@@ -56,13 +58,29 @@
     tags:
       - install
       - upgrade
+      - update
 
   - name: NGINX Enable and start oml nginx service
+    systemd:
+      name: nginx.service
+      state: started
+      enabled: yes
+      daemon_reload: yes
+    tags:
+      - install
+      - upgrade
+      - update
+
+  - name: NGINX ReStart oml nginx service
     systemd:
       name: nginx.service
       state: restarted
       enabled: yes
       daemon_reload: yes
     tags:
-      - install
       - upgrade
+      - restart
+      - restart_django
+      - restart_core
+    when:       
+      - inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_aio']    
