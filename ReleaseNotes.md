@@ -10,8 +10,8 @@
 
 ## Improvements
 
-* oml-346 - [WEB][ANSIBLE] Added the capability to generate an Update.
-* oml-346 - [WEB][ANSIBLE] Added the capability to generate a Restart for all components.
+* oml-346 - [ANSIBLE] Added the capability to generate an Update.
+* oml-346 - [ANSIBLE] Added the capability to generate a Restart for all components.
 * oml-346 - [WEB] The docker-entrypoint.sh script has been divided into several scripts that implement specific commands for each invocation (cron, daphne, uwsgi, migrations, etc.).
 * oml-2457 - [WEB] The agent activity logging task has been migrated from asterisk-odbc queue_log to Django.
 
