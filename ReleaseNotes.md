@@ -1,28 +1,35 @@
-# Release Notes - OMniLeads 1.31.0
-[2023-10-19]
+# Release Notes - OMniLeads 1.32.0
+[2023-10-23]
 
 ## Added
 
-## Improvments
+oml-2482 - [WEB] Allow any value for Fixed Type (CUSTOM) CRM parameters.
+oml-2484 - [WEB] Control to prevent creating more than one agenda per contact per campaign.
+oml-2517 - [WEB] New endpoint to send HangUp call action via AMI.
+oml-2472 - [WEB] User authentication using LDAP.
 
-* oml-346 - [WEB][ANSIBLE] Se añade la posibilidad de generar un Update
-* oml-346 - [WEB][ANSIBLE] Se añade la posibilidad de generar un Restart de todos los componentes
-* oml-346 - [WEB] Se dividió el script docker-entrypoint por varios scripts que implementan comandos especificos para cada invocación (cron, daphne, uwsgi, migrations, etc.)
+## Improvements
+
+oml-346 - [WEB][ANSIBLE] Added the capability to generate an Update.
+oml-346 - [WEB][ANSIBLE] Added the capability to generate a Restart for all components.
+oml-346 - [WEB] The docker-entrypoint.sh script has been divided into several scripts that implement specific commands for each invocation (cron, daphne, uwsgi, migrations, etc.).
+oml-2457 - [WEB] The agent activity logging task has been migrated from asterisk-odbc queue_log to Django.
 
 ## Fixed
 
-* .....
+oml-2506 - [WEB] JavaScript errors in the address field selection when creating a campaign.
+oml-2499 - [WEB] Positioning fix for elements in the campaign report PDF.
 
 ## Removed
 
-* oml-346 - [WEB] Se remueve todo vestigio de logs sobre archivos del filesystem (django.log y slowsql.log)
-* oml-389 - [ACD] Se remueve la conexión entre asterisk odbc y postgres dejando la tarea de registrar logs a los componentes fastagi y omalpp
+oml-346 - [WEB] All traces of file system logs (django.log and slowsql.log) have been removed.
+oml-389 - [ACD] The connection between Asterisk ODBC and Postgres has been removed, leaving the task of logging to the FastAGI and omalpp components.
 
 # OMniLeads Component versions
 
 ```
-    omnileads_version: 231005.01
-    asterisk_version: 230925.02
+    omnileads_version: 231018.pre
+    asterisk_version: 231019.01
     fastagi_version: 230920.01
     astami_version: 230920.01
     nginx_version: 230923.01
