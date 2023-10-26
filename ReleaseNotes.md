@@ -1,5 +1,5 @@
 # Release Notes - OMniLeads 1.32.0
-[2023-10-23]
+[2023-10-26]
 
 ## Added
 
@@ -12,6 +12,7 @@
 
 * oml-346 - [ANSIBLE] Added the capability to generate an Update.
 * oml-346 - [ANSIBLE] Added the capability to generate a Restart for all components.
+* oml-384 - [ANSIBLE] Added the capability to set the NAT voip ip address.
 * oml-346 - [WEB] The docker-entrypoint.sh script has been divided into several scripts that implement specific commands for each invocation (cron, daphne, uwsgi, migrations, etc.).
 * oml-2457 - [WEB] The agent activity logging task has been migrated from asterisk-odbc queue_log to Django.
 
@@ -28,7 +29,7 @@
 # OMniLeads Component versions
 
 ```
-    omnileads_version: 231018.pre
+    omnileads_version: 231025.pre
     asterisk_version: 231025.01
     fastagi_version: 230920.01
     astami_version: 230920.01
