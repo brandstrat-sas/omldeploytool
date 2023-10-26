@@ -139,7 +139,6 @@ all:
 ##################################################################################################################
 # -- OMniLeads Common Variables                                                                                  #
 ##################################################################################################################
-
   vars:
     # --- ansible user auth connection
     ansible_user: root
@@ -148,13 +147,14 @@ all:
     # ------------------------------------------------------------------------------------------------ #
     # ------------------------------ Generic OMniLeads runtime variables ----------------------------- #
     # ------------------------------------------------------------------------------------------------ #
-
+    
     # --- Asterisk & RTPengine scenary for SIP & RTP
     # --- "cloud" instance (access through public IP)
     # --- "lan" instance (access through private IP)
     # --- "nat" instance (access through Public NAT IP)    
     # --- or "all" in order to access through all NICs
     infra_env: cloud
+    #nat_ip_addr: X.X.X.X
     # --- If you have an DNS FQDN resolution, you must to uncomment and set this param
     # --- otherwise leave commented to work invoking through an IP address
     #fqdn: fts.sefirot.cloud
