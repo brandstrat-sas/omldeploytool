@@ -29,14 +29,14 @@
 # OMniLeads Component versions
 
 ```
-    omnileads_version: 231025.pre
+    omnileads_version: 231030.01
     asterisk_version: 231025.01
     fastagi_version: 230920.01
     astami_version: 230920.01
     nginx_version: 230923.01
     websockets_version: 230204.01
     kamailio_version: 230925.01
-    rtpengine_version: 231025.01
+    rtpengine_version: 231030.01
     redis_version: 230704.01
     postgres_version: 230624.01
 ```

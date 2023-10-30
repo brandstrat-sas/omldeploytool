@@ -170,60 +170,60 @@ services:
     networks:
       - omnileads  
 
-  # voip_adapter:
-  #   image: ${OMLFASTAGI_IMG}
-  #   container_name: oml-voip_adapter
-  #   command: python /app/adapter.py
-  #   environment:
-  #     - TZ=${TZ}
-  #     - ARI_HOST=acd
-  #     - ARI_PORT=7088
-  #     - ARI_USER=omnileads
-  #     - ARI_PASS=5_MeO_DMT
-  #     - REDIS_HOSTNAME=${REDIS_HOSTNAME}
-  #     - RABBITMQ_HOSTNAME=rabbitmq
-  #   restart: on-failure  
-  #   volumes:
-  #    - ${REPO_PATH}/omlfastagi:/app
-  #   networks:
-  #     - omnileads  
+  voip_adapter:
+    image: ${OMLFASTAGI_IMG}
+    container_name: oml-voip_adapter
+    command: python /app/adapter.py
+    environment:
+      - TZ=${TZ}
+      - ARI_HOST=acd
+      - ARI_PORT=7088
+      - ARI_USER=omnileads
+      - ARI_PASS=5_MeO_DMT
+      - REDIS_HOSTNAME=${REDIS_HOSTNAME}
+      - RABBITMQ_HOSTNAME=rabbitmq
+    restart: on-failure  
+    volumes:
+     - ${REPO_PATH}/omlfastagi:/app
+    networks:
+      - omnileads  
 
-  # voip_orchester:
-  #   image: ${OMLFASTAGI_IMG}
-  #   container_name: oml-voip_orchester
-  #   command: python /app/consumer.py
-  #   environment:
-  #     - TZ=${TZ}
-  #     - ARI_HOST=acd
-  #     - ARI_PORT=7088
-  #     - ARI_USER=omnileads
-  #     - ARI_PASS=5_MeO_DMT
-  #     - REDIS_HOSTNAME=${REDIS_HOSTNAME}
-  #     - REDIS_PORT=6379
-  #     - RABBITMQ_HOSTNAME=rabbitmq
-  #   restart: on-failure  
-  #   volumes:
-  #    - ${REPO_PATH}/omlfastagi:/app
-  #   networks:
-  #     - omnileads  
+  voip_orchester:
+    image: ${OMLFASTAGI_IMG}
+    container_name: oml-voip_orchester
+    command: python /app/consumer.py
+    environment:
+      - TZ=${TZ}
+      - ARI_HOST=acd
+      - ARI_PORT=7088
+      - ARI_USER=omnileads
+      - ARI_PASS=5_MeO_DMT
+      - REDIS_HOSTNAME=${REDIS_HOSTNAME}
+      - REDIS_PORT=6379
+      - RABBITMQ_HOSTNAME=rabbitmq
+    restart: on-failure  
+    volumes:
+     - ${REPO_PATH}/omlfastagi:/app
+    networks:
+      - omnileads  
 
-  # voip_deliver:
-  #   image: ${OMLFASTAGI_IMG}
-  #   container_name: oml-voip_deliver
-  #   command: python /app/deliver.py
-  #   environment:
-  #     - TZ=${TZ}
-  #     - ARI_HOST=acd
-  #     - ARI_PORT=7088
-  #     - ARI_USER=omnileads
-  #     - ARI_PASS=5_MeO_DMT
-  #     - REDIS_HOSTNAME=${REDIS_HOSTNAME}
-  #     - RABBITMQ_HOSTNAME=rabbitmq
-  #   restart: on-failure  
-  #   volumes:
-  #    - ${REPO_PATH}/omlfastagi:/app
-  #   networks:
-  #     - omnileads  
+  voip_deliver:
+    image: ${OMLFASTAGI_IMG}
+    container_name: oml-voip_deliver
+    command: python /app/deliver.py
+    environment:
+      - TZ=${TZ}
+      - ARI_HOST=acd
+      - ARI_PORT=7088
+      - ARI_USER=omnileads
+      - ARI_PASS=5_MeO_DMT
+      - REDIS_HOSTNAME=${REDIS_HOSTNAME}
+      - RABBITMQ_HOSTNAME=rabbitmq
+    restart: on-failure  
+    volumes:
+     - ${REPO_PATH}/omlfastagi:/app
+    networks:
+      - omnileads  
 
   acd:
     build:
