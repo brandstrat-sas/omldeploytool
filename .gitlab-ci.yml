@@ -177,9 +177,9 @@ deploy-aio-lan-norm:
     - mkdir -p ~/omldeploytool/ansible/instances/gitlab
     - cd ~/omldeploytool/ansible
     - cp inventory.yml instances/gitlab/inventory.yml
-    - sed -i "s/190.19.11.2/$AIODEPLOY_IPADDR/g" ./instances/gitlab/inventory.yml
-    - sed -i "s/10.10.10.2/$AIOLAN_IPADDR/g" ./instances/gitlab/inventory.yml
-    - sed -i "s/2234/$AIODEPLOY_PORT/g" ./instances/gitlab/inventory.yml
+    - sed -i "s/190.19.11.2/$PROXMOX_ADDR_VM_AIO/g" ./instances/gitlab/inventory.yml
+    - sed -i "s/10.10.10.2/$PROXMOX_ADDR/g" ./instances/gitlab/inventory.yml
+    - sed -i "s/2234/$PROXMOX_PORT/g" ./instances/gitlab/inventory.yml
     - sed -i "317 s/tenant_example_1/#tenant_example_1/g" ./instances/gitlab/inventory.yml
     - sed -i "328 s/tenant_example_5_data/#tenant_example_5_data/g" ./instances/gitlab/inventory.yml
     - sed -i "333 s/tenant_example_5_voice/#tenant_example_5_voice/g" ./instances/gitlab/inventory.yml
