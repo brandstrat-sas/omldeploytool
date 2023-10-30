@@ -35,7 +35,7 @@ all:
           infra_env: lan
           ansible_port: 2234
         tenant_example_nat:
-          tenant_id: tenant_example_2
+          tenant_id: tenant_example_nat
           ansible_host: 190.19.11.2
           omni_ip_lan: 10.10.10.2          
           infra_env: nat
@@ -315,7 +315,7 @@ all:
 omnileads_aio:
   hosts:
     tenant_example_1:
-    #tenant_example_nat
+    #tenant_example_nat:
     #tenant_example_2:
     #tenant_example_3:
     #tenant_example_4:
