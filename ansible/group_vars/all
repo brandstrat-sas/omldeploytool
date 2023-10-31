@@ -22,7 +22,7 @@ fastagi_port: 4573
 postgres_port: 5432
 
 redis_ha_version: develop
-minio_version: latest
+minio_version: RELEASE.2023-09-27T15-22-50Z
 #postgres_version: 14-bullseye
 haproxy_version: 2.0-buster
 

@@ -22,7 +22,6 @@
     - omnileads_app
     - omnileads_aio
   tags:
-    - asterisk
     - fastagi
   vars:
     img_repo: '{{ container_image_registry }}/omnileads/fastagi'
@@ -39,6 +38,7 @@
     tags:
       - install
       - upgrade
+      - update
 
   - name: FASTAGI Copy systemd service file
     template:
@@ -47,6 +47,7 @@
     tags:
       - install
       - upgrade
+      - update
 
   - name: FASTAGI Pull image
     command: podman pull --quiet {{ img_repo }}:{{ fastagi_version }}
@@ -55,13 +56,28 @@
     tags:
       - install
       - upgrade
+      - update
 
   - name: FASTAGI Enable and start systemd service
+    systemd:
+      name: fastagi.service
+      state: started
+      enabled: yes
+      daemon_reload: yes
+    tags:
+      - install
+      - upgrade
+
+  - name: FASTAGI ReStart systemd service
     systemd:
       name: fastagi.service
       state: restarted
       enabled: yes
       daemon_reload: yes
     tags:
-      - install
       - upgrade
+      - restart
+      - restart_fastagi
+      - restart_core
+    when:       
+      - inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_aio']  
