@@ -33,13 +33,13 @@ all:
           ansible_host: 190.19.11.2
           omni_ip_lan: 10.10.10.2          
           infra_env: lan
-          ansible_port: 2234
+          ansible_ssh_port: 2234
         tenant_example_nat:
           tenant_id: tenant_example_nat
           ansible_host: 190.19.11.2
           omni_ip_lan: 10.10.10.2          
           infra_env: nat
-          ansible_port: 2237
+          ansible_ssh_port: 2237
           nat_ip_addr: 190.19.11.2
         tenant_example_3:
           tenant_id: tenant_example_3
