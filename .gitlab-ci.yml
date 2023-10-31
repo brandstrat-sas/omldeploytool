@@ -88,7 +88,7 @@ deploy-ait-cloud:
     - sed -i "s/190.134.62.33/$OML_IPADDR_APP/g" ./instances/gitlab/inventory.yml
     - sed -i "s/192.168.0.4/$OML_IPADDR_APPLAN/g" ./instances/gitlab/inventory.yml
     - sed -i "317 s/tenant_example_1/#tenant_example_1/g" ./instances/gitlab/inventory.yml
-    - sed -i "338 s/tenant_example_5_data/tenant_example_6_data/g" ./instances/gitlab/inventory.yml
+    - sed -i "328 s/tenant_example_5_data/tenant_example_6_data/g" ./instances/gitlab/inventory.yml
     - sed -i "332 s/tenant_example_5_voice/tenant_example_6_voice/g" ./instances/gitlab/inventory.yml
     - sed -i "336 s/tenant_example_5_app/tenant_example_6_app/g" ./instances/gitlab/inventory.yml
     - bash -x deploy.sh --action=install --tenant=gitlab
@@ -120,7 +120,7 @@ deploy-aio-cloud-norm:
     - cp inventory.yml instances/gitlab/inventory.yml
     - sed -i "s/190.19.150.18/$OML_IPADDR/g" ./instances/gitlab/inventory.yml
     - sed -i "s/172.16.101.44/$OML_IPADDR_APPLAN/g" ./instances/gitlab/inventory.yml
-    - sed -i "338 s/tenant_example_5_data/#tenant_example_5_data/g" ./instances/gitlab/inventory.yml
+    - sed -i "328 s/tenant_example_5_data/#tenant_example_5_data/g" ./instances/gitlab/inventory.yml
     - sed -i "332 s/tenant_example_5_voice/#tenant_example_5_voice/g" ./instances/gitlab/inventory.yml
     - sed -i "336 s/tenant_example_5_app/#tenant_example_5_app/g" ./instances/gitlab/inventory.yml
     - bash -x deploy.sh --action=install --tenant=gitlab
@@ -157,7 +157,7 @@ deploy-ait-cloud-norm:
     - sed -i "s/190.134.62.33/$OML_IPADDR_APP/g" ./instances/gitlab/inventory.yml
     - sed -i "s/192.168.0.4/$OML_IPADDR_APPLAN/g" ./instances/gitlab/inventory.yml
     - sed -i "317 s/tenant_example_1/#tenant_example_1/g" ./instances/gitlab/inventory.yml
-    - sed -i "338 s/tenant_example_5_data/tenant_example_6_data/g" ./instances/gitlab/inventory.yml
+    - sed -i "328 s/tenant_example_5_data/tenant_example_6_data/g" ./instances/gitlab/inventory.yml
     - sed -i "332 s/tenant_example_5_voice/tenant_example_6_voice/g" ./instances/gitlab/inventory.yml
     - sed -i "336 s/tenant_example_5_app/tenant_example_6_app/g" ./instances/gitlab/inventory.yml
     - bash -x deploy.sh --action=install --tenant=gitlab
