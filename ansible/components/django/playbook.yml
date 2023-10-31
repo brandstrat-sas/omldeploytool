@@ -42,6 +42,7 @@
     tags:
       - install
       - upgrade
+      - update
 
   - name: DJANGO Copy systemd service
     template:
@@ -50,6 +51,7 @@
     tags:
       - install
       - upgrade
+      - update
     
   - name: DJANGO Pull image
     command: podman pull --quiet {{ img_repo }}:{{ omnileads_version }}
@@ -58,16 +60,7 @@
     tags:
       - install
       - upgrade
- #   when: enterprise_edition == false
-
-  # - name: DJANGO Enterprise Pull image
-  #   command: podman pull --quiet {{ img_repo }}:{{ omnileads_version }}-enterprise
-  #   register: podman_pull
-  #   until: podman_pull is success
-  #   tags:
-  #     - install
-  #     - upgrade
-  #   when: enterprise_edition == true
+      - update
 
   - name: POSTGRESQL Create a new database with name {{ postgres_database }}
     postgresql_db:
@@ -83,54 +76,55 @@
     when: 
       - upgrade_from_oml_1 is not defined 
       - postgres_out == true
-      
-  - name: DJANGO Scalable tunings custom uwsgi.ini
-    template:
-      src: "{{ django_repo_path }}templates/uwsgi.ini"
-      dest: /etc/omnileads/uwsgi.ini
-      mode: 0777
-      owner: "{{ usuario }}"
-      group: "{{ usuario }}"
+
+  - name: DJANGO run migrations collectstatic & others commands
+    shell: "podman run --network=host --env-file /etc/default/django.env --volume=django_static:/opt/omnileads/static  {{ img_repo }}:{{ omnileads_version }} /opt/omnileads/bin/django_commands.sh"
     tags:
       - install
-      - upgrade  
-    when: 
-      - scalable_tunings is defined
+      - upgrade
 
-  # - name: DJANGO run django commands
-  #   shell: "podman run --network=host -e DJANGO_COMMANDS=True --env-file /etc/default/django.env {{ img_repo }}:{{ omnileads_version }}"
-  #   tags:
-  #     - install
-  #     - upgrade
-    
-  - name: DJANGO Enable and start systemd service
+  - name: DJANGO Enable and start systemd UWSGI service
+    systemd:
+      name: omnileads.service
+      state: started
+      enabled: yes
+      daemon_reload: yes
+    tags:
+      - install
+
+  - name: DJANGO Restart systemd UWSGI service
     systemd:
       name: omnileads.service
       state: restarted
       enabled: yes
       daemon_reload: yes
     tags:
-      - install
       - upgrade
+      - restart
+      - restart_django
+      - restart_core
+    when:       
+      - inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_aio']    
 
-  - name: POSTGRESQL Adds plperl extension to the database {{ postgres_database }}
-    shell: podman exec -it oml-django-server psql -U {{ postgres_user }} -d {{ postgres_database }} -c "CREATE EXTENSION IF NOT EXISTS plperl;" 
-    tags:
-      - install
-    when: 
-      - omnileads_ha is not defined
-      - upgrade_from_oml_1 is not defined 
-      - restore_file_timestamp is not defined
-      - postgres_out == true
+  # - name: POSTGRESQL Adds plperl extension to the database {{ postgres_database }}
+  #   shell: podman exec -it oml-django-server psql -U {{ postgres_user }} -d {{ postgres_database }} -c "CREATE EXTENSION IF NOT EXISTS plperl;" 
+  #   tags:
+  #     - install
+  #   when: 
+  #     - omnileads_ha is not defined
+  #     - upgrade_from_oml_1 is not defined 
+  #     - restore_file_timestamp is not defined
+  #     - postgres_out == true
 
-  - name: POSTGRESQL Adds plperl extension to the database {{ postgres_database }}
-    shell: podman exec -it oml-django-server psql -U {{ postgres_user }} -d {{ postgres_database }} -c "CREATE EXTENSION IF NOT EXISTS plperl;" 
-    tags:
-      - install
-    when: 
-      - omnileads_ha is defined
-      - ha_rol == "main"
-      - upgrade_from_oml_1 is not defined 
-      - restore_file_timestamp is not defined
+  # - name: POSTGRESQL Adds plperl extension to the database {{ postgres_database }}
+  #   shell: podman exec -it oml-django-server psql -U {{ postgres_user }} -d {{ postgres_database }} -c "CREATE EXTENSION IF NOT EXISTS plperl;" 
+  #   tags:
+  #     - install
+  #   when: 
+  #     - omnileads_ha is defined
+  #     - ha_rol == "main"
+  #     - upgrade_from_oml_1 is not defined 
+  #     - restore_file_timestamp is not defined
+      
 
   
