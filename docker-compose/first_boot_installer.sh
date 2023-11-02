@@ -22,9 +22,8 @@ apt update && apt install -y git
 curl -fsSL https://get.docker.com -o ~/get-docker.sh
 bash ~/get-docker.sh
 
-git clone https://gitlab.com/omnileads/omldeploytool.git
 if [ -z "$branch" ];then
-    echo "main branch"
+    git clone https://gitlab.com/omnileads/omldeploytool.git
 else
     echo "$branch branch"
     cd ./omldeploytool    
