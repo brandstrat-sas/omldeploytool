@@ -171,7 +171,7 @@ services:
       - omnileads  
 
   voip_adapter:
-    image: ${OMLFASTAGI_IMG}
+    image: ${OMLARI_IMG}
     container_name: oml-voip_adapter
     command: python /app/adapter.py
     environment:
@@ -189,7 +189,7 @@ services:
       - omnileads  
 
   voip_orchester:
-    image: ${OMLFASTAGI_IMG}
+    image: ${OMLARI_IMG}
     container_name: oml-voip_orchester
     command: python /app/consumer.py
     environment:
@@ -208,7 +208,7 @@ services:
       - omnileads  
 
   voip_deliver:
-    image: ${OMLFASTAGI_IMG}
+    image: ${OMLARI_IMG}
     container_name: oml-voip_deliver
     command: python /app/deliver.py
     environment:
