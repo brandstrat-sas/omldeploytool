@@ -184,7 +184,7 @@ services:
       - RABBITMQ_HOSTNAME=rabbitmq
     restart: on-failure  
     volumes:
-     - ${REPO_PATH}/omlfastagi:/app
+     - ${REPO_PATH}/omlari:/app
     networks:
       - omnileads  
 
@@ -203,7 +203,7 @@ services:
       - RABBITMQ_HOSTNAME=rabbitmq
     restart: on-failure  
     volumes:
-     - ${REPO_PATH}/omlfastagi:/app
+     - ${REPO_PATH}/omlari:/app
     networks:
       - omnileads  
 
@@ -221,7 +221,7 @@ services:
       - RABBITMQ_HOSTNAME=rabbitmq
     restart: on-failure  
     volumes:
-     - ${REPO_PATH}/omlfastagi:/app
+     - ${REPO_PATH}/omlari:/app
     networks:
       - omnileads  
 

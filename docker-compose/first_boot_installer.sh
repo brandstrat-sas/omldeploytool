@@ -22,11 +22,10 @@ apt update && apt install -y git
 curl -fsSL https://get.docker.com -o ~/get-docker.sh
 bash ~/get-docker.sh
 
-git clone https://gitlab.com/omnileads/omldeploytool.git
 if [ -z "$branch" ];then
-    echo "main branch"
+    git clone https://gitlab.com/omnileads/omldeploytool.git
 else
-    git checkout $branch
+    git clone -b $branch https://gitlab.com/omnileads/omldeploytool.git
 fi
 
 cd ./omldeploytool/docker-compose
