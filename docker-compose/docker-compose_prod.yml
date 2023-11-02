@@ -129,11 +129,15 @@ services:
       - OML_LOGGING_SLOWSQL_ENABLED=
       - OML_LOGGING_SLOWSQL_OUTPUT="-"
       - OML_LOGGING_SLOWSQL_DURATION=1
+      #- SURVEY_VERSION=develop
+      #- WALLBOARD_VERSION=develop
+      #- PREMIUM_REPORTS_VERSION=develop
+      #- WEBPHONE_CLIENT_VERSION=develop
     image: ${OMLAPP_IMG}
     command: /opt/omnileads/bin/django_commands.sh
     network_mode: host
     privileged: true
-    #restart: on-failure
+    restart: on-failure
     stdin_open: true
     stop_grace_period: 1m30s
     tty: true
@@ -276,10 +280,6 @@ services:
     container_name: oml-fastagi
     environment:
       - TZ=${TZ}
-      - AMI_HOST=${ASTERISK_HOSTNAME}
-      - AMI_USER=${AMI_USER}
-      - AMI_PASSWD=${AMI_PASSWORD}
-      - AMI_PORT=5038
       - PGHOST=${PGHOST}
       - PGPORT=${PGPORT}
       - PGDB=${PGDATABASE}

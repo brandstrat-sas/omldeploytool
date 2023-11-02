@@ -20,14 +20,8 @@ deploy-aio-cloud-docker:
   tags:
     - deploy
   rules:
-<<<<<<< HEAD
     - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"'
     - if: '$RUN_RM_DEPLOY_DOCKER == "true"'    
-=======
-    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"'
-    - if: '$RUN_RM_DEPLOY == "true"'
-    
->>>>>>> 3de8bbe (RN)
 
 deploy-aio-cloud:
   stage: deploy
@@ -162,10 +156,7 @@ deploy-ait-cloud-norm:
   tags:
     - deploy
   rules:
-<<<<<<< HEAD
-=======
     - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"'
->>>>>>> 3de8bbe (RN)
     - if: '$RUN_NORM_DEPLOY_AIT == "true"'
 
 deploy-aio-lan-norm:
