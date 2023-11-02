@@ -147,7 +147,7 @@ services:
       - django_callrec_zip:/opt/omnileads/asterisk/var/spool/asterisk/monitor
 
   channels:
-    container_name: oml-uwsgi-channels
+    container_name: oml-django-channels
     depends_on:
       - redis
     dns: 8.8.8.8
@@ -210,7 +210,7 @@ services:
     working_dir: /opt/omnileads/ominicontacto
 
   crones:
-    container_name: oml-uwsgi-cron
+    container_name: oml-django-cron
     depends_on:
       - postgresql
       - redis
@@ -420,7 +420,7 @@ services:
       - BIND_IP=${REDIS_HOSTNAME}
     network_mode: host
     image: ${OMLREDIS_IMG}
-    command: redis-server --bind ${REDIS_HOSTNAME}
+    command: redis-server --bind ${BIND_IP}
     privileged: true
     restart: on-failure
     stop_grace_period: 1m30s
