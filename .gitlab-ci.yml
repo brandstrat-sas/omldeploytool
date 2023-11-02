@@ -28,7 +28,7 @@ deploy-docker-compose-cloud:
     - doctl compute droplet delete -f cicd-docker-compose.${CI_JOB_ID}
     - rm -rf ./omldeploytool
   rules:
-    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"'
+    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"'
     - if: '$RUN_RM_DEPLOY == "true"'
     
 
@@ -58,7 +58,7 @@ deploy-aio-cloud:
   tags:
     - deploy
   rules:
-    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"'
+    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"'
     - if: '$RUN_RM_DEPLOY == "true"'
 
 
@@ -100,7 +100,7 @@ deploy-ait-cloud:
   tags:
     - deploy
   rules:
-    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"'
+    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"'
     - if: '$RUN_RM_DEPLOY == "true"'
 
 
@@ -165,7 +165,7 @@ deploy-ait-cloud-norm:
   tags:
     - deploy
   rules:
-    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"'
+    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"'
     - if: '$RUN_NORM_DEPLOY_AIT == "true"'
 
 deploy-aio-lan-norm:
