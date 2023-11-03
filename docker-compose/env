@@ -26,6 +26,7 @@ OMLNGINX_IMG=${REPO}/nginx:230923.oml-414
 OMLKAM_IMG=${REPO}/kamailio:230925.oml-414
 OMLRTPENGINE_IMG=${REPO}/rtpengine:231030.oml-414
 OMLWS_IMG=${REPO}/websockets:develop
+OMLREDIS_IMG=${REPO}/redis:230704.01
 OMLVIDEOCALLS_WIDGET_IMG=omnileads/videocalls_widget:230905.01
 OMLPSTNEMULATOR_IMG=omnileads/pstn_emulator:231025.01
 
