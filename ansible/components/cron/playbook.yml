@@ -48,6 +48,8 @@
       dest: /etc/systemd/system/omlcron.service
     tags:
       - install
+      - update
+      - upgrade
 
   - name: CRON Pull image
     command: podman pull --quiet {{ img_repo }}:{{ omnileads_version }}
