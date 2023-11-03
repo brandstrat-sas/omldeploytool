@@ -48,8 +48,8 @@
       dest: /etc/systemd/system/omlcron.service
     tags:
       - install
-      - upgrade
       - update
+      - upgrade
 
   - name: CRON Pull image
     command: podman pull --quiet {{ img_repo }}:{{ omlcron_version }}
