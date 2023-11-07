@@ -20,7 +20,7 @@ ExecStart=/usr/bin/podman run \
   --env-file=/etc/default/pstn.env \
   --name=oml-pstn-server \
   --rm  \
-  {{ container_image_registry }}/omnileads/pstn_emulator:latest
+  {{ img_registry_core_url }}/{{ img_registry_core_repo }}/pstn_emulator:latest
 ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
 ExecStopPost=/usr/bin/podman rm -f --ignore --cidfile=%t/%n.ctr-id
 Type=notify

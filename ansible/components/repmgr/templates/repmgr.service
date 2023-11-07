@@ -21,7 +21,7 @@ ExecStart=/usr/bin/podman run \
   --name=oml-repmgr-server \
 #  --volume=oml_repmgr:/data \
   --rm \
-  docker.io/omnileads/repmgr:{{ repmgr_version }}
+  {{ img_registry_core_url }}/{{ img_registry_core_repo }}/repmgr:{{ repmgr_version }}
 ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
 ExecStopPost=/usr/bin/podman rm -f --ignore --cidfile=%t/%n.ctr-id
 Type=notify

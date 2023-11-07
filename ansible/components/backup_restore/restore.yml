@@ -26,7 +26,7 @@
   tags:
     - restore
   vars:
-    img_repo: '{{ container_image_registry }}/omnileads/omlapp'
+    img_repo: '{{ img_registry_omlapp_url }}/{{ img_registry_omlapp_repo }}/omlapp'
   tasks:
 
     - name: RESTORE postgres Stop postgresql systemd service 

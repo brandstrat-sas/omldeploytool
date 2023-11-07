@@ -24,7 +24,7 @@
   tags:
     - fastagi
   vars:
-    img_repo: '{{ container_image_registry }}/omnileads/fastagi'
+    img_repo: '{{ img_registry_core_url }}/{{ img_registry_core_repo }}/fastagi'
 
   tasks:
 

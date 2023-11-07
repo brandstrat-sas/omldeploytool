@@ -21,7 +21,7 @@
     - omnileads_app
     - omnileads_aio
   vars:
-    img_repo: '{{ container_image_registry }}/omnileads/websockets'
+    img_repo: '{{ img_registry_core_url }}/{{ img_registry_core_repo }}/websockets'
     network: omnileads
   tags:
     - all_components
