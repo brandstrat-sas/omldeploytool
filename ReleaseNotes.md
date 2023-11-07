@@ -3,15 +3,15 @@
 
 ## Added
 
-* oml- [DEPLOY] Ahora CRON pasa a mantener un versionado propio
+* oml-418 [DEPLOY] Now CRON maintains its own versioning in Ansible (inventory.yml) and docker-compose (env).
 
 ## Improvements
 
 
 ## Fixed
 
-* oml- [DEPLOY][DOCKER-COMPOSE] Se adaptó docker-compose.yml para escenarios PROD al nuevo esquema de inicios de la img omlapp
-* oml- [CRON] Los procesos no se terminan llegando a bloquear el contenedor
+* oml-412 [DOCKER-COMPOSE] The docker-compose.yml file was adapted for PROD scenarios to the new startup scheme of the omlapp image.
+* oml-418 [CRON] Processes are not terminating, leading to container blockage.
 
 ## Removed
 
