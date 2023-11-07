@@ -21,7 +21,7 @@ ExecStart=/usr/bin/podman run \
   --env-file=/etc/default/fastagi.env \
   --name=oml-fastagi-server \
   --rm  \
-  {{ container_image_registry }}/omnileads/fastagi:{{ fastagi_version }}
+  {{ img_registry_core_url }}/{{ img_registry_core_repo }}/fastagi:{{ fastagi_version }}
 ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
 ExecStopPost=/usr/bin/podman rm -f --ignore --cidfile=%t/%n.ctr-id
 Type=notify

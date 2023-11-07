@@ -27,7 +27,7 @@
     - app
     - django
   vars:
-    img_repo: '{{ container_image_registry }}/omnileads/pstn_emulator'
+    img_repo: '{{ img_registry_core_url }}/{{ img_registry_core_repo }}/pstn_emulator'
     INSTALL_PREFIX: "/opt/omnileads"
 
   tasks:

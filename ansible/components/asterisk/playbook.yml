@@ -26,7 +26,7 @@
     - voice
     - asterisk
   vars:
-    img_repo: '{{ container_image_registry }}/omnileads/asterisk'
+    img_repo: '{{ img_registry_core_url }}/{{ img_registry_core_repo }}/asterisk'
   tasks:
 
   - name: ASTERISK Set environment variables for this installation

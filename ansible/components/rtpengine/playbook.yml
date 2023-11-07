@@ -27,7 +27,7 @@
     - voice
     - rtpengine
   vars:
-    img_repo: '{{ container_image_registry }}/omnileads/rtpengine'
+    img_repo: '{{ img_registry_core_url }}/{{ img_registry_core_repo }}/rtpengine'
   tasks:
 
   - name: RTPENGINE Set environment variables

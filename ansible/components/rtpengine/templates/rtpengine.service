@@ -26,7 +26,7 @@ ExecStart=/usr/bin/podman run \
   --env-file=/etc/default/rtpengine.env \
   --network=host \
   --log-driver=journald \
-  {{ container_image_registry }}/omnileads/rtpengine:{{ rtpengine_version }}
+  {{ img_registry_core_url }}/{{ img_registry_core_repo }}/rtpengine:{{ rtpengine_version }}
 ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
 ExecStopPost=/usr/bin/podman rm -f --ignore --cidfile=%t/%n.ctr-id
 Type=notify
