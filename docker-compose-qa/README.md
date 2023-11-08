@@ -39,6 +39,16 @@ $ docker-compose up -d
 ![Diagrama deploy tool](../ansible/png/deploy-tool-tenant-compose-localhost.png)
 
 
+## Deploy on linux VM
+
+You should have a Linux virtual machine with the capability to run Docker.
+
+```
+ssh root@your_vm_host
+curl -o first_boot_installer.sh -L "https://gitlab.com/omnileads/omldeploytool/-/raw/main/docker-compose-qa/deploy.sh" && chmod +x deploy.sh
+export BRANCH=main && ./deploy.sh
+```
+
 ## Log in to the Admin UI <a name="post_install"></a>
 
 Before first time you login must to exec:
