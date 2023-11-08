@@ -15,6 +15,7 @@ deploy-docker-compose-cloud:
     CI_JOB_ID: $CI_JOB_ID    
   script:
     - doctl auth init -t ${DIGITALOCEAN_ACCESS_TOKEN}
+    - echo "deploy brach: '$CI_COMMIT_REF_NAME'"
     - git clone -b $CI_COMMIT_REF_NAME https://gitlab.com/omnileads/omldeploytool.git
     - sed -i "s/\${NIC}/eth1/g" ./omldeploytool/docker-compose/first_boot_installer.sh
     - sed -i "s/\${ENV}/cloud/g" ./omldeploytool/docker-compose/first_boot_installer.sh
