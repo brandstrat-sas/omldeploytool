@@ -1,7 +1,7 @@
 version: '3.3'
 services:
   app:
-    container_name: oml-django
+    container_name: oml-uwsgi
     depends_on:
       - postgresql
       - redis
@@ -518,7 +518,7 @@ services:
       - ALLOW_EMPTY_PASSWORD=yes
       - TZ=${TZ}
       - MARIADB_ROOT_PASSWORD=${MYSQL_ROOT_PASS}
-      - MARIADBBASE=${WOMBAT_DB}
+      - MARIADB_DATABASE=${WOMBAT_DB}
       - MARIADB_USER=${WOMBAT_DB_USER}
       - MARIADB_PASSWORD=${WOMBAT_DB_PASS}
     image: ${MARIADB_IMG}
@@ -530,13 +530,12 @@ services:
     volumes:
       - mariadb:/bitnami
 
-  wombat:
+  wombat:  
     command: >
-      bash -c "sed -i '/JDBC_URL/c\JDBC_URL=jdbc:mariadb:\/\/${MYSQL_HOST}\/${WOMBAT_DB}?user=${WOMBAT_DB_USER}&password=${WOMBAT_DB_PASS}&autoReconnect=true' /usr/local/tomcat/webapps/wombat/WEB-INF/tpf.properties && catalina.sh run"
+      bash -c "sed -i '/JDBC_URL/c\JDBC_URL=jdbc:mariadb:\/\/${MYSQL_HOST}\/${WOMBAT_DB}?user=${WOMBAT_DB_USER}&password=${WOMBAT_DB_PASS}&autoReconnect=true' /usr/local/tomcat/webapps/wombat/WEB-INF/tpf.properties && catalina.sh run"    
     container_name: oml-wombat
     depends_on:
       - mariadb
-      - acd
     dns: 8.8.8.8
     environment:
       - TZ=${TZ}
