@@ -45,7 +45,7 @@ You should have a Linux virtual machine with the capability to run Docker.
 
 ```
 ssh root@your_vm_host
-curl -o first_boot_installer.sh -L "https://gitlab.com/omnileads/omldeploytool/-/raw/main/docker-compose-qa/deploy.sh" && chmod +x deploy.sh
+curl -o deploy.sh -L "https://gitlab.com/omnileads/omldeploytool/-/raw/main/docker-compose-qa/deploy.sh" && chmod +x deploy.sh
 export BRANCH=main && ./deploy.sh
 ```
 
