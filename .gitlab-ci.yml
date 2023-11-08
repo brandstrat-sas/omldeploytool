@@ -16,7 +16,10 @@ deploy-docker-compose-cloud:
   script:
     - doctl auth init -t ${DIGITALOCEAN_ACCESS_TOKEN}
     - echo "The branch is '$CI_COMMIT_REF_NAME'"
-    - git clone -b $CI_COMMIT_REF_NAME https://gitlab.com/omnileads/omldeploytool.git
+    - git clone https://gitlab.com/omnileads/omldeploytool.git
+    - cd /omldeploytool
+    - git checkout $CI_COMMIT_REF_NAME
+    - cd ..
     - sed -i "s/\${NIC}/eth1/g" ./omldeploytool/docker-compose/first_boot_installer.sh
     - sed -i "s/\${ENV}/cloud/g" ./omldeploytool/docker-compose/first_boot_installer.sh
     - sed -i "s/\${BRANCH}/$CI_COMMIT_REF_NAME/g" ./omldeploytool/docker-compose/first_boot_installer.sh
