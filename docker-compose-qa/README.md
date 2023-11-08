@@ -43,6 +43,8 @@ $ docker-compose up -d
 
 You should have a Linux virtual machine with the capability to run Docker.
 
+![Diagrama deploy tool](../ansible/png/deploy-tool-tenant-compose-vps.png)
+
 ```
 ssh root@your_vm_host
 curl -o deploy.sh -L "https://gitlab.com/omnileads/omldeploytool/-/raw/main/docker-compose-qa/deploy.sh" && chmod +x deploy.sh
