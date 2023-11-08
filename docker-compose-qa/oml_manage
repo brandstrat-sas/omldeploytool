@@ -164,6 +164,7 @@ USAGE:
 ./manage.sh COMMAND
 
 --reset_pass: reset admin password to admin admin
+--reset_all: clean all component docker volumes
 --init_env: init some basic configs in order to test it
 --call_generate: generate an ibound call through PSTN-Emulator container
 --backup: take a postgres & asterisk backup and send to external bucket

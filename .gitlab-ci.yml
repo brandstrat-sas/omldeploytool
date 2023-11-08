@@ -12,10 +12,10 @@ deploy-docker-compose-cloud:
     DIGITALOCEAN_DROPLET_SIZE: $DIGITALOCEAN_DROPLET_SIZE
     DIGITALOCEAN_REGION: $DIGITALOCEAN_REGION
     DIGITALOCEAN_SSH_KEY: $DIGITALOCEAN_SSH_KEY
-    CI_JOB_ID: $CI_JOB_ID
-    BRANCH: $CI_COMMIT_REF_NAME
+    CI_JOB_ID: $CI_JOB_ID    
   script:
     - doctl auth init -t ${DIGITALOCEAN_ACCESS_TOKEN}
+    - echo "deploy brach: $CI_COMMIT_REF_NAM"
     - git clone -b $CI_COMMIT_REF_NAME https://gitlab.com/omnileads/omldeploytool.git
     - sed -i "s/\${NIC}/eth1/g" ./omldeploytool/docker-compose/first_boot_installer.sh
     - sed -i "s/\${ENV}/cloud/g" ./omldeploytool/docker-compose/first_boot_installer.sh

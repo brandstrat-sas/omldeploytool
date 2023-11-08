@@ -135,8 +135,7 @@ services:
       #- WEBPHONE_CLIENT_VERSION=develop
     image: ${OMLAPP_IMG}
     command: /opt/omnileads/bin/django_commands.sh
-    networks:
-      - omnileads
+    network_mode: host
     privileged: true
     #restart: on-failure
     stdin_open: true
