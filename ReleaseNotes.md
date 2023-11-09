@@ -4,6 +4,7 @@
 ## Added
 
 * oml-418 [DEPLOY] Now CRON maintains its own versioning in Ansible (inventory.yml) and docker-compose (env).
+* oml-419 [DEPLOY] New QA VPS/VM environment.
 
 ## Improvements
 
@@ -11,7 +12,9 @@
 ## Fixed
 
 * oml-412 [DOCKER-COMPOSE] The docker-compose.yml file was adapted for PROD scenarios to the new startup scheme of the omlapp image.
-* oml-418 [CRON] Processes are not terminating, leading to container blockage.
+* oml-416 [CRON] Processes are not terminating, leading to container blockage.
+* oml-415 [ANSIBLE] update/upgrade tags for omlcron.service template render.
+* oml-419 [QAEnv] Fix docker-compose.yml in order to apply new init commands.
 
 ## Removed
 
