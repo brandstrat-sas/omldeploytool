@@ -7,6 +7,7 @@ services:
       - redis
       - acd
       - minio
+      - django_commands
     dns: 8.8.8.8
     environment:
       - CRON_ENABLE=false
@@ -56,7 +57,7 @@ services:
       - OML_LOGGING_SLOWSQL_ENABLED=
       - OML_LOGGING_SLOWSQL_OUTPUT="-"
       - OML_LOGGING_SLOWSQL_DURATION=1
-      - SURVEY_VERSION=develop
+      #- SURVEY_VERSION=develop
       #- WALLBOARD_VERSION=develop
       - PREMIUM_REPORTS_VERSION=develop
       - WEBPHONE_CLIENT_VERSION=develop
@@ -145,6 +146,8 @@ services:
       - django_callrec_zip:/opt/omnileads/asterisk/var/spool/asterisk/monitor
 
   channels:
+    depends_on:
+      - redis    
     container_name: oml-django-channels
     dns: 8.8.8.8
     environment:
@@ -207,6 +210,9 @@ services:
     working_dir: /opt/omnileads/ominicontacto
 
   crones:
+    depends_on:
+      - postgresql
+      - redis  
     container_name: oml-django-cron
     dns: 8.8.8.8
     environment:
@@ -266,6 +272,9 @@ services:
     working_dir: /opt/omnileads
 
   fastagi:
+    depends_on:
+      - redis  
+      - postgresql
     image: ${OMLFASTAGI_IMG}
     container_name: oml-fastagi
     environment:
@@ -281,6 +290,9 @@ services:
       - omnileads  
   
   ami: 
+    depends_on:
+      - acd
+      - redis
     image: ${OMLAMI_IMG}
     container_name: oml-astami
     environment:
@@ -373,6 +385,7 @@ services:
     container_name: oml-nginx
     depends_on:
       - app
+      - channels
       - kamailio
       - websockets
     dns: 8.8.8.8
