@@ -128,6 +128,9 @@
   --django_shell)
     docker exec -it oml-uwsgi python3 manage.py shell
     ;;    
+  --django_commands)
+    docker run --network=host --env-file .env omnileads/omlapp:$2 /opt/omnileads/bin/django_commands.sh
+    ;;      
   --fastagi_bash)
     docker exec -it oml-fastagi bash
     ;;      
@@ -186,6 +189,7 @@ USAGE:
 --django_logs: show container logs
 --django_bash: launch django container bash promt
 --django_shell: launch django shell 
+--django_commands: run migrations and others django_commands
 --rtpengine_logs: show container logs
 --websockets_logs: show container logs
 --nginx_t: print nginx container run config

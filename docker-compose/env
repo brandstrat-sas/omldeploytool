@@ -17,8 +17,8 @@ PUBLIC_IP=
 
 REPO=freetechsolutions
 
-OMLAPP_IMG=${REPO}/omlapp:231030.oml-414
-OMLACD_IMG=${REPO}/asterisk:231025.oml-414
+OMLAPP_IMG=${REPO}/omlapp:231107.oml-414
+OMLACD_IMG=${REPO}/asterisk:231109.oml-414
 OMLFASTAGI_IMG=${REPO}/fastagi:230920.oml-414
 OMLARI_IMG=${REPO}/astari:231102.dev
 OMLAMI_IMG=${REPO}/astami:230920.oml-414
