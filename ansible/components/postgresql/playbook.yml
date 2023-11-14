@@ -52,7 +52,7 @@
         - update
 
     - name: POSTGRESQL Pull image
-      command: podman pull --quiet {{ img_repo }}:{{ postgres_version }}
+      command: podman pull --quiet {{ img_repo }}
       register: podman_pull
       until: podman_pull is success
       tags:

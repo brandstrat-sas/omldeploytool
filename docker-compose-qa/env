@@ -70,6 +70,9 @@ EPHEMERAL_USER_TTL=28800
 # Secret Key for creating auth ephemeral credentials
 AUTHEPH_SK=SUp3rS3cr3tK3y
 
+# Django logs (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+DJANGO_LOG_LEVEL=INFO
+
 ##################################
 # Name of the agenda disposition #
 ##################################
