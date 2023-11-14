@@ -431,7 +431,7 @@ services:
       interval: 1s
       timeout: 10s
       retries: 10
-  
+
 volumes:
   redis_data:
   django_static:
