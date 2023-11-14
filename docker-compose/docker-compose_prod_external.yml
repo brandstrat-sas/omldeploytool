@@ -253,7 +253,6 @@ services:
       - OML_LOGGING_SLOWSQL_OUTPUT="-"
       - OML_LOGGING_SLOWSQL_DURATION=1
     image: ${OMLAPP_IMG}
-    command: /opt/omnileads/bin/init_cronos.sh
     network_mode: host
     privileged: true
     restart: on-failure
@@ -434,9 +433,6 @@ services:
       retries: 10
   
 volumes:
-  postgresql_data:
   redis_data:
-  minio_data:
   django_static:
   django_callrec_zip:
-  prometheus_data:
