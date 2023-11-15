@@ -21,7 +21,7 @@ ExecStart=/usr/bin/podman run \
   --env-file=/etc/default/omlcron.env \
   --name=oml-cron-server \
   --rm  \
-  {{ container_image_registry }}/{{ omlapp_repo }}/omlapp:{{ omlcron_version }} 
+  {{ img_registry_omlapp_url }}/{{ img_registry_omlapp_repo }}/omlapp:{{ omlcron_version }} 
 ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
 ExecStopPost=/usr/bin/podman rm -f --ignore --cidfile=%t/%n.ctr-id
 Type=notify
