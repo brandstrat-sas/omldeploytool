@@ -286,17 +286,17 @@ all:
     # --- For each OML Deploy Tool release, a versioned stack with the latest stable images of each component is maintained on inventory.yml
     # --- You can combine the versions as you like, also use your own TAGs, using the following TAG version variables
     
-    omnileads_version: 231030.01
-    omlcron_version: 230928.01
-    asterisk_version: 231025.01
-    fastagi_version: 230920.01
-    astami_version: 230920.01
-    nginx_version: 230923.01
-    websockets_version: 230204.01
-    kamailio_version: 230925.01
-    rtpengine_version: 231030.01
-    redis_version: 230704.01
-    postgres_version: 230624.01
+    omnileads_version: 231114.oml-414
+    omlcron_version: 1.30.1-tecnoenlace
+    asterisk_version: 231109.oml-414
+    fastagi_version: 230920.oml-414
+    astami_version: 230920.oml-414
+    nginx_version: 230923.oml-414
+    websockets_version: develop
+    kamailio_version: 230925.oml-414
+    rtpengine_version: 231030.oml-414
+    redis_version: 230704.oml-414
+
 
     # --- Activate the OMniLeads Enterprise Edition - with "AAAA" licensed.
     # --- on the contrary you will deploy OMniLeads OSS Edition with GPLV3 licensed. 
@@ -307,9 +307,9 @@ all:
         # --- Contaainer Registry repository
     # --- If you are going to use another registry for the images, you must indicate here
     img_registry_core_url: docker.io
-    img_registry_core_repo: omnileads
+    img_registry_core_repo: freetechsolutions
     img_registry_omlapp_url: docker.io
-    img_registry_omlapp_repo: omnileads
+    img_registry_omlapp_repo: freetechsolutions
 
 #############################################################################################################
 # -- In this section the hosts are grouped based on the type of deployment (AIO, Cluster & Cluster HA).  -- #
