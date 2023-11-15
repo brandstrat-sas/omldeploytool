@@ -26,7 +26,10 @@ git clone https://gitlab.com/omnileads/omldeploytool.git
 if [ -z "$branch" ];then
     echo "main branch"
 else
+    echo "$branch branch"
+    cd ./omldeploytool    
     git checkout $branch
+    cd ..
 fi
 
 cd ./omldeploytool/docker-compose
