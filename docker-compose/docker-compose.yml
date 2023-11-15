@@ -82,6 +82,81 @@ services:
       - redis
       - acd
       - minio
+      - django_commands
+    dns: 8.8.8.8
+    environment:
+      - CRON_ENABLE=false
+      - TZ=${TZ}
+      - DJANGO_HOSTNAME=${DJANGO_HOSTNAME}
+      - UWSGI_PORT=8099
+      - ASTERISK_HOSTNAME=${ASTERISK_HOSTNAME}
+      - AMI_USER=${AMI_USER}
+      - AMI_PASSWORD=${AMI_PASSWORD}
+      - KAMAILIO_HOSTNAME=${KAMAILIO_HOSTNAME}
+      - PGHOST=${PGHOST}
+      - PGDATABASE=${PGDATABASE}
+      - PGPORT=${PGPORT}
+      - PGUSER=${PGUSER}
+      - PGPASSWORD=${PGPASSWORD}
+      - PGHOSTHA=${PGHOSTHA}
+      - PGHOSTRO=${PGHOSTRO}
+      - REDIS_HOSTNAME=${REDIS_HOSTNAME}
+      - WEBSOCKET_HOST=${WEBSOCKET_HOSTNAME}
+      - WEBSOCKET_PORT=${WEBSOCKET_PORT}
+      - CALIFICACION_REAGENDA=${CALIFICACION_REAGENDA}
+      - DJANGO_SETTINGS_MODULE=${DJANGO_SETTINGS_MODULE}
+      - EPHEMERAL_USER_TTL=${EPHEMERAL_USER_TTL}
+      - INSTALL_PREFIX=${INSTALL_PREFIX}
+      - LOGIN_FAILURE_LIMIT=${LOGIN_FAILURE_LIMIT}
+      - OMNILEADS_HOSTNAME=${OMNILEADS_HOSTNAME}
+      - PYTHONPATH=${PYTHONPATH}
+      - SESSION_COOKIE_AGE=${SESSION_COOKIE_AGE}
+      - CALLREC_DEVICE=${CALLREC_DEVICE}
+      - MONITORFORMAT=mp3
+      - S3_STORAGE_ENABLED=true
+      - S3_BUCKET_NAME=${S3_BUCKET_NAME}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - S3_ENDPOINT=${S3_ENDPOINT}
+      - S3_ENDPOINT_MINIO=${S3_ENDPOINT_MINIO}
+      - AWS_DEFAULT_REGION=us-east-1
+      - GOOGLE_MAPS_API_KEY=${GOOGLE_MAPS_API_KEY}
+      - GOOGLE_MAPS_CENTER='${GOOGLE_MAPS_CENTER}'
+      - EMAIL_BACKEND=django.core.mail.backends.dummy.EmailBackend
+      - OML_BRANCH=${OMLAPP_IMG}
+      - OML_COMMIT=${OML_COMMIT}
+      - OML_BUILD_DATE=${OML_BUILD_DATE}
+      - WOMBAT_HOSTNAME=${WOMBAT_HOSTNAME}
+      - WOMBAT_USER=${WOMBAT_USER}
+      - WOMBAT_PASSWORD=${WOMBAT_PASSWORD}
+      - OML_LOGGING_SLOWSQL_ENABLED=
+      - OML_LOGGING_SLOWSQL_OUTPUT="-"
+      - OML_LOGGING_SLOWSQL_DURATION=1
+      #- SURVEY_VERSION=develop
+      #- WALLBOARD_VERSION=develop
+      #- PREMIUM_REPORTS_VERSION=develop
+      #- WEBPHONE_CLIENT_VERSION=develop
+    image: ${OMLAPP_IMG}
+    command: /opt/omnileads/bin/django_commands.sh
+    networks:
+      - omnileads
+    privileged: true
+    #restart: on-failure
+    stdin_open: true
+    stop_grace_period: 1m30s
+    tty: true
+    working_dir: /opt/omnileads/ominicontacto
+    volumes:
+      - django_static:/opt/omnileads/static
+      - django_callrec_zip:/opt/omnileads/asterisk/var/spool/asterisk/monitor
+
+  django_commands:
+    container_name: oml-django-commands
+    depends_on:
+      - postgresql
+      - redis
+      - acd
+      - minio
     dns: 8.8.8.8
     environment:
       - CRON_ENABLE=false
