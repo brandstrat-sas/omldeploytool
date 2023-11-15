@@ -92,6 +92,11 @@
     tags:
       - install
 
+  - name: DJANGO reset admin pass
+    shell: podman exec -it oml-uwsgi-server python3 /opt/omnileads/ominicontacto/manage.py cambiar_admin_password
+    tags:
+      - install
+
   - name: DJANGO Restart systemd UWSGI service
     systemd:
       name: omnileads.service
