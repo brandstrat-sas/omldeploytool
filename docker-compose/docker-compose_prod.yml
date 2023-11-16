@@ -80,7 +80,6 @@ services:
       - postgresql
       - redis
       - acd
-      - minio
     dns: 8.8.8.8
     environment:
       - CRON_ENABLE=false
@@ -290,6 +289,9 @@ services:
     network_mode: host
 
   ami:
+    depends_on:
+      - acd
+      - redis
     image: ${OMLAMI_IMG}
     container_name: oml-astami
     environment:
@@ -496,81 +498,9 @@ services:
       exit 0;
       "
 
-####################################### OBSERVABILITY #######################################
-
-  # prometheus:
-  #   image: prom/prometheus:latest
-  #   container_name: prometheus
-  #   command:
-  #     - '--config.file=/etc/prometheus/prometheus.yml'
-  #     - '--storage.tsdb.path=/prometheus'
-  #     - '--web.console.libraries=/etc/prometheus/console_libraries'
-  #     - '--web.console.templates=/etc/prometheus/consoles'
-  #     - '--storage.tsdb.retention.time=30d'
-  #     - '--web.enable-lifecycle'
-  #   restart: unless-stopped
-  #   ports:
-  #     - ${PUBLIC_IP}:9090:9090
-  #   labels:
-  #     org.label-schema.group: "monitoring"
-  #   logging:
-  #     options:
-  #       max-size: "50m"
-  #   volumes:
-  #     - /etc/omnileads/prometheus.yml/:/etc/prometheus/prometheus.yml
-  #     - prometheus_data:/prometheus
-
-  # nodeexporter:
-  #   image: prom/node-exporter:latest
-  #   container_name: obs-nodeexporter
-  #   user: root
-  #   privileged: true
-  #   volumes:
-  #     - /proc:/host/proc:ro
-  #     - /sys:/host/sys:ro
-  #     - /:/rootfs:ro
-  #   command:
-  #     - '--path.procfs=/host/proc'
-  #     - '--path.sysfs=/host/sys'
-  #     - '--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)'
-  #   restart: unless-stopped
-  #   ports:
-  #     - 127.0.0.1:9100:9100
-  #   labels:
-  #     org.label-schema.group: "monitoring"
-  #   logging:
-  #     options:
-  #       max-size: "50m"
-
-  # cadvisor:
-  #   image: gcr.io/cadvisor/cadvisor:latest
-  #   container_name: obs-cadvisor
-  #   restart: unless-stopped
-  #   ports:
-  #     - 127.0.0.1:8080:8080
-  #   volumes:
-  #   - /:/rootfs:ro
-  #   - /var/run:/var/run:rw
-  #   - /sys:/sys:ro
-  #   - /var/lib/docker/:/var/lib/docker:ro
-
-  # redis-exporter:
-  #   depends_on: 
-  #     - redis
-  #   image: oliver006/redis_exporter
-  #   container_name: obs-redis-exp
-  #   ports:
-  #     - 127.0.0.1:9121:9121
-  #   restart: unless-stopped
-  #   environment:
-  #     - REDIS_ADDR=localhost:6379
-  #     - REDIS_USER=null
-  #     - REDIS_PASSWORD=null
-
 volumes:
   postgresql_data:
   redis_data:
   minio_data:
   django_static:
   django_callrec_zip:
-  #prometheus_data:

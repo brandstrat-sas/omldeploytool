@@ -129,7 +129,8 @@
     docker exec -it oml-uwsgi python3 manage.py shell
     ;;    
   --django_commands)
-    docker run --network=host --env-file .env omnileads/omlapp:$2 /opt/omnileads/bin/django_commands.sh
+    REPO=$(cat .env | grep REPO= | awk -F'=' '{print $2}')
+    docker run --network=host --env-file .env $REPO/omlapp:$2 /opt/omnileads/bin/django_commands.sh
     ;;      
   --fastagi_bash)
     docker exec -it oml-fastagi bash
