@@ -22,7 +22,7 @@
   --call_generate)
     echo "generate an ibound call through PSTN-Emulator container"
     #docker exec -it oml-pstn-emulator sipp -sn uac 127.0.0.1:5060 -s stress -m 1 -r 1 -d 60000 -l 1
-    docker exec -it oml-pstn-emulator sipp -sn uac 127.0.0.1:5060 -s stress -m $2 -r 20 -rp $3 -d 60000
+    docker exec -it oml-pstn-emulator sipp -sn uac 127.0.0.1:5060 -s stress -m $2 -r $3 -rp 50 -d 60000
     ;;
   --backup)
     file_date=$(date +'%y%m%d.%H%M')
@@ -175,7 +175,7 @@ USAGE:
 
 --reset_pass: reset admin password to admin admin
 --init_env: init some basic configs in order to test it
---call_generate: generate an ibound call through PSTN-Emulator container
+--call_generate: generate an ibound call through PSTN-Emulator container. Arg1: calls  Arg2: caps.
 --backup: take a postgres & asterisk backup and send to external bucket
 --postgres_drop_db: delete all PostgreSQL databases
 --postgres_clean_logs: drop calls and agent count tables PostgreSQL 
