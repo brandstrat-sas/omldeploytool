@@ -238,29 +238,31 @@
      - redis_host_ha is not defined
      - docker_compose is not defined
 
-- name: OS_CONF Copy CRON logs cleaner
-  template:
-    src: "templates/crones"
-    dest: /etc/cron.d/logs_cleaner.sh
-    mode: 0755
+- name: OS_CONF Set SystemMaxUse journald.conf
+  lineinfile:
+    path: /etc/systemd/journald.conf
+    regexp: '^SystemMaxUse='
+    line: 'SystemMaxUse=5G'   
   tags: 
     - install
     - upgrade
-  when: 
-    - inventory_hostname not in groups['ha_omnileads_sql']
 
-
-- name: OS_CONF Copy CRON logs cleaner
-  template:
-    src: "templates/crones"
-    dest: /etc/cron.d/logs_cleaner.sh
-    mode: 0755
+- name: OS_CONF Set SystemMaxUse journald.conf
+  lineinfile:
+    path: /etc/systemd/journald.conf
+    regexp: '^RuntimeMaxUse=' 
+    line: 'RuntimeMaxUse=1G'  
   tags: 
     - install
     - upgrade
-  when: 
-    - inventory_hostname not in groups['ha_omnileads_sql']
 
+- name: OS_CONF restart systemd-journald
+  service:
+    name: systemd-journald
+    state: restarted
+  tags: 
+    - install
+    - upgrade
 
 - name: OS_CONF stop OMniLeads App for Upgrade
   systemd:
