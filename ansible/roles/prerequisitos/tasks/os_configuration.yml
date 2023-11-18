@@ -242,16 +242,43 @@
   lineinfile:
     path: /etc/systemd/journald.conf
     regexp: '^SystemMaxUse='
-    line: 'SystemMaxUse=5G'   
+    line: 'SystemMaxUse={{ journald_system_max_use }}'
   tags: 
     - install
     - upgrade
 
-- name: OS_CONF Set SystemMaxUse journald.conf
+- name: OS_CONF Set RuntimeMaxUse journald.conf
   lineinfile:
     path: /etc/systemd/journald.conf
     regexp: '^RuntimeMaxUse=' 
-    line: 'RuntimeMaxUse=1G'  
+    line: 'RuntimeMaxUse={{ journald_runtime_max_use }}'
+  tags: 
+    - install
+    - upgrade
+
+- name: OS_CONF Set SystemMaxFileSize journald.conf
+  lineinfile:
+    path: /etc/systemd/journald.conf
+    regexp: '^SystemMaxFileSize=' 
+    line: 'SystemMaxFileSize={{ journald_system_max_file_size }}'
+  tags: 
+    - install
+    - upgrade
+
+- name: OS_CONF Set SystemKeepFree journald.conf
+  lineinfile:
+    path: /etc/systemd/journald.conf
+    regexp: '^SystemKeepFree=' 
+    line: 'SystemKeepFree={{ journald_system_keep_free }}'
+  tags: 
+    - install
+    - upgrade
+
+- name: OS_CONF Set RuntimeKeepFree journald.conf
+  lineinfile:
+    path: /etc/systemd/journald.conf
+    regexp: '^SRuntimeKeepFree=' 
+    line: 'RuntimeKeepFree={{ journald_runtime_keep_free }}'
   tags: 
     - install
     - upgrade

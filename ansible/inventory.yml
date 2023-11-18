@@ -59,7 +59,8 @@ all:
           tenant_id: tenant_example_4
           ansible_host: 172.16.101.109
           omni_ip_lan: 172.16.101.109
-          infra_env: lan          
+          infra_env: lan 
+          qa_env: true         
     # -----------------------------------------
     # -----------------------------------------
     cluster_instances:
@@ -296,7 +297,6 @@ all:
     kamailio_version: 230925.oml-414
     rtpengine_version: 231030.oml-414
     redis_version: 230704.oml-414
-
 
     # --- Activate the OMniLeads Enterprise Edition - with "AAAA" licensed.
     # --- on the contrary you will deploy OMniLeads OSS Edition with GPLV3 licensed. 

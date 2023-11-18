@@ -52,6 +52,16 @@
         - inventory_hostname in groups['omnileads_data'] or inventory_hostname in groups['omnileads_aio']
         - container_orchest == "systemd"
 
+    # - name: RESTORE wait for postgresql
+    #   shell: |
+    #     until psql -h {{  }} -U {{ postgres_user }} -c "SELECT 1;" >/dev/null 2>&1; do
+    #       echo "Wait for PostgreSQL ..."
+    #       sleep 5
+    #     done
+    #   register: result
+    #   retries: 20
+    #   delay: 10
+
     - name: RESTORE postgres DB pg_restore
       shell: "podman run --name pgsql_bk_{{ restore_file_timestamp }} --network=host --env-file /etc/default/django.env -e BACKUP_FILENAME=pgsql-backup-{{ restore_file_timestamp }}.sql {{ img_repo }}:{{ omnileads_version }} bash -x /opt/omnileads/bin/init_pgsql_restore.sh"
       when:
