@@ -27,8 +27,8 @@
     - app
     - qa
   vars:
-    img_repo_pstn: '{{ img_registry_core_url }}/{{ img_registry_core_repo }}/pstn_emulator'
-    img_repo_nginx_qa: '{{ img_registry_core_url }}/{{ img_registry_core_repo }}/nginxqa'
+    img_repo_pstn: '{{ img_registry_core_url }}/omnileads/pstn_emulator'
+    img_repo_nginx_qa: '{{ img_registry_core_url }}/omnileads/nginxqa'
     INSTALL_PREFIX: "/opt/omnileads"
 
   tasks:
