@@ -1,4 +1,4 @@
-# Copyright (C) 2022 Freetech Solutions
+# qa_repoCopyright (C) 2023 Freetech Solutions
 
 # This file is part of OMniLeads
 
@@ -110,26 +110,3 @@
       - restart_core
     when:       
       - inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_aio']    
-
-  # - name: POSTGRESQL Adds plperl extension to the database {{ postgres_database }}
-  #   shell: podman exec -it oml-django-server psql -U {{ postgres_user }} -d {{ postgres_database }} -c "CREATE EXTENSION IF NOT EXISTS plperl;" 
-  #   tags:
-  #     - install
-  #   when: 
-  #     - omnileads_ha is not defined
-  #     - upgrade_from_oml_1 is not defined 
-  #     - restore_file_timestamp is not defined
-  #     - postgres_out == true
-
-  # - name: POSTGRESQL Adds plperl extension to the database {{ postgres_database }}
-  #   shell: podman exec -it oml-django-server psql -U {{ postgres_user }} -d {{ postgres_database }} -c "CREATE EXTENSION IF NOT EXISTS plperl;" 
-  #   tags:
-  #     - install
-  #   when: 
-  #     - omnileads_ha is defined
-  #     - ha_rol == "main"
-  #     - upgrade_from_oml_1 is not defined 
-  #     - restore_file_timestamp is not defined
-      
-
-  

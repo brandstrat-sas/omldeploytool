@@ -1,0 +1,113 @@
+# qa_repoCopyright (C) 2023 Freetech Solutions
+
+# This file is part of OMniLeads
+
+# This program is free software: You can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY, without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see http://www.gnu.org/licenses/.
+
+---
+
+- name: QA PSTN_EMULATOR OMniLeads application installation
+  hosts: 
+    - omnileads_app
+    - omnileads_aio
+  tags:
+    - all_components
+    - aio
+    - app
+    - qa
+  vars:
+    img_repo_pstn: '{{ img_registry_core_url }}/{{ img_registry_core_repo }}/pstn_emulator'
+    img_repo_nginx_qa: '{{ img_registry_core_url }}/{{ img_registry_core_repo }}/nginxqa'
+    INSTALL_PREFIX: "/opt/omnileads"
+
+  tasks:
+
+  - name: QA PSTN_EULATOR Pull image
+    command: podman pull --quiet {{ img_repo_pstn }}:{{ pstn_emulator_version }}
+    register: podman_pull
+    until: podman_pull is success
+    tags:
+      - install
+      - upgrade
+
+  - name: QA PSTN_EMULATOR environment variables for this installation
+    template:
+      src: "{{ qa_repo_path }}templates/pstn.env"
+      dest: /etc/default/pstn.env
+      mode: 666
+      owner: "{{ usuario }}"
+      group: "{{ usuario }}"
+    tags:
+      - install
+      - upgrade
+
+  - name: QA PSTN_EMULATOR Copy systemd service
+    template:
+      src: "{{ qa_repo_path }}templates/pstn.service"
+      dest: /etc/systemd/system/pstn.service
+    tags:
+      - install
+      - upgrade
+
+  - name: QA PSTN_EMULATOR start
+    systemd:
+      name: pstn.service
+      state: restarted
+      enabled: yes
+      daemon_reload: yes
+    tags:
+      - install
+      - upgrade
+
+  - name: QA NGINX_CGI Pull image
+    command: podman pull --quiet {{ img_repo_nginx_qa }}:{{ nginxcgi_version }}
+    register: podman_pull
+    until: podman_pull is success
+    tags:
+      - install
+      - upgrade
+
+  - name: QA NGINX_CGI environment variables for this installation
+    template:
+      src: "{{ qa_repo_path }}templates/nginx_qa.env"
+      dest: /etc/default/nginx_qa.env
+      mode: 666
+      owner: "{{ usuario }}"
+      group: "{{ usuario }}"
+    tags:
+      - install
+      - upgrade
+
+  - name: QA NGINX_CGI Copy systemd service
+    template:
+      src: "{{ qa_repo_path }}templates/nginx_qa.service"
+      dest: /etc/systemd/system/nginx_qa.service
+    tags:
+      - install
+      - upgrade
+    
+  - name: QA NGINX_CGI start
+    systemd:
+      name: nginx_qa.service
+      state: restarted
+      enabled: yes
+      daemon_reload: yes
+    tags:
+      - install
+      - upgrade
+
+  - name: QA init environment
+    shell: podman exec -it oml-uwsgi-server python3 /opt/omnileads/ominicontacto/manage.py inicializar_entorno
+    tags:
+      - install    
