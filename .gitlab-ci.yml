@@ -43,6 +43,7 @@ deploy-aio-cloud:
     - sed -i "333 s/tenant_example_5_data/#tenant_example_5_data/g" ./instances/gitlab/inventory.yml
     - sed -i "337 s/tenant_example_5_voice/#tenant_example_5_voice/g" ./instances/gitlab/inventory.yml
     - sed -i "341 s/tenant_example_5_app/#tenant_example_5_app/g" ./instances/gitlab/inventory.yml
+    - sleep 30
     - bash -x deploy.sh --action=install --tenant=gitlab
     - until curl -sk --head --request GET https://$OML_IPADDR|grep "302" > /dev/null; do echo "Environment still being installed, sleeping 60 seconds"; sleep 60; done; echo "Environment is up"
     - sleep 90
@@ -83,6 +84,7 @@ deploy-ait-cloud:
     - sed -i "333 s/tenant_example_5_data/tenant_example_6_data/g" ./instances/gitlab/inventory.yml
     - sed -i "337 s/tenant_example_5_voice/tenant_example_6_voice/g" ./instances/gitlab/inventory.yml
     - sed -i "341 s/tenant_example_5_app/tenant_example_6_app/g" ./instances/gitlab/inventory.yml
+    - sleep 30
     - bash -x deploy.sh --action=install --tenant=gitlab
     - until curl -sk --head --request GET https://$OML_IPADDR_APP |grep "302" > /dev/null; do echo "Environment still being installed, sleeping 60 seconds"; sleep 60; done; echo "Environment is up"
     - sleep 120
@@ -115,6 +117,7 @@ deploy-aio-cloud-norm:
     - sed -i "333 s/tenant_example_5_data/#tenant_example_5_data/g" ./instances/gitlab/inventory.yml
     - sed -i "337 s/tenant_example_5_voice/#tenant_example_5_voice/g" ./instances/gitlab/inventory.yml
     - sed -i "341 s/tenant_example_5_app/#tenant_example_5_app/g" ./instances/gitlab/inventory.yml
+    - sleep 30
     - bash -x deploy.sh --action=install --tenant=gitlab
     - until curl -sk --head --request GET https://$OML_IPADDR|grep "302" > /dev/null; do echo "Environment still being installed, sleeping 60 seconds"; sleep 60; done; echo "Environment is up"
   tags:
@@ -152,6 +155,7 @@ deploy-ait-cloud-norm:
     - sed -i "333 s/tenant_example_5_data/tenant_example_6_data/g" ./instances/gitlab/inventory.yml
     - sed -i "337 s/tenant_example_5_voice/tenant_example_6_voice/g" ./instances/gitlab/inventory.yml
     - sed -i "341 s/tenant_example_5_app/tenant_example_6_app/g" ./instances/gitlab/inventory.yml
+    - sleep 30
     - bash -x deploy.sh --action=install --tenant=gitlab
     - until curl -sk --head --request GET https://$OML_IPADDR_APP |grep "302" > /dev/null; do echo "Environment still being installed, sleeping 60 seconds"; sleep 60; done; echo "Environment is up"
   tags:
@@ -177,6 +181,7 @@ deploy-aio-lan-norm:
     - sed -i "337 s/tenant_example_5_voice/#tenant_example_5_voice/g" ./instances/gitlab/inventory.yml
     - sed -i "341 s/tenant_example_5_app/#tenant_example_5_app/g" ./instances/gitlab/inventory.yml
     - sed -i "323 s/#tenant_example_2/tenant_example_2/g" ./instances/gitlab/inventory.yml
+    - sleep 30
     - bash -x deploy.sh --action=install --tenant=gitlab
     - until curl -sk --head --request GET https://$PROXMOX_ADDR:5706|grep "302" > /dev/null; do echo "Environment still being installed, sleeping 60 seconds"; sleep 60; done; echo "Environment is up"
   tags:
