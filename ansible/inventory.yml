@@ -60,7 +60,8 @@ all:
           ansible_host: 172.16.101.109
           omni_ip_lan: 172.16.101.109
           infra_env: lan 
-          qa_env: true         
+          qa_env: true
+          ansible_ssh_port: 2234
     # -----------------------------------------
     # -----------------------------------------
     cluster_instances:
@@ -279,7 +280,6 @@ all:
     # br_bucket_url: https://sfo3.digitaloceanspaces.com
     # br_bucket_access_key: Hghjkdghjkdhasjdasdsada
     # br_bucket_secret_key: jknkjhkjh4523kjhcksjdhkjfdhKJHHKJGKJh786876876NBVJHB
-    # --- Restore source object Storage SSL certs: custom or selfsigned
     
     # ------------------------------------------------------------------------------------------------ #
     # ---------------------------- Container IMG TAG customization ----------------------------------- #
