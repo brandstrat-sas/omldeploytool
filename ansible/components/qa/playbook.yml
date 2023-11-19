@@ -24,11 +24,12 @@
   tags:
     - all_components
     - aio
-    - app
     - qa
   vars:
     img_repo_pstn: '{{ img_registry_core_url }}/omnileads/pstn_emulator'
     img_repo_nginx_qa: '{{ img_registry_core_url }}/omnileads/nginxqa'
+    img_repo_mysql: '{{ img_registry_core_url }}/bitnami/mariadb'
+    img_repo_wombat: '{{ img_registry_core_url }}/freetechsolutions/wombat'
     INSTALL_PREFIX: "/opt/omnileads"
 
   tasks:
@@ -110,4 +111,80 @@
   - name: QA init environment
     shell: podman exec -it oml-uwsgi-server python3 /opt/omnileads/ominicontacto/manage.py inicializar_entorno
     tags:
-      - install    
+      - install
+
+  - name: QA WOMBAT Pull image
+    command: podman pull --quiet {{ img_repo_wombat }}:{{ wombat_version }}
+    register: podman_pull
+    until: podman_pull is success
+    tags:
+      - install
+      - upgrade
+
+  - name: QA WOMBAT environment variables for this installation
+    template:
+      src: "{{ qa_repo_path }}templates/wombat.env"
+      dest: /etc/default/wombat.env
+      mode: 666
+      owner: "{{ usuario }}"
+      group: "{{ usuario }}"
+    tags:
+      - install
+      - upgrade
+
+  - name: QA WOMBAT Copy systemd service
+    template:
+      src: "{{ qa_repo_path }}templates/wombat.service"
+      dest: /etc/systemd/system/wombat.service
+    tags:
+      - install
+      - upgrade
+    
+  - name: QA WOMBAT start
+    systemd:
+      name: wombat.service
+      state: restarted
+      enabled: yes
+      daemon_reload: yes
+    tags:
+      - install
+      - upgrade
+
+  - name: QA MYSQL Pull image
+    command: podman pull --quiet {{ img_repo_mysql }}:{{ mysql_version }}
+    register: podman_pull
+    until: podman_pull is success
+    tags:
+      - install
+      - upgrade
+
+  - name: QA MYSQL environment variables for this installation
+    template:
+      src: "{{ qa_repo_path }}templates/mysql.env"
+      dest: /etc/default/mysql.env
+      mode: 666
+      owner: "{{ usuario }}"
+      group: "{{ usuario }}"
+    tags:
+      - install
+      - upgrade
+
+  - name: QA MYSQL Copy systemd service
+    template:
+      src: "{{ qa_repo_path }}templates/mysql.service"
+      dest: /etc/systemd/system/mysql.service
+    tags:
+      - install
+      - upgrade
+    
+  - name: QA MYSQL start
+    systemd:
+      name: mysql.service
+      state: restarted
+      enabled: yes
+      daemon_reload: yes
+    tags:
+      - install
+      - upgrade
+
+  
