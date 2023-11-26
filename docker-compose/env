@@ -15,7 +15,7 @@ PUBLIC_IP=
 #           versions of each image to deploy                #
 #############################################################
 
-REPO=omnileads
+REPO=freetechsolutions
 
 OMLAPP_IMG=${REPO}/omlapp:231125.01
 OMLCRON_IMG=${REPO}/omlapp:230928.01

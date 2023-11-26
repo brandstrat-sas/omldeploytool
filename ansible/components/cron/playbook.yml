@@ -52,7 +52,7 @@
       - upgrade
 
   - name: CRON Pull image
-    command: podman pull --quiet {{ img_repo }}:{{ omlcron_version }}
+    command: podman pull --quiet {{ img_repo }}:{{ omnileads_version }}
     register: podman_pull
     until: podman_pull is success
     tags:
