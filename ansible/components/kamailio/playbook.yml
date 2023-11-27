@@ -1,4 +1,4 @@
-# Copyright (C) 2022 Freetech Solutions
+# qa_repoCopyright (C) 2023 Freetech Solutions
 
 # This file is part of OMniLeads
 
@@ -25,7 +25,7 @@
     - kamailio
     - app
   vars:
-    img_repo: '{{ container_image_registry }}/omnileads/kamailio'
+    img_repo: '{{ img_registry_core_url }}/{{ img_registry_core_repo }}/kamailio'
   tasks:
 
     - name: KAMAILIO environment variables for this installation

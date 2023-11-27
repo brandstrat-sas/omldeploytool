@@ -1,4 +1,4 @@
-# Copyright (C) 2022 Freetech Solutions
+# qa_repoCopyright (C) 2023 Freetech Solutions
 
 # This file is part of OMniLeads
 
@@ -21,7 +21,7 @@
   tags:
     - haproxy
   vars:
-    img_repo: '{{ container_image_registry }}/haproxy'
+    img_repo: '{{ img_registry_core_url }}/{{ img_registry_core_repo }}/haproxy'
   tasks:
 
     - name: HAPROXY environment variables for this installation

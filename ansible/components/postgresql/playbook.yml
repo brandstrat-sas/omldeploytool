@@ -1,4 +1,4 @@
-# Copyright (C) 2022 Freetech Solutions
+# qa_repoCopyright (C) 2023 Freetech Solutions
 
 # This file is part of OMniLeads
 
@@ -27,7 +27,7 @@
     - postgres
     - install
   vars:
-    img_repo: '{{ container_image_registry }}/omnileads/postgres'
+    img_repo: '{{ container_image_registry }}/{{ postgres_version }}'
     img_prometheus_repo: 'docker.io/prometheuscommunity/postgres-exporter'
 
   tasks:
@@ -52,7 +52,7 @@
         - update
 
     - name: POSTGRESQL Pull image
-      command: podman pull --quiet {{ img_repo }}:{{ postgres_version }}
+      command: podman pull --quiet {{ img_repo }}
       register: podman_pull
       until: podman_pull is success
       tags:

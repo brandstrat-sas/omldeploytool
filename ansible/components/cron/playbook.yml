@@ -1,4 +1,4 @@
-# Copyright (C) 2022 Freetech Solutions
+# qa_repoCopyright (C) 2023 Freetech Solutions
 
 # This file is part of OMniLeads
 
@@ -25,7 +25,7 @@
     - cron
     - app
   vars:
-    img_repo: '{{ container_image_registry }}/{{ omlapp_repo }}/omlapp'
+    img_repo: '{{ img_registry_omlapp_url }}/{{ img_registry_omlapp_repo }}/omlapp'
     INSTALL_PREFIX: "/opt/omnileads"
 
   tasks:
@@ -48,11 +48,11 @@
       dest: /etc/systemd/system/omlcron.service
     tags:
       - install
-      - upgrade
       - update
+      - upgrade
 
   - name: CRON Pull image
-    command: podman pull --quiet {{ img_repo }}:{{ omlcron_version }}
+    command: podman pull --quiet {{ img_repo }}:{{ omnileads_version }}
     register: podman_pull
     until: podman_pull is success
     tags:
@@ -76,15 +76,15 @@
       name: omlcron.service
       state: restarted
       enabled: yes
-      daemon_reload: yes
-    when: omnileads_ha is not defined  
+      daemon_reload: yes    
     tags:
       - restart
       - upgrade
-    when:       
+    when: 
+      - omnileads_ha is not defined  
       - inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_aio']  
-
-  - name: CRON Crones Enable and start systemd service
+      
+  - name: CRON Crones Enable and start systemd service HA cluster
     systemd:
       name: omlcron.service
       state: started
@@ -103,11 +103,10 @@
       state: restarted
       enabled: yes
       daemon_reload: yes
-    when: 
-      - omnileads_ha is defined  
-      - ha_rol == "main"
     tags:
       - upgrade
       - restart
     when:       
-      - inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_aio']  
+      - inventory_hostname in groups['omnileads_aio']  
+      - omnileads_ha is defined  
+      - ha_rol == "main"
