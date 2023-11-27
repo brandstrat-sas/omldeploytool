@@ -21,7 +21,7 @@ ExecStart=/usr/bin/podman run \
   --env-file=/etc/default/omlcron.env \
   --name=oml-cron-server \
   --rm  \
-  {{ img_registry_omlapp_url }}/{{ img_registry_omlapp_repo }}/omlapp:{{ omnileads_version }} /opt/omnileads/bin/docker_entrypoint.sh
+  {{ img_registry_omlapp_url }}/{{ img_registry_omlapp_repo }}/omlapp:{{ omnileads_version }} /opt/omnileads/bin/docker-entrypoint.sh
 ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
 ExecStopPost=/usr/bin/podman rm -f --ignore --cidfile=%t/%n.ctr-id
 Type=notify

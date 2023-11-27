@@ -264,7 +264,7 @@ services:
       - OML_LOGGING_SLOWSQL_OUTPUT="-"
       - OML_LOGGING_SLOWSQL_DURATION=1
     image: ${OMLAPP_IMG}
-    command: /opt/omnileads/bin/docker_entrypoint.sh
+    command: /opt/omnileads/bin/docker-entrypoint.sh
     networks:
       - omnileads
     privileged: true
