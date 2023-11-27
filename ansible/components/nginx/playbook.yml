@@ -26,7 +26,7 @@
     - app
     - nginx
   vars:
-    img_repo: '{{ container_image_registry }}/omnileads/nginx'
+    img_repo: '{{ img_registry_core_url }}/{{ img_registry_core_repo }}/nginx'
 
   tasks:
 

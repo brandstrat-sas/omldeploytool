@@ -1,4 +1,4 @@
-# Copyright (C) 2022 Freetech Solutions
+# qa_repoCopyright (C) 2023 Freetech Solutions
 
 # This file is part of OMniLeads
 
@@ -27,8 +27,8 @@
     - redis
     - install
   vars:
-    img_repo: '{{ container_image_registry }}/omnileads/redis'
-    img_repo_ha: '{{ container_image_registry }}/omnileads/redis'
+    img_repo: '{{ img_registry_core_url }}/{{ img_registry_core_repo }}/redis'
+    img_repo_ha: '{{ img_registry_core_url }}/{{ img_registry_core_repo }}/redis'
     img_prometheus_repo: 'docker.io/oliver006/redis_exporter:latest'
   tasks:
 
@@ -48,7 +48,7 @@
       dest: /etc/systemd/system/redis.service
     tags:
       - upgrade
-    #when: omnileads_ha is not defined  
+      - update
 
   - name: REDIS Pull image
     command: podman pull --quiet {{ img_repo }}:{{ redis_version }}
@@ -56,14 +56,8 @@
     until: podman_pull is success
     tags:
       - upgrade
-    #when: omnileads_ha is not defined   
-
-  - name: REDIS Pull image
-    command: podman pull --quiet {{ img_repo_ha }}:{{ redis_ha_version }}
-    register: podman_pull
-    until: podman_pull is success
-    tags:
-      - upgrade
+      - update
+    when: omnileads_ha is not defined   
 
   - name: REDIS Enable and start service
     systemd:
@@ -73,6 +67,7 @@
       daemon_reload: yes
     tags:
       - upgrade
+      - update
 
   - name: REDIS Restart service
     systemd:

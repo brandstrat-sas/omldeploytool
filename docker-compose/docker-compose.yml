@@ -58,7 +58,7 @@ services:
       - OML_LOGGING_SLOWSQL_OUTPUT="-"
       - OML_LOGGING_SLOWSQL_DURATION=1
       #- SURVEY_VERSION=develop
-      #- WALLBOARD_VERSION=develop
+        #- WALLBOARD_VERSION=develop
       #- PREMIUM_REPORTS_VERSION=develop
       #- WEBPHONE_CLIENT_VERSION=develop
     image: ${OMLAPP_IMG}
@@ -263,7 +263,8 @@ services:
       - OML_LOGGING_SLOWSQL_ENABLED=
       - OML_LOGGING_SLOWSQL_OUTPUT="-"
       - OML_LOGGING_SLOWSQL_DURATION=1
-    image: ${OMLCRON_IMG}
+    image: ${OMLAPP_IMG}
+    command: /opt/omnileads/bin/docker-entrypoint.sh
     networks:
       - omnileads
     privileged: true
@@ -271,13 +272,14 @@ services:
     stdin_open: true
     stop_grace_period: 1m30s
     tty: true
-    working_dir: /opt/omnileads
+    working_dir: /opt/omnileads    
 
   fastagi:
     depends_on:
       - postgresql
       - redis
     image: ${OMLFASTAGI_IMG}
+    command: python /app/fastagi.py
     container_name: oml-fastagi
     environment:
       - TZ=${TZ}

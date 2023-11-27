@@ -118,4 +118,8 @@
 - import_playbook: components/observability/promtail.yml
   when: 
     - loki_host is defined
-    
+
+
+- import_playbook: components/qa/playbook.yml
+  when: 
+    - qa_env is defined
