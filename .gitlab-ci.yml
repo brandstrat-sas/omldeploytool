@@ -51,7 +51,7 @@ deploy-aio-cloud:
   tags:
     - deploy
   rules:
-    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"'
+    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"'
     - if: '$RUN_RM_DEPLOY == "true"'
 
 
@@ -94,7 +94,7 @@ deploy-ait-cloud:
   tags:
     - deploy
   rules:
-    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"'
+    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"'
     - if: '$RUN_RM_DEPLOY == "true"'
 
 
@@ -161,6 +161,7 @@ deploy-ait-cloud-norm:
   tags:
     - deploy
   rules:
+    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"'
     - if: '$RUN_NORM_DEPLOY_AIT == "true"'
 
 deploy-aio-lan-norm:
