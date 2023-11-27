@@ -17,12 +17,12 @@ deploy-aio-cloud-docker:
     - OML_IPADDR=$(doctl compute droplet list |grep cicd-docker-compose.${CI_JOB_ID} |awk '{print $3}') && echo "${OML_IPADDR} to run tests"    
     - until curl -sk --head --request GET https://$OML_IPADDR|grep "302" > /dev/null; do echo "Environment still being installed, sleeping 60 seconds"; sleep 60; done; echo "Environment is up"
     - sleep 90
-    - doctl compute droplet delete -f cicd-systemd.${CI_JOB_ID}
+    - doctl compute droplet delete -f cicd-docker-compose.${CI_JOB_ID}
   tags:
     - deploy
   rules:
     - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"'
-    - if: '$RUN_RM_DEPLOY_DOCKER == "true"'    
+    - if: '$RUN_RM_DEPLOY_DOCKER == "true"'
 
 deploy-aio-cloud:
   stage: deploy
@@ -51,7 +51,7 @@ deploy-aio-cloud:
   tags:
     - deploy
   rules:
-    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"'
+    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"'
     - if: '$RUN_RM_DEPLOY == "true"'
 
 
@@ -94,7 +94,7 @@ deploy-ait-cloud:
   tags:
     - deploy
   rules:
-    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"'
+    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"'
     - if: '$RUN_RM_DEPLOY == "true"'
 
 
@@ -161,7 +161,6 @@ deploy-ait-cloud-norm:
   tags:
     - deploy
   rules:
-    - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"'
     - if: '$RUN_NORM_DEPLOY_AIT == "true"'
 
 deploy-aio-lan-norm:
