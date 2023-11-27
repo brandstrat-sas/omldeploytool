@@ -24,7 +24,7 @@ ExecStart=/usr/bin/podman run \
 --volume=django_static:/opt/omnileads/static \
 --volume=django_callrec_zip:/opt/omnileads/asterisk/var/spool/asterisk/monitor \
 --rm  \
-{{ container_image_registry }}/{{ omlapp_repo }}/omlapp:{{ omnileads_version }} /opt/omnileads/bin/init_uwsgi.sh
+{{ img_registry_omlapp_url }}/{{ img_registry_omlapp_repo }}/omlapp:{{ omnileads_version }} /opt/omnileads/bin/init_uwsgi.sh
 ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
 ExecStopPost=/usr/bin/podman rm -f --ignore --cidfile=%t/%n.ctr-id
 Type=notify

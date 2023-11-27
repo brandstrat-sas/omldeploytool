@@ -167,7 +167,7 @@ case ${oml_action} in
     sentinel_repo_path=$(pwd)/components/sentinel/ \
     daphne_repo_path=$(pwd)/components/daphne/ \
     keepalived_repo_path=$(pwd)/components/keepalived/ \
-    pstn_repo_path=$(pwd)/components/pstn_emulator/ \
+    qa_repo_path=$(pwd)/components/qa/ \
     addons_repo_path=$(pwd)/components/addons/ \
     observability_repo_path=$(pwd)/components/observability/ \
     rebrand=false \

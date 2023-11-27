@@ -1,5 +1,5 @@
 [Unit]
-Description=Podman container-oml-redis-server.service
+Description=Podman container-oml-wombat-server.service
 Documentation=man:podman-generate-systemd(1)
 Wants=network-online.target
 After=network-online.target
@@ -17,18 +17,14 @@ ExecStart=/usr/bin/podman run \
   --replace \
   --detach \
   --network=host \
-  --log-driver=journald \
-  --env-file=/etc/default/redis.env \
-  --name=oml-redis-server \
-  --volume=oml_redis:/data \
-  --rm \
-  {{ img_registry_core_url }}/{{ img_registry_core_repo }}/redis:{{ redis_version }}
+  --env-file=/etc/default/wombat.env \
+  --name=oml-wombat-server \
+  --rm  \
+  {{ img_registry_core_url }}/freetechsolutions/wombat:{{ wombat_version }} bash -c "sed -i '/JDBC_URL/c\JDBC_URL=jdbc:mariadb:\/\/{{ MYSQL_HOST }}\/{{ WOMBAT_DB }}?user={{ WOMBAT_DB_USER }}&password={{ WOMBAT_DB_PASS }}&autoReconnect=true' /usr/local/tomcat/webapps/wombat/WEB-INF/tpf.properties && catalina.sh run"
 ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
 ExecStopPost=/usr/bin/podman rm -f --ignore --cidfile=%t/%n.ctr-id
 Type=notify
 NotifyAccess=all
-StandardOutput=journal
-StandardError=journal
 
 [Install]
 WantedBy=default.target

@@ -1,5 +1,5 @@
 [Unit]
-Description=Podman container-oml-redis-server.service
+Description=Podman container-oml-nginx_qa-server.service
 Documentation=man:podman-generate-systemd(1)
 Wants=network-online.target
 After=network-online.target
@@ -17,18 +17,14 @@ ExecStart=/usr/bin/podman run \
   --replace \
   --detach \
   --network=host \
-  --log-driver=journald \
-  --env-file=/etc/default/redis.env \
-  --name=oml-redis-server \
-  --volume=oml_redis:/data \
-  --rm \
-  {{ img_registry_core_url }}/{{ img_registry_core_repo }}/redis:{{ redis_version }}
+  --env-file=/etc/default/nginx_qa.env \
+  --name=oml-nginx_qa-server \
+  --rm  \
+  {{ img_registry_core_url }}/omnileads/nginxqa:{{ nginxcgi_version }}
 ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
 ExecStopPost=/usr/bin/podman rm -f --ignore --cidfile=%t/%n.ctr-id
 Type=notify
 NotifyAccess=all
-StandardOutput=journal
-StandardError=journal
 
 [Install]
 WantedBy=default.target

@@ -1,4 +1,4 @@
-# Copyright (C) 2022 Freetech Solutions
+# qa_repoCopyright (C) 2023 Freetech Solutions
 
 # This file is part of OMniLeads
 
@@ -30,8 +30,8 @@
     - redis
     - sentinel
   vars:
-    img_repo: '{{ container_image_registry }}/omnileads/redis'
-    img_repo_ha: '{{ container_image_registry }}/omnileads/redis'
+    img_repo: '{{ img_registry_core_url }}/{{ img_registry_core_repo }}/redis'
+    img_repo_ha: '{{ img_registry_core_url }}/{{ img_registry_core_repo }}/redis'
     img_prometheus_repo: 'docker.io/oliver006/redis_exporter'
   tasks:
 

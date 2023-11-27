@@ -1,5 +1,5 @@
 [Unit]
-Description=Podman container-oml-redis-server.service
+Description=Podman container-oml-pstn-server.service
 Documentation=man:podman-generate-systemd(1)
 Wants=network-online.target
 After=network-online.target
@@ -17,18 +17,14 @@ ExecStart=/usr/bin/podman run \
   --replace \
   --detach \
   --network=host \
-  --log-driver=journald \
-  --env-file=/etc/default/redis.env \
-  --name=oml-redis-server \
-  --volume=oml_redis:/data \
-  --rm \
-  {{ img_registry_core_url }}/{{ img_registry_core_repo }}/redis:{{ redis_version }}
+  --env-file=/etc/default/pstn.env \
+  --name=oml-pstn-server \
+  --rm  \
+  {{ img_registry_core_url }}/omnileads/pstn_emulator:{{ pstn_emulator_version }}
 ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
 ExecStopPost=/usr/bin/podman rm -f --ignore --cidfile=%t/%n.ctr-id
 Type=notify
 NotifyAccess=all
-StandardOutput=journal
-StandardError=journal
 
 [Install]
 WantedBy=default.target
