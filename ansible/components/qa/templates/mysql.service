@@ -1,5 +1,5 @@
 [Unit]
-Description=Podman container-oml-pstn-server.service
+Description=Podman container-oml-mysql-server.service
 Documentation=man:podman-generate-systemd(1)
 Wants=network-online.target
 After=network-online.target
@@ -17,10 +17,10 @@ ExecStart=/usr/bin/podman run \
   --replace \
   --detach \
   --network=host \
-  --env-file=/etc/default/pstn.env \
-  --name=oml-pstn-server \
+  --env-file=/etc/default/mysql.env \
+  --name=oml-mysql-server \
   --rm  \
-  {{ container_image_registry }}/omnileads/pstn_emulator:latest
+  {{ img_registry_core_url }}/bitnami/mariadb:{{ mysql_version }}
 ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
 ExecStopPost=/usr/bin/podman rm -f --ignore --cidfile=%t/%n.ctr-id
 Type=notify

@@ -1,4 +1,4 @@
-# Copyright (C) 2022 Freetech Solutions
+# qa_repoCopyright (C) 2023 Freetech Solutions
 
 # This file is part of OMniLeads
 
@@ -27,8 +27,8 @@
     - repmgr
     
   vars:
-    img_repo: '{{ container_image_registry }}/omnileads/repmgr'
-    img_repo_ha: '{{ container_image_registry }}/omnileads/repmgr'
+    img_repo: '{{ img_registry_core_url }}/{{ img_registry_core_repo }}/repmgr'
+    img_repo_ha: '{{ img_registry_core_url }}/{{ img_registry_core_repo }}/repmgr'
   tasks:
 
   - name: REPMGR Set environment variables for this installation

@@ -26,7 +26,7 @@
   tags:
     - backup
   vars:
-    img_repo: '{{ container_image_registry }}/omnileads/omlapp'
+    img_repo: '{{ img_registry_omlapp_url }}/{{ img_registry_omlapp_repo }}/omlapp'
   tasks:
 
     - name: BACKUP generate file_timestamp

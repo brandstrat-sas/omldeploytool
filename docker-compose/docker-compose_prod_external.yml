@@ -3,10 +3,8 @@ services:
   app:
     container_name: oml-uwsgi
     depends_on:
-      - postgresql
       - redis
       - acd
-      - minio
       - django_commands
     dns: 8.8.8.8
     environment:
@@ -43,7 +41,6 @@ services:
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
       - S3_ENDPOINT=${S3_ENDPOINT}
-      - S3_ENDPOINT_MINIO=${S3_ENDPOINT_MINIO}
       - AWS_DEFAULT_REGION=us-east-1
       - GOOGLE_MAPS_API_KEY=${GOOGLE_MAPS_API_KEY}
       - GOOGLE_MAPS_CENTER='${GOOGLE_MAPS_CENTER}'
@@ -77,7 +74,6 @@ services:
   django_commands:
     container_name: oml-django-commands
     depends_on:
-      - postgresql
       - redis
       - acd
     dns: 8.8.8.8
@@ -142,9 +138,6 @@ services:
     stop_grace_period: 1m30s
     tty: true
     working_dir: /opt/omnileads/ominicontacto
-    volumes:
-      - django_static:/opt/omnileads/static
-      - django_callrec_zip:/opt/omnileads/asterisk/var/spool/asterisk/monitor
 
   channels:
     container_name: oml-django-channels
@@ -185,7 +178,6 @@ services:
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
       - S3_ENDPOINT=${S3_ENDPOINT}
-      - S3_ENDPOINT_MINIO=${S3_ENDPOINT_MINIO}
       - AWS_DEFAULT_REGION=us-east-1
       - GOOGLE_MAPS_API_KEY=${GOOGLE_MAPS_API_KEY}
       - GOOGLE_MAPS_CENTER='${GOOGLE_MAPS_CENTER}'
@@ -212,10 +204,8 @@ services:
   crones:
     container_name: oml-django-cron
     depends_on:
-      - postgresql
       - redis
       - acd
-      - minio
     dns: 8.8.8.8
     environment:
       - TZ=${TZ}
@@ -249,7 +239,6 @@ services:
       - S3_BUCKET_NAME=${S3_BUCKET_NAME}
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
-      - S3_ENDPOINT=${S3_ENDPOINT_MINIO}
       - AWS_DEFAULT_REGION=us-east-1
       - GOOGLE_MAPS_API_KEY=${GOOGLE_MAPS_API_KEY}
       - GOOGLE_MAPS_CENTER='${GOOGLE_MAPS_CENTER}'
@@ -275,13 +264,16 @@ services:
 
   fastagi:
     depends_on:
-      - postgresql
       - redis
     image: ${OMLFASTAGI_IMG}
     command: python /app/fastagi.py
     container_name: oml-fastagi
     environment:
       - TZ=${TZ}
+      - AMI_HOST=${ASTERISK_HOSTNAME}
+      - AMI_USER=${AMI_USER}
+      - AMI_PASSWD=${AMI_PASSWORD}
+      - AMI_PORT=5038
       - PGHOST=${PGHOST}
       - PGPORT=${PGPORT}
       - PGDB=${PGDATABASE}
@@ -289,11 +281,10 @@ services:
       - PGPASSWORD=${PGPASSWORD}
       - REDIS_HOSTNAME=${REDIS_HOSTNAME}
     network_mode: host
-
+    
   ami:
     depends_on:
       - acd
-      - redis
     image: ${OMLAMI_IMG}
     container_name: oml-astami
     environment:
@@ -304,14 +295,12 @@ services:
       - REDIS_HOSTNAME=${REDIS_HOSTNAME}
     restart: on-failure  
     network_mode: host
-
+      
   acd:
     container_name: oml-asterisk
     depends_on:
-      - postgresql
       - redis
       - websockets
-      - minio
     dns: 8.8.8.8
     environment:
       - ENV=${ENV}
@@ -332,7 +321,7 @@ services:
       - S3_BUCKET_NAME=${S3_BUCKET_NAME}
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
-      - S3_ENDPOINT=${S3_ENDPOINT_MINIO}
+      - S3_ENDPOINT=${S3_ENDPOINT}
       - AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION}
       - HOMERHOST=${HOMERHOST}
       - HOMERPORT=${HOMERPORT}
@@ -388,7 +377,7 @@ services:
       - DAPHNE_HOSTNAME=${DAPHNE_HOSTNAME}
       - KAMAILIO_HOSTNAME=${KAMAILIO_HOSTNAME}
       - WEBSOCKETS_HOSTNAME=${WEBSOCKET_HOSTNAME}
-      - S3_ENDPOINT=${S3_ENDPOINT_MINIO}
+      - S3_ENDPOINT=${S3_ENDPOINT}
       - CALLREC_DEVICE=${CALLREC_DEVICE}
     image: ${OMLNGINX_IMG}
     network_mode: host
@@ -400,23 +389,6 @@ services:
       - django_callrec_zip:/opt/omnileads/asterisk/var/spool/asterisk/monitor
       - ./certs:/etc/omnileads/certs
 
-  postgresql:
-    container_name: oml-postgres
-    dns: 8.8.8.8
-    environment:
-      - TZ=${TZ}
-      - POSTGRES_USER=${PGUSER}
-      - POSTGRES_PASSWORD=${PGPASSWORD}
-      - POSTGRES_DB=${PGDATABASE}
-    image: ${OMLPGSQL_IMG}
-    command: postgres -c listen_addresses=${PGHOST}
-    network_mode: host
-    privileged: true
-    restart: on-failure
-    stop_grace_period: 1m30s
-    volumes:
-      - postgresql_data:/var/lib/postgresql/data
-
   redis:
     container_name: oml-redis
     dns: 8.8.8.8
@@ -425,7 +397,7 @@ services:
       - BIND_IP=${REDIS_HOSTNAME}
     network_mode: host
     image: ${OMLREDIS_IMG}
-    command: redis-server --bind ${BIND_IP}
+    command: redis-server --bind ${REDIS_HOSTNAME}
     privileged: true
     restart: on-failure
     stop_grace_period: 1m30s
@@ -463,46 +435,8 @@ services:
       interval: 1s
       timeout: 10s
       retries: 10
-  
-  minio:
-    tty: true
-    container_name: oml-minio
-    image: ${OMLMINIO_IMG}
-    command: server --console-address "localhost:9001" /data
-    environment:
-      - MINIO_ROOT_USER=${S3_HTTP_ADMIN_USER}
-      - MINIO_ROOT_PASSWORD=${S3_HTTP_ADMIN_PASS}
-      - MINIO_SERVER_URL=${S3_ENDPOINT_MINIO}
-      - MINIO_PROMETHEUS_AUTH_TYPE="public"
-    network_mode: host
-    volumes:
-      - minio_data:/data
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
-      interval: 30s
-      timeout: 20s
-      retries: 3
-
-  createbuckets:  
-    tty: true
-    image: minio/mc
-    container_name: oml-initminio
-    depends_on:
-      - minio
-    network_mode: host
-    entrypoint: >
-      /bin/sh -c "
-      /usr/bin/mc config host rm local;
-      /usr/bin/mc config host add --quiet --api s3v4 local http://localhost:9000 minio s3minio123;
-      /usr/bin/mc mb --quiet local/omnileads/;
-      /usr/bin/mc admin user add local omlminio s3omnileads123;
-      /usr/bin/mc admin policy attach local readwrite --user omlminio;
-      exit 0;
-      "
 
 volumes:
-  postgresql_data:
   redis_data:
-  minio_data:
   django_static:
   django_callrec_zip:

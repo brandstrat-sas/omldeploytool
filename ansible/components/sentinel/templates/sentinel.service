@@ -20,7 +20,7 @@ ExecStart=/usr/bin/podman run \
   --env-file=/etc/default/sentinel.env \
   --name=oml-sentinel-server \
   --rm  \
-  docker.io/omnileads/redis_sentinel:{{ redis_ha_version }}
+  {{ img_registry_core_url }}/{{ img_registry_core_repo }}/redis_sentinel:{{ redis_ha_version }}
 ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
 ExecStopPost=/usr/bin/podman rm -f --ignore --cidfile=%t/%n.ctr-id
 Type=notify

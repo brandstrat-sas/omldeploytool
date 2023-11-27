@@ -1,4 +1,4 @@
-# Copyright (C) 2022 Freetech Solutions
+# qa_repoCopyright (C) 2023 Freetech Solutions
 
 # This file is part of OMniLeads
 
@@ -27,7 +27,7 @@
     - voice
     - rtpengine
   vars:
-    img_repo: '{{ container_image_registry }}/omnileads/rtpengine'
+    img_repo: '{{ img_registry_core_url }}/{{ img_registry_core_repo }}/rtpengine'
   tasks:
 
   - name: RTPENGINE Set environment variables

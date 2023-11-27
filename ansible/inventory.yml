@@ -59,7 +59,9 @@ all:
           tenant_id: tenant_example_4
           ansible_host: 172.16.101.109
           omni_ip_lan: 172.16.101.109
-          infra_env: lan          
+          infra_env: lan 
+          qa_env: true
+          ansible_ssh_port: 2234
     # -----------------------------------------
     # -----------------------------------------
     cluster_instances:
@@ -278,7 +280,6 @@ all:
     # br_bucket_url: https://sfo3.digitaloceanspaces.com
     # br_bucket_access_key: Hghjkdghjkdhasjdasdsada
     # br_bucket_secret_key: jknkjhkjh4523kjhcksjdhkjfdhKJHHKJGKJh786876876NBVJHB
-    # --- Restore source object Storage SSL certs: custom or selfsigned
     
     # ------------------------------------------------------------------------------------------------ #
     # ---------------------------- Container IMG TAG customization ----------------------------------- #
@@ -286,17 +287,15 @@ all:
     # --- For each OML Deploy Tool release, a versioned stack with the latest stable images of each component is maintained on inventory.yml
     # --- You can combine the versions as you like, also use your own TAGs, using the following TAG version variables
     
-    omnileads_version: 231030.01
-    omlcron_version: 230928.01
-    asterisk_version: 231025.01
-    fastagi_version: 230920.01
-    astami_version: 230920.01
-    nginx_version: 230923.01
-    websockets_version: 230204.01
-    kamailio_version: 230925.01
-    rtpengine_version: 231030.01
-    redis_version: 230704.01
-    postgres_version: 230624.01
+    omnileads_version: 231125.01 
+    asterisk_version: 231125.01
+    fastagi_version: 231125.01
+    astami_version: 231125.01
+    nginx_version: 231125.01
+    websockets_version: 231125.01
+    kamailio_version: 231125.01
+    rtpengine_version: 231125.01
+    redis_version: 231125.01
 
     # --- Activate the OMniLeads Enterprise Edition - with "AAAA" licensed.
     # --- on the contrary you will deploy OMniLeads OSS Edition with GPLV3 licensed. 
@@ -304,7 +303,12 @@ all:
 
     # --- Docker Registry repository
     # --- If you are going to use another registry for the images, you must indicate here
-    omlapp_repo: omnileads
+    # --- Docker Registry repository
+    # --- If you are going to use another registry for the images, you must indicate here
+    img_registry_core_url: docker.io
+    img_registry_core_repo: omnileads
+    img_registry_omlapp_url: docker.io
+    img_registry_omlapp_repo: omnileads
 
 #############################################################################################################
 # -- In this section the hosts are grouped based on the type of deployment (AIO, Cluster & Cluster HA).  -- #
@@ -312,6 +316,7 @@ all:
 # -- The Ansible playbooks are applied on the hosts below declared and classified according to the       -- #
 # -- architecture of the instance on which they are deployed.                                            -- #
 #############################################################################################################
+
 omnileads_aio:
   hosts:
     tenant_example_1:
