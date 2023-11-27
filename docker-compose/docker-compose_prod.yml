@@ -278,6 +278,7 @@ services:
       - postgresql
       - redis
     image: ${OMLFASTAGI_IMG}
+    command: python /app/fastagi.py
     container_name: oml-fastagi
     environment:
       - TZ=${TZ}

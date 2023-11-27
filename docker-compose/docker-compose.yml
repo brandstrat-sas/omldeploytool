@@ -272,13 +272,14 @@ services:
     stdin_open: true
     stop_grace_period: 1m30s
     tty: true
-    working_dir: /opt/omnileads
+    working_dir: /opt/omnileads    
 
   fastagi:
     depends_on:
       - postgresql
       - redis
     image: ${OMLFASTAGI_IMG}
+    command: python /app/fastagi.py
     container_name: oml-fastagi
     environment:
       - TZ=${TZ}
