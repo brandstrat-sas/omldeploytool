@@ -28,8 +28,7 @@
 # OMniLeads Component versions
 
 ```
-    omnileads_version: 231125.01 
-    omlcron_version: 231125.01
+    omnileads_version: 231125.01
     asterisk_version: 231125.01
     fastagi_version: 231125.01
     astami_version: 231125.01
