@@ -15,7 +15,6 @@
 
 ## Removed
 
-* oml-414 [Django] Migrations related to the plperl trigger have been removed. 
 
 # OMniLeads Component versions
 
