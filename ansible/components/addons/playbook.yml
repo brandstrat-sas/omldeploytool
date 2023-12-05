@@ -18,43 +18,45 @@
 ---
 
 - name: ADDONS OMniLeads application installation
-  hosts: omnileads_app
+  hosts: 
+    - omnileads_app
+    - omnileads_aio
   tags:
-    - all_components
     - addons
-    - app
-    - django
   vars:
-    img_repo: '{{ img_registry_omlapp_url }}/{{ img_registry_omlapp_repo }}/omlapp'
+    img_repo: '{{ img_registry_omlapp_url }}/{{ img_registry_omlapp_repo }}/survey_worker'
     INSTALL_PREFIX: "/opt/omnileads"
 
   tasks:
 
   - name: ADDON SURVEY from REDIS to Postgres Pull image
-    command: podman pull --quiet docker.io/{{ redis2postgres_version }}
+    command: podman pull --quiet {{ img_repo }}:{{ survey_worker_version }}
     register: podman_pull
     until: podman_pull is success
     tags:
       - install
       - upgrade
+      - update
     when: enterprise_edition == true
 
   - name: ADDON SURVEY Copy REDIS2POSTGRES systemd service
     template:
-      src: "{{ addons_repo_path }}templates/redis2postgres.service"
-      dest: /etc/systemd/system/redis2postgres.service
+      src: "{{ addons_repo_path }}templates/survey_worker.service"
+      dest: /etc/systemd/system/survey_worker.service
     tags:
       - install
       - upgrade
+      - update
     when: enterprise_edition == true
 
   - name: ADDON SURVEY Redis2Postgres Enable and start systemd service
     systemd:
-      name: redis2postgres.service
+      name: survey_worker.service
       state: restarted
       enabled: yes
       daemon_reload: yes
     tags:
       - install
       - upgrade
+      - restart
     when: enterprise_edition == true    

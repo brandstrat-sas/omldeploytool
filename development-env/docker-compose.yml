@@ -149,6 +149,7 @@ services:
       - PGDATABASE=${PGDATABASE}
       - PGPASSWORD=${PGPASSWORD}
       - REDIS_HOSTNAME=${REDIS_HOSTNAME}
+      - REDIS_PORT=6379
     volumes:
       - ${REPO_PATH}/omlfastagi:/app
     restart: on-failure

@@ -17,10 +17,10 @@ ExecStart=/usr/bin/podman run \
   --replace \
   --detach \
   --network=host \
-  --env-file=/etc/default/django.env \
-  --name=oml-redis2postgres-server \
+  --env-file=/etc/default/fastagi.env \
+  --name=oml-survey_worker-server \
   --rm  \
-  {{ container_image_registry }}/{{ redis2postgres_version }}
+  {{ img_registry_core_url }}/{{ img_registry_core_repo }}/survey_worker:{{ survey_worker_version }}
 ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
 ExecStopPost=/usr/bin/podman rm -f --ignore --cidfile=%t/%n.ctr-id
 Type=notify

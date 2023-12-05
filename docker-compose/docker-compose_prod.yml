@@ -288,6 +288,7 @@ services:
       - PGUSER=${PGUSER}
       - PGPASSWORD=${PGPASSWORD}
       - REDIS_HOSTNAME=${REDIS_HOSTNAME}
+      - REDIS_PORT=6379
     network_mode: host
 
   ami:
