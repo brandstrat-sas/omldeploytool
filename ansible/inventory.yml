@@ -306,9 +306,9 @@ all:
     # --- Docker Registry repository
     # --- If you are going to use another registry for the images, you must indicate here
     img_registry_core_url: docker.io
-    img_registry_core_repo: freetechsolutions
+    img_registry_core_repo: omnileads
     img_registry_omlapp_url: docker.io
-    img_registry_omlapp_repo: freetechsolutions
+    img_registry_omlapp_repo: omnileads
 
 #############################################################################################################
 # -- In this section the hosts are grouped based on the type of deployment (AIO, Cluster & Cluster HA).  -- #
