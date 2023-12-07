@@ -1,5 +1,5 @@
 # Release Notes - OMniLeads 1.32.3
-[2023-12-05]
+[2023-12-07]
 
 ## Added
 
@@ -9,8 +9,8 @@
 
 ## Fixed
 
-oml-385 - Fix deploy Cx Survey Addond
-oml-xxx - Fix Django Admin constance
+* oml-385: Deploy Cx Survey Addond
+* oml-2540: Django admin constance error
 
 ## Removed
 
@@ -18,9 +18,9 @@ oml-xxx - Fix Django Admin constance
 # OMniLeads Component versions
 
 ```
-    omnileads_version: 231125.01
+    omnileads_version: 231207.01
     asterisk_version: 231125.01
-    fastagi_version: 231125.01
+    fastagi_version: 231207.01
     astami_version: 231125.01
     nginx_version: 231125.01
     websockets_version: 231125.01
