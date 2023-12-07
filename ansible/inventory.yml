@@ -287,9 +287,9 @@ all:
     # --- For each OML Deploy Tool release, a versioned stack with the latest stable images of each component is maintained on inventory.yml
     # --- You can combine the versions as you like, also use your own TAGs, using the following TAG version variables
     
-    omnileads_version: 231125.01
+    omnileads_version: 231207.01
     asterisk_version: 231125.01
-    fastagi_version: 231125.01
+    fastagi_version: 231207.01
     astami_version: 231125.01
     nginx_version: 231125.01
     websockets_version: 231125.01
