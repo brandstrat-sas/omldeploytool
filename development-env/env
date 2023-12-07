@@ -273,4 +273,8 @@ OML_BRANCH=docker-compose
 OML_COMMIT=XCOMIT
 OML_BUILD_DATE="20231210"
 KAMAILIO_CERTS_LOCATION=/etc/kamailio/certs
+<<<<<<< HEAD
 MONITORFORMAT=mp3
+=======
+MONITORFORMAT=mp3
+>>>>>>> f6a71a9 (release 1.33.3)
