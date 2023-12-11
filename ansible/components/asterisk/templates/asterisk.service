@@ -20,10 +20,9 @@ ExecStart=/usr/bin/podman run \
   --network=host \
   --log-driver=journald \
   --env-file=/etc/default/asterisk.env \
-  --volume=/etc/asterisk/custom/:/etc/asterisk/custom \
   --name=oml-asterisk-server \
   --rm  \
-  {{ img_registry_core_url }}/{{ img_registry_core_repo }}/asterisk:{{ asterisk_version }}
+  {{ img_registry_omlacd_url }}/{{ img_registry_omlacd_repo }}/asterisk:{{ asterisk_version }}
 ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
 ExecStopPost=/usr/bin/podman rm -f --ignore --cidfile=%t/%n.ctr-id
 StandardOutput=journal

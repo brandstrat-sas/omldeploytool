@@ -301,14 +301,14 @@ all:
     # --- on the contrary you will deploy OMniLeads OSS Edition with GPLV3 licensed. 
     enterprise_edition: false
 
-    # --- Docker Registry repository
-    # --- If you are going to use another registry for the images, you must indicate here
-    # --- Docker Registry repository
-    # --- If you are going to use another registry for the images, you must indicate here
+    # --- Container Registry repository
+    # --- You can customize the container registry for the application, ACD, and the rest of the components' images.
     img_registry_core_url: docker.io
     img_registry_core_repo: omnileads
     img_registry_omlapp_url: docker.io
     img_registry_omlapp_repo: omnileads
+    img_registry_omlacd_url: docker.io
+    img_registry_omlacd_repo: omnileads
 
 #############################################################################################################
 # -- In this section the hosts are grouped based on the type of deployment (AIO, Cluster & Cluster HA).  -- #
