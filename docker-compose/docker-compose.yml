@@ -570,6 +570,8 @@ services:
     image: ${OMLPSTNEMULATOR_IMG}
     networks:
       - omnileads
+    volumes:
+      - ./pstn_emulator_custom_conf:/etc/asterisk/custom/  
     ports:
       - 6060:6060/udp
       - 4569:4569/udp

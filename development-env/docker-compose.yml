@@ -271,7 +271,7 @@ services:
     restart: on-failure
     stop_grace_period: 1m30s
     volumes:
-      - ./ast_custom_conf:/etc/asterisk/custom
+      - ./ast_custom_conf:/etc/asterisk/
       - ${REPO_PATH}/omlacd/source/astconf:/etc/asterisk
       - ${REPO_PATH}/omlacd/source/scripts:/opt/asterisk/scripts
     working_dir: /etc/asterisk
@@ -465,10 +465,11 @@ services:
     networks:
       - omnileads
     volumes:
-      - ${REPO_PATH}/omlapp/omnileads_ui/:/home/app/
+      # - ${REPO_PATH}/omlapp/omnileads_ui/:/home/app/
+      - ${REPO_PATH}/omlapp/omnileads_ui/:/home/oml_frontend/
       - ${REPO_PATH}/survey_app/:/home/survey/
       - ${REPO_PATH}/wallboard_app/:/home/wallboard/
-      - vuejs:/home/app/supervision/node_modules/
+      - vuejs:/home/app/supervision/node_modules/      
 
   rabbitmq:
     container_name: oml-rabbit-mq
@@ -533,6 +534,8 @@ services:
       - 4569:4569/udp
       - 6060:6060/udp
       - 10000-10020:10000-10020/udp
+    volumes:
+      - ./pstn_emulator_custom_conf:/etc/asterisk/custom/
     privileged: true
     restart: on-failure
     stdin_open: true
