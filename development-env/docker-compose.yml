@@ -12,6 +12,7 @@ services:
       - minio
     dns: 8.8.8.8
     environment:
+      - DJANGO_ALLOW_ASYNC_UNSAFE=true
       - CRON_ENABLE=false
       - TZ=${TZ}
       - ASTERISK_HOSTNAME=${ASTERISK_HOSTNAME}

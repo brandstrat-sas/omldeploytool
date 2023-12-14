@@ -10,6 +10,7 @@ services:
       - django_commands
     dns: 8.8.8.8
     environment:
+      - DJANGO_ALLOW_ASYNC_UNSAFE=true
       - CRON_ENABLE=false
       - TZ=${TZ}
       - DJANGO_HOSTNAME=${DJANGO_HOSTNAME}
@@ -57,10 +58,10 @@ services:
       - OML_LOGGING_SLOWSQL_ENABLED=
       - OML_LOGGING_SLOWSQL_OUTPUT="-"
       - OML_LOGGING_SLOWSQL_DURATION=1
-      - SURVEY_VERSION=1.1.2
+      #- SURVEY_VERSION=1.1.2
       #- WALLBOARD_VERSION=develop
-      - PREMIUM_REPORTS_VERSION=develop
-      - WEBPHONE_CLIENT_VERSION=develop
+      #- PREMIUM_REPORTS_VERSION=develop
+      #- WEBPHONE_CLIENT_VERSION=develop
     image: ${OMLAPP_IMG}
     command: /opt/omnileads/bin/init_uwsgi.sh
     networks:
