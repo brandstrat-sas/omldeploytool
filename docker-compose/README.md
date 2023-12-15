@@ -279,9 +279,23 @@ You can register a SIP account on pstn-emulator container in order to play with 
 
 This are the SIP account credentials:
 
+```
 username: 1234567
 secret: omnileads
 domain: YOUR_HOSTNAME
+```
+
+(Change "YOUR_HOSTNAME" with the VM hostname/IPADDR  or localhost)
+
+
+This are the IAX2 account credentials:
+
+```
+username: 1234567
+secret: omnileads
+domain: YOUR_HOSTNAME
+```
+
 (Change "YOUR_HOSTNAME" with the VM hostname/IPADDR  or localhost)
 
 Then you can send calls to DID 01177660010, an also send calls from an agent to this SIP account phone calling 1234567.
