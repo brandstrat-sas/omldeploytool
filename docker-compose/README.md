@@ -273,20 +273,9 @@ as well as generate calls from the command line to OMniLeads inbound routes.
 This actions will make an inbound call to the default inbound campaign created from testing data. 
 You can attend the call and listen some cool music, then the recordings appear on the recordings search views. 
 
-##### Register your SIP softphone to test the stack 
+##### Register your IAX2 softphone to test the stack 
 
-You can register a SIP account on pstn-emulator container in order to play with OMniLeads and the softphone you want. 
-
-This are the SIP account credentials:
-
-```
-username: 1234567
-secret: omnileads
-domain: YOUR_HOSTNAME
-```
-
-(Change "YOUR_HOSTNAME" with the VM hostname/IPADDR  or localhost)
-
+You can register a IAX2 account on pstn-emulator container in order to play with OMniLeads and the softphone you want. 
 
 This are the IAX2 account credentials:
 
@@ -298,7 +287,7 @@ domain: YOUR_HOSTNAME
 
 (Change "YOUR_HOSTNAME" with the VM hostname/IPADDR  or localhost)
 
-Then you can send calls to DID 01177660010, an also send calls from an agent to this SIP account phone calling 1234567.
+Then you can send calls to DID 01177660010 to 01177660015, an also send calls from an agent to this IAX2 account phone calling 1234567.
 
 ## Configuring wombat dialer <a name="wombat_dialer"></a>
 
