@@ -131,6 +131,12 @@ S3_ENDPOINT=https://$PUBLIC_IPV4 or S3_ENDPOINT=https://$FQDN
 S3_ENDPOINT_MINIO=http://localhost:9000
 ```
 
+You can invoke the docker-compose with:
+
+```
+$ docker-compose -f docker-compose_prod.yml up -d
+```
+
 ![Diagrama deploy tool](../ansible/png/deploy-tool-tenant-compose-vps.png)
 
 ### **Onpremise Virtual Machine and VPS Cloud deploy with external bucket**

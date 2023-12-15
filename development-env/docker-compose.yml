@@ -172,61 +172,6 @@ services:
     networks:
       - omnileads  
 
-  # voip_adapter:
-  #   image: ${OMLARI_IMG}
-  #   container_name: oml-voip_adapter
-  #   command: python /app/adapter.py
-  #   environment:
-  #     - TZ=${TZ}
-  #     - ARI_HOST=acd
-  #     - ARI_PORT=7088
-  #     - ARI_USER=omnileads
-  #     - ARI_PASS=5_MeO_DMT
-  #     - REDIS_HOSTNAME=${REDIS_HOSTNAME}
-  #     - RABBITMQ_HOSTNAME=rabbitmq
-  #   restart: on-failure  
-  #   volumes:
-  #    - ${REPO_PATH}/omlari:/app
-  #   networks:
-  #     - omnileads  
-
-  # voip_orchester:
-  #   image: ${OMLARI_IMG}
-  #   container_name: oml-voip_orchester
-  #   command: python /app/consumer.py
-  #   environment:
-  #     - TZ=${TZ}
-  #     - ARI_HOST=acd
-  #     - ARI_PORT=7088
-  #     - ARI_USER=omnileads
-  #     - ARI_PASS=5_MeO_DMT
-  #     - REDIS_HOSTNAME=${REDIS_HOSTNAME}
-  #     - REDIS_PORT=6379
-  #     - RABBITMQ_HOSTNAME=rabbitmq
-  #   restart: on-failure  
-  #   volumes:
-  #    - ${REPO_PATH}/omlari:/app
-  #   networks:
-  #     - omnileads  
-
-  # voip_deliver:
-  #   image: ${OMLARI_IMG}
-  #   container_name: oml-voip_deliver
-  #   command: python /app/deliver.py
-  #   environment:
-  #     - TZ=${TZ}
-  #     - ARI_HOST=acd
-  #     - ARI_PORT=7088
-  #     - ARI_USER=omnileads
-  #     - ARI_PASS=5_MeO_DMT
-  #     - REDIS_HOSTNAME=${REDIS_HOSTNAME}
-  #     - RABBITMQ_HOSTNAME=rabbitmq
-  #   restart: on-failure  
-  #   volumes:
-  #    - ${REPO_PATH}/omlari:/app
-  #   networks:
-  #     - omnileads  
-
   acd:
     build:
       target: run
@@ -533,8 +478,6 @@ services:
       - omnileads
     ports:
       - 4569:4569/udp
-      - 6060:6060/udp
-      - 10000-10020:10000-10020/udp
     volumes:
       - ./pstn_emulator_custom_conf:/etc/asterisk/custom/
     privileged: true
@@ -543,24 +486,24 @@ services:
     stop_grace_period: 1m30s
     tty: true
 
-  # nginxcgi:
-  #   container_name: oml-nginx-cgi
-  #   hostname: nginxcgi
-  #   dns: 8.8.8.8
-  #   image: omnileads/nginxqa:latest
-  #   environment:
-  #     - PGHOST=${PGHOST}
-  #     - PGPASSWORD=${PGPASSWORD}
-  #     - PSTN_HOSTNAME=pbxemulator
-  #   networks: 
-  #     - omnileads
-  #   ports:
-  #     - 8888:8888
-  #   privileged: true
-  #   restart: on-failure
-  #   stdin_open: true
-  #   stop_grace_period: 1m30s
-  #   tty: true
+  nginxcgi:
+    container_name: oml-nginx-cgi
+    hostname: nginxcgi
+    dns: 8.8.8.8
+    image: omnileads/nginxqa:latest
+    environment:
+      - PGHOST=${PGHOST}
+      - PGPASSWORD=${PGPASSWORD}
+      - PSTN_HOSTNAME=pbxemulator
+    networks: 
+      - omnileads
+    ports:
+      - 8888:8888
+    privileged: true
+    restart: on-failure
+    stdin_open: true
+    stop_grace_period: 1m30s
+    tty: true
 
   videocalls:
     container_name: oml-videocalls-widget
