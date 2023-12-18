@@ -288,7 +288,7 @@ all:
     # --- You can combine the versions as you like, also use your own TAGs, using the following TAG version variables
     
     omnileads_version: 231218-whatsapp.alpha
-    asterisk_version: 231212.oml-438
+    asterisk_version: 231218.oml-438
     fastagi_version: 231207.01
     astami_version: 231125.01
     nginx_version: 231125.01

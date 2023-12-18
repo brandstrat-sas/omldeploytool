@@ -18,7 +18,7 @@ PUBLIC_IP=
 REPO=omnileads
 
 OMLAPP_IMG=freetechsolutions/omlapp:231218-whatsapp.alpha
-OMLACD_IMG=freetechsolutions/asterisk:231212.oml-438
+OMLACD_IMG=freetechsolutions/asterisk:231218.oml-438
 OMLFASTAGI_IMG=${REPO}/fastagi:231207.01
 OMLAMI_IMG=${REPO}/astami:231125.01
 OMLNGINX_IMG=${REPO}/nginx:231125.01
