@@ -321,6 +321,7 @@ services:
       - fastagi
     dns: 8.8.8.8
     environment:
+      - SCALE=True
       - ENV=${ENV}
       - FASTAGI=${FASTAGI_HOSTNAME}
       - TZ=${TZ}
