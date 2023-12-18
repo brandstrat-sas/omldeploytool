@@ -305,7 +305,7 @@ Check our official documentation to check this: https://www.wombatdialer.com/ins
 
 ## OMniLeads interaction tool <a name="oml_manage"></a>
 
-In this directory, we have the script "oml_manage," which allows us to perform various actions such as clearing cache, deleting the database, launching the Django shell, invoking the Asterisk CLI, etc.
+In this directory, we have the script "oml_manage," which allows us to perform various actions such as backup & restore, clearing cache, deleting the database, launching the Django shell, invoking the Asterisk CLI, etc.
 
 For more options:
 
