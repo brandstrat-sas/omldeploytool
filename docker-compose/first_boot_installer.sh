@@ -39,7 +39,7 @@ if [ "$OS_ID" = "debian" ] || [ "$OS_ID" = "ubuntu" ]; then
 elif [ "$OS_ID" = "rhel" ] || [ "$OS_ID" = "almalinux" ] || [ "$OS_ID" = "rocky" ] || [ "$OS_ID" = "centos" ]; then
     dnf check-update
     dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
-    dnf install docker-ce docker-ce-cli containerd.io docker-compose-plugin git
+    dnf install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin git
     systemctl start docker
     systemctl enable docker
 
