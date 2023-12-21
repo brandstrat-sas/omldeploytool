@@ -9,7 +9,12 @@ RequiresMountsFor=%t/containers
 Environment=PODMAN_SYSTEMD_UNIT=%n
 Restart=on-failure
 TimeoutStopSec=70
+{% if scale_asterisk is defined %}
+SCALE=True
+MemoryLimit={{ asterisk_mem_limit }}
+{% else %}
 MemoryLimit=
+{% endif %}
 ExecStartPre=/bin/rm -f %t/%n.ctr-id
 ExecStart=/usr/bin/podman run \
   --cidfile=%t/%n.ctr-id \

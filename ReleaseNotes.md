@@ -1,16 +1,18 @@
 # Release Notes - OMniLeads 1.32.3
-[2023-12-07]
+[2023-12-21]
 
 ## Added
 
+* oml-438 [OMLAPP]: Deployment of WhatsApp channel
 
 ## Improvements
 
+* oml-250 [ASTERISK]: It is now possible to customize certain parameters to achieve scalability of concurrent calls.
+* oml-438 [ASTERISK]: Customization of dialplan, AGI, and the Asterisk component environment is now possible using Docker multistage build.
+* oml-438 [ANSIBLE]: Within the inventory.yml file, there are various parameters available to customize the scalability of UWSGi and Asterisk.
 
 ## Fixed
 
-* oml-385: Deploy Cx Survey Addond
-* oml-2540: Django admin constance error
 
 ## Removed
 
@@ -18,8 +20,8 @@
 # OMniLeads Component versions
 
 ```
-    omnileads_version: 231207.01
-    asterisk_version: 231125.01
+    omnileads_version: 231218-whatsapp.alpha (freetechsolutions)
+    asterisk_version: 231221.oml-438 (freetechsolutions)
     fastagi_version: 231207.01
     astami_version: 231125.01
     nginx_version: 231125.01
