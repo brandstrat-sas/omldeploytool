@@ -26,6 +26,7 @@ ExecStart=/usr/bin/podman run \
   --log-driver=journald \
   --env-file=/etc/default/asterisk.env \
   --name=oml-asterisk-server \
+  --volume=asterisk_callrec:/var/spool/asterisk/monitor:rw \
   --rm  \
   {{ img_registry_omlacd_url }}/{{ img_registry_omlacd_repo }}/asterisk:{{ asterisk_version }}
 ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
