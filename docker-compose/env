@@ -17,8 +17,8 @@ PUBLIC_IP=
 
 REPO=omnileads
 
-OMLAPP_IMG=${REPO}/omlapp:231218.01
-OMLACD_IMG=${REPO}/asterisk:231125.01
+OMLAPP_IMG=freetechsolutions/omlapp:231214-whatsapp.alpha
+OMLACD_IMG=freetechsolutions/asterisk:231221.oml-438
 OMLFASTAGI_IMG=${REPO}/fastagi:231207.01
 OMLAMI_IMG=${REPO}/astami:231125.01
 OMLNGINX_IMG=${REPO}/nginx:231125.01
@@ -102,6 +102,8 @@ AMI_PASSWORD=5_MeO_DMT
 SIP_EXT_PORT=5060
 
 FASTAGI_HOSTNAME=fastagi
+
+SCALE=false
 #####################################################################################################
 #                                       POSTGRESQL                                                  #
 #####################################################################################################

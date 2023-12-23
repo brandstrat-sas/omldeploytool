@@ -10,6 +10,7 @@ services:
       - django_commands
     dns: 8.8.8.8
     environment:
+      - DJANGO_ALLOW_ASYNC_UNSAFE=true
       - CRON_ENABLE=false
       - TZ=${TZ}
       - DJANGO_HOSTNAME=${DJANGO_HOSTNAME}
@@ -272,7 +273,8 @@ services:
     stdin_open: true
     stop_grace_period: 1m30s
     tty: true
-    working_dir: /opt/omnileads    
+    working_dir: /opt/omnileads
+
 
   fastagi:
     depends_on:
@@ -319,6 +321,7 @@ services:
       - fastagi
     dns: 8.8.8.8
     environment:
+      - SCALE=True
       - ENV=${ENV}
       - FASTAGI=${FASTAGI_HOSTNAME}
       - TZ=${TZ}
@@ -346,15 +349,16 @@ services:
     networks:
       - omnileads
     expose:
-        - 40000-40999/udp
+        - 40000-40199/udp
     ports:
       - ${SIP_EXT_PORT}:5060/udp
     privileged: true
     restart: on-failure
     stop_grace_period: 1m30s
-    volumes:
-      - ./ast_custom_conf:/etc/asterisk/custom
     working_dir: /etc/asterisk
+    volumes:
+      - ./asterisk_custom/fidelio/oml_extensions_custom.conf:/etc/asterisk/oml_extensions_custom.conf
+      - ./asterisk_custom/fidelio/bot.py:/var/lib/asterisk/agi-bin/bot.py
 
   kamailio:
     command:
@@ -572,10 +576,10 @@ services:
     image: ${OMLPSTNEMULATOR_IMG}
     networks:
       - omnileads
+    volumes:
+      - ./pstn_emulator_custom_conf:/etc/asterisk/custom/  
     ports:
-      - 6060:6060/udp
       - 4569:4569/udp
-      - 10000-10020:10000-10020/udp
     privileged: true
     restart: on-failure
     stdin_open: true

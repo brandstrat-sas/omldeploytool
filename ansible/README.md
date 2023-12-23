@@ -26,6 +26,7 @@
 * [Deploy a restore](#restore)
 * [Observability](#observability)
 * [Container image & tag customizations](#components_img)
+* [Scalability](#scalability)
 * [Cluster HA recovery tools](#cluster_ha_recovery)
 
 # OMniLeads automation your subscribers deploys with Ansible
@@ -808,6 +809,35 @@ enterprise_edition: false
 # --- Docker Registry repository
 # --- If you are going to use another registry for the images, you must indicate here
 omlapp_repo: omnileads
+```
+
+## Scalability <a name="#scalability"></a>
+
+* Asterisk:
+
+This is the application server that powers the VoIP part of OMniLeads. You can adjust the following values to achieve better performance on the Asterisk component, aiming to handle more than 200 concurrent calls.
+
+We can use asterisk_mem_limit to limit the amount of memory the process can consume. As for pjsip, stasis, and other settings in .conf files, we recommend referring to this article: https://docs.asterisk.org/Deployment/Performance-Tuning/.
+
+By setting the scale_asterisk value on the inventory.yml host or group, you enable the ability to specify some params.
+
+```
+scale_asterisk: true
+  asterisk_mem_limit: 1G
+  pjsip_threadpool_idle_timeout: 120
+  pjsip_threadpool_max_size: 150
+```
+
+* UWSGI:
+
+This is the application server that powers the OMniLeads Django application.
+
+By setting the scale_uwsgi value on the host or group, you enable the ability to specify the number of processes and threads it will handle.
+
+```
+scale_uwsgi: true
+  processes: 8
+  threads: 1 
 ```
 
 ## Postgres Cluster actions :arrows_clockwise: <a name="cluster_ha_recovery"></a>
