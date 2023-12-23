@@ -22,8 +22,12 @@
   --call_generate)
     echo "generate an ibound call through PSTN-Emulator container"
     #docker exec -it oml-pstn-emulator sipp -sn uac 127.0.0.1:5060 -s stress -m 1 -r 1 -d 60000 -l 1
-    docker exec -it oml-pstn-emulator sipp -sn uac 127.0.0.1:5060 -s stress -m $2 -r $3 -rp 50 -d 60000
+    docker exec -it oml-pstn-emulator sipp -sn uac 127.0.0.1:5070 -s stress -m $2 -r $3 -rp 50 -d 60000
     ;;
+  --call_generate_did)
+    echo "generate an ibound call through PSTN-Emulator container to DID: $2"
+    docker exec -it oml-pstn-emulator sipp -sn uac 127.0.0.1:5070 -s $2 -m 1 -r 1 -d 60000 -l 1
+    ;;  
   --backup)
     file_date=$(date +'%y%m%d.%H%M')
     docker run --network=host --env-file .env -e POSTGRES_BACKUP=True -e BACKUP_FILENAME=pgsql-backup-$file_date.sql omnileads/omlapp:231005.01 /opt/omnileads/bin/init_pgsql_backup.sh
@@ -176,7 +180,7 @@ USAGE:
 
 --reset_pass: reset admin password to admin admin
 --init_env: init some basic configs in order to test it
---call_generate: generate an ibound call through PSTN-Emulator container. Arg1: calls  Arg2: caps.
+--call_generate: generate an ibound call through PSTN-Emulator container. Arg1: calls  Arg2: caps [optional] Arg3 tel num.
 --backup: take a postgres & asterisk backup and send to external bucket
 --postgres_drop_db: delete all PostgreSQL databases
 --postgres_clean_logs: drop calls and agent count tables PostgreSQL 
