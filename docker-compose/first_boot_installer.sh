@@ -60,11 +60,11 @@ fi
 
 # AIO 
 if [[ -z "$bucket_url" && -z "$postgres_host" ]]; then
-    if [[ "$ENV" == "cloud" ]];then
+    if [[ "$env" == "cloud" ]];then
         sed -i "s%\S3_ENDPOINT=https://localhost%S3_ENDPOINT=https://$PUBLIC_IPV4%g" .env
-    elif [[ "$ENV" == "lan" ]];then    
+    elif [[ "$env" == "lan" ]];then    
         sed -i "s%\S3_ENDPOINT=https://localhost%S3_ENDPOINT=https://$PRIVATE_IPV4%g" .env
-    elif [[ "$ENV" == "nat" ]];then    
+    elif [[ "$env" == "nat" ]];then    
         sed -i "s%\S3_ENDPOINT=https://localhost%S3_ENDPOINT=https://$PRIVATE_IPV4%g" .env
     fi    
     sed -i "s/minio:9000/localhost:9000/g" .env
@@ -105,9 +105,9 @@ fi
 ln -s ./omldeploytool/docker-compose/oml_manage /usr/bin/
 ln -s /usr/libexec/docker/cli-plugins/docker-compose /usr/bin/
 
-if [[ "$ENV" == "devenv" ]];then
+if [[ "$env" == "devenv" ]];then
     until curl -sk --head  --request GET https://localhost |grep "302" > /dev/null; do echo "Environment still initializing , sleeping 10 seconds"; sleep 10; done; echo "Environment is up"
-elif [[ "$ENV" == "lan" ]];then
+elif [[ "$env" == "lan" ]];then
     until curl -sk --head  --request GET https://$PRIVATE_IPV4 |grep "302" > /dev/null; do echo "Environment still initializing , sleeping 10 seconds"; sleep 10; done; echo "Environment is up"
 else
     until curl -sk --head  --request GET https://$PUBLIC_IPV4 |grep "302" > /dev/null; do echo "Environment still initializing , sleeping 10 seconds"; sleep 10; done; echo "Environment is up"

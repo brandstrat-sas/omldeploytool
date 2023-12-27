@@ -1,4 +1,4 @@
-# Copyright (C) 2018 Freetech Solutions
+# Copyright (C) 2023 Freetech Solutions
 
 # This file is part of OMniLeads
 
@@ -168,9 +168,9 @@
     - install
 
 - name: MAIN Check if Omnileads has been installed previously
-  include: checks.yml
+  import_tasks: checks.yml
   
 - name: MAIN First configuration in server or servers
-  include: os_configuration.yml
+  import_tasks: os_configuration.yml
 
 
