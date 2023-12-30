@@ -1,5 +1,5 @@
 # Release Notes - OMniLeads 1.33.0
-[2023-12-20]
+[2023-12-29]
 
 ## Added
 
@@ -19,7 +19,7 @@
 # OMniLeads Component versions
 
 ```
-    omnileads_version: 231218.01
+    omnileads_version: 231227.01
     asterisk_version: 231125.01
     fastagi_version: 231207.01
     astami_version: 231125.01
