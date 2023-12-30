@@ -152,7 +152,7 @@ services:
       - REDIS_HOSTNAME=${REDIS_HOSTNAME}
       - REDIS_PORT=6379
     volumes:
-      - ${REPO_PATH}/omlfastagi:/app
+      - ${REPO_PATH}/omlfastagi/fastagi.py:/app/fastagi.py
     restart: on-failure
     networks:
       - omnileads  
@@ -168,7 +168,7 @@ services:
       - REDIS_HOSTNAME=${REDIS_HOSTNAME}      
     restart: on-failure  
     volumes:
-     - ${REPO_PATH}/omlami:/app
+     - ${REPO_PATH}/omlami/ami.py:/app/ami.py
     networks:
       - omnileads  
 
@@ -217,7 +217,6 @@ services:
     restart: on-failure
     stop_grace_period: 1m30s
     volumes:
-      - ./ast_custom_conf:/etc/asterisk/
       - ${REPO_PATH}/omlacd/source/astconf:/etc/asterisk
       - ${REPO_PATH}/omlacd/source/scripts:/opt/asterisk/scripts
     working_dir: /etc/asterisk
@@ -539,6 +538,3 @@ volumes:
   django_static:
   django_callrec_zip:
   vuejs:
-  ast_conf:
-  ast_sounds:
-  ast_db:

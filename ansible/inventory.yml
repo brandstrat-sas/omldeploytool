@@ -301,8 +301,8 @@ all:
     
     omnileads_version: 231214-whatsapp.alpha
     asterisk_version: 231221.oml-438
-    fastagi_version: 231207.01
-    astami_version: 231125.01
+    fastagi_version: 231230.01
+    astami_version: 231230.01
     nginx_version: 231125.01
     websockets_version: 231125.01
     kamailio_version: 231125.01
@@ -316,7 +316,7 @@ all:
     # --- Container Registry repository
     # --- You can customize the container registry for the application, ACD, and the rest of the components' images.
     img_registry_core_url: docker.io
-    img_registry_core_repo: omnileads
+    img_registry_core_repo: freetechsolutions
     img_registry_omlapp_url: docker.io
     img_registry_omlapp_repo: freetechsolutions
     img_registry_omlacd_url: docker.io
