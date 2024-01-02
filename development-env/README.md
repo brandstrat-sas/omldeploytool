@@ -1,37 +1,43 @@
 # OMniLeads Docker Compose
 
-El devenv de OMniLeads plantea un docker-compose.yml que mapea algunos repositorios dentro de algunos contenedores.
+El devenv implementa un stack de la App sobre docker-compose.yml que en base a "binds" monta el código fuente de cada repositorio de componente
+sobre el contenedor correspondiente a dicho componente. De esta manera el desarrollador podrá trabajar en su entorno local con su editor
+de código favorito, pudiendo observar los cambios al mismo tiempo sobre los contenedores operativos en la App.
 
-Tomamos como ejemplo el código de Django. Donde se puede observar dentro del servicio app, como se mapea el codigo dentro del container.
+Ejemplo de service app del docker-compose.yml:
 
 ```
 volumes:
   - ${REPO_PATH}/omlapp/:/opt/omnileads/ominicontacto/
 ```
 
-El deploy del entorno implica que se cree un directorio *omnileads-repos* para allí clonar todos los repos
-de los componentes de OMniLeads.
+Ejemplo de service acd del docker-compose.yml:
+
+```
+volumes:
+    - ${REPO_PATH}/omlacd/source/astconf:/etc/asterisk
+    - ${REPO_PATH}/omlacd/source/scripts:/opt/asterisk/scripts
+```
+
+El deploy del entorno implicará crear un nuevo directorio (omldeploytool/development-env/omnileads-repos) *omnileads-repos* (omldeploytool/development-env/omnileads-repos) 
+para allí clonar todos los repositorios de cada componente de OMniLeads.
 
 Para levantar el entorno de desarrollo se deberá ejecutar por única vez el script de deploy.sh
 
 ```
 $ ./deploy.sh --os_host= --gitlab_clone=
 ```
-Donde os_host puede valer: *linux*, *mac* o *win*. Mientras que gitlab_clone *ssh* o *https* a la hora de
-elegir por que método se van a clonar los repos.
 
-Además de clonar los repos, el deploy.sh se encarga de setear minIO para que las grabaciones y media_root (django)
-operen bajo un bucket provisto por el propio servicio minio.
+Donde os_host puede valer: *linux* o *mac*. Mientras que gitlab_clone *ssh* o *https* a la hora de
+elegir por que método se van a clonar los repositorios.
 
-Finalmente se realiza un pull de todas las imágenes y luego se levanta el entorno.
-
-## Reset django pass
+## Reset **admin** password
 
 ```
 ./manage --reset_pass
 ```
 
-## Inicializar entorno con datos de pruebas
+## Inicializar entorno con datos para desarrollo & testing
 
 ```
 ./manage --init_env
@@ -46,13 +52,12 @@ Finalmente se realiza un pull de todas las imágenes y luego se levanta el entor
 
 ## Variables
 
-Todas las variables implicadas en el docker-compose se pueden leer/editar sobre el archivo .env
+Todas las variables implicadas en el docker-compose.yml se pueden modificar en el archivo .env
 
 ## Build de imagenes
 
-Los servicios: nginx, rtpengine, acd (asterisk), kamailio y app presentan la posibilidad de ser buidleados
+Los servicios: nginx, rtpengine, asterisk, kamailio y app presentan la posibilidad de ser buidleados
 desde el compose, por ejemplo:
-
 
 ```
 docker-compose build app

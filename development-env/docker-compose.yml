@@ -410,7 +410,6 @@ services:
     networks:
       - omnileads
     volumes:
-      # - ${REPO_PATH}/omlapp/omnileads_ui/:/home/app/
       - ${REPO_PATH}/omlapp/omnileads_ui/:/home/oml_frontend/
       - ${REPO_PATH}/survey_app/:/home/survey/
       - ${REPO_PATH}/wallboard_app/:/home/wallboard/
