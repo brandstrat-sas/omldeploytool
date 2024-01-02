@@ -22,7 +22,7 @@
 
 ```
     omnileads_version: 231214-whatsapp.alpha (freetechsolutions)
-    asterisk_version: 231221.oml-438 (freetechsolutions)
+    asterisk_version: 240102.01 (freetechsolutions)
     fastagi_version: 231207.01
     astami_version: 231125.01
     nginx_version: 231125.01
