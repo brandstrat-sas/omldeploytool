@@ -28,13 +28,20 @@ Finalmente se realiza un pull de todas las imágenes y luego se levanta el entor
 ## Reset django pass
 
 ```
-./manage.sh --reset_pass
+./manage --reset_pass
 ```
 
 ## Inicializar entorno con datos de pruebas
 
 ```
-./manage.sh --init_env
+./manage --init_env
+```
+
+## Build VueJS
+
+```
+./manage --vuejs_install
+./manage --vuejs_build
 ```
 
 ## Variables
