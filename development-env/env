@@ -24,22 +24,6 @@ REPO_PATH=./omnileads-repos
 
 REPO=omnileads
 
-##############################################
-# Uncomment if you want to build the images  #
-##############################################
-# OMLAPP_IMG=omlapp:dev
-# OMLCRON_IMG=omlapp:dev
-# OMLACD_IMG=aterisk:dev
-# OMLFASTAGI_IMG=fastagi:dev
-# OMLARI_IMG=astari:dev
-# OMLAMI_IMG=astami:dev
-# OMLNGINX_IMG=nginx:dev
-# OMLKAM_IMG=kamailio:dev
-# OMLRTPENGINE_IMG=dev
-
-##############################################
-# Comment if you want to build the images    #
-##############################################
 OMLAPP_IMG=freetechsolutions/omlapp:231214-whatsapp.alpha
 OMLACD_IMG=freetechsolutions/asterisk:240102.01
 OMLFASTAGI_IMG=freetechsolutions/fastagi:231230.01

@@ -63,6 +63,20 @@ desde el compose, por ejemplo:
 docker-compose build app
 ```
 
+Además se pueden forzar a que ciertas imagenes se construyan si o si cada vez que se levanta el stack. Para ello se debe modificar el nombre de la img
+en el archivo .env, de manera tal que sea una IMG no existente en el container registry. 
+
+Por ejemplo:
+
+```
+OMLAPP_IMG=omlapp:dev.1002
+```
+
+## Trabajar con Addons
+
+Los Addons permiten adicionar y/o complementar a la aplicación web distribuida como GPLV3. Pueden ser distribuidos tanto utilizando 
+licencias open source o restrictivas. 
+
 ## Configuring wombat dialer
 
 You only need to do this if you are going to work with Predictive Dialer campaigns
@@ -73,8 +87,4 @@ Check our official documentation to check this: https://documentacion-omnileads.
 
 Note: when configuring initial mariadb credentials the root pass is admin123, then on the AMI connection, the server address is acd.
 
-## Trabajar con Addons
-
-Los Addons permiten adicionar y/o complementar a la aplicación web distribuida como GPLV3. Pueden ser distribuidos tanto utilizando 
-licencias open source o restrictivas. 
 
