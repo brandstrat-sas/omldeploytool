@@ -19,6 +19,15 @@ volumes:
     - ${REPO_PATH}/omlacd/source/scripts:/opt/asterisk/scripts
 ```
 
+## Deploy devenv
+
+Se debe contar con docker & docker-compose instalado sobre su sistema operativo (Mac o Linux).
+
+```
+git clone https://gitlab.com/omnileads/omldeploytool.git
+cd omldeploytool/development-env
+```
+
 El deploy del entorno implicará crear un nuevo directorio (omldeploytool/development-env/omnileads-repos) *omnileads-repos* (omldeploytool/development-env/omnileads-repos) 
 para allí clonar todos los repositorios de cada componente de OMniLeads.
 
