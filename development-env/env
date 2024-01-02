@@ -22,19 +22,35 @@ REPO_PATH=./omnileads-repos
 #           versions of each image to deploy                #
 #############################################################
 
-REPO=freetechsolutions
+REPO=omnileads
 
-OMLAPP_IMG=${REPO}/omlapp:231114.oml-414
-OMLCRON_IMG=${REPO}/omlapp:231114.oml-414
-OMLACD_IMG=${REPO}/asterisk:240102.01
-OMLFASTAGI_IMG=${REPO}/fastagi:230920.oml-414
-OMLARI_IMG=${REPO}/astari:231102.dev
-OMLAMI_IMG=${REPO}/astami:230920.oml-414
-OMLNGINX_IMG=${REPO}/nginx:230923.oml-414
-OMLKAM_IMG=${REPO}/kamailio:230925.oml-414
-OMLRTPENGINE_IMG=${REPO}/rtpengine:231030.oml-414
+##############################################
+# Uncomment if you want to build the images  #
+##############################################
+# OMLAPP_IMG=omlapp:dev
+# OMLCRON_IMG=omlapp:dev
+# OMLACD_IMG=aterisk:dev
+# OMLFASTAGI_IMG=fastagi:dev
+# OMLARI_IMG=astari:dev
+# OMLAMI_IMG=astami:dev
+# OMLNGINX_IMG=nginx:dev
+# OMLKAM_IMG=kamailio:dev
+# OMLRTPENGINE_IMG=dev
+
+##############################################
+# Comment if you want to build the images    #
+##############################################
+OMLAPP_IMG=freetechsolutions/omlapp:231214-whatsapp.alpha
+OMLACD_IMG=freetechsolutions/asterisk:240102.01
+OMLFASTAGI_IMG=freetechsolutions/fastagi:231230.01
+OMLAMI_IMG=freetechsolutions/astami:231230.01
+OMLNGINX_IMG=${REPO}/nginx:231125.01
+OMLKAM_IMG=${REPO}/kamailio:231125.01
+OMLRTPENGINE_IMG=${REPO}/rtpengine:231125.01
+
+
 OMLWS_IMG=${REPO}/websockets:develop
-OMLREDIS_IMG=${REPO}/redis:230704.oml-414
+OMLREDIS_IMG=${REPO}/redis:231125.01
 OMLVIDEOCALLS_WIDGET_IMG=omnileads/videocalls_widget:230905.01
 OMLPSTNEMULATOR_IMG=omnileads/pstn_emulator:231118.01
 

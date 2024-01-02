@@ -24,9 +24,9 @@ OMLAMI_IMG=freetechsolutions/astami:231230.01
 OMLNGINX_IMG=${REPO}/nginx:231125.01
 OMLKAM_IMG=${REPO}/kamailio:231125.01
 OMLRTPENGINE_IMG=${REPO}/rtpengine:231125.01
+
 OMLWS_IMG=${REPO}/websockets:231125.01
 OMLREDIS_IMG=${REPO}/redis:231125.01
-
 OMLVIDEOCALLS_WIDGET_IMG=omnileads/videocalls_widget:230905.01
 OMLPSTNEMULATOR_IMG=omnileads/pstn_emulator:231118.01
 
