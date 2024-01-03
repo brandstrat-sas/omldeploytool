@@ -173,7 +173,7 @@ case ${oml_action} in
     rebrand=false \
     tenant_folder=$oml_tenant \
     commit="$(git rev-parse HEAD)" \
-    omnileads_release="$(git branch --show-current)" \
+    omnileads_release="$(git describe --tags --exact-match)" \
     build_date=\"$(env LC_hosts=C LC_TIME=C date)\"" \
     --tags "$oml_action"\
     -i .inventory.yml
