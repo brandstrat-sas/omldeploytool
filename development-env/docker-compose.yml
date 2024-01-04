@@ -168,7 +168,7 @@ services:
     image: ${OMLAMI_IMG}
     container_name: oml-astami
     environment:
-      - TZ=${TZ}
+      - TZ=${TZ}      
       - ASTERISK_HOSTNAME=${ASTERISK_HOSTNAME}
       - AMI_USER=${AMI_USER}
       - AMI_PASSWORD=${AMI_PASSWORD}

@@ -285,6 +285,7 @@ services:
     container_name: oml-fastagi
     environment:
       - TZ=${TZ}
+      - FASTAGI_HOSTNAME=${FASTAGI_HOSTNAME}
       - PGHOST=${PGHOST}
       - PGPORT=${PGPORT}
       - PGDB=${PGDATABASE}
