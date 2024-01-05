@@ -358,7 +358,7 @@
     - update
     
 # Set fastagi_host as {{ app_host }} on Asterisk instance when fastagi_host is not explicitly defined
-- name: CHECKS Setting fastagi_host as voice_host
+- name: CHECKS Setting fastagi_host as app_host
   set_fact:
     fastagi_host: "{{ application_host }}"
     fastagi_out: false
