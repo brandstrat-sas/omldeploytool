@@ -457,11 +457,11 @@ services:
       - REDIS_HOST=${WEBSOCKET_REDIS_HOSTNAME}
       - PYTHONUNBUFFERED=1
     network_mode: host
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health-checks"]
-      interval: 1s
-      timeout: 10s
-      retries: 10
+    # healthcheck:
+    #   test: ["CMD", "curl", "-f", "http://localhost:8000/health-checks"]
+    #   interval: 1s
+    #   timeout: 10s
+    #   retries: 10
 
 volumes:
   postgresql_data:

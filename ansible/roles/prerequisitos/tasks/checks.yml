@@ -380,7 +380,7 @@
   changed_when: false
   when:
     - fastagi_host is not defined
-    - inventory_hostname in groups['omnileads_aio']
+    - inventory_hostname in groups['omnileads_aio'] or inventory_hostname in groups['omnileads_app']
   tags: 
     - install
     - upgrade

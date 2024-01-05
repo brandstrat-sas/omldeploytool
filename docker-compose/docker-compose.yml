@@ -487,11 +487,11 @@ services:
       - "${WEBSOCKET_EXT_PORT}:8000"
     networks:
       - omnileads
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health-checks"]
-      interval: 1s
-      timeout: 10s
-      retries: 10
+    # healthcheck:
+    #   test: ["CMD", "curl", "-f", "http://localhost:8000/health-checks"]
+    #   interval: 1s
+    #   timeout: 10s
+    #   retries: 10
 
   minio:
     tty: true
