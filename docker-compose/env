@@ -21,7 +21,7 @@ OMLAPP_IMG=freetechsolutions/omlapp:231214-whatsapp.alpha
 OMLACD_IMG=freetechsolutions/asterisk:240102.01
 OMLFASTAGI_IMG=freetechsolutions/fastagi:240104.01
 OMLAMI_IMG=freetechsolutions/astami:231230.01
-OMLNGINX_IMG=${REPO}/nginx:231125.01
+OMLNGINX_IMG=${REPO}/nginx:240105.01
 OMLKAM_IMG=${REPO}/kamailio:231125.01
 OMLRTPENGINE_IMG=${REPO}/rtpengine:231125.01
 

@@ -303,7 +303,7 @@ all:
     asterisk_version: 240102.01
     fastagi_version: 240104.01
     astami_version: 231230.01
-    nginx_version: 231125.01
+    nginx_version: 240105.01
     websockets_version: 231125.01
     kamailio_version: 231125.01
     rtpengine_version: 231125.01
