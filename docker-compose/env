@@ -73,6 +73,8 @@ AUTHEPH_SK=SUp3rS3cr3tK3y
 # Django logs (DEBUG, INFO, WARNING, ERROR, CRITICAL)
 DJANGO_LOG_LEVEL=INFO
 
+WSGI_PORT=8099
+ASGI_PORT=8098
 ##################################
 # Name of the agenda disposition #
 ##################################
@@ -148,6 +150,7 @@ WEBSOCKET_REDIS_HOSTNAME=redis://redis:6379
 
 # --- IP or hostname that each instance will invoke when locating the other    
 KAMAILIO_HOSTNAME=kamailio
+KAMAILIO_HTTPS_PORT=14443
 
 # Variables for Kamailio memory. SHM is the maximum memory ammount.
 # PKG is the minimum memory ammount

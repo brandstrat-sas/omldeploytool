@@ -13,6 +13,7 @@ daphne_port: 8099
 redis_port: 6379
 fastagi_port: 4573
 postgres_port: 5432
+kamailio_wss_port: 14443
 
 minio_version: RELEASE.2023-09-27T15-22-50Z
 postgres_version: postgres:14.9-bullseye
