@@ -357,9 +357,9 @@ services:
     restart: on-failure
     stop_grace_period: 1m30s
     working_dir: /etc/asterisk
-    volumes:
-      - ./asterisk_custom/fidelio/oml_extensions_custom.conf:/etc/asterisk/oml_extensions_custom.conf
-      - ./asterisk_custom/fidelio/bot.py:/var/lib/asterisk/agi-bin/bot.py
+    #volumes:
+    #  - ./asterisk_custom/fidelio/oml_extensions_custom.conf:/etc/asterisk/oml_extensions_custom.conf
+    #  - ./asterisk_custom/fidelio/bot.py:/var/lib/asterisk/agi-bin/bot.py
 
   kamailio:
     command:
