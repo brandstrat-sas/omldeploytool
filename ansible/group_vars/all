@@ -8,11 +8,12 @@ MONITORFORMAT: mp3
 
 container_image_registry: docker.io
 websocket_port: 8000
-uwsgi_port: 8098
-daphne_port: 8099
+uwsgi_port: 8099
+daphne_port: 8098
 redis_port: 6379
 fastagi_port: 4573
 postgres_port: 5432
+kamailio_wss_port: 14443
 
 minio_version: RELEASE.2023-09-27T15-22-50Z
 postgres_version: postgres:14.9-bullseye

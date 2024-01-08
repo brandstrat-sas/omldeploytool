@@ -283,6 +283,7 @@ services:
     container_name: oml-fastagi
     environment:
       - TZ=${TZ}
+      - FASTAGI_HOSTNAME=${FASTAGI_HOSTNAME}
       - PGHOST=${PGHOST}
       - PGPORT=${PGPORT}
       - PGDB=${PGDATABASE}
@@ -387,9 +388,13 @@ services:
       - TZ=${TZ}
       - ENV=prodenv
       - DJANGO_HOSTNAME=${DJANGO_HOSTNAME}
+      - WSGI_PORT=${DJANGO_PORT}
       - DAPHNE_HOSTNAME=${DAPHNE_HOSTNAME}
+      - ASGI_PORT=${DAPHNE_PORT}
       - KAMAILIO_HOSTNAME=${KAMAILIO_HOSTNAME}
+      - KAMAILIO_PORT=${KAMAILIO_HTTPS_PORT}
       - WEBSOCKETS_HOSTNAME=${WEBSOCKET_HOSTNAME}
+      - WEBSOCKETS_PORT=${WEBSOCKET_PORT}
       - S3_ENDPOINT=${S3_ENDPOINT_MINIO}
       - CALLREC_DEVICE=${CALLREC_DEVICE}
     image: ${OMLNGINX_IMG}
@@ -460,11 +465,11 @@ services:
       - REDIS_HOST=${WEBSOCKET_REDIS_HOSTNAME}
       - PYTHONUNBUFFERED=1
     network_mode: host
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health-checks"]
-      interval: 1s
-      timeout: 10s
-      retries: 10
+    # healthcheck:
+    #   test: ["CMD", "curl", "-f", "http://localhost:8000/health-checks"]
+    #   interval: 1s
+    #   timeout: 10s
+    #   retries: 10
   
   minio:
     tty: true

@@ -19,14 +19,14 @@ REPO=omnileads
 
 OMLAPP_IMG=freetechsolutions/omlapp:231214-whatsapp.alpha
 OMLACD_IMG=freetechsolutions/asterisk:240102.01
-OMLFASTAGI_IMG=freetechsolutions/fastagi:231230.01
+OMLFASTAGI_IMG=freetechsolutions/fastagi:240104.01
 OMLAMI_IMG=freetechsolutions/astami:231230.01
-OMLNGINX_IMG=${REPO}/nginx:231125.01
+OMLNGINX_IMG=freetechsolutions/nginx:240105.01
 OMLKAM_IMG=${REPO}/kamailio:231125.01
 OMLRTPENGINE_IMG=${REPO}/rtpengine:231125.01
+
 OMLWS_IMG=${REPO}/websockets:231125.01
 OMLREDIS_IMG=${REPO}/redis:231125.01
-
 OMLVIDEOCALLS_WIDGET_IMG=omnileads/videocalls_widget:230905.01
 OMLPSTNEMULATOR_IMG=omnileads/pstn_emulator:231118.01
 
@@ -73,6 +73,8 @@ AUTHEPH_SK=SUp3rS3cr3tK3y
 # Django logs (DEBUG, INFO, WARNING, ERROR, CRITICAL)
 DJANGO_LOG_LEVEL=INFO
 
+DJANGO_PORT=8099
+DAPHNE_PORT=8098
 ##################################
 # Name of the agenda disposition #
 ##################################
@@ -148,6 +150,7 @@ WEBSOCKET_REDIS_HOSTNAME=redis://redis:6379
 
 # --- IP or hostname that each instance will invoke when locating the other    
 KAMAILIO_HOSTNAME=kamailio
+KAMAILIO_HTTPS_PORT=14443
 
 # Variables for Kamailio memory. SHM is the maximum memory ammount.
 # PKG is the minimum memory ammount
