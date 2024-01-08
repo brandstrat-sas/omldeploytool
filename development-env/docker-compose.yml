@@ -2,8 +2,9 @@ version: '3.8'
 services:
   app:
     build:
-      target: run
+      target: run    
       context: ${REPO_PATH}/omlapp
+    image: ${OMLAPP_IMG}
     container_name: oml-django
     depends_on:
       - postgresql
@@ -62,7 +63,7 @@ services:
       #- WALLBOARD_VERSION=develop
       #- PREMIUM_REPORTS_VERSION=develop
       #- WEBPHONE_CLIENT_VERSION=develop
-    image: ${OMLAPP_IMG}
+    #image: ${OMLAPP_IMG}
     command: /opt/omnileads/bin/init_devenv.sh
     networks:
       - omnileads
@@ -139,6 +140,9 @@ services:
     working_dir: /opt/omnileads/
 
   fastagi:
+    build:
+      target: run    
+      context: ${REPO_PATH}/omlfastagi
     image: ${OMLFASTAGI_IMG}
     container_name: oml-fastagi
     command: python /app/fastagi.py
@@ -158,10 +162,13 @@ services:
       - omnileads  
   
   ami: 
+    build:
+      target: run    
+      context: ${REPO_PATH}/omlami
     image: ${OMLAMI_IMG}
     container_name: oml-astami
     environment:
-      - TZ=${TZ}
+      - TZ=${TZ}      
       - ASTERISK_HOSTNAME=${ASTERISK_HOSTNAME}
       - AMI_USER=${AMI_USER}
       - AMI_PASSWORD=${AMI_PASSWORD}
@@ -176,6 +183,7 @@ services:
     build:
       target: run
       context: ${REPO_PATH}/omlacd
+    image: ${OMLACD_IMG}
     container_name: oml-asterisk
     depends_on:
       - postgresql
@@ -205,8 +213,7 @@ services:
       - HOMERPORT=${HOMERPORT}
       - HOMER_ENABLE=True
       - NETWORK_MODE=bridge
-      - ENV=devenv
-    image: ${OMLACD_IMG}
+      - ENV=devenv    
     networks:
       - omnileads
     ports:
@@ -225,8 +232,7 @@ services:
     build:
       target: run
       context: ${REPO_PATH}/omlkamailio
-    command:
-      - /bin/bash
+    image: ${OMLKAM_IMG}  
     container_name: oml-kamailio
     depends_on:
       - redis
@@ -242,8 +248,7 @@ services:
       - RTPENGINE_HOSTNAME=${RTPENGINE_HOSTNAME}
       - SHM_SIZE=${SHM_SIZE}
       - PKG_SIZE=${PKG_SIZE}
-      - KAMAILIO_CERTS_LOCATION=${KAMAILIO_CERTS_LOCATION}
-    image: ${OMLKAM_IMG}
+      - KAMAILIO_CERTS_LOCATION=${KAMAILIO_CERTS_LOCATION}    
     networks:
       - omnileads
     privileged: true
@@ -253,6 +258,10 @@ services:
       - ${REPO_PATH}/omlkamailio/source:/etc/kamailio:ro
 
   nginx:
+    build:
+      target: run
+      context: ${REPO_PATH}/omlnginx    
+    image: ${OMLNGINX_IMG}  
     container_name: oml-nginx
     depends_on:
       - app
@@ -260,19 +269,18 @@ services:
       - websockets
     dns: 8.8.8.8
     environment:
-      - CALLREC_DEVICE=${CALLREC_DEVICE}
-      - TZ=${TZ}
       - ENV=devenv
+      - TZ=${TZ}      
       - DJANGO_HOSTNAME=${DJANGO_HOSTNAME}
-      - DJANGO_PORT=8099
+      - WSGI_PORT=8099
       - DAPHNE_HOSTNAME=${DJANGO_HOSTNAME}
-      - DAPHNE_PORT=8099
+      - ASGI_PORT=8099
       - KAMAILIO_HOSTNAME=${KAMAILIO_HOSTNAME}
-      - KAMAILIO_WS_PORT=14443
+      - KAMAILIO_PORT=14443
       - WEBSOCKETS_HOSTNAME=${WEBSOCKET_HOSTNAME}
-      - WEBSOCKETS_PORT:8000
+      - WEBSOCKETS_PORT=8000      
+      - CALLREC_DEVICE=${CALLREC_DEVICE}
       - S3_ENDPOINT=${S3_ENDPOINT_MINIO}
-    image: ${OMLNGINX_IMG}
     networks:
       - omnileads
     privileged: true
@@ -328,12 +336,12 @@ services:
     build:
       target: run
       context: ${REPO_PATH}/omlrtpengine
+    image: ${OMLRTPENGINE_IMG}
     container_name: oml-rtpengine
     dns: 8.8.8.8
     environment:
       - ENV=devenv
-      - TZ=${TZ}
-    image: ${OMLRTPENGINE_IMG}
+      - TZ=${TZ}    
     networks:
       - omnileads
     privileged: true
