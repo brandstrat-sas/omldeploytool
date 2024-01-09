@@ -51,7 +51,7 @@
       - update
       
   - name: AMI Pull image
-    command: podman pull --quiet {{ img_repo }}:{{ ami_version }}
+    command: podman pull --quiet {{ img_repo }}:{{ astami_version }}
     register: podman_pull
     until: podman_pull is success
     tags:
@@ -78,5 +78,6 @@
     tags:
       - upgrade
       - restart
+      - restart_core
     when:       
       - inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_aio']  
