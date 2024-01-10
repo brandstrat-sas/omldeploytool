@@ -299,7 +299,7 @@ all:
     # --- For each OML Deploy Tool release, a versioned stack with the latest stable images of each component is maintained on inventory.yml
     # --- You can combine the versions as you like, also use your own TAGs, using the following TAG version variables
     
-    omnileads_version: 231214-whatsapp.alpha
+    omnileads_version: 231227.01
     asterisk_version: 240102.01
     fastagi_version: 240104.01
     astami_version: 231230.01
@@ -316,11 +316,11 @@ all:
     # --- Container Registry repository
     # --- You can customize the container registry for the application, ACD, and the rest of the components' images.
     img_registry_core_url: docker.io
-    img_registry_core_repo: freetechsolutions
+    img_registry_core_repo: omnileads
     img_registry_omlapp_url: docker.io
-    img_registry_omlapp_repo: freetechsolutions
+    img_registry_omlapp_repo: omnileads
     img_registry_omlacd_url: docker.io
-    img_registry_omlacd_repo: freetechsolutions
+    img_registry_omlacd_repo: omnileads
 
 #############################################################################################################
 # -- In this section the hosts are grouped based on the type of deployment (AIO, Cluster & Cluster HA).  -- #

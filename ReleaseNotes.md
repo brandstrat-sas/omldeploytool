@@ -1,9 +1,10 @@
 # Release Notes - OMniLeads 1.33.1
-[2024-01-08]
+[2024-01-10]
 
 ## Added
 
-* oml-438 [OMLAPP]: Deployment of WhatsApp channel
+* oml-390 [ANSIBLE]: Now, the logs from all components are generated in "volatile" mode on systemd-journal, while Promtail collects logs from /run/log/journal and sends them to Grafana Loki.
+* oml-390 [ANSIBLE]: The AstAMI component is deployed to read certain Asterisk queue metrics and write them to Redis.
 
 ## Improvements
 
@@ -24,7 +25,7 @@
 # OMniLeads Component versions
 
 ```
-    omnileads_version: 231214-whatsapp.alpha 
+    omnileads_version: 231227.01
     asterisk_version: 240102.01 
     fastagi_version: 240104.01 
     astami_version: 231230.01
