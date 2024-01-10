@@ -10,8 +10,6 @@ Environment=PODMAN_SYSTEMD_UNIT=%n
 Restart=on-failure
 TimeoutStopSec=70
 ExecStartPre=/bin/rm -f %t/%n.ctr-id
-
-{% if inventory_hostname in groups['omnileads_app'] %}
 ExecStart=/usr/bin/podman run \
   --cidfile=%t/%n.ctr-id \
   --cgroups=no-conmon \
@@ -21,61 +19,11 @@ ExecStart=/usr/bin/podman run \
   --network=host \
   --volume=/etc/default/promtail.yml:/etc/default/promtail.yml \
   --volume=oml_promtail:/tmp \
-  --volume=django_logs:/var/log/django/:ro \
-  --volume=nginx_logs:/var/log/nginx:ro \
+  --volume=/run/log/journal/:/var/log/journal/ \
+  --volume=/etc/machine-id:/etc/machine-id \
   --name=promtail-server \
   --rm  \
-  {{ container_image_registry }}/grafana/promtail -config.file=/etc/default/promtail.yml -config.expand-env=true
-{% elif inventory_hostname in groups['omnileads_voice'] %}
-ExecStart=/usr/bin/podman run \
-  --cidfile=%t/%n.ctr-id \
-  --cgroups=no-conmon \
-  --sdnotify=conmon \
-  --replace \
-  --detach \
-  --network=host \
-  --volume=/etc/default/promtail.yml:/etc/default/promtail.yml \
-  --volume=oml_promtail:/tmp \
-  --volume=asterisk_logs:/var/log/asterisk/:ro \
-  --volume=rtpengine_logs:/var/log/rtpengine:ro \
-  --name=promtail-server \
-  --rm  \
-  {{ container_image_registry }}/grafana/promtail -config.file=/etc/default/promtail.yml -config.expand-env=true
-{% elif inventory_hostname in groups['omnileads_data'] %}
-ExecStart=/usr/bin/podman run \
-  --cidfile=%t/%n.ctr-id \
-  --cgroups=no-conmon \
-  --sdnotify=conmon \
-  --replace \
-  --detach \
-  --network=host \
-  --volume=/etc/default/promtail.yml:/etc/default/promtail.yml \
-  --volume=oml_promtail:/tmp \
-  --volume=postgres_logs:/var/log/postgres/:ro \
-  --volume=redis_logs:/var/log/redis:ro \
-  --name=promtail-server \
-  --rm  \
-  {{ container_image_registry }}/grafana/promtail -config.file=/etc/default/promtail.yml -config.expand-env=true
-{% else %}
-ExecStart=/usr/bin/podman run \
-  --cidfile=%t/%n.ctr-id \
-  --cgroups=no-conmon \
-  --sdnotify=conmon \
-  --replace \
-  --detach \
-  --network=host \
-  --volume=/etc/default/promtail.yml:/etc/default/promtail.yml \
-  --volume=oml_promtail:/tmp \
-  --volume=postgres_logs:/var/log/postgres/:ro \
-  --volume=redis_logs:/var/log/redis:ro \
-  --volume=django_logs:/var/log/django/:ro \
-  --volume=nginx_logs:/var/log/nginx:ro \
-  --name=promtail-server \
-  --volume=asterisk_logs:/var/log/asterisk/:ro \
-  --volume=rtpengine_logs:/var/log/rtpengine:ro \
-  --rm  \
-  {{ container_image_registry }}/grafana/promtail -config.file=/etc/default/promtail.yml -config.expand-env=true
-{% endif %}     
+  docker.io/grafana/promtail -config.file=/etc/default/promtail.yml -config.expand-env=true
 
 ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
 ExecStopPost=/usr/bin/podman rm -f --ignore --cidfile=%t/%n.ctr-id
