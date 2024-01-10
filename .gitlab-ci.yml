@@ -105,7 +105,7 @@ deploy-aio-cloud-rocky:
     - deploy
   rules:
     - if: '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"'
-    - if: '$RUN_RM_DEPLOY == "true"
+    - if: '$RUN_RM_DEPLOY == "true"'
     
 deploy-ait-cloud:
   stage: deploy
