@@ -26,7 +26,7 @@ deploy-aio-cloud-docker:
 
 deploy-aio-cloud-docker-rocky:
   stage: deploy
-  environment: DOCKER_COMPOSE
+  environment: DOCKER_COMPOSE_ROCKY
   script:
     - doctl auth init -t ${DIGITALOCEAN_ACCESS_TOKEN}
     - rm -rf ~/omldeploytool
@@ -79,7 +79,7 @@ deploy-aio-cloud:
 
 deploy-aio-cloud-rocky:
   stage: deploy
-  environment: SYSTEMD_AIO  
+  environment: SYSTEMD_AIO_ROCKY
   script:
     - doctl auth init -t ${DIGITALOCEAN_ACCESS_TOKEN}
     - doctl compute droplet create --image ${DIGITALOCEAN_DROPLET_ROCKY_IMG} --size ${DIGITALOCEAN_DROPLET_SIZE} --region ${DIGITALOCEAN_REGION} --ssh-keys ${DIGITALOCEAN_SSH_KEY} cicd-systemd.${CI_JOB_ID}
