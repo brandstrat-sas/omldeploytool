@@ -182,11 +182,11 @@ case $1 in
     podman exec -it oml-uwsgi-server bash
     ;;  
   --django_shell)
-    podman exec -it oml-uwsgi-server python3 manage.py shell
+    podman exec -it oml-uwsgi-server python3 /opt/omnileads/ominicontacto/manage.py shell
     ;;    
   --django_commands)
-    echo "the 2nd argument must be the omlapp img tag: $2"
-    podman run --network=host --env-file /etc/default/django.env docker.io/omnileads:omlapp:$2 /opt/omnileads/bin/django_commands.sh
+    echo "the 2nd argument must be the omlapp img tag: $2 (example: omnileads/omlapp:231227.01)"
+    podman run --network=host --env-file /etc/default/django.env $2 /opt/omnileads/bin/django_commands.sh
     ;;
   --fastagi_bash)
     podman exec -it oml-fastagi-server bash
@@ -221,6 +221,7 @@ USAGE:
   --kamailio_logs: show container logs 
   --django_shell: init a django shell
   --django_bash: init bash session on django container
+  --django_commands: run commands like compress, migrate, and collectstatic. You need to pass a second argument with the omlapp image (for example: docker.io/omnileads/omlapp:231227.01).
   --rtpengine_bash: init bash session on
   --rtpengine_config: show rtpengine config
   --websockets_logs: show container logs 

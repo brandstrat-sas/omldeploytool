@@ -159,6 +159,7 @@ case ${oml_action} in
     docker_compose_repo_path=$(pwd)/components/docker_compose/ \
     rtpengine_repo_path=$(pwd)/components/rtpengine/ \
     fastagi_repo_path=$(pwd)/components/fastagi/ \
+    ami_repo_path=$(pwd)/components/ami/ \
     websockets_repo_path=$(pwd)/components/websockets/ \
     nginx_repo_path=$(pwd)/components/nginx/ \
     minio_repo_path=$(pwd)/components/minio/ \
@@ -173,6 +174,7 @@ case ${oml_action} in
     rebrand=false \
     tenant_folder=$oml_tenant \
     commit="$(git rev-parse HEAD)" \
+    omnileads_release="$(git describe --tags --exact-match)" \
     build_date=\"$(env LC_hosts=C LC_TIME=C date)\"" \
     --tags "$oml_action"\
     -i .inventory.yml

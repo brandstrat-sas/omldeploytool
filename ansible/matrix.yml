@@ -79,6 +79,11 @@
     - inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_aio']
 
 
+- import_playbook: components/ami/playbook.yml
+  when: 
+    - inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_aio']
+
+
 - import_playbook: components/websockets/playbook.yml
   when: 
    - inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_aio']

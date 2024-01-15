@@ -11,111 +11,286 @@ clients:
 scrape_configs:
 
 {% if inventory_hostname in groups['omnileads_app'] %}
-  - job_name: uwsgi
-    static_configs:
-    - targets:
-        - localhost
-      labels:
-        arq: cluster
-        component: uwsgi
-        tenant: {{ tenant_id }}
-        __path__: /var/log/django/django.log
 
-  - job_name: nginx_access
-    static_configs:
-    - targets:
-        - localhost
+  - job_name: nginx
+    journal:
+      json: false
+      max_age: 12h
+      path: /var/log/journal
+      matches: "_SYSTEMD_UNIT=nginx.service"
       labels:
-        arq: cluster
-        component: nginx
+        job: nginx
         tenant: {{ tenant_id }}
-        __path__: /var/log/nginx/omnileads_access.log
+    relabel_configs:
+      - source_labels: ['__journal__systemd_unit']
+        target_label: 'unit'
 
-  - job_name: nginx_error
-    static_configs:
-    - targets:
-        - localhost
+  - job_name: omnileads
+    journal:
+      json: false
+      max_age: 12h
+      path: /var/log/journal
+      matches: "_SYSTEMD_UNIT=omnileads.service"
       labels:
-        arq: cluster
-        component: nginx
+        job: omnileads
         tenant: {{ tenant_id }}
-        __path__: /var/log/nginx/omnileads_error.log
+    relabel_configs:
+      - source_labels: ['__journal__systemd_unit']
+        target_label: 'unit'      
+
+  - job_name: astami
+    journal:
+      json: false
+      max_age: 12h
+      path: /var/log/journal
+      matches: "_SYSTEMD_UNIT=astami.service"
+      labels:
+        job: astami
+        tenant: {{ tenant_id }}
+    relabel_configs:
+      - source_labels: ['__journal__systemd_unit']
+        target_label: 'unit'
+
+  - job_name: fastagi
+    journal:
+      json: false
+      max_age: 12h
+      path: /var/log/journal
+      matches: "_SYSTEMD_UNIT=fastagi.service"
+      labels:
+        job: fastagi
+        tenant: {{ tenant_id }}
+    relabel_configs:
+      - source_labels: ['__journal__systemd_unit']
+        target_label: 'unit'      
+      
+  - job_name: omlcron
+    journal:
+      json: false
+      max_age: 12h
+      path: /var/log/journal
+      matches: "_SYSTEMD_UNIT=omlcron.service"
+      labels:
+        job: omlcron
+        tenant: {{ tenant_id }}
+    relabel_configs:
+      - source_labels: ['__journal__systemd_unit']
+        target_label: 'unit'
+
+  - job_name: daphne
+    journal:
+      json: false
+      max_age: 12h
+      path: /var/log/journal
+      matches: "_SYSTEMD_UNIT=daphne.service"
+      labels:
+        job: daphne
+        tenant: {{ tenant_id }}
+    relabel_configs:
+      - source_labels: ['__journal__systemd_unit']
+        target_label: 'unit'      
+
 
 {% elif inventory_hostname in groups['omnileads_voice'] %}
-  - job_name: asterisk_full
-    static_configs:
-    - targets:
-        - localhost
-      labels:
-        arq: cluster
-        component: asterisk
-        tenant: {{ tenant_id }}
-        __path__: /var/log/asterisk/full
 
-  - job_name: asterisk_conf_provisioner
-    static_configs:
-    - targets:
-        - localhost
+  - job_name: rtpengine
+    journal:
+      json: false
+      max_age: 12h
+      path: /var/log/journal
+      matches: "_SYSTEMD_UNIT=rtpengine.service"
       labels:
-        arq: cluster
-        component: asterisk
+        job: rtpengine
         tenant: {{ tenant_id }}
-        __path__: /var/log/asterisk/websockets.log
+    relabel_configs:
+      - source_labels: ['__journal__systemd_unit']
+        target_label: 'unit'
+
+  - job_name: asterisk
+    journal:
+      json: false
+      max_age: 12h
+      path: /var/log/journal
+      matches: "_SYSTEMD_UNIT=asterisk.service"
+      labels:
+        job: asterisk
+        tenant: {{ tenant_id }}
+    relabel_configs:
+      - source_labels: ['__journal__systemd_unit']
+        target_label: 'unit'
 
 {% elif inventory_hostname in groups['omnileads_data'] %}
 
+  - job_name: postgresql
+    journal:
+      json: false
+      max_age: 12h
+      path: /var/log/journal
+      matches: "_SYSTEMD_UNIT=postgresql.service"
+      labels:
+        job: postgresql
+        tenant: {{ tenant_id }}
+    relabel_configs:
+      - source_labels: ['__journal__systemd_unit']
+        target_label: 'unit'
+
+  - job_name: redis
+    journal:
+      json: false
+      max_age: 12h
+      path: /var/log/journal
+      matches: "_SYSTEMD_UNIT=redis.service"
+      labels:
+        job: redis
+        tenant: {{ tenant_id }}
+    relabel_configs:
+      - source_labels: ['__journal__systemd_unit']
+        target_label: 'unit'
 
 {% elif inventory_hostname in groups['omnileads_aio'] %}
 
-  - job_name: uwsgi
-    static_configs:
-    - targets:
-        - localhost
+  - job_name: asterisk
+    journal:
+      json: false
+      max_age: 12h
+      path: /var/log/journal
+      matches: "_SYSTEMD_UNIT=asterisk.service"
       labels:
-        arq: aio
-        component: uwsgi
+        job: asterisk
         tenant: {{ tenant_id }}
-        __path__: /var/log/django/django.log
+    relabel_configs:
+      - source_labels: ['__journal__systemd_unit']
+        target_label: 'unit'
 
-  - job_name: nginx_access
-    static_configs:
-    - targets:
-        - localhost
+  - job_name: nginx
+    journal:
+      json: false
+      max_age: 12h
+      path: /var/log/journal
+      matches: "_SYSTEMD_UNIT=nginx.service"
       labels:
-        arq: aio
-        component: nginx
+        job: nginx
         tenant: {{ tenant_id }}
-        __path__: /var/log/nginx/omnileads_access.log
+    relabel_configs:
+      - source_labels: ['__journal__systemd_unit']
+        target_label: 'unit'
 
-  - job_name: nginx_error
-    static_configs:
-    - targets:
-        - localhost
+  - job_name: omnileads
+    journal:
+      json: false
+      max_age: 12h
+      path: /var/log/journal
+      matches: "_SYSTEMD_UNIT=omnileads.service"
       labels:
-        arq: aio
-        component: nginx
+        job: omnileads
         tenant: {{ tenant_id }}
-        __path__: /var/log/nginx/omnileads_error.log
+    relabel_configs:
+      - source_labels: ['__journal__systemd_unit']
+        target_label: 'unit'      
 
-  - job_name: asterisk_full
-    static_configs:
-    - targets:
-        - localhost
+  - job_name: astami
+    journal:
+      json: false
+      max_age: 12h
+      path: /var/log/journal
+      matches: "_SYSTEMD_UNIT=astami.service"
       labels:
-        arq: aio
-        component: asterisk
+        job: astami
         tenant: {{ tenant_id }}
-        __path__: /var/log/asterisk/full
+    relabel_configs:
+      - source_labels: ['__journal__systemd_unit']
+        target_label: 'unit'
 
-  - job_name: asterisk_conf_provisioner
-    static_configs:
-    - targets:
-        - localhost
+  - job_name: fastagi
+    journal:
+      json: false
+      max_age: 12h
+      path: /var/log/journal
+      matches: "_SYSTEMD_UNIT=fastagi.service"
       labels:
-        arq: aio
-        component: asterisk
+        job: fastagi
         tenant: {{ tenant_id }}
-        __path__: /var/log/asterisk/websockets.log
+    relabel_configs:
+      - source_labels: ['__journal__systemd_unit']
+        target_label: 'unit'      
+      
+  - job_name: omlcron
+    journal:
+      json: false
+      max_age: 12h
+      path: /var/log/journal
+      matches: "_SYSTEMD_UNIT=omlcron.service"
+      labels:
+        job: omlcron
+        tenant: {{ tenant_id }}
+    relabel_configs:
+      - source_labels: ['__journal__systemd_unit']
+        target_label: 'unit'
+
+  - job_name: daphne
+    journal:
+      json: false
+      max_age: 12h
+      path: /var/log/journal
+      matches: "_SYSTEMD_UNIT=daphne.service"
+      labels:
+        job: daphne
+        tenant: {{ tenant_id }}
+    relabel_configs:
+      - source_labels: ['__journal__systemd_unit']
+        target_label: 'unit'      
+
+  - job_name: postgresql
+    journal:
+      json: false
+      max_age: 12h
+      path: /var/log/journal
+      matches: "_SYSTEMD_UNIT=postgresql.service"
+      labels:
+        job: postgresql
+        tenant: {{ tenant_id }}
+    relabel_configs:
+      - source_labels: ['__journal__systemd_unit']
+        target_label: 'unit'
+
+  - job_name: redis
+    journal:
+      json: false
+      max_age: 12h
+      path: /var/log/journal
+      matches: "_SYSTEMD_UNIT=redis.service"
+      labels:
+        job: redis
+        tenant: {{ tenant_id }}
+    relabel_configs:
+      - source_labels: ['__journal__systemd_unit']
+        target_label: 'unit'
+
+  - job_name: rtpengine
+    journal:
+      json: false
+      max_age: 12h
+      path: /var/log/journal
+      matches: "_SYSTEMD_UNIT=rtpengine.service"
+      labels:
+        job: rtpengine
+        tenant: {{ tenant_id }}
+    relabel_configs:
+      - source_labels: ['__journal__systemd_unit']
+        target_label: 'unit'
+
+  - job_name: websockets
+    journal:
+      json: false
+      max_age: 12h
+      path: /var/log/journal
+      matches: "_SYSTEMD_UNIT=websockets.service"
+      labels:
+        job: websockets
+        tenant: {{ tenant_id }}
+    relabel_configs:
+      - source_labels: ['__journal__systemd_unit']
+        target_label: 'unit'
 
 {% else %}
 {% endif %}     

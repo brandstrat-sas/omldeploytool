@@ -9,7 +9,11 @@ RequiresMountsFor=%t/containers
 Environment=PODMAN_SYSTEMD_UNIT=%n
 Restart=on-failure
 TimeoutStopSec=70
+{% if scale_asterisk is defined %}
+MemoryLimit={{ asterisk_mem_limit }}
+{% else %}
 MemoryLimit=
+{% endif %}
 ExecStartPre=/bin/rm -f %t/%n.ctr-id
 ExecStart=/usr/bin/podman run \
   --cidfile=%t/%n.ctr-id \
@@ -20,10 +24,10 @@ ExecStart=/usr/bin/podman run \
   --network=host \
   --log-driver=journald \
   --env-file=/etc/default/asterisk.env \
-  --volume=/etc/asterisk/custom/:/etc/asterisk/custom \
   --name=oml-asterisk-server \
+  --volume=asterisk_callrec:/var/spool/asterisk/monitor:rw \
   --rm  \
-  {{ img_registry_core_url }}/{{ img_registry_core_repo }}/asterisk:{{ asterisk_version }}
+  {{ img_registry_omlacd_url }}/{{ img_registry_omlacd_repo }}/asterisk:{{ asterisk_version }}
 ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
 ExecStopPost=/usr/bin/podman rm -f --ignore --cidfile=%t/%n.ctr-id
 StandardOutput=journal
