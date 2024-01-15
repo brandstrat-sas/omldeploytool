@@ -271,6 +271,18 @@ all:
     ha_notification_email: mr_robot@mr_robot.com
 
     # ------------------------------------------------------------------------------------------------ #
+    # ------------------------------------ Scale tunnings -------------------------------------------- #
+    # ------------------------------------------------------------------------------------------------ #
+
+    #scale_uwsgi: true
+    #processes: 8
+    #threads: 1
+    #scale_asterisk: true
+    #asterisk_mem_limit: 1G
+    #pjsip_threadpool_idle_timeout: 120
+    #pjsip_threadpool_max_size: 150
+
+    # ------------------------------------------------------------------------------------------------ #
     # ------------------------------------ Backup & Restore ------------------------------------------ #
     # ------------------------------------------------------------------------------------------------ #
 
@@ -288,10 +300,10 @@ all:
     # --- You can combine the versions as you like, also use your own TAGs, using the following TAG version variables
     
     omnileads_version: 231227.01
-    asterisk_version: 231125.01
-    fastagi_version: 231207.01
-    astami_version: 231125.01
-    nginx_version: 231125.01
+    asterisk_version: 240102.01
+    fastagi_version: 240104.01
+    astami_version: 231230.01
+    nginx_version: 240105.01
     websockets_version: 231125.01
     kamailio_version: 231125.01
     rtpengine_version: 231125.01
@@ -301,14 +313,14 @@ all:
     # --- on the contrary you will deploy OMniLeads OSS Edition with GPLV3 licensed. 
     enterprise_edition: false
 
-    # --- Docker Registry repository
-    # --- If you are going to use another registry for the images, you must indicate here
-    # --- Docker Registry repository
-    # --- If you are going to use another registry for the images, you must indicate here
+    # --- Container Registry repository
+    # --- You can customize the container registry for the application, ACD, and the rest of the components' images.
     img_registry_core_url: docker.io
     img_registry_core_repo: omnileads
     img_registry_omlapp_url: docker.io
     img_registry_omlapp_repo: omnileads
+    img_registry_omlacd_url: docker.io
+    img_registry_omlacd_repo: omnileads
 
 #############################################################################################################
 # -- In this section the hosts are grouped based on the type of deployment (AIO, Cluster & Cluster HA).  -- #

@@ -134,10 +134,10 @@ case $1 in
     docker logs -f oml-nginx
     ;;    
   --vuejs_install)
-    docker exec -it oml-vuejs-cli /bin/sh -c "cd supervision && npm i"
+    docker exec -it oml-vuejs-cli /bin/sh -c "cd /home/oml_frontend && npm i"
     ;;        
   --vuejs_build)  
-    docker exec -it oml-vuejs-cli /bin/sh -c "cd supervision && npm run build"
+    docker exec -it oml-vuejs-cli /bin/sh -c "cd /home/oml_frontend && npm run build"
     ;;
   --help)
     echo "

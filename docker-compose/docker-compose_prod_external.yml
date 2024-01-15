@@ -54,6 +54,7 @@ services:
       - OML_LOGGING_SLOWSQL_ENABLED=
       - OML_LOGGING_SLOWSQL_OUTPUT="-"
       - OML_LOGGING_SLOWSQL_DURATION=1
+      - DJANGO_ALLOW_ASYNC_UNSAFE=true
       #- SURVEY_VERSION=develop
       #- WALLBOARD_VERSION=develop
       #- PREMIUM_REPORTS_VERSION=develop
@@ -270,6 +271,7 @@ services:
     container_name: oml-fastagi
     environment:
       - TZ=${TZ}
+      - FASTAGI_HOSTNAME=${FASTAGI_HOSTNAME}
       - AMI_HOST=${ASTERISK_HOSTNAME}
       - AMI_USER=${AMI_USER}
       - AMI_PASSWD=${AMI_PASSWORD}
@@ -375,10 +377,14 @@ services:
       - TZ=${TZ}
       - ENV=prodenv
       - DJANGO_HOSTNAME=${DJANGO_HOSTNAME}
+      - WSGI_PORT=${DJANGO_PORT}
       - DAPHNE_HOSTNAME=${DAPHNE_HOSTNAME}
+      - ASGI_PORT=${DAPHNE_PORT}
       - KAMAILIO_HOSTNAME=${KAMAILIO_HOSTNAME}
+      - KAMAILIO_PORT=${KAMAILIO_HTTPS_PORT}
       - WEBSOCKETS_HOSTNAME=${WEBSOCKET_HOSTNAME}
-      - S3_ENDPOINT=${S3_ENDPOINT}
+      - WEBSOCKETS_PORT=${WEBSOCKET_PORT}
+      - S3_ENDPOINT=${S3_ENDPOINT_MINIO}
       - CALLREC_DEVICE=${CALLREC_DEVICE}
     image: ${OMLNGINX_IMG}
     network_mode: host
@@ -431,11 +437,11 @@ services:
       - REDIS_HOST=${WEBSOCKET_REDIS_HOSTNAME}
       - PYTHONUNBUFFERED=1
     network_mode: host
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health-checks"]
-      interval: 1s
-      timeout: 10s
-      retries: 10
+    # healthcheck:
+    #   test: ["CMD", "curl", "-f", "http://localhost:8000/health-checks"]
+    #   interval: 1s
+    #   timeout: 10s
+    #   retries: 10
 
 volumes:
   redis_data:

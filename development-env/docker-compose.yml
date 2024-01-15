@@ -2,8 +2,9 @@ version: '3.8'
 services:
   app:
     build:
-      target: run
+      target: run    
       context: ${REPO_PATH}/omlapp
+    image: ${OMLAPP_IMG}
     container_name: oml-django
     depends_on:
       - postgresql
@@ -12,6 +13,7 @@ services:
       - minio
     dns: 8.8.8.8
     environment:
+      - DJANGO_ALLOW_ASYNC_UNSAFE=true
       - CRON_ENABLE=false
       - TZ=${TZ}
       - ASTERISK_HOSTNAME=${ASTERISK_HOSTNAME}
@@ -61,7 +63,7 @@ services:
       #- WALLBOARD_VERSION=develop
       #- PREMIUM_REPORTS_VERSION=develop
       #- WEBPHONE_CLIENT_VERSION=develop
-    image: ${OMLAPP_IMG}
+    #image: ${OMLAPP_IMG}
     command: /opt/omnileads/bin/init_devenv.sh
     networks:
       - omnileads
@@ -138,6 +140,9 @@ services:
     working_dir: /opt/omnileads/
 
   fastagi:
+    build:
+      target: run    
+      context: ${REPO_PATH}/omlfastagi
     image: ${OMLFASTAGI_IMG}
     container_name: oml-fastagi
     command: python /app/fastagi.py
@@ -151,85 +156,34 @@ services:
       - REDIS_HOSTNAME=${REDIS_HOSTNAME}
       - REDIS_PORT=6379
     volumes:
-      - ${REPO_PATH}/omlfastagi:/app
+      - ${REPO_PATH}/omlfastagi/fastagi.py:/app/fastagi.py
     restart: on-failure
     networks:
       - omnileads  
   
   ami: 
+    build:
+      target: run    
+      context: ${REPO_PATH}/omlami
     image: ${OMLAMI_IMG}
     container_name: oml-astami
     environment:
-      - TZ=${TZ}
+      - TZ=${TZ}      
       - ASTERISK_HOSTNAME=${ASTERISK_HOSTNAME}
       - AMI_USER=${AMI_USER}
       - AMI_PASSWORD=${AMI_PASSWORD}
       - REDIS_HOSTNAME=${REDIS_HOSTNAME}      
     restart: on-failure  
     volumes:
-     - ${REPO_PATH}/omlami:/app
+     - ${REPO_PATH}/omlami/ami.py:/app/ami.py
     networks:
       - omnileads  
-
-  # voip_adapter:
-  #   image: ${OMLARI_IMG}
-  #   container_name: oml-voip_adapter
-  #   command: python /app/adapter.py
-  #   environment:
-  #     - TZ=${TZ}
-  #     - ARI_HOST=acd
-  #     - ARI_PORT=7088
-  #     - ARI_USER=omnileads
-  #     - ARI_PASS=5_MeO_DMT
-  #     - REDIS_HOSTNAME=${REDIS_HOSTNAME}
-  #     - RABBITMQ_HOSTNAME=rabbitmq
-  #   restart: on-failure  
-  #   volumes:
-  #    - ${REPO_PATH}/omlari:/app
-  #   networks:
-  #     - omnileads  
-
-  # voip_orchester:
-  #   image: ${OMLARI_IMG}
-  #   container_name: oml-voip_orchester
-  #   command: python /app/consumer.py
-  #   environment:
-  #     - TZ=${TZ}
-  #     - ARI_HOST=acd
-  #     - ARI_PORT=7088
-  #     - ARI_USER=omnileads
-  #     - ARI_PASS=5_MeO_DMT
-  #     - REDIS_HOSTNAME=${REDIS_HOSTNAME}
-  #     - REDIS_PORT=6379
-  #     - RABBITMQ_HOSTNAME=rabbitmq
-  #   restart: on-failure  
-  #   volumes:
-  #    - ${REPO_PATH}/omlari:/app
-  #   networks:
-  #     - omnileads  
-
-  # voip_deliver:
-  #   image: ${OMLARI_IMG}
-  #   container_name: oml-voip_deliver
-  #   command: python /app/deliver.py
-  #   environment:
-  #     - TZ=${TZ}
-  #     - ARI_HOST=acd
-  #     - ARI_PORT=7088
-  #     - ARI_USER=omnileads
-  #     - ARI_PASS=5_MeO_DMT
-  #     - REDIS_HOSTNAME=${REDIS_HOSTNAME}
-  #     - RABBITMQ_HOSTNAME=rabbitmq
-  #   restart: on-failure  
-  #   volumes:
-  #    - ${REPO_PATH}/omlari:/app
-  #   networks:
-  #     - omnileads  
 
   acd:
     build:
       target: run
       context: ${REPO_PATH}/omlacd
+    image: ${OMLACD_IMG}
     container_name: oml-asterisk
     depends_on:
       - postgresql
@@ -259,8 +213,7 @@ services:
       - HOMERPORT=${HOMERPORT}
       - HOMER_ENABLE=True
       - NETWORK_MODE=bridge
-      - ENV=devenv
-    image: ${OMLACD_IMG}
+      - ENV=devenv    
     networks:
       - omnileads
     ports:
@@ -271,7 +224,6 @@ services:
     restart: on-failure
     stop_grace_period: 1m30s
     volumes:
-      - ./ast_custom_conf:/etc/asterisk/custom
       - ${REPO_PATH}/omlacd/source/astconf:/etc/asterisk
       - ${REPO_PATH}/omlacd/source/scripts:/opt/asterisk/scripts
     working_dir: /etc/asterisk
@@ -280,8 +232,7 @@ services:
     build:
       target: run
       context: ${REPO_PATH}/omlkamailio
-    command:
-      - /bin/bash
+    image: ${OMLKAM_IMG}  
     container_name: oml-kamailio
     depends_on:
       - redis
@@ -297,8 +248,7 @@ services:
       - RTPENGINE_HOSTNAME=${RTPENGINE_HOSTNAME}
       - SHM_SIZE=${SHM_SIZE}
       - PKG_SIZE=${PKG_SIZE}
-      - KAMAILIO_CERTS_LOCATION=${KAMAILIO_CERTS_LOCATION}
-    image: ${OMLKAM_IMG}
+      - KAMAILIO_CERTS_LOCATION=${KAMAILIO_CERTS_LOCATION}    
     networks:
       - omnileads
     privileged: true
@@ -308,6 +258,10 @@ services:
       - ${REPO_PATH}/omlkamailio/source:/etc/kamailio:ro
 
   nginx:
+    build:
+      target: run
+      context: ${REPO_PATH}/omlnginx    
+    image: ${OMLNGINX_IMG}  
     container_name: oml-nginx
     depends_on:
       - app
@@ -315,19 +269,18 @@ services:
       - websockets
     dns: 8.8.8.8
     environment:
-      - CALLREC_DEVICE=${CALLREC_DEVICE}
-      - TZ=${TZ}
       - ENV=devenv
+      - TZ=${TZ}      
       - DJANGO_HOSTNAME=${DJANGO_HOSTNAME}
-      - DJANGO_PORT=8099
+      - WSGI_PORT=8099
       - DAPHNE_HOSTNAME=${DJANGO_HOSTNAME}
-      - DAPHNE_PORT=8099
+      - ASGI_PORT=8099
       - KAMAILIO_HOSTNAME=${KAMAILIO_HOSTNAME}
-      - KAMAILIO_WS_PORT=14443
+      - KAMAILIO_PORT=14443
       - WEBSOCKETS_HOSTNAME=${WEBSOCKET_HOSTNAME}
-      - WEBSOCKETS_PORT:8000
+      - WEBSOCKETS_PORT=8000      
+      - CALLREC_DEVICE=${CALLREC_DEVICE}
       - S3_ENDPOINT=${S3_ENDPOINT_MINIO}
-    image: ${OMLNGINX_IMG}
     networks:
       - omnileads
     privileged: true
@@ -383,12 +336,12 @@ services:
     build:
       target: run
       context: ${REPO_PATH}/omlrtpengine
+    image: ${OMLRTPENGINE_IMG}
     container_name: oml-rtpengine
     dns: 8.8.8.8
     environment:
       - ENV=devenv
-      - TZ=${TZ}
-    image: ${OMLRTPENGINE_IMG}
+      - TZ=${TZ}    
     networks:
       - omnileads
     privileged: true
@@ -465,10 +418,10 @@ services:
     networks:
       - omnileads
     volumes:
-      - ${REPO_PATH}/omlapp/omnileads_ui/:/home/app/
+      - ${REPO_PATH}/omlapp/omnileads_ui/:/home/oml_frontend/
       - ${REPO_PATH}/survey_app/:/home/survey/
       - ${REPO_PATH}/wallboard_app/:/home/wallboard/
-      - vuejs:/home/app/supervision/node_modules/
+      - vuejs:/home/app/supervision/node_modules/      
 
   rabbitmq:
     container_name: oml-rabbit-mq
@@ -531,32 +484,32 @@ services:
       - omnileads
     ports:
       - 4569:4569/udp
-      - 6060:6060/udp
-      - 10000-10020:10000-10020/udp
+    volumes:
+      - ./pstn_emulator_custom_conf:/etc/asterisk/custom/
     privileged: true
     restart: on-failure
     stdin_open: true
     stop_grace_period: 1m30s
     tty: true
 
-  # nginxcgi:
-  #   container_name: oml-nginx-cgi
-  #   hostname: nginxcgi
-  #   dns: 8.8.8.8
-  #   image: omnileads/nginxqa:latest
-  #   environment:
-  #     - PGHOST=${PGHOST}
-  #     - PGPASSWORD=${PGPASSWORD}
-  #     - PSTN_HOSTNAME=pbxemulator
-  #   networks: 
-  #     - omnileads
-  #   ports:
-  #     - 8888:8888
-  #   privileged: true
-  #   restart: on-failure
-  #   stdin_open: true
-  #   stop_grace_period: 1m30s
-  #   tty: true
+  nginxcgi:
+    container_name: oml-nginx-cgi
+    hostname: nginxcgi
+    dns: 8.8.8.8
+    image: omnileads/nginxqa:latest
+    environment:
+      - PGHOST=${PGHOST}
+      - PGPASSWORD=${PGPASSWORD}
+      - PSTN_HOSTNAME=pbxemulator
+    networks: 
+      - omnileads
+    ports:
+      - 8888:8888
+    privileged: true
+    restart: on-failure
+    stdin_open: true
+    stop_grace_period: 1m30s
+    tty: true
 
   videocalls:
     container_name: oml-videocalls-widget
@@ -592,6 +545,3 @@ volumes:
   django_static:
   django_callrec_zip:
   vuejs:
-  ast_conf:
-  ast_sounds:
-  ast_db:

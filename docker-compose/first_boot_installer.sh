@@ -20,10 +20,35 @@ postgres_db=${PGDATABASE}
 PRIVATE_IPV4=$(ip addr show $oml_nic | grep "inet\b" | awk '{print $2}' | cut -d/ -f1)
 PUBLIC_IPV4=$(curl ifconfig.co)
 
-apt update && apt install -y git
+# Obtener el ID de la distribución del sistema operativo
+if [ -f /etc/os-release ]; then
+    . /etc/os-release
+    OS_ID=$ID
+else
+    echo "No se puede determinar el sistema operativo."
+    exit 1
+fi
 
-curl -fsSL https://get.docker.com -o ~/get-docker.sh
-bash ~/get-docker.sh
+# Debian family
+if [ "$OS_ID" = "debian" ] || [ "$OS_ID" = "ubuntu" ]; then    
+    apt update && apt install -y git
+    curl -fsSL https://get.docker.com -o ~/get-docker.sh
+    bash ~/get-docker.sh    
+
+# Redhat family
+elif [ "$OS_ID" = "rhel" ] || [ "$OS_ID" = "almalinux" ] || [ "$OS_ID" = "rocky" ] || [ "$OS_ID" = "centos" ]; then
+    dnf check-update
+    dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+    dnf install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin git
+    systemctl start docker
+    systemctl enable docker
+
+else
+    echo "Distribución no soportada."
+    exit 1
+fi
+
+ln -s /usr/libexec/docker/cli-plugins/docker-compose /usr/bin/
 
 git clone https://gitlab.com/omnileads/omldeploytool.git
 
@@ -103,7 +128,6 @@ else
 fi
 
 ln -s ./omldeploytool/docker-compose/oml_manage /usr/bin/
-ln -s /usr/libexec/docker/cli-plugins/docker-compose /usr/bin/
 
 if [[ "$env" == "devenv" ]];then
     until curl -sk --head  --request GET https://localhost |grep "302" > /dev/null; do echo "Environment still initializing , sleeping 10 seconds"; sleep 10; done; echo "Environment is up"
