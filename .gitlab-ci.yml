@@ -9,9 +9,9 @@ deploy-aio-cloud-docker:
     - rm -rf ~/omldeploytool
     - git clone -b $CI_COMMIT_REF_NAME https://gitlab.com/omnileads/omldeploytool.git ~/omldeploytool
     - cd ~/omldeploytool/docker-compose
-    - sed -i "s/\${NIC}/eth1/g" ./first_boot_installer.sh
-    - sed -i "s/\${ENV}/cloud/g" ./first_boot_installer.sh
-    - sed -i "s/\${BRANCH}/$CI_COMMIT_REF_NAME/g" ./first_boot_installer.sh
+    - sed -i "s/\oml_nic=/oml_nic=eth1/g" ./first_boot_installer.sh
+    - sed -i "s/\env=/env=cloud/g" ./first_boot_installer.sh
+    - sed -i "s/\branch=/branch=$CI_COMMIT_REF_NAME/g" ./first_boot_installer.sh
     - |
       if [ -n "${OMLAPP_IMG}" ]; then
         echo "OMLAPP_IMG is set to: ${OMLAPP_IMG}"
@@ -37,9 +37,9 @@ deploy-aio-cloud-docker-rocky:
     - rm -rf ~/omldeploytool
     - git clone -b $CI_COMMIT_REF_NAME https://gitlab.com/omnileads/omldeploytool.git ~/omldeploytool
     - cd ~/omldeploytool/docker-compose
-    - sed -i "s/\${NIC}/eth1/g" ./first_boot_installer.sh
-    - sed -i "s/\${ENV}/cloud/g" ./first_boot_installer.sh
-    - sed -i "s/\${BRANCH}/$CI_COMMIT_REF_NAME/g" ./first_boot_installer.sh
+    - sed -i "s/\oml_nic=/oml_nic=eth1/g" ./first_boot_installer.sh
+    - sed -i "s/\env=/env=cloud/g" ./first_boot_installer.sh
+    - sed -i "s/\branch=/branch=$CI_COMMIT_REF_NAME/g" ./first_boot_installer.sh
     - |
       if [ -n "${OMLAPP_IMG}" ]; then
         echo "OMLAPP_IMG is set to: ${OMLAPP_IMG}"
@@ -258,9 +258,9 @@ deploy-aio-cloud-docker-norm:
     - rm -rf ~/omldeploytool
     - git clone -b $CI_COMMIT_REF_NAME https://gitlab.com/omnileads/omldeploytool.git ~/omldeploytool
     - cd ~/omldeploytool/docker-compose
-    - sed -i "s/\${NIC}/eth1/g" ./first_boot_installer.sh
-    - sed -i "s/\${ENV}/cloud/g" ./first_boot_installer.sh
-    - sed -i "s/\${BRANCH}/$CI_COMMIT_REF_NAME/g" ./first_boot_installer.sh
+    - sed -i "s/\oml_nic=/oml_nic=eth1/g" ./first_boot_installer.sh
+    - sed -i "s/\env=/env=cloud/g" ./first_boot_installer.sh
+    - sed -i "s/\branch=/branch=$CI_COMMIT_REF_NAME/g" ./first_boot_installer.sh
     - |
       if [ -n "${OMLAPP_IMG}" ]; then
         echo "OMLAPP_IMG is set to: ${OMLAPP_IMG}"
