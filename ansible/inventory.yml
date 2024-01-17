@@ -310,7 +310,7 @@ all:
     rtpengine_img: docker.io/omnileads/rtpengine:231125.01
     redis_img: docker.io/omnileads/redis:231125.01
 
-    # --- Activate the OMniLeads Enterprise Edition - with "AAAA" licensed.
+    # --- Activate the OMniLeads Enterprise Edition.
     # --- on the contrary you will deploy OMniLeads OSS Edition with GPLV3 licensed. 
     
     enterprise_edition: false

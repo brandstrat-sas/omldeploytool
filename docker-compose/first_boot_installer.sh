@@ -160,7 +160,8 @@ else
     exit 0
 fi
 
-ln -s ./omldeploytool/docker-compose/oml_manage /usr/bin/
+ln -s ./omldeploytool/docker-compose/oml_manage /usr/local/bin/
+chmod +x /usr/local/bin/oml_manage
 
 if [[ "$env" == "devenv" ]];then
     until curl -sk --head  --request GET https://localhost |grep "302" > /dev/null; do echo "Environment still initializing , sleeping 10 seconds"; sleep 10; done; echo "Environment is up"
