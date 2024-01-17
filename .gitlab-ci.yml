@@ -186,9 +186,8 @@ deploy-aio-cloud-norm:
     - sed -i "346 s/tenant_example_5_app/#tenant_example_5_app/g" ./instances/gitlab/inventory.yml
     - |
       if [ -n "${OMLAPP_IMG}" ]; then
-        echo "OMLAPP_IMG is set to: ${OMLAPP_IMG}"        
-        sed -i "s|\(omnileads_version:.*\)|\1-${OMLAPP_IMG}|" ./instances/gitlab/inventory.yml
-
+        echo "OMLAPP_IMG is set to: ${OMLAPP_IMG}"                
+        sed -i "s|omnileads_img:.*|omnileads_img: ${OMLAPP_IMG}|" ./instances/gitlab/inventory.yml
       fi    
     - sleep 30
     - bash -x deploy.sh --action=install --tenant=gitlab
