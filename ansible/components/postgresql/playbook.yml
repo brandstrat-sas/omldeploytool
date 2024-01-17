@@ -24,10 +24,7 @@
   tags:
     - all_components
     - data
-    - postgres
-    - install
-  vars:
-    img_prometheus_repo: 'docker.io/prometheuscommunity/postgres-exporter'
+    - postgres    
 
   tasks:
 
@@ -39,6 +36,7 @@
         owner: "{{ usuario }}"
         group: "{{ usuario }}"
       tags:
+        - install
         - upgrade
         - update
 
@@ -46,7 +44,8 @@
       template:
         src: "{{ pgsql_repo_path }}templates/postgresql.service"
         dest: /etc/systemd/system/postgresql.service
-      tags:
+      tags: 
+        - install
         - upgrade
         - update
 
@@ -55,6 +54,7 @@
       register: podman_pull
       until: podman_pull is success
       tags:
+        - install
         - upgrade
         - update
 
@@ -65,6 +65,7 @@
         enabled: yes
         daemon_reload: yes
       tags:
+        - install
         - upgrade
         - update
 
@@ -74,6 +75,7 @@
         state: restarted
         daemon_reload: yes
       tags:
+        - install
         - upgrade
         - restart
       when:       
@@ -87,6 +89,7 @@
         owner: "{{ usuario }}"
         group: "{{ usuario }}"
       tags:
+        - install
         - upgrade
 
     - name: POSTGRESQL prometheus Copy systemd file
@@ -94,6 +97,7 @@
         src: "{{ pgsql_repo_path }}templates/prometheus.service"
         dest: /etc/systemd/system/prometheus_postgres.service
       tags:
+        - install
         - upgrade
 
     - name: POSTGRESQL prometheus Pull image
@@ -101,6 +105,7 @@
       register: podman_pull
       until: podman_pull is success
       tags:
+        - install
         - upgrade
 
     - name: POSTGRESQL prometheus Enable and start service
@@ -109,4 +114,5 @@
         state: started
         daemon_reload: yes
       tags:
+        - install
         - upgrade

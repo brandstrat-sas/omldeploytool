@@ -76,6 +76,11 @@ deploy-aio-cloud:
     - sed -i "338 s/tenant_example_5_data/#tenant_example_5_data/g" ./instances/gitlab/inventory.yml
     - sed -i "342 s/tenant_example_5_voice/#tenant_example_5_voice/g" ./instances/gitlab/inventory.yml
     - sed -i "346 s/tenant_example_5_app/#tenant_example_5_app/g" ./instances/gitlab/inventory.yml
+    - |
+      if [ -n "${OMLAPP_IMG}" ]; then
+        echo "OMLAPP_IMG is set to: ${OMLAPP_IMG}"
+        sed -i "s/\(omnileads_version:.*\)/\1-${OMLAPP_IMG}/" ./instances/gitlab/inventory.yml
+      fi    
     - sleep 30
     - bash -x deploy.sh --action=install --tenant=gitlab
     - until curl -sk --head --request GET https://$OML_IPADDR|grep "302" > /dev/null; do echo "Environment still being installed, sleeping 60 seconds"; sleep 60; done; echo "Environment is up"
@@ -179,6 +184,11 @@ deploy-aio-cloud-norm:
     - sed -i "338 s/tenant_example_5_data/#tenant_example_5_data/g" ./instances/gitlab/inventory.yml
     - sed -i "342 s/tenant_example_5_voice/#tenant_example_5_voice/g" ./instances/gitlab/inventory.yml
     - sed -i "346 s/tenant_example_5_app/#tenant_example_5_app/g" ./instances/gitlab/inventory.yml
+    - |
+      if [ -n "${OMLAPP_IMG}" ]; then
+        echo "OMLAPP_IMG is set to: ${OMLAPP_IMG}"
+        sed -i "s/\(omnileads_version:.*\)/\1-${OMLAPP_IMG}/" ./instances/gitlab/inventory.yml
+      fi    
     - sleep 30
     - bash -x deploy.sh --action=install --tenant=gitlab
     - until curl -sk --head --request GET https://$OML_IPADDR|grep "302" > /dev/null; do echo "Environment still being installed, sleeping 60 seconds"; sleep 60; done; echo "Environment is up"
