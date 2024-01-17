@@ -5,8 +5,8 @@
 ######################################################
 
 oml_nic=${NIC}
-# lan_addr=
-# nat_addr=
+lan_addr=${PRIVATE_IP}
+nat_addr=${NAT_IP}
 
 ######################################################
 ###################### STAGE #########################
@@ -24,23 +24,25 @@ branch=${BRANCH}
 ######################################################
 ##### External Object Storage Bucket integration #####
 ######################################################
-# bucket_url=
-# bucket_access_key=
-# bucket_secret_key=
-# bucket_region=
-# bucket_name=
+bucket_url=${BUCKET_URL}
+bucket_access_key=${BUCKET_ACCESS_KEY}
+bucket_secret_key=${BUCKET_SECRET_KEY}
+bucket_region=${BUCKET_REGION}
+bucket_name=${BUCKET_NAME}
 
 # External Wombat Dialer integration
-# dialer_host=
-# dialer_user=
-# dialer_pass=
+dialer_host=${DIALER_HOST}
+dialer_user=${DIALER_USER}
+dialer_pass=${DIALER_PASS}
 
 # External PostgreSQL engine integration
-# postgres_host=
-# postgres_port=
-# postgres_user=
-# postgres_password=
-# postgres_db=
+postgres_host=${PGSQL_HOST}
+postgres_port=${PGSQL_PORT}
+postgres_user=${PGSQL_USER}
+postgres_password=${PGSQL_PASSWORD}
+postgres_db=${PGDATABASE}
+
+################################################################################################
 
 if [[ -z "$lan_addr" ]]; then
     lan_ipv4=$(ip addr show $oml_nic | grep "inet\b" | awk '{print $2}' | cut -d/ -f1)
