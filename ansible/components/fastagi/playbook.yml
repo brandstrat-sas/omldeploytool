@@ -24,7 +24,6 @@
   tags:
     - fastagi
   vars:
-    img_repo: '{{ img_registry_core_url }}/{{ img_registry_core_repo }}/fastagi'
 
   tasks:
 
@@ -50,7 +49,7 @@
       - update
 
   - name: FASTAGI Pull image
-    command: podman pull --quiet {{ img_repo }}:{{ fastagi_version }}
+    command: podman pull --quiet {{ fastagi_img }}
     register: podman_pull
     until: podman_pull is success
     tags:

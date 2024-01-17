@@ -24,8 +24,6 @@
     - all_components
     - kamailio
     - app
-  vars:
-    img_repo: '{{ img_registry_core_url }}/{{ img_registry_core_repo }}/kamailio'
   tasks:
 
     - name: KAMAILIO environment variables for this installation
@@ -49,20 +47,8 @@
         - upgrade
         - update
 
-    # - name: KAMAILIO Copy kamailio.cfg Systemd file
-    #   template:
-    #     src: "{{ kamailio_repo_path }}templates/kamailio.cfg"
-    #     dest: /etc/omnileads/kamailio.cfg
-    #     mode: 664
-    #     owner: "{{ usuario }}"
-    #     group: "{{ usuario }}"
-    #   tags:
-    #     - install
-    #     - upgrade
-    #   when: omnileads_ha is defined
-
     - name: KAMAILIO Pull image
-      command: podman pull --quiet {{ img_repo }}:{{ kamailio_version }}
+      command: podman pull --quiet {{ kamailio_img }}
       register: podman_pull
       until: podman_pull is success
       tags:

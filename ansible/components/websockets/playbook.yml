@@ -21,7 +21,6 @@
     - omnileads_app
     - omnileads_aio
   vars:
-    img_repo: '{{ img_registry_core_url }}/{{ img_registry_core_repo }}/websockets'
     network: omnileads
   tags:
     - all_components
@@ -51,7 +50,7 @@
       - update
 
   - name: WEBSOCKETS Pull image
-    command: podman pull --quiet {{ img_repo }}:{{ websockets_version }}
+    command: podman pull --quiet {{ websockets_img }}
     register: podman_pull
     until: podman_pull is success
     tags:

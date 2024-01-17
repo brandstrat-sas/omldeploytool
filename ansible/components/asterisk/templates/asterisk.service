@@ -27,7 +27,7 @@ ExecStart=/usr/bin/podman run \
   --name=oml-asterisk-server \
   --volume=asterisk_callrec:/var/spool/asterisk/monitor:rw \
   --rm  \
-  {{ img_registry_omlacd_url }}/{{ img_registry_omlacd_repo }}/asterisk:{{ asterisk_version }}
+  {{ asterisk_img }}
 ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
 ExecStopPost=/usr/bin/podman rm -f --ignore --cidfile=%t/%n.ctr-id
 StandardOutput=journal

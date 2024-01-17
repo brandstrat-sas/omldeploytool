@@ -27,7 +27,6 @@
     - postgres
     - install
   vars:
-    img_repo: '{{ container_image_registry }}/{{ postgres_version }}'
     img_prometheus_repo: 'docker.io/prometheuscommunity/postgres-exporter'
 
   tasks:
@@ -52,7 +51,7 @@
         - update
 
     - name: POSTGRESQL Pull image
-      command: podman pull --quiet {{ img_repo }}
+      command: podman pull --quiet {{ postgres_img }}
       register: podman_pull
       until: podman_pull is success
       tags:
@@ -98,7 +97,7 @@
         - upgrade
 
     - name: POSTGRESQL prometheus Pull image
-      command: podman pull --quiet {{ img_prometheus_repo }}
+      command: podman pull --quiet {{ postgres_prometheus_img }}
       register: podman_pull
       until: podman_pull is success
       tags:

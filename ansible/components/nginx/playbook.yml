@@ -25,9 +25,7 @@
     - all_components
     - app
     - nginx
-  vars:
-    img_repo: '{{ img_registry_core_url }}/{{ img_registry_core_repo }}/nginx'
-
+  
   tasks:
 
   - name: NGINX environment variables for this installation
@@ -52,7 +50,7 @@
       - update
 
   - name: NGINX Pull oml-nginx image
-    command: podman pull --quiet {{ img_repo }}:{{ nginx_version }}
+    command: podman pull --quiet {{ nginx_img }}
     register: podman_pull
     until: podman_pull is success
     tags:

@@ -25,8 +25,6 @@
     - all_components
     - minio
     - install
-  vars:
-    img_repo: quay.io/minio/minio
 
   tasks:
 
@@ -50,7 +48,7 @@
       - update
 
   - name: MINIO Pull image
-    command: podman pull --quiet {{ img_repo }}:{{ minio_version }}
+    command: podman pull --quiet {{ minio_img }}
     register: podman_pull
     until: podman_pull is success
     tags:
