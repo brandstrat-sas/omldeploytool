@@ -4,7 +4,7 @@
 ####################  NETWORKING #####################
 ######################################################
 
-oml_nic=
+oml_nic=${NIC}
 # lan_addr=
 # nat_addr=
 
@@ -16,11 +16,10 @@ oml_nic=
 # --- "lan" instance (access through private IP)
 # --- "nat" instance (access through Public NAT IP)    
 # --- or "all" in order to access through all NICs
-
-env=
+env=${ENV}
 
 # --- branch is about specific omnileads release
-# branch=release-1.33.2
+branch=${BRANCH}
 
 ######################################################
 ##### External Object Storage Bucket integration #####
@@ -43,11 +42,11 @@ env=
 # postgres_password=
 # postgres_db=
 
-if [[ -z "${PRIVATE_IP}" ]]; then
+if [[ -z "$lan_addr" ]]; then
     lan_ipv4=$(ip addr show $oml_nic | grep "inet\b" | awk '{print $2}' | cut -d/ -f1)
 fi
 
-if [[ -z "${PUBLIC_IP}" ]]; then
+if [[ -z "$nat_addr" ]]; then
     nat_addr=$(curl http://ipinfo.io/ip)
     #nat_addr=$(curl ifconfig.co)
 fi
