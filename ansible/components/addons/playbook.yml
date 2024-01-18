@@ -23,14 +23,13 @@
     - omnileads_aio
   tags:
     - addons
-  vars:
-    img_repo: '{{ img_registry_omlapp_url }}/{{ img_registry_omlapp_repo }}/survey_worker'
+  vars:    
     INSTALL_PREFIX: "/opt/omnileads"
 
   tasks:
 
   - name: ADDON SURVEY from REDIS to Postgres Pull image
-    command: podman pull --quiet {{ img_repo }}:{{ survey_worker_version }}
+    command: podman pull --quiet {{ survey_worker_img }}
     register: podman_pull
     until: podman_pull is success
     tags:

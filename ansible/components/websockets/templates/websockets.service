@@ -22,7 +22,7 @@ ExecStart=/usr/bin/podman run \
 --name=oml-websockets-server \
 --network=host \
 --log-driver=journald \
-{{ img_registry_core_url }}/{{ img_registry_core_repo }}/websockets:{{ websockets_version }}
+{{ websockets_img }}
 ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
 ExecStopPost=/usr/bin/podman rm -f --ignore --cidfile=%t/%n.ctr-id
 Type=notify

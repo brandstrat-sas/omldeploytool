@@ -24,9 +24,7 @@
   tags:
     - asterisk
     - ami
-  vars:
-    img_repo: '{{ img_registry_core_url }}/{{ img_registry_core_repo }}/astami'
-
+  
   tasks:
 
   - name: AMI environment variables
@@ -51,7 +49,7 @@
       - update
       
   - name: AMI Pull image
-    command: podman pull --quiet {{ img_repo }}:{{ astami_version }}
+    command: podman pull --quiet {{ astami_img }}
     register: podman_pull
     until: podman_pull is success
     tags:
