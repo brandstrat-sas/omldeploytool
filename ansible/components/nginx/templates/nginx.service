@@ -24,7 +24,7 @@ ExecStart=/usr/bin/podman run \
   --volume=django_static:/opt/omnileads/static \
   --volume=django_callrec_zip:/opt/omnileads/asterisk/var/spool/asterisk/monitor \
   --rm  \
-  {{ img_registry_core_url }}/{{ img_registry_core_repo }}/nginx:{{ nginx_version }}
+  {{ nginx_img }}
 ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
 ExecStopPost=/usr/bin/podman rm -f --ignore --cidfile=%t/%n.ctr-id
 Type=notify

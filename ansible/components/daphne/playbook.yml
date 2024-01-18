@@ -24,8 +24,7 @@
   tags:
     - app
     - daphne
-  vars:
-    img_repo: '{{ img_registry_omlapp_url }}/{{ img_registry_omlapp_repo }}/omlapp'
+  vars:    
     INSTALL_PREFIX: "/opt/omnileads"
     
 
@@ -53,7 +52,7 @@
       - update
        
   - name: DAPHNE Pull image
-    command: podman pull --quiet {{ img_repo }}:{{ omnileads_version }}
+    command: podman pull --quiet {{ omnileads_img }}
     register: podman_pull
     until: podman_pull is success
     tags:

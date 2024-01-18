@@ -20,7 +20,7 @@ ExecStart=/usr/bin/podman run \
   --env-file=/etc/default/prometheus_redis.env \
   --name=oml-prometheus-redis \
   --rm  \
-  {{ container_image_registry }}/oliver006/redis_exporter:latest
+ {{ redis_prometheus_img }}
 ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
 ExecStopPost=/usr/bin/podman rm -f --ignore --cidfile=%t/%n.ctr-id
 Type=notify

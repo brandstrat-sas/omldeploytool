@@ -20,7 +20,7 @@ ExecStart=/usr/bin/podman run \
   --env-file=/etc/default/prometheus_postgres.env \
   --name=oml-prometheus-postgres \
   --rm  \
-  {{ container_image_registry }}/prometheuscommunity/postgres-exporter
+  {{ postgres_prometheus_img }}
 ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
 ExecStopPost=/usr/bin/podman rm -f --ignore --cidfile=%t/%n.ctr-id
 Type=notify

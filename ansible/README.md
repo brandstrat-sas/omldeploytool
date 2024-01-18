@@ -785,33 +785,30 @@ Centralized observability.
 In the inventory file you can customize the tags of the images to display, as well as the registry from where to download them.
 
 ```
-# ------------------------------------------------------------------------------------------------ #
-# ---------------------------- Container IMG TAG customization ----------------------------------- #
-# ------------------------------------------------------------------------------------------------ #
+    # ------------------------------------------------------------------------------------------------ #
+    # ---------------------------- Container IMG TAG customization ----------------------------------- #
+    # ------------------------------------------------------------------------------------------------ #
+    
+    # --- For each OML Deploy Tool release, a versioned stack with the latest stable images of each component is maintained on inventory.yml
+    # --- You can combine the versions as you like, also use your own TAGs, using the following TAG version variables
+    
+    omnileads_img: docker.io/omnileads/omlapp:231227.01
+    asterisk_img: docker.io/omnileads/asterisk:240102.01
+    fastagi_img: docker.io/omnileads/fastagi:240104.01
+    astami_img: docker.io/omnileads/astami:231230.01
+    nginx_img: docker.io/omnileads/nginx:240105.01
+    websockets_img: docker.io/omnileads/websockets:231125.01
+    kamailio_img: docker.io/omnileads/kamailio:231125.01
+    rtpengine_img: docker.io/omnileads/rtpengine:231125.01
+    redis_img: docker.io/omnileads/redis:231125.01
 
-# --- For each OML Deploy Tool release, a versioned stack with the latest stable images of each component is maintained on inventory.yml
-# --- You can combine the versions as you like, also use your own TAGs, using the following TAG version variables
-
-omnileads_version: 1.29.0
-asterisk_version: 230703.01
-fastagi_version: 230703.01
-nginx_version: 230215.01    
-websockets_version: 230204.01
-kamailio_version: 230204.01    
-rtpengine_version: 230606.01
-redis_version: 230704.01
-postgres_version: 230624.01
-
-# --- Activate the OMniLeads Enterprise Edition - with "AAAA" licensed.
-# --- on the contrary you will deploy OMniLeads OSS Edition with GPLV3 licensed. 
-enterprise_edition: false
-
-# --- Docker Registry repository
-# --- If you are going to use another registry for the images, you must indicate here
-omlapp_repo: omnileads
+    # --- Activate the OMniLeads Enterprise Edition.
+    # --- on the contrary you will deploy OMniLeads OSS Edition with GPLV3 licensed. 
+    
+    enterprise_edition: false
 ```
 
-## Scalability <a name="#scalability"></a>
+# Scalability <a name="#scalability"></a>
 
 * Asterisk:
 
@@ -840,7 +837,7 @@ scale_uwsgi: true
   threads: 1 
 ```
 
-## Postgres Cluster actions :arrows_clockwise: <a name="cluster_ha_recovery"></a>
+# Postgres Cluster actions :arrows_clockwise: <a name="cluster_ha_recovery"></a>
 
 ### **Recovery Postgres main node**
 
