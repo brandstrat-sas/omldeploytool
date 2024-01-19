@@ -86,6 +86,48 @@ OMLAPP_IMG=omlapp:dev.1002
 Los Addons permiten adicionar y/o complementar a la aplicación web distribuida como GPLV3. Pueden ser distribuidos tanto utilizando 
 licencias open source o restrictivas. 
 
+
+## Simulate calls from/to PSTN
+
+Adittionally with omnileads container is the pstn-emulator, this an emulation of a PSTN provider,
+so you can make calls via Omnileads and have different results of the call based on what you dialed
+as well as generate calls from the command line to OMniLeads inbound routes.
+
+##### Dialplan outbound rules:
+
+* Any number dialed finished with 0: PSTN is going to send you a BUSY signal
+* Any number dialed finished with 1: PSTN is going to answer your call and playback audios
+* Any number dialed finished with 2: PSTN will anwer your call, play short audio then hangup. This will emulate a calle hangup
+* Any number dialed finished with 3: PSTN will answer your call after 35 seconds
+* Any number dialed finished with 5: PSTN will make you wait 120 seconds and then hangup. This will emulate a NO_ANSWER
+* Any number dialed finished with 9: PSTN will simulate a congestion
+
+##### Generate inbound calls to omnileads stack:
+
+```
+./oml_manage --call_generate
+```
+
+This actions will make an inbound call to the default inbound campaign created from testing data. 
+You can attend the call and listen some cool music, then the recordings appear on the recordings search views. 
+
+##### Register your IAX2 softphone to test the stack 
+
+You can register a IAX2 account on pstn-emulator container in order to play with OMniLeads and the softphone you want. 
+
+This are the IAX2 account credentials:
+
+```
+username: 1234567
+secret: omnileads
+domain: YOUR_HOSTNAME
+```
+
+(Change "YOUR_HOSTNAME" with the VM hostname/IPADDR  or localhost)
+
+Then you can send calls to DID 01177660010 to 01177660015, an also send calls from an agent to this IAX2 account phone calling 1234567.
+
+
 ## Configuring wombat dialer
 
 You only need to do this if you are going to work with Predictive Dialer campaigns

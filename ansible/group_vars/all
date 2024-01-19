@@ -15,16 +15,19 @@ fastagi_port: 4573
 postgres_port: 5432
 kamailio_wss_port: 14443
 
-minio_version: RELEASE.2023-09-27T15-22-50Z
-postgres_version: postgres:14.9-bullseye
-nginxcgi_version: 231117.01
-pstn_emulator_version: 231118.01
+minio_img: quay.io/minio/minio:RELEASE.2023-09-27T15-22-50Z
+postgres_img: docker.io/postgres:14.9-bullseye
+postgres_prometheus_img: docker.io/prometheuscommunity/postgres-exporter
+redis_prometheus_img: docker.io/oliver006/redis_exporter:latest
+nginxcgi_img: docker.io/omnileads/nginxqa:231117.01
+pstn_emulator_img: docker.io/omnileads/231118.01
+wombat_img: docker.io/freetechsolutions/wombat:21.06.4-9
+mysql_img: docker.io/bitnami/mariadb:latest
+survey_worker_img: docker.io/omnileads/survey_worker:231201.01
+
 redis_ha_version: develop
 haproxy_version: 2.0-buster
 centos_postgresql_version: 11
-wombat_version: 21.06.4-9
-mysql_version: latest
-survey_worker_version: 231201.01
 
 # (temporal) hay que buildear nueva img, en el repo omnileads y agregar todo al pipeline
 redis2postgres_version: freetechsolutions/omlredis2pgsql:develop
