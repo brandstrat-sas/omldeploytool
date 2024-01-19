@@ -79,7 +79,7 @@ Below are the Firewall rules to be applied on All In One instance:
 
 >  Note: If working on a VPS with a public IP address, it is a mandatory requirement that it also has a network interface with the ability to associate a private IP address.
 
-The first_boot_installer.sh script can be used to deploy to a debian-based clean instance.
+The first_boot_installer.sh script can be used to deploy to a debian-based or red-hat linux clean instance.
 
 For example:
 
@@ -90,45 +90,39 @@ curl -o first_boot_installer.sh -L "https://gitlab.com/omnileads/omldeploytool/-
 Without dialer:
 
 ```
-export BRANCH=main NIC=eth0 ENV=lan && ./first_boot_installer.sh
+export NIC=eth0 ENV=lan && ./first_boot_installer.sh
 ```
 
-With dialer:
+
+#### Desplegar una versión de OMniLeads específica:
+
+Se puede dar el caso de tener que desplegar algun release específico de la App, para ello se peude utilizar el parámetro BRANCH, se puede añadir el parámetro BRANCH=release-1.33.2. 
 
 ```
-export BRANCH=main NIC=eth0 ENV=lan DIALER_HOST=X.X.X.X DIALER_USER=demo DIALER_PASS=demoadmin && ./first_boot_installer.sh
+export BRANCH=release-1.33.2 ENV=cloud && ./first_boot_installer.sh)
+```
+
+#### Ambientes de NAT: 
+
+Se puede dar el caso de tener que desplegar la App detrás de algún tipo de NAT en el cual deseamos advertir la dirección IP con la cual van a atravesar el NAT de manera explicita, se puede añadir el parámetro NAT_IPV4=xxx.xxx.xxx or NAT_IPV4=tenant.example.com. En caso de no espeficar una IP de NAT, el script va a resolver asignar la IP pública que se autotecta utilizando curl.
+
+```
+export NIC=ens5 ENV=nat NAT_IPV4=182.333.20.12 && ./first_boot_installer.sh)
+```
+
+#### Desplegar con la integración con Wombat Dialer 
+
+```
+export  NIC=eth0 ENV=lan DIALER_HOST=X.X.X.X DIALER_USER=demo DIALER_PASS=demoadmin && ./first_boot_installer.sh
 ```
 
 You must to specify the private ipv4 NIC and scenario (ENV) we'll be working with, which will be cloud if we're working on a VPS (cloud), and lan if we're using an on-premise Virtual Machine (lan).
 The BUCKE_NAME=NULL is necesary in order to work with the minio (localhost) object storage.
 
-If we look at the .env file, we will see that the variables corresponding to the hostname of each component have been modified:
+You can invoke the docker-compose with:
 
 ```
-DJANGO_HOSTNAME=localhost
-DAPHNE_HOSTNAME=localhost
-ASTERISK_HOSTNAME=$PRIVATE_IPV4
-WEBSOCKET_HOSTNAME=localhosts
-WEBSOCKET_REDIS_HOSTNAME=redis://localhost:6379
-PGHOST=localhost
-OMNILEADS_HOSTNAME=$PRIVATE_IPV4
-RTPENGINE_HOSTNAME=$PRIVATE_IPV4
-REDIS_HOSTNAME=localhost
-KAMAILIO_HOSTNAME=localhost
-```
-
-depending on the scenario (lan or cloud), the .env in terms of bucket, should look like this:
-
-if ENV=lan:
-```
-S3_ENDPOINT=https://$PRIVATE_IPV4
-S3_ENDPOINT_MINIO=http://localhost:9000
-```
-
-if ENV=cloud:
-```
-S3_ENDPOINT=https://$PUBLIC_IPV4 or S3_ENDPOINT=https://$FQDN
-S3_ENDPOINT_MINIO=http://localhost:9000
+$ docker-compose -f docker-compose_prod.yml up -d
 ```
 
 You can invoke the docker-compose with:
@@ -139,7 +133,7 @@ $ docker-compose -f docker-compose_prod.yml up -d
 
 ![Diagrama deploy tool](../ansible/png/deploy-tool-tenant-compose-vps.png)
 
-### **Onpremise Virtual Machine and VPS Cloud deploy with external bucket**
+### **Onpremise Virtual Machine and VPS Cloud deploy with external bucket & postgres DB**
 
 >  Note: If working on a VPS with a public IP address, it is a mandatory requirement that it also has a network interface with the ability to associate a private IP address.
 

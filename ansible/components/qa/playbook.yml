@@ -26,16 +26,12 @@
     - aio
     - qa
   vars:
-    img_repo_pstn: '{{ img_registry_core_url }}/omnileads/pstn_emulator'
-    img_repo_nginx_qa: '{{ img_registry_core_url }}/omnileads/nginxqa'
-    img_repo_mysql: '{{ img_registry_core_url }}/bitnami/mariadb'
-    img_repo_wombat: '{{ img_registry_core_url }}/freetechsolutions/wombat'
     INSTALL_PREFIX: "/opt/omnileads"
 
   tasks:
 
   - name: QA PSTN_EULATOR Pull image
-    command: podman pull --quiet {{ img_repo_pstn }}:{{ pstn_emulator_version }}
+    command: podman pull --quiet {{ pstn_emulator_img }}
     register: podman_pull
     until: podman_pull is success
     tags:
@@ -72,7 +68,7 @@
       - upgrade
 
   - name: QA NGINX_CGI Pull image
-    command: podman pull --quiet {{ img_repo_nginx_qa }}:{{ nginxcgi_version }}
+    command: podman pull --quiet {{ nginxcgi_img }}
     register: podman_pull
     until: podman_pull is success
     tags:
@@ -114,7 +110,7 @@
       - install
 
   - name: QA WOMBAT Pull image
-    command: podman pull --quiet {{ img_repo_wombat }}:{{ wombat_version }}
+    command: podman pull --quiet {{ wombat_img }}
     register: podman_pull
     until: podman_pull is success
     tags:
@@ -151,7 +147,7 @@
       - upgrade
 
   - name: QA MYSQL Pull image
-    command: podman pull --quiet {{ img_repo_mysql }}:{{ mysql_version }}
+    command: podman pull --quiet {{ mysql_img }}
     register: podman_pull
     until: podman_pull is success
     tags:

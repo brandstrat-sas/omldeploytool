@@ -27,7 +27,6 @@
     - app
     - django
   vars:
-    img_repo: '{{ img_registry_omlapp_url }}/{{ img_registry_omlapp_repo }}/omlapp'
     INSTALL_PREFIX: "/opt/omnileads"
 
   tasks:
@@ -54,7 +53,7 @@
       - update
     
   - name: DJANGO Pull image
-    command: podman pull --quiet {{ img_repo }}:{{ omnileads_version }}
+    command: podman pull --quiet {{ omnileads_img }}
     register: podman_pull
     until: podman_pull is success
     tags:
@@ -78,7 +77,7 @@
       - postgres_out == true
 
   - name: DJANGO run migrations collectstatic & others commands
-    shell: "podman run --network=host --env-file /etc/default/django.env --volume=django_static:/opt/omnileads/static  {{ img_repo }}:{{ omnileads_version }} /opt/omnileads/bin/django_commands.sh"
+    shell: "podman run --network=host --env-file /etc/default/django.env --volume=django_static:/opt/omnileads/static  {{ omnileads_img }} /opt/omnileads/bin/django_commands.sh"
     tags:
       - install
       - upgrade
@@ -93,7 +92,7 @@
       - install
 
   - name: DJANGO reset admin pass
-    shell: "podman run --network=host --env-file /etc/default/django.env --volume=django_static:/opt/omnileads/static  {{ img_repo }}:{{ omnileads_version }} python /opt/omnileads/ominicontacto/manage.py cambiar_admin_password"
+    shell: "podman run --network=host --env-file /etc/default/django.env --volume=django_static:/opt/omnileads/static  {{ omnileads_img }} python /opt/omnileads/ominicontacto/manage.py cambiar_admin_password"
     tags:
       - install
 

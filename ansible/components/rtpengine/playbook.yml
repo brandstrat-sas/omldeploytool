@@ -26,8 +26,6 @@
     - all_components
     - voice
     - rtpengine
-  vars:
-    img_repo: '{{ img_registry_core_url }}/{{ img_registry_core_repo }}/rtpengine'
   tasks:
 
   - name: RTPENGINE Set environment variables
@@ -52,7 +50,7 @@
       - update
 
   - name: RTPENGINE Pull image
-    command: podman pull --quiet {{ img_repo }}:{{ rtpengine_version }}
+    command: podman pull --quiet {{ rtpengine_img }}
     register: podman_pull
     until: podman_pull is success
     tags:

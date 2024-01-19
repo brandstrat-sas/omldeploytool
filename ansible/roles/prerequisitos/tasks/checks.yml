@@ -428,70 +428,70 @@
 #   when: application_host is not defined and assert_application_host.rc == 1
 #   tags: always
 
-- name: CHECKS Check if omnileads_version variable is defined
+- name: CHECKS Check if omnileads_img variable is defined
   fail:
-    msg: omnileads_version variable undefined, edit voice_host variable in inventory file
-  when: omnileads_version is not defined and assert_omnileads_version.rc == 1
+    msg: omnileads_img variable undefined, edit voice_host variable in inventory file
+  when: omnileads_img is not defined and assert_omnileads_img.rc == 1
   tags: 
     - install
     - upgrade
     - update
 
 
-- name: CHECKS Check if websockets_version variable is defined
+- name: CHECKS Check if websockets_img variable is defined
   fail:
-    msg: websockets_version variable undefined, edit voice_host variable in inventory file
-  when: websockets_version is not defined and assert_websockets_version.rc == 1
+    msg: websockets_img variable undefined, edit voice_host variable in inventory file
+  when: websockets_img is not defined and assert_websockets_img.rc == 1
   tags: 
     - install
     - upgrade
     - update
 
 
-- name: CHECKS Check if nginx_version variable is defined
+- name: CHECKS Check if nginx_img variable is defined
   fail:
-    msg: nginx_version variable undefined, edit voice_host variable in inventory file
-  when: nginx_version is not defined and assert_nginx_version.rc == 1
+    msg: nginx_img variable undefined, edit voice_host variable in inventory file
+  when: nginx_img is not defined and assert_nginx_img.rc == 1
   tags: 
     - install
     - upgrade
     - update
 
 
-- name: CHECKS Check if kamailio_version variable is defined
+- name: CHECKS Check if kamailio_img variable is defined
   fail:
-    msg: kamailio_version variable undefined, edit voice_host variable in inventory file
-  when: kamailio_version is not defined and assert_kamailio_version.rc == 1
+    msg: kamailio_img variable undefined, edit voice_host variable in inventory file
+  when: kamailio_img is not defined and assert_kamailio_img.rc == 1
   tags: 
     - install
     - upgrade
     - update
 
 
-- name: CHECKS Check if asterisk_version variable is defined
+- name: CHECKS Check if asterisk_img variable is defined
   fail:
-    msg: asterisk_version variable undefined, edit voice_host variable in inventory file
-  when: asterisk_version is not defined and assert_asterisk_version.rc == 1
+    msg: asterisk_img variable undefined, edit voice_host variable in inventory file
+  when: asterisk_img is not defined and assert_asterisk_img.rc == 1
   tags: 
     - install
     - upgrade
     - update
 
 
-- name: CHECKS Check if rtpengine_version variable is defined
+- name: CHECKS Check if rtpengine_img variable is defined
   fail:
-    msg: rtpengine_version variable undefined, edit voice_host variable in inventory file
-  when: rtpengine_version is not defined and assert_rtpengine_version.rc == 1
+    msg: rtpengine_img variable undefined, edit voice_host variable in inventory file
+  when: rtpengine_img is not defined and assert_rtpengine_img.rc == 1
   tags: 
     - install
     - upgrade
     - update
 
 
-- name: CHECKS Check if postgres_version variable is defined
+- name: CHECKS Check if postgres_img variable is defined
   fail:
-    msg: postgres_version variable undefined, edit voice_host variable in inventory file
-  when: postgres_version is not defined and assert_postgres_version.rc == 1
+    msg: postgres_img variable undefined, edit voice_host variable in inventory file
+  when: postgres_img is not defined and assert_postgres_img.rc == 1
   tags: 
     - install
     - upgrade

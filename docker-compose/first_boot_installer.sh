@@ -1,24 +1,57 @@
 #!/bin/bash
 
+######################################################
+####################  NETWORKING #####################
+######################################################
+
 oml_nic=${NIC}
+lan_addr=${PRIVATE_IP}
+nat_addr=${NAT_IP}
+
+######################################################
+###################### STAGE #########################
+######################################################
+
+# --- "cloud" instance (access through public IP)
+# --- "lan" instance (access through private IP)
+# --- "nat" instance (access through Public NAT IP)    
+# --- or "all" in order to access through all NICs
 env=${ENV}
+
+# --- branch is about specific omnileads release
 branch=${BRANCH}
+
+######################################################
+##### External Object Storage Bucket integration #####
+######################################################
 bucket_url=${BUCKET_URL}
 bucket_access_key=${BUCKET_ACCESS_KEY}
 bucket_secret_key=${BUCKET_SECRET_KEY}
 bucket_region=${BUCKET_REGION}
 bucket_name=${BUCKET_NAME}
+
+# External Wombat Dialer integration
 dialer_host=${DIALER_HOST}
 dialer_user=${DIALER_USER}
 dialer_pass=${DIALER_PASS}
+
+# External PostgreSQL engine integration
 postgres_host=${PGSQL_HOST}
 postgres_port=${PGSQL_PORT}
 postgres_user=${PGSQL_USER}
 postgres_password=${PGSQL_PASSWORD}
 postgres_db=${PGDATABASE}
 
-PRIVATE_IPV4=$(ip addr show $oml_nic | grep "inet\b" | awk '{print $2}' | cut -d/ -f1)
-PUBLIC_IPV4=$(curl ifconfig.co)
+################################################################################################
+
+if [[ -z "$lan_addr" ]]; then
+    lan_ipv4=$(ip addr show $oml_nic | grep "inet\b" | awk '{print $2}' | cut -d/ -f1)
+fi
+
+if [[ -z "$nat_addr" ]]; then
+    nat_addr=$(curl http://ipinfo.io/ip)
+    #nat_addr=$(curl ifconfig.co)
+fi
 
 # Obtener el ID de la distribución del sistema operativo
 if [ -f /etc/os-release ]; then
@@ -66,15 +99,15 @@ cp env .env
 
 sed -i "s/ENV=devenv/ENV=$env/g" .env
 sed -i "s/DJANGO_HOSTNAME=app/DJANGO_HOSTNAME=localhost/g" .env
-sed -i "s/PUBLIC_IP=/PUBLIC_IP=$PUBLIC_IPV4/g" .env
+sed -i "s/PUBLIC_IP=/PUBLIC_IP=$nat_addr/g" .env
 sed -i "s/DAPHNE_HOSTNAME=channels/DAPHNE_HOSTNAME=localhost/g" .env
-sed -i "s/ASTERISK_HOSTNAME=acd/ASTERISK_HOSTNAME=$PRIVATE_IPV4/g" .env
-sed -i "s/FASTAGI_HOSTNAME=fastagi/FASTAGI_HOSTNAME=$PRIVATE_IPV4/g" .env
+sed -i "s/ASTERISK_HOSTNAME=acd/ASTERISK_HOSTNAME=$lan_ipv4/g" .env
+sed -i "s/FASTAGI_HOSTNAME=fastagi/FASTAGI_HOSTNAME=$lan_ipv4/g" .env
 sed -i "s/WEBSOCKET_HOSTNAME=websockets/WEBSOCKET_HOSTNAME=localhost/g" .env
 sed -i "s/KAMAILIO_HOSTNAME=kamailio/KAMAILIO_HOSTNAME=localhost/g" .env
-sed -i "s/OMNILEADS_HOSTNAME=nginx/OMNILEADS_HOSTNAME=$PRIVATE_IPV4/g" .env
+sed -i "s/OMNILEADS_HOSTNAME=nginx/OMNILEADS_HOSTNAME=$lan_ipv4/g" .env
 sed -i "s/^REDIS_HOSTNAME=redis/REDIS_HOSTNAME=localhost/g" .env
-sed -i "s/RTPENGINE_HOSTNAME=rtpengine/RTPENGINE_HOSTNAME=$PRIVATE_IPV4/g" .env
+sed -i "s/RTPENGINE_HOSTNAME=rtpengine/RTPENGINE_HOSTNAME=$lan_ipv4/g" .env
 sed -i "s/redis:6379/localhost:6379/g" .env
 
 if [ ! -z "$dialer_host" ];then
@@ -86,11 +119,11 @@ fi
 # AIO 
 if [[ -z "$bucket_url" && -z "$postgres_host" ]]; then
     if [[ "$env" == "cloud" ]];then
-        sed -i "s%\S3_ENDPOINT=https://localhost%S3_ENDPOINT=https://$PUBLIC_IPV4%g" .env
+        sed -i "s%\S3_ENDPOINT=https://localhost%S3_ENDPOINT=https://$nat_addr%g" .env
     elif [[ "$env" == "lan" ]];then    
-        sed -i "s%\S3_ENDPOINT=https://localhost%S3_ENDPOINT=https://$PRIVATE_IPV4%g" .env
+        sed -i "s%\S3_ENDPOINT=https://localhost%S3_ENDPOINT=https://$lan_ipv4%g" .env
     elif [[ "$env" == "nat" ]];then    
-        sed -i "s%\S3_ENDPOINT=https://localhost%S3_ENDPOINT=https://$PRIVATE_IPV4%g" .env
+        sed -i "s%\S3_ENDPOINT=https://localhost%S3_ENDPOINT=https://$nat_addr%g" .env
     fi    
     sed -i "s/minio:9000/localhost:9000/g" .env
     sed -i "s/PGHOST=postgresql/PGHOST=localhost/g" .env
@@ -127,14 +160,15 @@ else
     exit 0
 fi
 
-ln -s ./omldeploytool/docker-compose/oml_manage /usr/bin/
+ln -s ./omldeploytool/docker-compose/oml_manage /usr/local/bin/
+chmod +x /usr/local/bin/oml_manage
 
 if [[ "$env" == "devenv" ]];then
     until curl -sk --head  --request GET https://localhost |grep "302" > /dev/null; do echo "Environment still initializing , sleeping 10 seconds"; sleep 10; done; echo "Environment is up"
 elif [[ "$env" == "lan" ]];then
-    until curl -sk --head  --request GET https://$PRIVATE_IPV4 |grep "302" > /dev/null; do echo "Environment still initializing , sleeping 10 seconds"; sleep 10; done; echo "Environment is up"
+    until curl -sk --head  --request GET https://$lan_ipv4 |grep "302" > /dev/null; do echo "Environment still initializing , sleeping 10 seconds"; sleep 10; done; echo "Environment is up"
 else
-    until curl -sk --head  --request GET https://$PUBLIC_IPV4 |grep "302" > /dev/null; do echo "Environment still initializing , sleeping 10 seconds"; sleep 10; done; echo "Environment is up"
+    until curl -sk --head  --request GET https://$nat_addr |grep "302" > /dev/null; do echo "Environment still initializing , sleeping 10 seconds"; sleep 10; done; echo "Environment is up"
 fi
 
 ./oml_manage --reset_pass
