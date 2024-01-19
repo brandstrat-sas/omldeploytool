@@ -125,6 +125,12 @@ You can invoke the docker-compose with:
 $ docker-compose -f docker-compose_prod.yml up -d
 ```
 
+You can invoke the docker-compose with:
+
+```
+$ docker-compose -f docker-compose_prod.yml up -d
+```
+
 ![Diagrama deploy tool](../ansible/png/deploy-tool-tenant-compose-vps.png)
 
 ### **Onpremise Virtual Machine and VPS Cloud deploy with external bucket & postgres DB**
