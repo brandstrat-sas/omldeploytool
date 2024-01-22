@@ -41,7 +41,6 @@
   command: setenforce 0
   tags:
     - install
-    - upgrade
   when: ansible_facts['distribution'] == "Rocky" or ansible_facts['distribution'] == "AlmaLinux"  or ansible_facts['distribution'] == "CentOS"
   ignore_errors: yes
   

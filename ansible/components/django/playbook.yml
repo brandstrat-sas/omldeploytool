@@ -92,7 +92,7 @@
       - install
 
   - name: DJANGO reset admin pass
-    shell: "podman run --network=host --env-file /etc/default/django.env --volume=django_static:/opt/omnileads/static  {{ omnileads_img }} python /opt/omnileads/ominicontacto/manage.py cambiar_admin_password"
+    shell: "podman run --network=host --env-file /etc/default/django.env {{ omnileads_img }} python /opt/omnileads/ominicontacto/manage.py cambiar_admin_password"
     tags:
       - install
 

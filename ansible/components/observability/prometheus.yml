@@ -46,11 +46,9 @@
       - upgrade
 
   - name: OBSERVABILITY Prometheus Pull image
-    command: podman pull --quiet '{{ container_image_registry }}/{{ item }}'
+    command: podman pull --quiet '{{ prometheus_img }}'
     register: podman_pull
     until: podman_pull is success
-    with_items:
-      - prom/prometheus:latest
     tags:
       - install
       - upgrade

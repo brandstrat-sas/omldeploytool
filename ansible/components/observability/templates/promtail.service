@@ -23,7 +23,7 @@ ExecStart=/usr/bin/podman run \
   --volume=/etc/machine-id:/etc/machine-id \
   --name=promtail-server \
   --rm  \
-  docker.io/grafana/promtail -config.file=/etc/default/promtail.yml -config.expand-env=true
+  {{ promtail_img }} -config.file=/etc/default/promtail.yml -config.expand-env=true
 
 ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
 ExecStopPost=/usr/bin/podman rm -f --ignore --cidfile=%t/%n.ctr-id
