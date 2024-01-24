@@ -304,7 +304,6 @@
         dest: '{{ pg_lib_location }}/pg_hba.conf'
         contype: local
         users: repmgr
-        source:
         databases: repmgr
         method: trust
       when: omnileads_ha is defined
@@ -323,8 +322,7 @@
       postgresql_pg_hba:
         dest: '{{ pg_lib_location }}/pg_hba.conf'
         contype: local
-        users: repmgr
-        source:
+        users: repmgr        
         databases: replication
         method: trust
       when: omnileads_ha is defined
@@ -334,7 +332,6 @@
         dest: '{{ pg_lib_location }}/pg_hba.conf'
         contype: local
         users: all
-        source:
         databases: replication
         method: peer
       when: omnileads_ha is defined

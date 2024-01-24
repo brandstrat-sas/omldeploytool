@@ -76,11 +76,23 @@
       - upgrade_from_oml_1 is not defined 
       - postgres_out == true
 
+  - name: DJANGO run migrations collectstatic & others commands HA scenary
+    shell: "podman run --network=host --env-file /etc/default/django.env --volume=django_static:/opt/omnileads/static  {{ omnileads_img }} /opt/omnileads/bin/django_commands.sh"
+    tags:
+      - install
+      - upgrade
+    when:       
+      - inventory_hostname in groups['omnileads_aio']  
+      - omnileads_ha is defined  
+      - ha_rol == "main"
+  
   - name: DJANGO run migrations collectstatic & others commands
     shell: "podman run --network=host --env-file /etc/default/django.env --volume=django_static:/opt/omnileads/static  {{ omnileads_img }} /opt/omnileads/bin/django_commands.sh"
     tags:
       - install
       - upgrade
+    when:       
+      - omnileads_ha is not defined  
 
   - name: DJANGO Enable and start systemd UWSGI service
     systemd:
