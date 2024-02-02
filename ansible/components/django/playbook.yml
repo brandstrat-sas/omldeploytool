@@ -76,8 +76,8 @@
       - upgrade_from_oml_1 is not defined 
       - postgres_out == true
 
-  - name: DJANGO run migrations collectstatic & others commands HA scenary
-    shell: "podman run --network=host --env-file /etc/default/django.env --volume=django_static:/opt/omnileads/static  {{ omnileads_img }} /opt/omnileads/bin/django_commands.sh"
+  - name: DJANGO run migrations HA scenary
+    shell: "podman run --network=host --env-file /etc/default/django.env --volume=django_static:/opt/omnileads/static  {{ omnileads_img }} /opt/omnileads/bin/django_migrations.sh"
     tags:
       - install
       - upgrade
@@ -86,13 +86,19 @@
       - omnileads_ha is defined  
       - ha_rol == "main"
   
-  - name: DJANGO run migrations collectstatic & others commands
-    shell: "podman run --network=host --env-file /etc/default/django.env --volume=django_static:/opt/omnileads/static  {{ omnileads_img }} /opt/omnileads/bin/django_commands.sh"
+  - name: DJANGO run migrations 
+    shell: "podman run --network=host --env-file /etc/default/django.env --volume=django_static:/opt/omnileads/static  {{ omnileads_img }} /opt/omnileads/bin/django_migrations.sh"
     tags:
       - install
       - upgrade
     when:       
       - omnileads_ha is not defined  
+
+  - name: DJANGO run collect static files
+    shell: "podman run --network=host --env-file /etc/default/django.env --volume=django_static:/opt/omnileads/static  {{ omnileads_img }} /opt/omnileads/bin/django_collectstatic.sh"
+    tags:
+      - install
+      - upgrade
 
   - name: DJANGO Enable and start systemd UWSGI service
     systemd:
@@ -103,11 +109,22 @@
     tags:
       - install
 
+  - name: DJANGO reset admin pass HA scenary
+    shell: "podman run --network=host --env-file /etc/default/django.env {{ omnileads_img }} python /opt/omnileads/ominicontacto/manage.py cambiar_admin_password"
+    tags:
+      - install
+    when:       
+      - inventory_hostname in groups['omnileads_aio']  
+      - omnileads_ha is defined  
+      - ha_rol == "main"  
+
   - name: DJANGO reset admin pass
     shell: "podman run --network=host --env-file /etc/default/django.env {{ omnileads_img }} python /opt/omnileads/ominicontacto/manage.py cambiar_admin_password"
     tags:
       - install
-
+    when:       
+      - omnileads_ha is not defined  
+    
   - name: DJANGO Restart systemd UWSGI service
     systemd:
       name: omnileads.service
