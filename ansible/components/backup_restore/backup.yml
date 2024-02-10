@@ -32,7 +32,7 @@
         file_timestamp: "{{ ansible_date_time.epoch }}"
 
     - name: BACKUP postgres DB selfhosted bucket cluster
-      shell: "podman run --name pgsql_bk_{{ file_timestamp }} --network=host --env-file /etc/default/django.env -e BACKUP_FILENAME=pgsql-backup-{{ file_timestamp }}.sql {{ omnileads_img }} bash -x /opt/omnileads/bin/init_pgsql_backup.sh"
+      shell: "podman run --name pgsql_bk_{{ file_timestamp }} --network=host --env-file /etc/default/django.env -e BACKUP_FILENAME=pgsql-backup-{{ file_timestamp }}.sql --rm {{ omnileads_img }} bash -x /opt/omnileads/bin/init_pgsql_backup.sh"
       when:
         - inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_aio']
             

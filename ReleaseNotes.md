@@ -19,13 +19,13 @@
 # OMniLeads Component versions
 
 ```
-    omnileads_version: 240117.01
-    asterisk_version: 240102.01 
-    fastagi_version: 240104.01 
-    astami_version: 231230.01
-    nginx_version: 240105.01 
-    websockets_version: 231125.01
-    kamailio_version: 231125.01
-    rtpengine_version: 231125.01
-    redis_version: 231125.01
+    omnileads_img: docker.io/omnileads/omlapp:240117.01
+    asterisk_img: docker.io/omnileads/asterisk:240102.01
+    fastagi_img: docker.io/omnileads/fastagi:240104.01
+    astami_img: docker.io/omnileads/astami:231230.01
+    nginx_img: docker.io/omnileads/nginx:240105.01
+    websockets_img: docker.io/omnileads/websockets:231125.01
+    kamailio_img: docker.io/omnileads/kamailio:231125.01
+    rtpengine_img: docker.io/omnileads/rtpengine:231125.01
+    redis_img: docker.io/omnileads/redis:231125.01
 ```

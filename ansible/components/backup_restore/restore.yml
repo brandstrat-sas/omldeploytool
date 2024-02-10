@@ -61,7 +61,7 @@
     #   delay: 10
 
     - name: RESTORE postgres DB pg_restore
-      shell: "podman run --name pgsql_bk_{{ restore_file_timestamp }} --network=host --env-file /etc/default/django.env -e BACKUP_FILENAME=pgsql-backup-{{ restore_file_timestamp }}.sql {{ omnileads_img }} bash -x /opt/omnileads/bin/init_pgsql_restore.sh"
+      shell: "podman run --name pgsql_bk_{{ restore_file_timestamp }} --network=host --env-file /etc/default/django.env -e BACKUP_FILENAME=pgsql-backup-{{ restore_file_timestamp }}.sql --rm {{ omnileads_img }} bash -x /opt/omnileads/bin/init_pgsql_restore.sh"
       when:
         - inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_aio']
         - container_orchest == "systemd"
@@ -97,9 +97,6 @@
         - container_orchest == "systemd"
         - bucket_url is defined
         - bucket_ssl_selfsigned is defined
-
-    # - name: RESTORE DJANGO run migrations collectstatic & others commands
-    #   shell: "podman run --network=host --env-file /etc/default/django.env --volume=django_static:/opt/omnileads/static  {{ omnileads_img }} /opt/omnileads/bin/django_commands.sh"
 
     - name: RESTORE DJANGO Restart systemd service
       systemd:

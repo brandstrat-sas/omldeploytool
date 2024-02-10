@@ -89,12 +89,12 @@
       state: started
       enabled: yes
       daemon_reload: yes
-    when: 
-      - omnileads_ha is defined  
-      - ha_rol == "main"
     tags:
       - install
       - upgrade
+    when: 
+      - omnileads_ha is defined  
+      - ha_rol == "main"    
 
   - name: CRON Crones Restart systemd service
     systemd:
