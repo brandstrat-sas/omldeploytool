@@ -269,7 +269,7 @@ all:
     #restore_bucket: 
 
     ha_notification_email: mr_robot@mr_robot.com
-
+    
     # ------------------------------------------------------------------------------------------------ #
     # ------------------------------------ Scale tunnings -------------------------------------------- #
     # ------------------------------------------------------------------------------------------------ #
@@ -283,15 +283,15 @@ all:
     #pjsip_threadpool_max_size: 150
 
     # ------------------------------------------------------------------------------------------------ #
-    # ------------------------------------ Backup & Restore ------------------------------------------ #
+    # ------------------------------------ Upgrade from OML 1.X--------------------------------------- #
+    # ------------------------------------ Restore filename ------------------------------------------ #
     # ------------------------------------------------------------------------------------------------ #
 
     # --- Restore filename id, request by restore filename
     #restore_file_timestamp: 1681215859
-    # Backup / Restore centralized Bucket
-    # br_bucket_url: https://sfo3.digitaloceanspaces.com
-    # br_bucket_access_key: Hghjkdghjkdhasjdasdsada
-    # br_bucket_secret_key: jknkjhkjh4523kjhcksjdhkjfdhKJHHKJGKJh786876876NBVJHB
+    
+    # Uncomment in case of upgrading from OML 1.X
+    #upgrade_from_oml_1: true
     
     # ------------------------------------------------------------------------------------------------ #
     # ---------------------------- Container IMG TAG customization ----------------------------------- #
@@ -300,7 +300,7 @@ all:
     # --- For each OML Deploy Tool release, a versioned stack with the latest stable images of each component is maintained on inventory.yml
     # --- You can combine the versions as you like, also use your own TAGs, using the following TAG version variables
     
-    omnileads_img: docker.io/omnileads/omlapp:240117.01
+    omnileads_img: docker.io/freetechsolutions/omlapp:240201.01
     asterisk_img: docker.io/omnileads/asterisk:240102.01
     fastagi_img: docker.io/omnileads/fastagi:240104.01
     astami_img: docker.io/omnileads/astami:231230.01
