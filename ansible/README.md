@@ -893,6 +893,18 @@ Once the URL is available with the App returning the login view,  we can log in 
 oml_manage --reset_pass
 ```
 
+## OMniLeads Enterprise
+
+What is OMniLeads Enterprise?
+
+It is an additional layer with complementary modules to OMniLeads Community (GPLV3). It includes functionalities such as advanced reports, wallboards, and automated satisfaction surveys implemented as modules.
+
+This version can be implemented simply by referencing the image for the container that implements the web application.
+Therefore, in our "inventory.yml" variable file, we must invoke the enterprise imag e. To do this, we add the string "-enterprise" to the end of the tag that describes the image of the omnileads_img component:
+
+```
+omnileads_img: docker.io/your_registry/omlapp:231227.01-enterprise
+```
 
 # Postgres Cluster actions :arrows_clockwise: <a name="cluster_ha_recovery"></a>
 

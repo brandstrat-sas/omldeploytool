@@ -12,6 +12,7 @@
 
 ## Removed
 
+* oml-463 [ANSIBLE] Now it is possible to migrate to Omnileads Enterprise without inventory.yml flag "enterprise_edition:"
 
 ## OMniLeads Component versions
 
