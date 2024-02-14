@@ -1,25 +1,25 @@
-# Release Notes - OMniLeads 1.33.2
-[2024-01-18]
+# Release Notes - OMniLeads 1.33.3
+[2024-02-16]
 
 ## Added
 
+* oml-463 [DOCKER] Now it is possible to migrate to Omnileads Enterprise without editing the docker-compose YAML file.
 
 ## Improvements
 
-* oml-460 [ANSIBLE]: Images for each component are now referenced using the syntax: url_registry/repo/component:tag (for example: docker.io/omnileads/omlapp:231227.01).
+* oml-463 [ANSIBLE] --rm flag added to the podman run commands launching backup & django playbooks.
+* oml-463 [WEB] Startup scripts for the web app (django commands) have been modified.
+* oml-463 [ANSIBLE] Order changed in the failover actions script (aio_transitions.sh).
+* oml-463 [ANSIBLE] Django playbook for deploying in HA.
 
 ## Fixed
 
-* oml-2555 [WEB]: Fixed an error when rescheduling a contact previously qualified by another agent.
-* oml-460 [DEPLOY]: Added the "NAT" scenario to the deployment with first_boot_installer.sh (docker-compose).
-
 ## Removed
 
-
-# OMniLeads Component versions
+## OMniLeads Component versions
 
 ```
-    omnileads_img: docker.io/omnileads/omlapp:240117.01
+    omnileads_img: docker.io/omnileads/omlapp:240201.01
     asterisk_img: docker.io/omnileads/asterisk:240102.01
     fastagi_img: docker.io/omnileads/fastagi:240104.01
     astami_img: docker.io/omnileads/astami:231230.01
