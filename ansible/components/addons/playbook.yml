@@ -36,7 +36,6 @@
       - install
       - upgrade
       - update
-    when: enterprise_edition == true
 
   - name: ADDON SURVEY Copy REDIS2POSTGRES systemd service
     template:
@@ -46,7 +45,6 @@
       - install
       - upgrade
       - update
-    when: enterprise_edition == true
 
   - name: ADDON SURVEY Redis2Postgres Enable and start systemd service
     systemd:
@@ -58,4 +56,3 @@
       - install
       - upgrade
       - restart
-    when: enterprise_edition == true    

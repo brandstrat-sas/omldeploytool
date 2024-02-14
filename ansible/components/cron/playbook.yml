@@ -70,24 +70,11 @@
       - install
       - upgrade
 
-  - name: CRON Crones Restart systemd service
-    systemd:
-      name: omlcron.service
-      state: restarted
-      enabled: yes
-      daemon_reload: yes    
-    tags:
-      - restart
-      - upgrade
-    when: 
-      - omnileads_ha is not defined  
-      - inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_aio']  
-      
   - name: CRON Crones Enable and start systemd service HA cluster
     systemd:
       name: omlcron.service
       state: started
-      enabled: yes
+      enabled: no
       daemon_reload: yes
     tags:
       - install
@@ -101,11 +88,22 @@
       name: omlcron.service
       state: restarted
       enabled: yes
+      daemon_reload: yes    
+    tags:
+      - restart
+      - upgrade
+    when: 
+      - omnileads_ha is not defined  
+
+  - name: CRON Crones Restart systemd service HA scenary
+    systemd:
+      name: omlcron.service
+      state: restarted
+      enabled: no
       daemon_reload: yes
     tags:
       - upgrade
       - restart
-    when:       
-      - inventory_hostname in groups['omnileads_aio']  
+    when:         
       - omnileads_ha is defined  
       - ha_rol == "main"

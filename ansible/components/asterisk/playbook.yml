@@ -66,7 +66,22 @@
     tags:
       - install
       - upgrade
-    
+    when:       
+      - omnileads_ha is not defined
+
+  - name: ASTERISK Enable and start systemd service HA scenary
+    systemd:
+      name: asterisk.service
+      state: started
+      enabled: no
+      daemon_reload: yes
+    tags:
+      - install
+      - upgrade
+    when:       
+      - omnileads_ha is defined 
+      - ha_rol == "main"  
+
   - name: ASTERISK Restart systemd service
     systemd:
       name: asterisk.service
@@ -77,5 +92,21 @@
       - upgrade
       - restart
       - restart_core
-    when:       
-        - inventory_hostname in groups['omnileads_voice'] or inventory_hostname in groups['omnileads_aio']  
+      - restart_asterisk
+    when:               
+      - omnileads_ha is not defined
+  
+  - name: ASTERISK Restart systemd service HA Scenary
+    systemd:
+      name: asterisk.service
+      state: restarted
+      enabled: no
+      daemon_reload: yes
+    tags:
+      - upgrade
+      - restart
+      - restart_core
+      - restart_asterisk
+    when:      
+      - omnileads_ha is defined 
+      - ha_rol == "main"  

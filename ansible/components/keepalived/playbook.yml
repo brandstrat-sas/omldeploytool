@@ -54,6 +54,7 @@
       - inventory_hostname in groups['omnileads_aio']
     tags:
       - upgrade
+      - update
 
   - name: KEEPALIVED check_component.sh script AIO provissioning
     template: 
@@ -64,6 +65,7 @@
       - inventory_hostname in groups['omnileads_aio']
     tags:
       - upgrade
+      - update
 
   - name: KEEPALIVED transition to master script
     template: 
@@ -74,8 +76,9 @@
       - inventory_hostname in groups['omnileads_aio']
     tags:
       - upgrade
+      - update
 
-  - name: KEEPALIVED Start and enable Systemd High Availability TOOLs
+  - name: KEEPALIVED Restart and enable Systemd High Availability TOOLs
     systemd:
       name: keepalived.service
       state: restarted
