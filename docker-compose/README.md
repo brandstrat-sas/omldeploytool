@@ -16,6 +16,7 @@
 * [Simulate calls](#pstn_emulator)
 * [Predictive dialer](#wombat_dialer)
 * [OMniLeads interaction tool](#oml_manage)
+* [OMniLeads Eneterprise](#oml_enterprise)
 
 You need docker installed (on Linux, Mac or Windows) and this reposotory cloned <a name="requirements"></a>
 
@@ -306,3 +307,30 @@ For more options:
 ```
 ./oml_manage --help
 ```
+
+## OMniLeads Enterprise <a name="oml_enterprise"></a>
+
+What is OMniLeads Enterprise?
+
+It is an additional layer with complementary modules to OMniLeads Community (GPLV3). It includes functionalities such as advanced reports, wallboards, and automated satisfaction surveys implemented as modules.
+
+This version can be implemented simply by referencing the image for the container that implements the web application.
+Therefore, in our ".env" variable file, we must invoke the Enterprise image. To do this, we add the string "-enterprise" to the end of the tag that describes the image of the OMLAPP_IMG component:
+
+```
+OMLAPP_IMG=${REPO}/omlapp:240117.01-enterprise
+```
+
+Finally, we run the command:
+If you are using Docker Desktop on localhost:
+
+```
+docker-compose up -d
+```
+
+If you are using Docker on a VM:
+
+```
+docker-compose -f docker-compose_prod.yml up -d
+```
+

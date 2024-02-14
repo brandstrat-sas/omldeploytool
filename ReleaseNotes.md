@@ -3,15 +3,17 @@
 
 ## Added
 
+* Se agrega una columna a la tabla reportes_app_llamadalog con la información de la ruta (entrante o saliente) para cada registro.
 
 ## Improvements
 
-* oml-460 [ANSIBLE]: Images for each component are now referenced using the syntax: url_registry/repo/component:tag (for example: docker.io/omnileads/omlapp:231227.01).
+* Se añade --rm a los podman run que lanzan las playbooks de backup & django
+* Se modifican los scripts de arranque de la app web (django commands)
+* Se cambia el orden en el scrip de acciones de failover (aio_transitions.sh)
+* Playbook de django para desplegar en HA
 
 ## Fixed
 
-* oml-2555 [WEB]: Fixed an error when rescheduling a contact previously qualified by another agent.
-* oml-460 [DEPLOY]: Added the "NAT" scenario to the deployment with first_boot_installer.sh (docker-compose).
 
 ## Removed
 
