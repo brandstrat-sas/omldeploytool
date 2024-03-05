@@ -20,7 +20,7 @@ ExecStart=/usr/bin/podman run \
   --env-file=/etc/default/nginx_qa.env \
   --name=oml-nginx_qa-server \
   --rm  \
-  {{ img_registry_core_url }}/omnileads/nginxqa:{{ nginxcgi_version }}
+  {{ nginxcgi_img }}
 ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
 ExecStopPost=/usr/bin/podman rm -f --ignore --cidfile=%t/%n.ctr-id
 Type=notify

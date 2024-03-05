@@ -20,7 +20,7 @@ ExecStart=/usr/bin/podman run \
   --env-file=/etc/default/wombat.env \
   --name=oml-wombat-server \
   --rm  \
-  {{ img_registry_core_url }}/freetechsolutions/wombat:{{ wombat_version }} bash -c "sed -i '/JDBC_URL/c\JDBC_URL=jdbc:mariadb:\/\/{{ MYSQL_HOST }}\/{{ WOMBAT_DB }}?user={{ WOMBAT_DB_USER }}&password={{ WOMBAT_DB_PASS }}&autoReconnect=true' /usr/local/tomcat/webapps/wombat/WEB-INF/tpf.properties && catalina.sh run"
+  {{ wombat_img }} bash -c "sed -i '/JDBC_URL/c\JDBC_URL=jdbc:mariadb:\/\/{{ MYSQL_HOST }}\/{{ WOMBAT_DB }}?user={{ WOMBAT_DB_USER }}&password={{ WOMBAT_DB_PASS }}&autoReconnect=true' /usr/local/tomcat/webapps/wombat/WEB-INF/tpf.properties && catalina.sh run"
 ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
 ExecStopPost=/usr/bin/podman rm -f --ignore --cidfile=%t/%n.ctr-id
 Type=notify
