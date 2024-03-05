@@ -26,8 +26,6 @@
   tags:
     - install
     - keepalived
-  vars:
-    img_repo: '{{ img_registry_core_url }}/{{ img_registry_core_repo }}/asterisk'
   tasks:
 
   - name: KEEPALIVED Install High Availability TOOLs

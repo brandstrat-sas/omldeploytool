@@ -2,15 +2,16 @@
 
 #################### containers img taf  ################################
 
-prometheus_img: docker.io/prom/prometheus:latest
-prometheus_node_exp_img: docker.io/prom/node-exporter:latest
+postgres_img: docker.io/postgres:14.9-bullseye
+#postgres_img: omnileads/postgres:230624.01
+prometheus_img: docker.io/prom/prometheus:v2.49.1
+prometheus_node_exp_img: docker.io/prom/node-exporter:v1.7.0
 promtail_img: docker.io/grafana/promtail:latest
 minio_img: quay.io/minio/minio:RELEASE.2023-09-27T15-22-50Z
-postgres_img: docker.io/postgres:14.9-bullseye
 postgres_prometheus_img: docker.io/prometheuscommunity/postgres-exporter
 redis_prometheus_img: docker.io/oliver006/redis_exporter:latest
 nginxcgi_img: docker.io/omnileads/nginxqa:231117.01
-pstn_emulator_img: docker.io/omnileads/pstn_emulator:231118.01
+pstn_emulator_img: docker.io/omnileads/pstn_emulator:240229.01
 wombat_img: docker.io/freetechsolutions/wombat:21.06.4-9
 mysql_img: docker.io/bitnami/mariadb:latest
 survey_worker_img: docker.io/omnileads/survey_worker:231201.01

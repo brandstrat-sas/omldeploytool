@@ -20,7 +20,7 @@ ExecStart=/usr/bin/podman run \
   --env-file=/etc/default/mysql.env \
   --name=oml-mysql-server \
   --rm  \
-  {{ img_registry_core_url }}/bitnami/mariadb:{{ mysql_version }}
+  {{ mysql_img }}
 ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
 ExecStopPost=/usr/bin/podman rm -f --ignore --cidfile=%t/%n.ctr-id
 Type=notify

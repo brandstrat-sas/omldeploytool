@@ -1,4 +1,4 @@
-# Copyright (C) 2023 Freetech Solutions
+# Copyright (C) 2024 Freetech Solutions
 
 # This file is part of OMniLeads
 
@@ -16,7 +16,7 @@
 # along with this program. If not, see http://www.gnu.org/licenses/.
 ---
 ###############################################################################################################
-# -- The complete list of host                                                                                #
+##############################   The complete list of host  ################################################### 
 ###############################################################################################################
 all:
   children:
@@ -150,6 +150,7 @@ all:
 ##################################################################################################################
 # -- OMniLeads Common Variables                                                                                  #
 ##################################################################################################################
+  
   vars:
     # --- ansible user auth connection
     ansible_user: root
@@ -174,8 +175,7 @@ all:
     # --- time zone (for example: America/Argentina/Cordoba)
     TZ: America/Argentina/Cordoba
     # --- TLS/SSL Certs configuration (selfsigned, custom or certbot letsencrypt)
-    # --- if you have your own certs, put them into instances/tenant folder and
-    # --- change this to *custom*
+    # --- https://gitlab.com/omnileads/omldeploytool/-/blob/develop/ansible/README.md?ref_type=heads#tls-cert-provisioning  
     certs: selfsigned
     # --- PostgreSQL    
     postgres_port: 5432
@@ -301,10 +301,10 @@ all:
     
     # --- For each OML Deploy Tool release, a versioned stack with the latest stable images of each component is maintained on inventory.yml
     # --- You can combine the versions as you like, also use your own TAGs, using the following TAG version variables
-    # --- If you want to deploy OMniLeads Enterprise, you just need to add "-enterprise" as a suffix to the omnileads_img image tag: (240216.01-enteprise)
-    # --- for example: omnileads_img: docker.io/omnileads/240216.01-enterprise.
+    # --- If you want to deploy OMniLeads Enterprise, you just need to add "-enterprise" as a suffix to the omnileads_img image tag
+    # --- for example: omnileads_img: docker.io/omnileads/omlapp:240216.01-enterprise.
 
-    omnileads_img: docker.io/omnileads/240216.01
+    omnileads_img: docker.io/omnileads/omlapp:240308.01
     asterisk_img: docker.io/omnileads/asterisk:240226.01
     fastagi_img: docker.io/omnileads/fastagi:240228.01
     astami_img: docker.io/omnileads/astami:231230.01
