@@ -3,6 +3,9 @@
 
 ## Added
 
+* oml-2585 [WEB] [API] New endpoint to upload massive contacts from CRM.
+* oml-488 [WEB] [ANSIBLE] Now it's possible to deploy an instance with automatically generated Let's Encrypt SSL certificates.
+
 ## Improvements
 
 ## Fixed
