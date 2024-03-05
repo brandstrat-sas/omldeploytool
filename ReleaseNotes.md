@@ -1,7 +1,10 @@
 # Release Notes - OMniLeads 1.33.3
-[2024-03-05]
+[2024-03-08]
 
 ## Added
+
+* oml-2585 [WEB] [API] New endpoint to upload massive contacts from CRM.
+* oml-488 [WEB] [ANSIBLE] Now it's possible to deploy an instance with automatically generated Let's Encrypt SSL certificates.
 
 ## Improvements
 
@@ -10,6 +13,7 @@
 * oml-463 [WEB] [HA] Startup scripts for the web app UWSGI (django commands) have been modified.
 * oml-463 [ANSIBLE] [HA] Order changed in the failover actions script (aio_transitions.sh).
 * oml-463 [ANSIBLE] [HA] Django, Asterisk, Cron & Nginx components playbook for deploying in HA.
+* oml-2586 [WEB] Pending translations into English and Portuguese have been completed
 
 ## Fixed
 
@@ -22,7 +26,7 @@
 ## OMniLeads Component versions
 
 ```
-    omnileads_img: docker.io/omnileads/omlapp:240216.01
+    omnileads_img: docker.io/omnileads/omlapp:240308.01
     asterisk_img: docker.io/omnileads/asterisk:240226.01
     fastagi_img: docker.io/omnileads/fastagi:240128.01
     astami_img: docker.io/omnileads/astami:231230.01

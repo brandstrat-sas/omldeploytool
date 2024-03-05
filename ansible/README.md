@@ -194,6 +194,7 @@ From the inventory variable *certs* you can indicate what to do with the SSL cer
 The possible options are:
 
 * **selfsigned**: which will display the self-signed certificates (not recommended for production).
+* **certbot**: deploy an instance with automatically generated Let's Encrypt SSL certificates.
 * **custom**: if the idea is to implement your own certificates. Then you must place them inside instances/tenant_name_folder/ with the names: *cert.pem* for and *key.pem*
 
 # Install on Linux instance 🚀 <a name="aio-deploy"></a>
@@ -213,7 +214,9 @@ algarrobo:
   infra_env: lan
 ```
 
-The ***infra_env*** variable can be initialized as "lan" or "cloud" (default), depending on whether the instance will be accessible via WAN access (IPADDR or FQDN) or via LAN access (IP or FQDN).
+The ***infra_env*** variable can be initialized as "lan", "cloud" or "nat", depending on whether the instance will be accessible via WAN access (IPADDR or FQDN), LAN access (IP or FQDN) or behind a NAT (IPADDRR or FQDN).
+
+The ***nat_ip_addr*** variable. In the case of selecting infra_env: nat, it's optional to uncomment and indicate the address that will perform the NAT (nat_ip_addr: X.X.X.X); otherwise, auto-discovery of the NAT IP address will be performed.
 
 The *bucket_url* and *postgres_host* parameters must be commented out, so that both (PostgreSQL and Object Storage MinIO) are deployed within the AIO instance.
 
@@ -605,13 +608,22 @@ counterparts in the CentOS 7 instance from which you want to migrate. below shou
 * dialer_user
 * dialer_password
 
+We must consider that the version of the Postgres image to be deployed with OMniLeads 2.X should be "omnileads/postgres:230624.01". Therefore, you will need to temporarily change the variable groupall/all inherent to Postgres, as follows:
+
+```
+#################### containers img taf  ################################
+
+#postgres_img: docker.io/postgres:14.9-bullseye
+postgres_img: omnileads/postgres:230624.01
+```
+
 On the OMniLeads 1.X CentOS-7 instance run the following commands to generate a postgres backup on the one hand 
 and then upload to the Bucket Object Storage of the new OMniLeads version the recordings, telephony audios, Asterisk customizations (if any) _custom.conf & _override.conf. 
 (if any) Asterisk _custom.conf & _override_conf customizations and also the Postgres backup itself.
 
 ```
 export NOMBRE_BACKUP=some_file_name
-pg_dump -h ${PGHOST} -p ${PGPORT} -U ${PGUSER} -Fc -b -v -f /tmp/${NOMBRE_BACKUP}.sql -d ${PGDATABASE} --no-acl --exclude-table=queue_log
+pg_dump -h ${PGHOST} -p ${PGPORT} -U ${PGUSER} -Fc -b -v -f /tmp/${NOMBRE_BACKUP}.sql -d ${PGDATABASE} --no-acl
 export AWS_ACCESS_KEY_ID=$your_new_instance_bucket_key
 export AWS_SECRET_ACCESS_KEY=$your_new_instance_bucket_secret_key
 export S3_BUCKET_NAME=$your_new_instance_bucket_name
@@ -658,6 +670,22 @@ Execute the restore deploy on the tenant in question:
 ```
 ./deploy.sh --action=restore --tenant=$your_inventory_folder_name
 ```
+
+Now we must revert back to the original Postgres image, which means restoring our group_vars/all file to its previous state:
+
+```
+#################### containers img taf  ################################
+
+postgres_img: docker.io/postgres:14.9-bullseye
+#postgres_img: omnileads/postgres:230624.01
+```
+
+And finally, execute:
+
+```
+./deploy.sh --action=upgrade --tenant=$your_inventory_folder_name
+```
+
 
 # Perform a Backup :floppy_disk: <a name="backups"></a>
 

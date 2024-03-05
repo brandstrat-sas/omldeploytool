@@ -176,6 +176,58 @@
   when:
     - key_file_name is defined
 
+- name: OS_CONF CERTBOT Create directories for Certbot
+  become: yes
+  file:
+    path: "{{ item }}"
+    state: directory
+  loop:
+    - /opt/certbot/
+    - /opt/certbot/webroot
+    - /opt/certbot/letsencrypt
+  tags:
+    - install
+  when: certs == "certbot"
+
+- name: OS_CONF CERTBOT launch container to generate lets & crypt Certs
+  become: yes
+  shell: "podman run -it --rm --name nginx-certbot -e FQDN={{ fqdn }} -e EMAIL={{ ha_notification_email }} -e RENEW_CERTIFICATE=false -v '/opt/certbot/letsencrypt:/etc/letsencrypt' -v '/opt/certbot/webroot:/var/www/certbot' -p 80:80 docker.io/omnileads/certbot:240201.01"
+  tags:
+    - install
+    - upgrade
+  when:
+    - certs == "certbot"  
+
+- name: OS_CONF CERTBOT SSL Cert Copy
+  become: yes
+  copy:
+    src: "/opt/certbot/letsencrypt/archive/{{ fqdn }}/cert1.pem"
+    dest: "/etc/omnileads/certs/cert.pem"
+    owner: '{{ usuario }}'
+    group: '{{ usuario }}'
+    mode: 0777
+    remote_src: yes
+  tags:
+    - install
+    - upgrade
+  when:
+    - certs == "certbot"  
+
+- name: OS_CONF CERTBOT SSL Key Copy
+  become: yes
+  copy:
+    src: "/opt/certbot/letsencrypt/archive/{{ fqdn }}/privkey1.pem"
+    dest: "/etc/omnileads/certs/key.pem"
+    owner: '{{ usuario }}'
+    group: '{{ usuario }}'
+    mode: 0777
+    remote_src: yes
+  tags:
+    - install
+    - upgrade
+  when:
+    - certs == "certbot"  
+
 - name: OS_CONF Copy oml_manage script
   template:
     src: "templates/oml_manage.sh"
