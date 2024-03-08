@@ -179,6 +179,27 @@ services:
     networks:
       - omnileads  
 
+  google_tts_stt:
+    image: ${OMLORCH_IMG}
+    container_name: oml-google-tts-stt
+    command: python /app/google_tts_stt.py
+    environment:
+      - TZ=${TZ}
+      - ARI_HOST=acd
+      - ARI_PORT=7088
+      - ARI_USER=omnileads
+      - ARI_PASS=5_MeO_DMT
+      - REDIS_HOSTNAME=${REDIS_HOSTNAME}
+      - REDIS_PORT=6379
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+      - GOOGLE_APPLICATION_CREDENTIALS=/tmp/google_credential.json
+    restart: on-failure  
+    volumes:
+     - ${REPO_PATH}/omlari:/app
+    networks:
+      - omnileads
+
+
   acd:
     build:
       target: run
