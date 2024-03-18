@@ -107,7 +107,6 @@
 - import_playbook: components/addons/playbook.yml
   when: 
     - inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_aio']
-    - enterprise_edition == true
 
 
 - import_playbook: components/nginx/playbook.yml

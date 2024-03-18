@@ -43,20 +43,20 @@ elegir por que método se van a clonar los repositorios.
 ## Reset **admin** password
 
 ```
-./manage --reset_pass
+./oml_manage --reset_pass
 ```
 
 ## Inicializar entorno con datos para desarrollo & testing
 
 ```
-./manage --init_env
+./oml_manage --init_env
 ```
 
 ## Build VueJS
 
 ```
-./manage --vuejs_install
-./manage --vuejs_build
+./oml_manage --vuejs_install
+./oml_manage --vuejs_build
 ```
 
 ## Variables

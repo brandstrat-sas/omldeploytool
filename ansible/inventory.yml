@@ -146,6 +146,7 @@ all:
             bucket_access_key: mYLcr7sx5vEbe7PO
             bucket_secret_key: v1Dl34Q29Bv6ruaWS7cUAEvSVfAtvGkR
             bucket_name: tenant_example_7
+
 ##################################################################################################################
 # -- OMniLeads Common Variables                                                                                  #
 ##################################################################################################################
@@ -157,6 +158,7 @@ all:
     # ------------------------------------------------------------------------------------------------ #
     # ------------------------------ Generic OMniLeads runtime variables ----------------------------- #
     # ------------------------------------------------------------------------------------------------ #
+
     # --- Asterisk & RTPengine scenary for SIP & RTP
     # --- "cloud" instance (access through public IP)
     # --- "lan" instance (access through private IP)
@@ -269,7 +271,7 @@ all:
     #restore_bucket: 
 
     ha_notification_email: mr_robot@mr_robot.com
-
+    
     # ------------------------------------------------------------------------------------------------ #
     # ------------------------------------ Scale tunnings -------------------------------------------- #
     # ------------------------------------------------------------------------------------------------ #
@@ -283,15 +285,15 @@ all:
     #pjsip_threadpool_max_size: 150
 
     # ------------------------------------------------------------------------------------------------ #
-    # ------------------------------------ Backup & Restore ------------------------------------------ #
+    # ------------------------------------ Upgrade from OML 1.X -------------------------------------- #
+    # ------------------------------------ Restore filename ------------------------------------------ #
     # ------------------------------------------------------------------------------------------------ #
 
     # --- Restore filename id, request by restore filename
     #restore_file_timestamp: 1681215859
-    # Backup / Restore centralized Bucket
-    # br_bucket_url: https://sfo3.digitaloceanspaces.com
-    # br_bucket_access_key: Hghjkdghjkdhasjdasdsada
-    # br_bucket_secret_key: jknkjhkjh4523kjhcksjdhkjfdhKJHHKJGKJh786876876NBVJHB
+    
+    # Uncomment in case of upgrading from OML 1.X
+    #upgrade_from_oml_1: true
     
     # ------------------------------------------------------------------------------------------------ #
     # ---------------------------- Container IMG TAG customization ----------------------------------- #
@@ -299,10 +301,12 @@ all:
     
     # --- For each OML Deploy Tool release, a versioned stack with the latest stable images of each component is maintained on inventory.yml
     # --- You can combine the versions as you like, also use your own TAGs, using the following TAG version variables
-    
-    omnileads_img: docker.io/omnileads/omlapp:240117.01
-    asterisk_img: docker.io/omnileads/asterisk:240102.01
-    fastagi_img: docker.io/omnileads/fastagi:240104.01
+    # --- If you want to deploy OMniLeads Enterprise, you just need to add "-enterprise" as a suffix to the omnileads_img image tag
+    # --- for example: omnileads_img: docker.io/omnileads/omlapp:240216.01-enterprise.
+
+    omnileads_img: docker.io/omnileads/omlapp:240308.01
+    asterisk_img: docker.io/omnileads/asterisk:240226.01
+    fastagi_img: docker.io/omnileads/fastagi:240228.01
     astami_img: docker.io/omnileads/astami:231230.01
     nginx_img: docker.io/omnileads/nginx:240105.01
     websockets_img: docker.io/omnileads/websockets:231125.01
@@ -310,17 +314,13 @@ all:
     rtpengine_img: docker.io/omnileads/rtpengine:231125.01
     redis_img: docker.io/omnileads/redis:231125.01
 
-    # --- Activate the OMniLeads Enterprise Edition.
-    # --- on the contrary you will deploy OMniLeads OSS Edition with GPLV3 licensed. 
-    
-    enterprise_edition: false
 
-#############################################################################################################
-# -- In this section the hosts are grouped based on the type of deployment (AIO, Cluster & Cluster HA).  -- #
-# -- here you can control which host the action deployed by the deploy.sh script will be applied to      -- #
-# -- The Ansible playbooks are applied on the hosts below declared and classified according to the       -- #
-# -- architecture of the instance on which they are deployed.                                            -- #
-#############################################################################################################
+##############################################################################################################
+## -- In this section the hosts are grouped based on the type of deployment (AIO, Cluster & Cluster HA).  -- #
+## -- here you can control which host the action deployed by the deploy.sh script will be applied to      -- #
+## -- The Ansible playbooks are applied on the hosts below declared and classified according to the       -- #
+## -- architecture of the instance on which they are deployed.                                            -- #
+##############################################################################################################
 
 omnileads_aio:
   hosts:
@@ -331,8 +331,8 @@ omnileads_aio:
     #tenant_example_4:
     #tenant_example_7_aio_A:
     #tenant_example_7_aio_B:
-
 ################################################    
+
 omnileads_data:
   hosts:
     tenant_example_5_data:  
@@ -346,6 +346,7 @@ omnileads_app:
     tenant_example_5_app:
 
 ################################################
+
 ha_omnileads_sql:
   hosts:
     #tenant_example_7_sql_A:

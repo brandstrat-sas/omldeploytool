@@ -68,6 +68,22 @@
       - install
       - upgrade
       - update
+    when:
+      - omnileads_ha is not defined  
+
+  - name: NGINX Enable and start oml nginx service HA scenary
+    systemd:
+      name: nginx.service
+      state: started
+      enabled: no
+      daemon_reload: yes
+    tags:
+      - install
+      - upgrade
+      - update
+    when:       
+      - omnileads_ha is defined  
+      - ha_rol == "main"  
 
   - name: NGINX ReStart oml nginx service
     systemd:
@@ -81,4 +97,19 @@
       - restart_django
       - restart_core
     when:       
-      - inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_aio']    
+      - omnileads_ha is not defined  
+
+  - name: NGINX ReStart oml nginx service HA scenary
+    systemd:
+      name: nginx.service
+      state: restarted
+      enabled: no
+      daemon_reload: yes
+    tags:
+      - upgrade
+      - restart
+      - restart_django
+      - restart_core
+    when:       
+      - omnileads_ha is defined  
+      - ha_rol == "main"

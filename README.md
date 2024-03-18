@@ -4,7 +4,7 @@
 
 ## What is OMniLeads ?
 
-<p>OmniLeads (OML) is an innovative Open Source software solution leveraging WebRTC technology (WebRTC) to empower Contact Centers. Designed with versatility in mind, OML supports a wide range of communication channels including Voice, Video, and soon WhatsApp. This makes it an ideal choice for organizations looking to manage and deploy efficient, multi-channel customer service strategies.</p>
+<p>OmniLeads (OML) is an innovative Open Source software solution leveraging WebRTC technology (WebRTC) to empower Contact Centers. Designed with versatility in mind, OML supports a wide range of communication channels including Voice, Video, and very soon WhatsApp. This makes it an ideal choice for organizations looking to manage and deploy efficient, omni-channel customer service strategies.</p>
 
 As part of the roadmap of the develop we are planning to include SMS, Social Networks integration and Chat Campaigns from the web page, and many other features
 
