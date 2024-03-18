@@ -179,10 +179,10 @@ services:
     networks:
       - omnileads  
 
-  google_tts_stt:
-    image: ${OMLORCH_IMG}
+  audiosocket:
+    image: ${OMLAUDIOSOCKET_IMG}
     container_name: oml-google-tts-stt
-    command: python /app/google_tts_stt.py
+    #command: python /app/google_tts_stt.py
     environment:
       - TZ=${TZ}
       - ARI_HOST=acd
@@ -193,13 +193,10 @@ services:
       - REDIS_PORT=6379
       - GOOGLE_API_KEY=${GOOGLE_API_KEY}
       - GOOGLE_APPLICATION_CREDENTIALS=/tmp/google_credential.json
-    restart: on-failure  
-    volumes:
-     - ${REPO_PATH}/omlari:/app
+    restart: on-failure      
     networks:
       - omnileads
-
-
+    
   acd:
     build:
       target: run
@@ -246,7 +243,8 @@ services:
     stop_grace_period: 1m30s
     volumes:
       - ${REPO_PATH}/omlacd/source/astconf:/etc/asterisk
-      - ${REPO_PATH}/omlacd/source/scripts:/opt/asterisk/scripts
+      - ${REPO_PATH}/omlacd/source/scripts:/opt/asterisk/scripts      
+      - ./asterisk_custom/oml_extensions_custom.conf:/etc/asterisk/oml_extensions_custom.conf
     working_dir: /etc/asterisk
 
   kamailio:
@@ -507,7 +505,7 @@ services:
     ports:
       - 4569:4569/udp
     volumes:
-      - ./pstn_emulator_custom_conf:/etc/asterisk/custom/
+    - ./asterisk_custom/oml_extensions_custom.conf:/etc/asterisk/custom/extensions_custom.conf
     privileged: true
     restart: on-failure
     stdin_open: true
