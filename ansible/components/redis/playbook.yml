@@ -63,7 +63,6 @@
       daemon_reload: yes
     tags:
       - upgrade
-      - update
 
   - name: REDIS Restart service
     systemd:

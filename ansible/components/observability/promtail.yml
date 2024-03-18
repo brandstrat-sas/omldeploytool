@@ -49,7 +49,7 @@
       - upgrade
 
   - name: OBSERVABILITY Promtail Pull image
-    command: podman pull --quiet '{{ container_image_registry }}/{{ item }}'
+    command: podman pull --quiet '{{ promtail_img }}'
     register: podman_pull
     until: podman_pull is success
     with_items:

@@ -183,4 +183,22 @@
       - install
       - upgrade
 
-  
+  # - name: QA commands 1
+  #     shell: "podman run --network=host --env-file /etc/default/django.env --rm {{ omnileads_img }} python manage.py shell -c 'from constance import config; config.CLIENT_NAME = {{ qa_name }}'"
+  #     when:
+  #     - omnileads_ha is not defined
+
+  # - name: QA commands 2
+  #     shell: "podman run --network=host --env-file /etc/default/django.env --rm {{ omnileads_img }} python manage.py shell -c 'from constance import config; config.CLIENT_EMAIL = {{ qa_email }}'"
+  #     when:
+  #     - omnileads_ha is not defined
+
+  # - name: QA commands 3
+  #     shell: "podman run --network=host --env-file /etc/default/django.env --rm {{ omnileads_img }} python manage.py shell -c 'from constance import config; config.CLIENT_KEY = {{ qa_key }}'"
+  #     when:
+  #     - omnileads_ha is not defined    
+
+  # - name: QA commands 4
+  #     shell: "podman run --network=host --env-file /etc/default/django.env --rm {{ omnileads_img }} python manage.py shell -c 'from constance import config; config.CLIENT_PASSWORD = {{ qa_pass }}'"
+  #     when:
+  #     - omnileads_ha is not defined    

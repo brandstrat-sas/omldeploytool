@@ -21,7 +21,7 @@ ExecStart=/usr/bin/podman run \
   --volume=prometheus_data:/prometheus \
   --name=prometheus-server \
   --rm  \
-  {{ container_image_registry }}/prom/prometheus \
+  {{ prometheus_img }} \
   --config.file=/etc/prometheus/prometheus.yml \
   --storage.tsdb.path=/prometheus \
   --web.console.libraries=/etc/prometheus/console_libraries \

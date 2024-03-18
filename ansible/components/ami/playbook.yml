@@ -57,6 +57,19 @@
       - upgrade
       - update
 
+  - name: AMI Enable and start systemd service HA scenary
+    systemd:
+      name: ami.service
+      state: started
+      enabled: no
+      daemon_reload: yes
+    tags:
+      - install
+      - upgrade
+    when:       
+      - omnileads_ha is defined  
+      - ha_rol == "main"
+  
   - name: AMI Enable and start systemd service
     systemd:
       name: ami.service
@@ -66,7 +79,9 @@
     tags:
       - install
       - upgrade
-      
+    when:       
+      - omnileads_ha is not defined        
+
   - name: AMI ReStart systemd service
     systemd:
       name: ami.service
@@ -78,4 +93,18 @@
       - restart
       - restart_core
     when:       
-      - inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_aio']  
+      - omnileads_ha is not defined  
+
+  - name: AMI ReStart systemd service HA scenary
+    systemd:
+      name: ami.service
+      state: restarted
+      enabled: no
+      daemon_reload: yes
+    tags:
+      - upgrade
+      - restart
+      - restart_core
+    when:       
+      - omnileads_ha is defined  
+      - ha_rol == "main"

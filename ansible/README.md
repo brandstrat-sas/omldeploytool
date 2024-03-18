@@ -16,6 +16,7 @@
 * [Deploy all in one (AIO) instance](#aio-deploy)
 * [Deploy Cluster all in three (AIT) instance](#ait-deploy)
 * [Deploy Onpremise Cluster HA](#cluster-ha-deploy)
+* [Deploy OMniLeads Enterprise](#omnileads-enterprise)
 * [OMniLeads Podman containers](#podman-systemd)
 * [TLS Certs provisioning](#tls-cert-provisioning)
 * [Security](#security)
@@ -193,6 +194,7 @@ From the inventory variable *certs* you can indicate what to do with the SSL cer
 The possible options are:
 
 * **selfsigned**: which will display the self-signed certificates (not recommended for production).
+* **certbot**: deploy an instance with automatically generated Let's Encrypt SSL certificates.
 * **custom**: if the idea is to implement your own certificates. Then you must place them inside instances/tenant_name_folder/ with the names: *cert.pem* for and *key.pem*
 
 # Install on Linux instance 🚀 <a name="aio-deploy"></a>
@@ -212,7 +214,9 @@ algarrobo:
   infra_env: lan
 ```
 
-The ***infra_env*** variable can be initialized as "lan" or "cloud" (default), depending on whether the instance will be accessible via WAN access (IPADDR or FQDN) or via LAN access (IP or FQDN).
+The ***infra_env*** variable can be initialized as "lan", "cloud" or "nat", depending on whether the instance will be accessible via WAN access (IPADDR or FQDN), LAN access (IP or FQDN) or behind a NAT (IPADDRR or FQDN).
+
+The ***nat_ip_addr*** variable. In the case of selecting infra_env: nat, it's optional to uncomment and indicate the address that will perform the NAT (nat_ip_addr: X.X.X.X); otherwise, auto-discovery of the NAT IP address will be performed.
 
 The *bucket_url* and *postgres_host* parameters must be commented out, so that both (PostgreSQL and Object Storage MinIO) are deployed within the AIO instance.
 
@@ -484,6 +488,18 @@ Once the URL is available with the App returning the login view,  we can log in 
 oml_manage --reset_pass
 ```
 
+## OMniLeads Enterprise
+
+What is OMniLeads Enterprise?
+
+It is an additional layer with complementary modules to OMniLeads Community (GPLV3). It includes functionalities such as advanced reports, wallboards, and automated satisfaction surveys implemented as modules.
+
+This version can be implemented simply by referencing the image for the container that implements the web application.
+Therefore, in our "inventory.yml" variable file, we must invoke the enterprise imag e. To do this, we add the string "-enterprise" to the end of the tag that describes the image of the omnileads_img component:
+
+```
+omnileads_img: docker.io/your_registry/omlapp:231227.01-enterprise
+```
 
 ## Systemd & Podman 🔧 <a name="podman-systemd"></a>
 
@@ -527,7 +543,6 @@ ExecStart=/usr/bin/podman run \
   --volume=/etc/omnileads/certs:/etc/omnileads/certs \
   --volume=django_static:/opt/omnileads/static \
   --volume=django_callrec_zip:/opt/omnileads/asterisk/var/spool/asterisk/monitor \
-  --volume=nginx_logs:/var/log/nginx/ \
   --rm  \
   docker.io/omnileads/nginx:230215.01
 ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
@@ -593,13 +608,22 @@ counterparts in the CentOS 7 instance from which you want to migrate. below shou
 * dialer_user
 * dialer_password
 
+We must consider that the version of the Postgres image to be deployed with OMniLeads 2.X should be "omnileads/postgres:230624.01". Therefore, you will need to temporarily change the variable groupall/all inherent to Postgres, as follows:
+
+```
+#################### containers img taf  ################################
+
+#postgres_img: docker.io/postgres:14.9-bullseye
+postgres_img: omnileads/postgres:230624.01
+```
+
 On the OMniLeads 1.X CentOS-7 instance run the following commands to generate a postgres backup on the one hand 
 and then upload to the Bucket Object Storage of the new OMniLeads version the recordings, telephony audios, Asterisk customizations (if any) _custom.conf & _override.conf. 
 (if any) Asterisk _custom.conf & _override_conf customizations and also the Postgres backup itself.
 
 ```
 export NOMBRE_BACKUP=some_file_name
-pg_dump -F c omnileads -f /tmp/pgsql-backup-$NOMBRE_BACKUP.sql --no-acl
+pg_dump -h ${PGHOST} -p ${PGPORT} -U ${PGUSER} -Fc -b -v -f /tmp/${NOMBRE_BACKUP}.sql -d ${PGDATABASE} --no-acl
 export AWS_ACCESS_KEY_ID=$your_new_instance_bucket_key
 export AWS_SECRET_ACCESS_KEY=$your_new_instance_bucket_secret_key
 export S3_BUCKET_NAME=$your_new_instance_bucket_name
@@ -647,6 +671,22 @@ Execute the restore deploy on the tenant in question:
 ./deploy.sh --action=restore --tenant=$your_inventory_folder_name
 ```
 
+Now we must revert back to the original Postgres image, which means restoring our group_vars/all file to its previous state:
+
+```
+#################### containers img taf  ################################
+
+postgres_img: docker.io/postgres:14.9-bullseye
+#postgres_img: omnileads/postgres:230624.01
+```
+
+And finally, execute:
+
+```
+./deploy.sh --action=upgrade --tenant=$your_inventory_folder_name
+```
+
+
 # Perform a Backup :floppy_disk: <a name="backups"></a>
 
 
@@ -668,25 +708,6 @@ another directory is generated with the timestamp date and there inside are the 
 
 The OMniLeads project builds images of all its components to be hosted in docker hub: https://hub.docker.com/repositories/omnileads.
 
-We are going to differentiate the web application repository (https://hub.docker.com/repository/docker/omnileads/omlapp/general) whose
-semantics implies the string RC (release candidates) or stable (able to deploy on production) string, before the dated version.
-
-For example:
-
-```
-pre-release-1.27.0
-1.27.0
-```
-
-On the other hand, the rest of the components (asterisk, rtpengine, kamailio, nginx, websockets and postgres) are
-named directly with the release date.
-
-For example:
-
-```
-230204.01
-```
-
 Every time a new Release of the application becomes available as an image in the container registry, it will be impacted.
 the **Releases-Notes.md** file available in the root of this repository, which exposes the mapping between the
 versions of the images of each component for each release.
@@ -695,21 +716,22 @@ Therefore to apply updates we must first launch on this repository:
 
 ```
 git pull origin main
+git checkout release-1.33.3
 ```
 
 Then indicate at the inventory.yml level within the corresponding tenant folder, the versions
-desired.
+desired, for example:
 
 ```
-omnileads_version: 1.29.0
-websockets_version: 230204.01
-nginx_version: 230215.01
-kamailio_version: 230204.01
-asterisk_version: 230204.01
-fastagi_version: 230204.01
-rtpengine_version: 230204.01
-postgres_version: 230204.01
-redis_version: 230204.01
+omnileads_img: docker.io/omnileads/omlapp:240201.01
+asterisk_img: docker.io/omnileads/asterisk:240102.01
+fastagi_img: docker.io/omnileads/fastagi:240104.01
+astami_img: docker.io/omnileads/astami:231230.01
+nginx_img: docker.io/omnileads/nginx:240105.01
+websockets_img: docker.io/omnileads/websockets:231125.01
+kamailio_img: docker.io/omnileads/kamailio:231125.01
+rtpengine_img: docker.io/omnileads/rtpengine:231125.01
+redis_img: docker.io/omnileads/redis:231125.01
 ```
 
 Then the deploy.sh script must be called with the --upgrade parameter.
@@ -725,13 +747,15 @@ The use of containers when executing the OMniLeads components allows us to easil
 frozen history and accessible through the "tag".
 
 ```
-omnileads_version: stable-190112.01
-websockets_version: 190112.01
-nginx_version: 190112.01
-kamailio_version: 190112.01
-asterisk_version: 190112.01
-rtpengine_version: 190112.01
-postgres_version: 190112.01
+omnileads_img: docker.io/omnileads/omlapp:240117.01
+asterisk_img: docker.io/omnileads/asterisk:240102.01
+fastagi_img: docker.io/omnileads/fastagi:240104.01
+astami_img: docker.io/omnileads/astami:231230.01
+nginx_img: docker.io/omnileads/nginx:240105.01
+websockets_img: docker.io/omnileads/websockets:231125.01
+kamailio_img: docker.io/omnileads/kamailio:231125.01
+rtpengine_img: docker.io/omnileads/rtpengine:231125.01
+redis_img: docker.io/omnileads/redis:231125.01
 ```
 
 Then the deploy.sh script must be called with the --upgrade parameter.
@@ -792,15 +816,15 @@ In the inventory file you can customize the tags of the images to display, as we
     # --- For each OML Deploy Tool release, a versioned stack with the latest stable images of each component is maintained on inventory.yml
     # --- You can combine the versions as you like, also use your own TAGs, using the following TAG version variables
     
-    omnileads_img: docker.io/omnileads/omlapp:231227.01
-    asterisk_img: docker.io/omnileads/asterisk:240102.01
+    omnileads_img: docker.io/your_registry/omlapp:231227.01
+    asterisk_img: docker.io/your_registry/asterisk:240102.01
     fastagi_img: docker.io/omnileads/fastagi:240104.01
     astami_img: docker.io/omnileads/astami:231230.01
     nginx_img: docker.io/omnileads/nginx:240105.01
     websockets_img: docker.io/omnileads/websockets:231125.01
     kamailio_img: docker.io/omnileads/kamailio:231125.01
     rtpengine_img: docker.io/omnileads/rtpengine:231125.01
-    redis_img: docker.io/omnileads/redis:231125.01
+    redis_img: docker.io/your_registry/redis:231125.01
 
     # --- Activate the OMniLeads Enterprise Edition.
     # --- on the contrary you will deploy OMniLeads OSS Edition with GPLV3 licensed. 

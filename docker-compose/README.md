@@ -3,19 +3,21 @@
 ![Diagrama deploy tool](../ansible/png/omnileads_logo_1.png)
 
 #### 100% Open-Source Contact Center Software
-#### [Community Forum](https://forum.omnileads.net/)
+
+#### [Community discord](https://discord.gg/FEDkVmSQ)
 
 ---
 # Index
 
 * [Requirements](#requirements)
 * [Docker Desktop](#docker_desktop)
-* [Cloud VPS or Onpremise VM](#vps_vm)
 * [Security](#security)
+* [Cloud VPS or Onpremise VM](#vps_vm)
 * [First login](#post_install)
-* [Simulate calls](#pstn_emulator)
-* [Predictive dialer](#wombat_dialer)
+* [OMniLeads Eneterprise](#oml_enterprise)
 * [OMniLeads interaction tool](#oml_manage)
+* [Simulate calls (only for docker-desktop ENV)](#pstn_emulator)
+* [Predictive dialer setting (only for docker-desktop ENV)](#wombat_dialer)
 
 You need docker installed (on Linux, Mac or Windows) and this reposotory cloned <a name="requirements"></a>
 
@@ -94,23 +96,23 @@ export NIC=eth0 ENV=lan && ./first_boot_installer.sh
 ```
 
 
-#### Desplegar una versión de OMniLeads específica:
+#### Deploying a specific version of OMniLeads:
 
-Se puede dar el caso de tener que desplegar algun release específico de la App, para ello se peude utilizar el parámetro BRANCH, se puede añadir el parámetro BRANCH=release-1.33.2. 
+There may be a need to deploy a specific release of the app. For this purpose, the BRANCH parameter can be used by adding BRANCH=release-1.33.2.
 
 ```
 export BRANCH=release-1.33.2 ENV=cloud && ./first_boot_installer.sh)
 ```
 
-#### Ambientes de NAT: 
+#### NAT Environments:
 
-Se puede dar el caso de tener que desplegar la App detrás de algún tipo de NAT en el cual deseamos advertir la dirección IP con la cual van a atravesar el NAT de manera explicita, se puede añadir el parámetro NAT_IPV4=xxx.xxx.xxx or NAT_IPV4=tenant.example.com. En caso de no espeficar una IP de NAT, el script va a resolver asignar la IP pública que se autotecta utilizando curl.
+It may be necessary to deploy the app behind some type of NAT where we want to explicitly specify the IP address that will traverse the NAT. For this, the parameter NAT_IPV4=xxx.xxx.xxx or NAT_IPV4=tenant.example.com can be added. If no NAT IP is specified, the script will resolve to assign the public IP detected using curl.
 
 ```
 export NIC=ens5 ENV=nat NAT_IPV4=182.333.20.12 && ./first_boot_installer.sh)
 ```
 
-#### Desplegar con la integración con Wombat Dialer 
+#### Deploying with Wombat Dialer integration.
 
 ```
 export  NIC=eth0 ENV=lan DIALER_HOST=X.X.X.X DIALER_USER=demo DIALER_PASS=demoadmin && ./first_boot_installer.sh
@@ -215,7 +217,33 @@ admin
 
 Finally  you can choice a custom password. 
 
-## The oml_manage script
+## OMniLeads Enterprise <a name="oml_enterprise"></a>
+
+What is OMniLeads Enterprise?
+
+It is an additional layer with complementary modules to OMniLeads Community (GPLV3). It includes functionalities such as advanced reports, wallboards, and automated satisfaction surveys implemented as modules.
+
+This version can be implemented simply by referencing the image for the container that implements the web application.
+Therefore, in our ".env" variable file, we must invoke the Enterprise image. To do this, we add the string "-enterprise" to the end of the tag that describes the image of the OMLAPP_IMG component:
+
+```
+OMLAPP_IMG=${REPO}/omlapp:240117.01-enterprise
+```
+
+Finally, we run the command:
+If you are using Docker Desktop on localhost:
+
+```
+docker-compose up -d --force-recreate app nginx
+```
+
+If you are using Docker on a VM:
+
+```
+docker-compose -f docker-compose_prod.yml up -d --force-recreate app nginx
+```
+
+## The oml_manage script <a name="oml_manage"></a>
 
 This is used to launch some administration actions like, read containers logs, delete postgres logs tables and more. 
 
@@ -242,6 +270,7 @@ For all users the pass is:
 ```
 usuario0*
 ```
+
 
 ## Simulate calls from/to PSTN (Only on Docker-Desktop scenary) <a name="pstn_emulator"></a>
 
@@ -283,7 +312,8 @@ domain: YOUR_HOSTNAME
 
 Then you can send calls to DID 01177660010 to 01177660015, an also send calls from an agent to this IAX2 account phone calling 1234567.
 
-## Configuring wombat dialer <a name="wombat_dialer"></a>
+
+## Configuring wombat dialer (only for docker-desktop scenary) <a name="wombat_dialer"></a>
 
 You only need to do this if you are going to work with Predictive Dialer campaigns.
 
@@ -296,13 +326,3 @@ Note: when configuring initial mariadb credentials the root pass is ***admin123*
 The **production** scenarios do not implement Wombat Dialer by default, so if you want to implement Wombat Dialer in production, you will need to have a VM/VPS to install the dialer there and then configure it to work with OMniLeads.
 
 Check our official documentation to check this: https://www.wombatdialer.com/installation.jsp
-
-## OMniLeads interaction tool <a name="oml_manage"></a>
-
-In this directory, we have the script "oml_manage," which allows us to perform various actions such as backup & restore, clearing cache, deleting the database, launching the Django shell, invoking the Asterisk CLI, etc.
-
-For more options:
-
-```
-./oml_manage --help
-```

@@ -17,12 +17,11 @@ ExecStart=/usr/bin/podman run \
   --replace \
   --detach \
   --network=host \
-  --env-file=/etc/default/prometheus_node_exporter.env \
   --volume=/:/host-root:ro,rslave \
   --volume=/var/lib/containers:/host-var-lib-container:ro,rslave \
   --name=oml-prometheus_node_exporter-server \
   --rm  \
-  {{ container_image_registry }}/prom/node-exporter:latest
+  {{ prometheus_node_exp_img }}
 ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
 ExecStopPost=/usr/bin/podman rm -f --ignore --cidfile=%t/%n.ctr-id
 Type=notify
