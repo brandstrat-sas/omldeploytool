@@ -13,7 +13,11 @@
 * oml-463 [WEB] [HA] Startup scripts for the web app UWSGI (django commands) have been modified.
 * oml-463 [ANSIBLE] [HA] Order changed in the failover actions script (aio_transitions.sh).
 * oml-463 [ANSIBLE] [HA] Django, Asterisk, Cron & Nginx components playbook for deploying in HA.
+<<<<<<< HEAD
 * oml-2586 [WEB] Pending translations into English have been completed
+=======
+* oml-2586 [WEB] Pending translations into English and Portuguese have been completed
+>>>>>>> 0df11d1 (release-1.33.3)
 
 ## Fixed
 
@@ -28,7 +32,11 @@
 ```
     omnileads_img: docker.io/omnileads/omlapp:240308.01
     asterisk_img: docker.io/omnileads/asterisk:240226.01
+<<<<<<< HEAD
     fastagi_img: docker.io/omnileads/fastagi:240228.01
+=======
+    fastagi_img: docker.io/omnileads/fastagi:240128.01
+>>>>>>> 0df11d1 (release-1.33.3)
     astami_img: docker.io/omnileads/astami:231230.01
     nginx_img: docker.io/omnileads/nginx:240105.01
     websockets_img: docker.io/omnileads/websockets:231125.01
