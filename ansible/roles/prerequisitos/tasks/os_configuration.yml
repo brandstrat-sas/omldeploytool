@@ -193,8 +193,7 @@
   become: yes
   shell: "podman run -it --rm --name nginx-certbot -e FQDN={{ fqdn }} -e EMAIL={{ ha_notification_email }} -e RENEW_CERTIFICATE=false -v '/opt/certbot/letsencrypt:/etc/letsencrypt' -v '/opt/certbot/webroot:/var/www/certbot' -p 80:80 docker.io/omnileads/certbot:240201.01"
   tags:
-    - install
-    - upgrade
+    - install  
   when:
     - certs == "certbot"  
 
@@ -209,7 +208,6 @@
     remote_src: yes
   tags:
     - install
-    - upgrade
   when:
     - certs == "certbot"  
 
@@ -223,8 +221,7 @@
     mode: 0777
     remote_src: yes
   tags:
-    - install
-    - upgrade
+    - install    
   when:
     - certs == "certbot"  
 
