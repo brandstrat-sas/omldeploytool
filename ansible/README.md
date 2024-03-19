@@ -189,18 +189,6 @@ Then, once we have adjusted the inventory.yml file inside the tenant's folder, w
 ./deploy.sh --action=install --tenant=cloud_oml
 ```
 
-<<<<<<< HEAD
-=======
-# TLS/SSL certs provisioning :closed_lock_with_key: <a name="tls-cert-provisioning"></a>
-
-From the inventory variable *certs* you can indicate what to do with the SSL certificates.
-The possible options are:
-
-* **selfsigned**: which will display the self-signed certificates (not recommended for production).
-* **certbot**: deploy an instance with automatically generated Let's Encrypt SSL certificates.
-* **custom**: if the idea is to implement your own certificates. Then you must place them inside instances/tenant_name_folder/ with the names: *cert.pem* for and *key.pem*
-
->>>>>>> d25215d (release-1.33.3)
 # Install on Linux instance 🚀 <a name="aio-deploy"></a>
 
 You must have a generic Linux instance (Redhat or Debian based) with with internet access and your public SSH key available, as Ansible needs to establish an SSH connection using the public key.
@@ -905,11 +893,6 @@ Once the URL is available with the App returning the login view,  we can log in 
 oml_manage --reset_pass
 ```
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 0df11d1 (release-1.33.3)
 ## OMniLeads Enterprise
 
 What is OMniLeads Enterprise?
