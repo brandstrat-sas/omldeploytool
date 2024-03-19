@@ -193,7 +193,10 @@ services:
       - REDIS_PORT=6379
       - GOOGLE_API_KEY=${GOOGLE_API_KEY}
       - GOOGLE_APPLICATION_CREDENTIALS=/tmp/google_credential.json
+      - MY_LANGUAGE_CODE = es-AR
     restart: on-failure      
+    volumes:
+      - ./asterisk_custom/google_credential.json:/tmp/google_credential.json    
     networks:
       - omnileads
     
