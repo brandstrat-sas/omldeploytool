@@ -308,6 +308,20 @@ services:
     networks:
       - omnileads
 
+  audiosocket:
+    image: ${OMLAUDIOSOCKET_IMG}
+    container_name: oml-audiosocket    
+    environment:
+      - TZ=${TZ}
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+      - GOOGLE_APPLICATION_CREDENTIALS=/tmp/google_credential.json
+      - MY_LANGUAGE_CODE = es-AR
+    restart: on-failure      
+    volumes:
+      - ./asterisk_custom/google_credential.json:/tmp/google_credential.json    
+    networks:
+      - omnileads
+
   acd:
     container_name: oml-asterisk
     depends_on:
@@ -353,8 +367,8 @@ services:
     restart: on-failure
     stop_grace_period: 1m30s
     working_dir: /etc/asterisk
-    #volumes:
-    #  - ./asterisk_custom/fidelio/oml_extensions_custom.conf:/etc/asterisk/oml_extensions_custom.conf
+    volumes:
+      - ./asterisk_custom/oml_extensions_custom.conf:/etc/asterisk/oml_extensions_custom.conf
     #  - ./asterisk_custom/fidelio/bot.py:/var/lib/asterisk/agi-bin/bot.py
 
   kamailio:
