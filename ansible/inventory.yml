@@ -1,4 +1,4 @@
-# Copyright (C) 2023 Freetech Solutions
+# Copyright (C) 2024 Freetech Solutions
 
 # This file is part of OMniLeads
 
@@ -16,7 +16,7 @@
 # along with this program. If not, see http://www.gnu.org/licenses/.
 ---
 ###############################################################################################################
-# -- The complete list of host                                                                                #
+##############################   The complete list of host  ################################################### 
 ###############################################################################################################
 all:
   children:
@@ -150,6 +150,7 @@ all:
 ##################################################################################################################
 # -- OMniLeads Common Variables                                                                                  #
 ##################################################################################################################
+  
   vars:
     # --- ansible user auth connection
     ansible_user: root
@@ -174,8 +175,7 @@ all:
     # --- time zone (for example: America/Argentina/Cordoba)
     TZ: America/Argentina/Cordoba
     # --- TLS/SSL Certs configuration (selfsigned, custom or certbot letsencrypt)
-    # --- if you have your own certs, put them into instances/tenant folder and
-    # --- change this to *custom*
+    # --- https://gitlab.com/omnileads/omldeploytool/-/blob/develop/ansible/README.md?ref_type=heads#tls-cert-provisioning  
     certs: selfsigned
     # --- PostgreSQL    
     postgres_port: 5432

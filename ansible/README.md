@@ -12,22 +12,23 @@
 * [Bash + Ansible](#bash-ansible)
 * [Ansible + Inventory](#ansible-inventory)
 * [Bash Script deploy.sh](#bash-script-deploy)
-* [Subscriber tracking & TLS certs](#subscriber-traking)
+* [Subscriber tracking](#subscriber-traking)
 * [Deploy all in one (AIO) instance](#aio-deploy)
-* [Deploy Cluster all in three (AIT) instance](#ait-deploy)
-* [Deploy Onpremise Cluster HA](#cluster-ha-deploy)
-* [Deploy OMniLeads Enterprise](#omnileads-enterprise)
-* [OMniLeads Podman containers](#podman-systemd)
 * [TLS Certs provisioning](#tls-cert-provisioning)
 * [Security](#security)
+* [Deploy OMniLeads Enterprise](#omnileads-enterprise)
+* [OMniLeads Podman containers](#podman-systemd)
+* [Asterisk Dialplan & other customizations](#asterisk_customizations)
+* [Container image & tag customizations](#components_img)
 * [Deploy an upgrade from CentOS7](#upgrade_from_centos7)
 * [Deploy an upgrade](#upgrades)
 * [Deploy a rollback](#rollback)
 * [Deploy a backup](#backups)
 * [Deploy a restore](#restore)
 * [Observability](#observability)
-* [Container image & tag customizations](#components_img)
 * [Scalability](#scalability)
+* [Deploy Cluster all in three (AIT) instance](#ait-deploy)
+* [Deploy Onpremise Cluster HA](#cluster-ha-deploy)
 * [Cluster HA recovery tools](#cluster_ha_recovery)
 
 # OMniLeads automation your subscribers deploys with Ansible
@@ -188,15 +189,6 @@ Then, once we have adjusted the inventory.yml file inside the tenant's folder, w
 ./deploy.sh --action=install --tenant=cloud_oml
 ```
 
-# TLS/SSL certs provisioning :closed_lock_with_key: <a name="tls-cert-provisioning"></a>
-
-From the inventory variable *certs* you can indicate what to do with the SSL certificates.
-The possible options are:
-
-* **selfsigned**: which will display the self-signed certificates (not recommended for production).
-* **certbot**: deploy an instance with automatically generated Let's Encrypt SSL certificates.
-* **custom**: if the idea is to implement your own certificates. Then you must place them inside instances/tenant_name_folder/ with the names: *cert.pem* for and *key.pem*
-
 # Install on Linux instance 🚀 <a name="aio-deploy"></a>
 
 You must have a generic Linux instance (Redhat or Debian based) with with internet access and your public SSH key available, as Ansible needs to establish an SSH connection using the public key.
@@ -264,6 +256,418 @@ Once the URL is available with the App returning the login view,  we can log in 
 ```
 oml_manage --reset_pass
 ```
+
+
+# TLS/SSL certs provisioning :closed_lock_with_key: <a name="tls-cert-provisioning"></a>
+
+From the inventory variable *certs* you can indicate what to do with the SSL certificates.
+The possible options are:
+
+* **selfsigned**: which will display the self-signed certificates (not recommended for production).
+* **certbot**: deploy an instance with automatically generated Let's Encrypt SSL certificates.
+
+
+When working with self-generated certificates in the deployment using Certbot, we must ensure that our instance has DNS resolution based on our FQDN. Additionally, we must ensure that our port 80 is accessible from the certificate authority.
+
+```
+certs: certbot
+fqdn: omlinstance.domain.com
+```
+
+
+* **custom**: if the idea is to implement your own certificates. Then you must place them inside instances/tenant_name_folder/ with the names: *cert.pem* for and *key.pem*
+
+
+Custom certificates should be placed within the folder where we store the inventory file used to manage the instances, i.e., *instances/tenants_folder*.
+
+If we are going to use *certs: custom*, then the certificate and key files should be named *cert.pem* and *key.pem*. Although we can also use different names, in that case, instead of using *certs: custom*, we must change it to:
+
+```
+cert_file_name: cert_custom_filename.pem
+key_file_name: key_custom_filename.pem 
+```
+
+```
+./deploy.sh --action=install --tenant=cloud_oml
+```
+
+# Security 🛡️ <a name="security"></a>
+
+OMniLeads is an application that combines Web (https), WebRTC (wss & sRTP) and VoIP (SIP & RTP) technologies. This implies a certain complexity and 
+when deploying it in production under an Internet exposure scenario. 
+
+On the Web side of the things the ideal is to implement a Reverse Proxy or Load Balancer ahead of OMnileads, i.e. exposed to the Internet (TCP 443) 
+and that it forwards the requests to the Nginx of the OMniLeads stack. On the VoIP side, when connecting to the PSTN via VoIP it is ideal to 
+operate behind an SBC (Session Border Controller) exposed to the Internet.
+
+However, we can intelligently use the **Cloud Firewall** technology when operating over VPS exposed to the Internet.
+
+![Diagrama security](./png/security.png)
+
+Below are the Firewall rules to be applied on All In One instance:
+
+* 443/tcp Nginx: This is where Web/WebRTC requests to Nginx are processed. Port 443 can be opened to the entire Internet.
+
+* 20000/30000 UDP WebRTC sRTP RTPengine: this port range can be opened to the entire Internet.
+
+* 5060/UDP Asterisk: This is where SIP requests for incoming calls from the ITSP(s) are processed. This port must be opened by restricting by origin on the IP(s) of the PSTN SIP termination provider(s).
+
+* 40000/50000 UDP: VoIP RTP Asterisk: this port range can be opened to the entire Internet.
+
+* 9090/tcp Prometheus metrics: This is where the connections coming from the monitoring center. This port can be opened by restricting by origin in the IP of the monitoring center.
+
+
+## OMniLeads Enterprise
+
+What is OMniLeads Enterprise?
+
+It is an additional layer with complementary modules to OMniLeads Community (GPLV3). It includes functionalities such as advanced reports, wallboards, and automated satisfaction surveys implemented as modules.
+
+This version can be implemented simply by referencing the image for the container that implements the web application.
+Therefore, in our "inventory.yml" variable file, we must invoke the enterprise imag e. To do this, we add the string "-enterprise" to the end of the tag that describes the image of the omnileads_img component:
+
+```
+omnileads_img: docker.io/your_registry/omlapp:231227.01-enterprise
+```
+
+## Systemd & Podman 🔧 <a name="podman-systemd"></a>
+
+Then, once OMnileads is deployed on the corresponding instance/s, each container on which a component works
+can be managed as a systemd service.
+
+```
+systemctl start component
+systemctl restart component
+systemctl stop component
+```
+
+Behind every action triggered by the systemctl command, there is actually a Podman container that is launched, stopped, or restarted. This container is the result of the image invoked along with the environment variables.
+
+For example, if we look at the systemd file of the Nginx component.
+
+/etc/systemd/system/nginx.service looks like:
+
+```
+[Unit]
+Description=Podman container-oml-nginx-server.service
+Documentation=man:podman-generate-systemd(1)
+Wants=network-online.target
+After=network-online.target
+RequiresMountsFor=%t/containers
+
+[Service]
+Environment=PODMAN_SYSTEMD_UNIT=%n
+Restart=on-failure
+TimeoutStopSec=70
+ExecStartPre=/bin/rm -f %t/%n.ctr-id
+ExecStart=/usr/bin/podman run \
+  --cidfile=%t/%n.ctr-id \
+  --cgroups=no-conmon \
+  --sdnotify=conmon \
+  --replace \
+  --detach \
+  --network=host \
+  --env-file=/etc/default/nginx.env \
+  --name=oml-nginx-server \
+  --volume=/etc/omnileads/certs:/etc/omnileads/certs \
+  --volume=django_static:/opt/omnileads/static \
+  --volume=django_callrec_zip:/opt/omnileads/asterisk/var/spool/asterisk/monitor \
+  --rm  \
+  docker.io/omnileads/nginx:230215.01
+ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
+ExecStopPost=/usr/bin/podman rm -f --ignore --cidfile=%t/%n.ctr-id
+Type=notify
+NotifyAccess=all
+
+[Install]
+WantedBy=default.target
+```
+
+/etc/default/nginx.env looks like:
+
+```
+DJANGO_HOSTNAME=172.16.101.221
+DAPHNE_HOSTNAME=172.16.101.221
+
+KAMAILIO_HOSTNAME=localhost
+WEBSOCKETS_HOSTNAME=172.16.101.221
+ENV=prodenv
+
+S3_ENDPOINT=http://172.16.101.221:9000
+```
+
+This is the standard for all components.
+
+
+# Upgrade from CentOS-7 OMniLeads instance :arrows_counterclockwise: <a name="upgrade_from_centos7"></a>
+
+
+You must deploy the new OMniLeads instances making sure that the inventory.yml variables listed below should be the same as their 
+counterparts in the CentOS 7 instance from which you want to migrate. below should be the same as their counterparts in the CentOS 7 instance from which you want to migrate.
+
+* ami_user
+* ami_password
+* postgres_password
+* postgres_database
+* postgres_user
+* dialer_user
+* dialer_password
+
+We must consider that the version of the Postgres image to be deployed with OMniLeads 2.X should be "omnileads/postgres:230624.01". Therefore, you will need to temporarily change the variable groupall/all inherent to Postgres, as follows:
+
+```
+#################### containers img taf  ################################
+
+#postgres_img: docker.io/postgres:14.9-bullseye
+postgres_img: omnileads/postgres:230624.01
+```
+
+On the OMniLeads 1.X CentOS-7 instance run the following commands to generate a postgres backup on the one hand 
+and then upload to the Bucket Object Storage of the new OMniLeads version the recordings, telephony audios, Asterisk customizations (if any) _custom.conf & _override.conf. 
+(if any) Asterisk _custom.conf & _override_conf customizations and also the Postgres backup itself.
+
+```
+export NOMBRE_BACKUP=some_file_name
+pg_dump -h ${PGHOST} -p ${PGPORT} -U ${PGUSER} -Fc -b -v -f /tmp/${NOMBRE_BACKUP}.sql -d ${PGDATABASE} --no-acl
+export AWS_ACCESS_KEY_ID=$your_new_instance_bucket_key
+export AWS_SECRET_ACCESS_KEY=$your_new_instance_bucket_secret_key
+export S3_BUCKET_NAME=$your_new_instance_bucket_name
+```
+
+If you are going to use the object storage self-hosted by OMnileads in an AIO instance:
+```
+export S3_ENDPOINT=http://$OML_AIO_IP:9000 
+```
+
+If you are going to use the object storage self-hosted by OMnileads in an AIT cluster instance:
+```
+export S3_ENDPOINT=http://$OML_DATA_IP:9000 
+```
+
+If you are going to use an external object storage service:
+```
+export S3_ENDPOINT=https://$object_storage_url 
+```
+
+Finally, all backups are uploaded to the bucklet of the new OMniLeads instance:
+```
+aws --endpoint ${S3_ENDPOINT} s3 sync /opt/omnileads/media_root s3://${S3_BUCKET_NAME}/media_root
+aws --endpoint ${S3_ENDPOINT} s3 sync /opt/omnileads/asterisk/var/spool/asterisk/monitor/ s3://${S3_BUCKET_NAME}
+aws --endpoint ${S3_ENDPOINT} s3 cp /tmp/pgsql-backup-$NOMBRE_BACKUP.sql  s3://${S3_BUCKET_NAME}/backup/
+```
+
+Given that all the necessary components for restoring the service on the new infrastructure are available in the same Bucket,
+you can proceed with deploying the restoration process.
+
+At the end of the file there is the variable *restore_file_timestamp* which must contain the name used in the previous step to refer to the backups.
+previous step to refer to the backups taken.
+
+```
+restore_file_timestamp: $NOMBRE_BACKUP
+```
+
+Execute the restore deploy on the tenant in question:
+
+```
+./deploy.sh --action=restore --tenant=$your_inventory_folder_name
+```
+
+Now we must revert back to the original Postgres image, which means restoring our group_vars/all file to its previous state:
+
+```
+#################### containers img taf  ################################
+
+postgres_img: docker.io/postgres:14.9-bullseye
+#postgres_img: omnileads/postgres:230624.01
+```
+
+And finally, execute:
+
+```
+./deploy.sh --action=upgrade --tenant=$your_inventory_folder_name
+```
+
+# Asterisk dialplan and other customizations 🛡️ <a name="asterisk_customizations"></a>
+
+Based on containers, code customizations made within the container are ephemeral. To make permanent modifications to the Asterisk dialplan, scripts, or configurations, it's recommended to use custom images:
+
+An example of how to do this is outlined in this [repo](https://gitlab.com/omnileads/acd-customizations-example/)
+
+# Use your own container registry & images. OMniLeads-enterprise :office: <a name="components_img"></a>
+
+In the inventory file you can customize the tags of the images to display, as well as the registry from where to download them.
+
+```
+    # ------------------------------------------------------------------------------------------------ #
+    # ---------------------------- Container IMG TAG customization ----------------------------------- #
+    # ------------------------------------------------------------------------------------------------ #
+    
+    # --- For each OML Deploy Tool release, a versioned stack with the latest stable images of each component is maintained on inventory.yml
+    # --- You can combine the versions as you like, also use your own TAGs, using the following TAG version variables
+    
+    omnileads_img: your_registry/omlapp:231227.01
+    asterisk_img: your_registry/asterisk:240102.01
+    fastagi_img: your_registry/fastagi:240104.01
+    astami_img: your_registry/astami:231230.01
+    nginx_img: your_registry/nginx:240105.01
+    websockets_img: your_registry/websockets:231125.01
+    kamailio_img: your_registry/kamailio:231125.01
+    rtpengine_img: your_registry/rtpengine:231125.01
+    redis_img: your_registry/redis:231125.01
+
+    # --- Activate the OMniLeads Enterprise Edition.
+    # --- on the contrary you will deploy OMniLeads OSS Edition with GPLV3 licensed. 
+    
+    enterprise_edition: false
+```
+
+
+# Perform a Backup :floppy_disk: <a name="backups"></a>
+
+
+Deploying a backup involves the asterisk custom configuration files /etc/asterisk/custom on the one hand and the database
+on the other, using the bucket associated with the instance as a backup log.
+
+To launch a backup, simply call the deploy.sh script:
+
+```
+./deploy.sh --action=backup --tenant=tenant_name_folder
+```
+
+The backup is deposited in the bucket, being under the backup folder on one side a .sql file with the timestamp and on the other side another directory is generated with the timestamp date and there are the custom and override asterisk files.
+another directory is generated with the timestamp date and there inside are the asterisk custom and override files.
+
+![Diagrama deploy backup](./png/deploy-backup.png)
+
+# Upgrades :arrows_counterclockwise:  <a name="upgrades"></a>
+
+The OMniLeads project builds images of all its components to be hosted in docker hub: https://hub.docker.com/repositories/omnileads.
+
+Every time a new Release of the application becomes available as an image in the container registry, it will be impacted.
+the **Releases-Notes.md** file available in the root of this repository, which exposes the mapping between the
+versions of the images of each component for each release.
+
+Therefore to apply updates we must first launch on this repository:
+
+```
+git pull origin main
+git checkout release-1.33.3
+```
+
+Then indicate at the inventory.yml level within the corresponding tenant folder, the versions
+desired, for example:
+
+```
+omnileads_img: docker.io/omnileads/omlapp:240201.01
+asterisk_img: docker.io/omnileads/asterisk:240102.01
+fastagi_img: docker.io/omnileads/fastagi:240104.01
+astami_img: docker.io/omnileads/astami:231230.01
+nginx_img: docker.io/omnileads/nginx:240105.01
+websockets_img: docker.io/omnileads/websockets:231125.01
+kamailio_img: docker.io/omnileads/kamailio:231125.01
+rtpengine_img: docker.io/omnileads/rtpengine:231125.01
+redis_img: docker.io/omnileads/redis:231125.01
+```
+
+Then the deploy.sh script must be called with the --upgrade parameter.
+
+```
+./deploy.sh --action=upgrade --tenant=tenant_name_folder
+```
+
+# Rollback  :leftwards_arrow_with_hook: <a name="rollback"></a>
+
+
+The use of containers when executing the OMniLeads components allows us to easily apply rollbacks towards versions
+frozen history and accessible through the "tag".
+
+```
+omnileads_img: docker.io/omnileads/omlapp:240117.01
+asterisk_img: docker.io/omnileads/asterisk:240102.01
+fastagi_img: docker.io/omnileads/fastagi:240104.01
+astami_img: docker.io/omnileads/astami:231230.01
+nginx_img: docker.io/omnileads/nginx:240105.01
+websockets_img: docker.io/omnileads/websockets:231125.01
+kamailio_img: docker.io/omnileads/kamailio:231125.01
+rtpengine_img: docker.io/omnileads/rtpengine:231125.01
+redis_img: docker.io/omnileads/redis:231125.01
+```
+
+Then the deploy.sh script must be called with the --upgrade parameter.
+
+```
+./deploy.sh --action=upgrade --tenant=tenant_name_folder
+```
+
+# Restore :clock9: <a name="restore"></a>
+
+
+You can proceed with a restore on a fresh installation as well as on a productive instance. 
+
+Apply restore on the new instance: The two final parameters of the inventory.yml must be uncommented. On the one hand to indicate that the bucket does not have trusted certificates and the second one is to indicate the restore that we want to execute.
+```
+restore_file_timestamp: 1681215859 
+```
+
+Run restore deploy:
+
+```
+./deploy.sh --action=restore --tenant=digitalocean_deb
+```
+
+# Observability :mag_right: :bar_chart: <a name="observability"></a>
+
+Inside each subscriber linux instance the deployer put some containers in order to not only be able to 
+to observe metrics at the operating system level but also to obtain specific metrics of components such as redis, postgres or asterisk, 
+as well as to get the logs of the operating system and the also to get the logs of the operating system and the components and send them to the observability stack.
+
+This allows us to propose a multi-instance observability center. On which it is possible to centralize the monitoring of OS and application metrics
+of the OS and the application and its components, as well as centralizing log analysis.
+
+This is possible thanks to the Prometheus approach together with its exporters for metrics monitoring on the one hand, and Loki and Promtail on the other. 
+while Loki and Promtail implement the centralization of logs.
+
+* **Loki**: used to storage file logs generated by OMniLeads components like django, nginx, kamailio, etc.
+* **Promtail**: used to parse logs file on Linux VM nd send this to Loki DB.
+
+![Diagrama deploy tool zoom](./png/observability_boxes.png)
+
+Finally, you will be able to have an instance of Grafana and Prometheus that invoke this Prometheus deployed on tenat like data-source in order
+to them build dashboards, on the other hand Grafana must to invoke the Loki deployed on tenant like data-source for logs analisys.
+
+![Diagrama deploy tool zoom](./png/observability_MT.png).
+
+Centralized observability.
+
+# Scalability settings <a name="#scalability"></a>
+
+* Asterisk:
+
+This is the application server that powers the VoIP part of OMniLeads. You can adjust the following values to achieve better performance on the Asterisk component, aiming to handle more than 200 concurrent calls.
+
+We can use asterisk_mem_limit to limit the amount of memory the process can consume. As for pjsip, stasis, and other settings in .conf files, we recommend referring to this article: https://docs.asterisk.org/Deployment/Performance-Tuning/.
+
+By setting the scale_asterisk value on the inventory.yml host or group, you enable the ability to specify some params.
+
+```
+scale_asterisk: true
+  asterisk_mem_limit: 1G
+  pjsip_threadpool_idle_timeout: 120
+  pjsip_threadpool_max_size: 150
+```
+
+* UWSGI:
+
+This is the application server that powers the OMniLeads Django application.
+
+By setting the scale_uwsgi value on the host or group, you enable the ability to specify the number of processes and threads it will handle.
+
+```
+scale_uwsgi: true
+  processes: 8
+  threads: 1 
+```
+
 
 # Install on three (Data, Voice & Web) cluster instances. 🚀 <a name="ait-deploy"></a>
 
@@ -488,378 +892,6 @@ Once the URL is available with the App returning the login view,  we can log in 
 oml_manage --reset_pass
 ```
 
-## OMniLeads Enterprise
-
-What is OMniLeads Enterprise?
-
-It is an additional layer with complementary modules to OMniLeads Community (GPLV3). It includes functionalities such as advanced reports, wallboards, and automated satisfaction surveys implemented as modules.
-
-This version can be implemented simply by referencing the image for the container that implements the web application.
-Therefore, in our "inventory.yml" variable file, we must invoke the enterprise imag e. To do this, we add the string "-enterprise" to the end of the tag that describes the image of the omnileads_img component:
-
-```
-omnileads_img: docker.io/your_registry/omlapp:231227.01-enterprise
-```
-
-## Systemd & Podman 🔧 <a name="podman-systemd"></a>
-
-Then, once OMnileads is deployed on the corresponding instance/s, each container on which a component works
-can be managed as a systemd service.
-
-```
-systemctl start component
-systemctl restart component
-systemctl stop component
-```
-
-Behind every action triggered by the systemctl command, there is actually a Podman container that is launched, stopped, or restarted. This container is the result of the image invoked along with the environment variables.
-
-For example, if we look at the systemd file of the Nginx component.
-
-/etc/systemd/system/nginx.service looks like:
-
-```
-[Unit]
-Description=Podman container-oml-nginx-server.service
-Documentation=man:podman-generate-systemd(1)
-Wants=network-online.target
-After=network-online.target
-RequiresMountsFor=%t/containers
-
-[Service]
-Environment=PODMAN_SYSTEMD_UNIT=%n
-Restart=on-failure
-TimeoutStopSec=70
-ExecStartPre=/bin/rm -f %t/%n.ctr-id
-ExecStart=/usr/bin/podman run \
-  --cidfile=%t/%n.ctr-id \
-  --cgroups=no-conmon \
-  --sdnotify=conmon \
-  --replace \
-  --detach \
-  --network=host \
-  --env-file=/etc/default/nginx.env \
-  --name=oml-nginx-server \
-  --volume=/etc/omnileads/certs:/etc/omnileads/certs \
-  --volume=django_static:/opt/omnileads/static \
-  --volume=django_callrec_zip:/opt/omnileads/asterisk/var/spool/asterisk/monitor \
-  --rm  \
-  docker.io/omnileads/nginx:230215.01
-ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
-ExecStopPost=/usr/bin/podman rm -f --ignore --cidfile=%t/%n.ctr-id
-Type=notify
-NotifyAccess=all
-
-[Install]
-WantedBy=default.target
-```
-
-/etc/default/nginx.env looks like:
-
-```
-DJANGO_HOSTNAME=172.16.101.221
-DAPHNE_HOSTNAME=172.16.101.221
-
-KAMAILIO_HOSTNAME=localhost
-WEBSOCKETS_HOSTNAME=172.16.101.221
-ENV=prodenv
-
-S3_ENDPOINT=http://172.16.101.221:9000
-```
-
-This is the standard for all components.
-
-# Security 🛡️ <a name="security"></a>
-
-OMniLeads is an application that combines Web (https), WebRTC (wss & sRTP) and VoIP (SIP & RTP) technologies. This implies a certain complexity and 
-when deploying it in production under an Internet exposure scenario. 
-
-On the Web side of the things the ideal is to implement a Reverse Proxy or Load Balancer ahead of OMnileads, i.e. exposed to the Internet (TCP 443) 
-and that it forwards the requests to the Nginx of the OMniLeads stack. On the VoIP side, when connecting to the PSTN via VoIP it is ideal to 
-operate behind an SBC (Session Border Controller) exposed to the Internet.
-
-However, we can intelligently use the **Cloud Firewall** technology when operating over VPS exposed to the Internet.
-
-![Diagrama security](./png/security.png)
-
-Below are the Firewall rules to be applied on All In One instance:
-
-* 443/tcp Nginx: This is where Web/WebRTC requests to Nginx are processed. Port 443 can be opened to the entire Internet.
-
-* 40000/50000 UDP: WebRTC sRTP RTPengine: this port range can be opened to the entire Internet.
-
-* 5060/UDP Asterisk: This is where SIP requests for incoming calls from the ITSP(s) are processed. This port must be opened by restricting by origin on the IP(s) of the PSTN SIP termination provider(s).
-
-* 20000/30000 UDP VoIP RTP Asterisk: this port range can be opened to the entire Internet.
-
-* 9090/tcp Prometheus metrics: This is where the connections coming from the monitoring center. This port can be opened by restricting by origin in the IP of the monitoring center.
-
-# Upgrade from CentOS-7 OMniLeads instance :arrows_counterclockwise: <a name="upgrade_from_centos7"></a>
-
-
-You must deploy the new OMniLeads instances making sure that the inventory.yml variables listed below should be the same as their 
-counterparts in the CentOS 7 instance from which you want to migrate. below should be the same as their counterparts in the CentOS 7 instance from which you want to migrate.
-
-* ami_user
-* ami_password
-* postgres_password
-* postgres_database
-* postgres_user
-* dialer_user
-* dialer_password
-
-We must consider that the version of the Postgres image to be deployed with OMniLeads 2.X should be "omnileads/postgres:230624.01". Therefore, you will need to temporarily change the variable groupall/all inherent to Postgres, as follows:
-
-```
-#################### containers img taf  ################################
-
-#postgres_img: docker.io/postgres:14.9-bullseye
-postgres_img: omnileads/postgres:230624.01
-```
-
-On the OMniLeads 1.X CentOS-7 instance run the following commands to generate a postgres backup on the one hand 
-and then upload to the Bucket Object Storage of the new OMniLeads version the recordings, telephony audios, Asterisk customizations (if any) _custom.conf & _override.conf. 
-(if any) Asterisk _custom.conf & _override_conf customizations and also the Postgres backup itself.
-
-```
-export NOMBRE_BACKUP=some_file_name
-pg_dump -h ${PGHOST} -p ${PGPORT} -U ${PGUSER} -Fc -b -v -f /tmp/${NOMBRE_BACKUP}.sql -d ${PGDATABASE} --no-acl
-export AWS_ACCESS_KEY_ID=$your_new_instance_bucket_key
-export AWS_SECRET_ACCESS_KEY=$your_new_instance_bucket_secret_key
-export S3_BUCKET_NAME=$your_new_instance_bucket_name
-mkdir /opt/omnileads/asterisk/etc/asterisk/custom
-cp /opt/omnileads/asterisk/etc/asterisk/*_custom* /opt/omnileads/asterisk/etc/asterisk/custom/
-cp /opt/omnileads/asterisk/etc/asterisk/*_override* /opt/omnileads/asterisk/etc/asterisk/custom/
-```
-
-If you are going to use the object storage self-hosted by OMnileads in an AIO instance:
-```
-export S3_ENDPOINT=http://$OML_AIO_IP:9000 
-```
-
-If you are going to use the object storage self-hosted by OMnileads in an AIT cluster instance:
-```
-export S3_ENDPOINT=http://$OML_DATA_IP:9000 
-```
-
-If you are going to use an external object storage service:
-```
-export S3_ENDPOINT=https://$object_storage_url 
-```
-
-Finally, all backups are uploaded to the bucklet of the new OMniLeads instance:
-```
-aws --endpoint ${S3_ENDPOINT} s3 sync /opt/omnileads/media_root s3://${S3_BUCKET_NAME}/media_root
-aws --endpoint ${S3_ENDPOINT} s3 sync /opt/omnileads/asterisk/var/spool/asterisk/monitor/ s3://${S3_BUCKET_NAME}
-aws --endpoint ${S3_ENDPOINT} s3 cp /tmp/pgsql-backup-$NOMBRE_BACKUP.sql  s3://${S3_BUCKET_NAME}/backup/
-aws --endpoint ${S3_ENDPOINT} s3 sync /opt/omnileads/asterisk/etc/asterisk/custom/ s3://${S3_BUCKET_NAME}/backup/asterisk/$NOMBRE_BACKUP/
-```
-
-Given that all the necessary components for restoring the service on the new infrastructure are available in the same Bucket,
-you can proceed with deploying the restoration process.
-
-At the end of the file there is the variable *restore_file_timestamp* which must contain the name used in the previous step to refer to the backups.
-previous step to refer to the backups taken.
-
-```
-restore_file_timestamp: $NOMBRE_BACKUP
-```
-
-Execute the restore deploy on the tenant in question:
-
-```
-./deploy.sh --action=restore --tenant=$your_inventory_folder_name
-```
-
-Now we must revert back to the original Postgres image, which means restoring our group_vars/all file to its previous state:
-
-```
-#################### containers img taf  ################################
-
-postgres_img: docker.io/postgres:14.9-bullseye
-#postgres_img: omnileads/postgres:230624.01
-```
-
-And finally, execute:
-
-```
-./deploy.sh --action=upgrade --tenant=$your_inventory_folder_name
-```
-
-
-# Perform a Backup :floppy_disk: <a name="backups"></a>
-
-
-Deploying a backup involves the asterisk custom configuration files /etc/asterisk/custom on the one hand and the database
-on the other, using the bucket associated with the instance as a backup log.
-
-To launch a backup, simply call the deploy.sh script:
-
-```
-./deploy.sh --action=backup --tenant=tenant_name_folder
-```
-
-The backup is deposited in the bucket, being under the backup folder on one side a .sql file with the timestamp and on the other side another directory is generated with the timestamp date and there are the custom and override asterisk files.
-another directory is generated with the timestamp date and there inside are the asterisk custom and override files.
-
-![Diagrama deploy backup](./png/deploy-backup.png)
-
-# Upgrades :arrows_counterclockwise:  <a name="upgrades"></a>
-
-The OMniLeads project builds images of all its components to be hosted in docker hub: https://hub.docker.com/repositories/omnileads.
-
-Every time a new Release of the application becomes available as an image in the container registry, it will be impacted.
-the **Releases-Notes.md** file available in the root of this repository, which exposes the mapping between the
-versions of the images of each component for each release.
-
-Therefore to apply updates we must first launch on this repository:
-
-```
-git pull origin main
-git checkout release-1.33.3
-```
-
-Then indicate at the inventory.yml level within the corresponding tenant folder, the versions
-desired, for example:
-
-```
-omnileads_img: docker.io/omnileads/omlapp:240201.01
-asterisk_img: docker.io/omnileads/asterisk:240102.01
-fastagi_img: docker.io/omnileads/fastagi:240104.01
-astami_img: docker.io/omnileads/astami:231230.01
-nginx_img: docker.io/omnileads/nginx:240105.01
-websockets_img: docker.io/omnileads/websockets:231125.01
-kamailio_img: docker.io/omnileads/kamailio:231125.01
-rtpengine_img: docker.io/omnileads/rtpengine:231125.01
-redis_img: docker.io/omnileads/redis:231125.01
-```
-
-Then the deploy.sh script must be called with the --upgrade parameter.
-
-```
-./deploy.sh --action=upgrade --tenant=tenant_name_folder
-```
-
-# Rollback  :leftwards_arrow_with_hook: <a name="rollback"></a>
-
-
-The use of containers when executing the OMniLeads components allows us to easily apply rollbacks towards versions
-frozen history and accessible through the "tag".
-
-```
-omnileads_img: docker.io/omnileads/omlapp:240117.01
-asterisk_img: docker.io/omnileads/asterisk:240102.01
-fastagi_img: docker.io/omnileads/fastagi:240104.01
-astami_img: docker.io/omnileads/astami:231230.01
-nginx_img: docker.io/omnileads/nginx:240105.01
-websockets_img: docker.io/omnileads/websockets:231125.01
-kamailio_img: docker.io/omnileads/kamailio:231125.01
-rtpengine_img: docker.io/omnileads/rtpengine:231125.01
-redis_img: docker.io/omnileads/redis:231125.01
-```
-
-Then the deploy.sh script must be called with the --upgrade parameter.
-
-```
-./deploy.sh --action=upgrade --tenant=tenant_name_folder
-```
-
-# Restore :clock9: <a name="restore"></a>
-
-
-You can proceed with a restore on a fresh installation as well as on a productive instance. 
-
-Apply restore on the new instance: The two final parameters of the inventory.yml must be uncommented. On the one hand to indicate that the bucket does not have trusted certificates and the second one is to indicate the restore that we want to execute.
-```
-restore_file_timestamp: 1681215859 
-```
-
-Run restore deploy:
-
-```
-./deploy.sh --action=restore --tenant=digitalocean_deb
-```
-
-# Observability :mag_right: :bar_chart: <a name="observability"></a>
-
-Inside each subscriber linux instance the deployer put some containers in order to not only be able to 
-to observe metrics at the operating system level but also to obtain specific metrics of components such as redis, postgres or asterisk, 
-as well as to get the logs of the operating system and the also to get the logs of the operating system and the components and send them to the observability stack.
-
-This allows us to propose a multi-instance observability center. On which it is possible to centralize the monitoring of OS and application metrics
-of the OS and the application and its components, as well as centralizing log analysis.
-
-This is possible thanks to the Prometheus approach together with its exporters for metrics monitoring on the one hand, and Loki and Promtail on the other. 
-while Loki and Promtail implement the centralization of logs.
-
-* **Loki**: used to storage file logs generated by OMniLeads components like django, nginx, kamailio, etc.
-* **Promtail**: used to parse logs file on Linux VM nd send this to Loki DB.
-
-![Diagrama deploy tool zoom](./png/observability_boxes.png)
-
-Finally, you will be able to have an instance of Grafana and Prometheus that invoke this Prometheus deployed on tenat like data-source in order
-to them build dashboards, on the other hand Grafana must to invoke the Loki deployed on tenant like data-source for logs analisys.
-
-![Diagrama deploy tool zoom](./png/observability_MT.png).
-
-Centralized observability.
-
-# Use your own container registry & images. OMniLeads-enterprise :office: <a name="components_img"></a>
-
-In the inventory file you can customize the tags of the images to display, as well as the registry from where to download them.
-
-```
-    # ------------------------------------------------------------------------------------------------ #
-    # ---------------------------- Container IMG TAG customization ----------------------------------- #
-    # ------------------------------------------------------------------------------------------------ #
-    
-    # --- For each OML Deploy Tool release, a versioned stack with the latest stable images of each component is maintained on inventory.yml
-    # --- You can combine the versions as you like, also use your own TAGs, using the following TAG version variables
-    
-    omnileads_img: docker.io/your_registry/omlapp:231227.01
-    asterisk_img: docker.io/your_registry/asterisk:240102.01
-    fastagi_img: docker.io/omnileads/fastagi:240104.01
-    astami_img: docker.io/omnileads/astami:231230.01
-    nginx_img: docker.io/omnileads/nginx:240105.01
-    websockets_img: docker.io/omnileads/websockets:231125.01
-    kamailio_img: docker.io/omnileads/kamailio:231125.01
-    rtpengine_img: docker.io/omnileads/rtpengine:231125.01
-    redis_img: docker.io/your_registry/redis:231125.01
-
-    # --- Activate the OMniLeads Enterprise Edition.
-    # --- on the contrary you will deploy OMniLeads OSS Edition with GPLV3 licensed. 
-    
-    enterprise_edition: false
-```
-
-# Scalability <a name="#scalability"></a>
-
-* Asterisk:
-
-This is the application server that powers the VoIP part of OMniLeads. You can adjust the following values to achieve better performance on the Asterisk component, aiming to handle more than 200 concurrent calls.
-
-We can use asterisk_mem_limit to limit the amount of memory the process can consume. As for pjsip, stasis, and other settings in .conf files, we recommend referring to this article: https://docs.asterisk.org/Deployment/Performance-Tuning/.
-
-By setting the scale_asterisk value on the inventory.yml host or group, you enable the ability to specify some params.
-
-```
-scale_asterisk: true
-  asterisk_mem_limit: 1G
-  pjsip_threadpool_idle_timeout: 120
-  pjsip_threadpool_max_size: 150
-```
-
-* UWSGI:
-
-This is the application server that powers the OMniLeads Django application.
-
-By setting the scale_uwsgi value on the host or group, you enable the ability to specify the number of processes and threads it will handle.
-
-```
-scale_uwsgi: true
-  processes: 8
-  threads: 1 
-```
 
 # Postgres Cluster actions :arrows_clockwise: <a name="cluster_ha_recovery"></a>
 
@@ -896,3 +928,4 @@ the RO VIP, a recovery deploy of the postgres backup node must be executed.
 ```
 ./deploy.sh --action=pgsql_node_recovery_backup --tenant=tenant_name_folder
 ```
+
