@@ -305,7 +305,7 @@ all:
     # --- If you want to deploy OMniLeads Enterprise, you just need to add "-enterprise" as a suffix to the omnileads_img image tag
     # --- for example: omnileads_img: docker.io/omnileads/omlapp:240216.01-enterprise.
 
-    omnileads_img: docker.io/omnileads/omlapp:240318-whatsapp
+    omnileads_img: docker.io/omnileads/omlapp:240321.01
     asterisk_img: docker.io/omnileads/asterisk:240226.01
     fastagi_img: docker.io/omnileads/fastagi:240228.01
     astami_img: docker.io/omnileads/astami:231230.01
