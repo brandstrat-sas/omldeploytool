@@ -4,23 +4,23 @@
 
 ## What is OMniLeads ?
 
-<p>OmniLeads (OML) is an innovative Open Source software solution leveraging WebRTC technology (WebRTC) to empower Contact Centers. Designed with versatility in mind, OML supports a wide range of communication channels including Voice, Video, and very soon WhatsApp. This makes it an ideal choice for organizations looking to manage and deploy efficient, omni-channel customer service strategies.</p>
+<p>OmniLeads (OML) is an innovative Open Source software solution leveraging WebRTC technology (WebRTC) to empower Contact Centers. Designed with versatility in mind, OML supports a wide range of communication channels including Voice calls, Video calls, and WhatsApp. This makes it an ideal choice for organizations looking to manage and deploy efficient, omni-channel customer service strategies.</p>
 
 As part of the roadmap of the develop we are planning to include SMS, Social Networks integration and Chat Campaigns from the web page, and many other features
 
 ## Features
 
-OML currently facilitates robust management and telephonic support using various campaign types:
+OML currently facilitates robust management and telephonic, video and whatsapp support using various campaign types:
 
-* Inbound Campaigns: Efficiently manage incoming calls and route them to appropriate agents.
-* Preview Campaigns: Prepare agents with relevant information before they make a call.
+* Inbound Campaigns: Efficiently manage incoming calls or whatsapp messages and route them to appropriate agents.
+* Preview Campaigns: Prepare agents with relevant information before they make a call or send a whatsapp message.
 * Manual Outbound Campaigns: Provide tools for agents to manually reach out to customers with ease.
 * Web-Based Video Calls: Video call campaigns directly from web pages, enhancing the personal touch in customer interactions.
 * WhatsApp Integration: Expand your reach and accessibility with upcoming WhatsApp communication capabilities.
 
 Additionally, it includes the typical functionalities of contact center management:
 
-* Agente & Supervisor console based on WebRTC.
+* Agent & Supervisor console based on WebRTC.
 * Differents user profiles: administrator, supervisor admin, supervisor customer & agent.
 * Multiple campaigns: voice, video & WhatsApp (comming soon) management.
 * Answering machine detection.
@@ -53,8 +53,7 @@ OMniLeads documentation: https://docs.omnileads.net/
 ## Useful resources:
 
 * [Community Discord](https://discord.com/invite/CFZYxJtN)
-* [Community Forum](https://forum.omnileads.net)
-* [Official training](https://www.omnileads.net/slides/entrenamiento-profesional-en-omnileads-1)
+* [Official training](https://omnileads.net/slides/entrenamiento-profesional-en-omnileads-1)
 
 ## License
 
@@ -62,5 +61,5 @@ GPLv3. Every source code file contains the license preamble and copyright detail
 
 ## Issues & Bugs reporting:
 
-For Issues & Bugs reporting: https://gitlab.com/omnileads/ominicontacto/issues
+For Issues & Bugs reporting: https://gitlab.com/omnileads/omldeploytool/issues
 
