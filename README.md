@@ -73,11 +73,11 @@ OMniLeads documentation: https://docs.omnileads.net/
 * [Official training](https://www.omnileads.net/slides/entrenamiento-profesional-en-omnileads-1)
 * [Youtube channel](https://www.youtube.com/@omnileadsoml7557)
 
-## License
+## License 📃
 
 GPLv3. Every source code file contains the license preamble and copyright details.
 
-## Issues & Bugs reporting:
+## Issues & Bugs reporting: 🐛 💡
 
 For Issues & Bugs reporting: https://gitlab.com/omnileads/ominicontacto/issues
 
