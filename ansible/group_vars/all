@@ -1,9 +1,9 @@
 ---
 
-#################### containers img taf  ################################
+#################### containers img tags  ################################
 
 postgres_img: docker.io/postgres:14.9-bullseye
-#postgres_img: omnileads/postgres:230624.01
+#postgres_img: docker.io/omnileads/postgres:230624.01
 prometheus_img: docker.io/prom/prometheus:v2.49.1
 prometheus_node_exp_img: docker.io/prom/node-exporter:v1.7.0
 promtail_img: docker.io/grafana/promtail:latest
