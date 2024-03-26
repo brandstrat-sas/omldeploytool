@@ -84,7 +84,7 @@ for example:
 
 ## Ansible 🔧 <a name="ansible-inventory"></a>
 
-Ansible allows you to run a number of tasks on a set of hosts specified in your inventory file. Depending on the structure and variables of this file, OMniLeads instances based on docker or podman can be launched. 
+Ansible allows you to run a number of tasks on a set of hosts specified in your inventory file. Depending on the structure and variables of this file, OMniLeads instances based on podman containers can be launched .
 
 This tool is capable of deploying OMniLeads in three layouts: 
 
