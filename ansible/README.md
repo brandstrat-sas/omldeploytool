@@ -267,11 +267,12 @@ The possible options are:
 * **certbot**: deploy an instance with automatically generated Let's Encrypt SSL certificates.
 
 
-When working with self-generated certificates in the deployment using Certbot, we must ensure that our instance has DNS resolution based on our FQDN. Additionally, we must ensure that our port 80 is accessible from the certificate authority.
+When working with self-generated certificates in the deployment using Certbot, we must ensure that our instance has DNS resolution based on our FQDN. Additionally, we must ensure that our port 80 is accessible from the certificate authority and set a valid email box in order to recieve TLS renew notifications from Let's & crypt.
 
 ```
 certs: certbot
 fqdn: omlinstance.domain.com
+notification_email: your_email@domain.com
 ```
 
 
@@ -416,10 +417,10 @@ counterparts in the CentOS 7 instance from which you want to migrate. below shou
 We must consider that the version of the Postgres image to be deployed with OMniLeads 2.X should be "omnileads/postgres:230624.01". Therefore, you will need to temporarily change the variable groupall/all inherent to Postgres, as follows:
 
 ```
-#################### containers img taf  ################################
+#################### containers img tag  ################################
 
 #postgres_img: docker.io/postgres:14.9-bullseye
-postgres_img: omnileads/postgres:230624.01
+postgres_img: docker.io/omnileads/postgres:230624.01
 ```
 
 On the OMniLeads 1.X CentOS-7 instance run the following commands to generate a postgres backup on the one hand 

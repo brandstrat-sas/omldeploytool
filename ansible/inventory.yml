@@ -177,6 +177,7 @@ all:
     # --- TLS/SSL Certs configuration (selfsigned, custom or certbot letsencrypt)
     # --- https://gitlab.com/omnileads/omldeploytool/-/blob/develop/ansible/README.md?ref_type=heads#tls-cert-provisioning  
     certs: selfsigned
+    notification_email: your_email@domain.com
     # --- PostgreSQL    
     postgres_port: 5432
     postgres_user: omnileads
@@ -233,7 +234,8 @@ all:
     #email_ssl_certfile:
     #email_ssl_keyfile:
     #email_use_ssl:
-    #email_use_tls:
+    #email_use_tls:    
+
 
     # ------------------------------------------------------------------------------------------------ #
     # ---------------------------- Integrations with external hosts ---------------------------------- #
@@ -269,8 +271,7 @@ all:
     #backup_bucket: 
     # --- Restore: in case of implementing a separate bucket for restore
     #restore_bucket: 
-
-    ha_notification_email: mr_robot@mr_robot.com
+    
     
     # ------------------------------------------------------------------------------------------------ #
     # ------------------------------------ Scale tunnings -------------------------------------------- #
@@ -313,7 +314,6 @@ all:
     kamailio_img: docker.io/omnileads/kamailio:231125.01
     rtpengine_img: docker.io/omnileads/rtpengine:231125.01
     redis_img: docker.io/omnileads/redis:231125.01
-
 
 ##############################################################################################################
 ## -- In this section the hosts are grouped based on the type of deployment (AIO, Cluster & Cluster HA).  -- #
