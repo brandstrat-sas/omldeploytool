@@ -18,9 +18,8 @@ PUBLIC_IP=
 
 REPO=omnileads
 
-OMLAPP_IMG=freetechsolutions/omlapp:240318-whatsapp-enterprise
-
-OMLACD_IMG=${REPO}/asterisk:240226.01
+OMLAPP_IMG=${REPO}/omlapp:240326.01
+OMLACD_IMG=freetechsolutions/asterisk:240226.01
 OMLFASTAGI_IMG=${REPO}/fastagi:240228.01
 OMLAMI_IMG=${REPO}/astami:231230.01
 OMLNGINX_IMG=${REPO}/nginx:240105.01
@@ -88,12 +87,6 @@ CALIFICACION_REAGENDA=AGENDA
 # Decrease it if paranoic reasons
 LOGIN_FAILURE_LIMIT=10
 
-
-##############################################################
-#           google maps integration credentials              #
-##############################################################
-GOOGLE_MAPS_API_KEY=NULL
-GOOGLE_MAPS_CENTER='{ "lat": -31.416668, "lng": -64.183334 }'
 
 #####################################################################################################
 #                                       ASTERISK                                                    #
@@ -274,3 +267,19 @@ OML_BRANCH=docker-compose
 OML_BUILD_DATE="20240216"
 KAMAILIO_CERTS_LOCATION=/etc/omnileads/certs
 MONITORFORMAT=mp3
+
+
+#########################################################################################################
+#                             Google Services integrations                                              #
+#########################################################################################################
+GOOGLE_MAPS_API_KEY=NULL
+GOOGLE_MAPS_CENTER='{ "lat": -31.416668, "lng": -64.183334 }'
+
+GOOGLE_API_KEY=igfdsjkhfjkh2345jkh23jk4h123jk4h123j
+
+
+#########################################################################################################
+#                              OpenAI Integrations                                                      #
+#########################################################################################################
+
+OPENAI_API_KEY=fjdhsfkhadsjkfhajksKJHJKHK876786HJGHJGfgsdf452345786dfs76sd
