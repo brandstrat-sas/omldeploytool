@@ -179,26 +179,26 @@ services:
     networks:
       - omnileads  
 
-  audiosocket:
-    image: ${OMLAUDIOSOCKET_IMG}
-    container_name: oml-google-tts-stt
-    #command: python /app/google_tts_stt.py
-    environment:
-      - TZ=${TZ}
-      - ARI_HOST=acd
-      - ARI_PORT=7088
-      - ARI_USER=omnileads
-      - ARI_PASS=5_MeO_DMT
-      - REDIS_HOSTNAME=${REDIS_HOSTNAME}
-      - REDIS_PORT=6379
-      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
-      - GOOGLE_APPLICATION_CREDENTIALS=/tmp/google_credential.json
-      - MY_LANGUAGE_CODE = es-AR
-    restart: on-failure      
-    volumes:
-      - ./asterisk_custom/google_credential.json:/tmp/google_credential.json    
-    networks:
-      - omnileads
+  # audiosocket:
+  #   image: ${OMLAUDIOSOCKET_IMG}
+  #   container_name: oml-google-tts-stt
+  #   #command: python /app/google_tts_stt.py
+  #   environment:
+  #     - TZ=${TZ}
+  #     - ARI_HOST=acd
+  #     - ARI_PORT=7088
+  #     - ARI_USER=omnileads
+  #     - ARI_PASS=5_MeO_DMT
+  #     - REDIS_HOSTNAME=${REDIS_HOSTNAME}
+  #     - REDIS_PORT=6379
+  #     - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+  #     - GOOGLE_APPLICATION_CREDENTIALS=/tmp/google_credential.json
+  #     - MY_LANGUAGE_CODE = es-AR
+  #   restart: on-failure      
+  #   volumes:
+  #     - ./asterisk_custom/google_credential.json:/tmp/google_credential.json    
+  #   networks:
+  #     - omnileads
     
   acd:
     build:
@@ -212,6 +212,9 @@ services:
       - minio
     dns: 8.8.8.8
     environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY} 
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}      
+      - GOOGLE_APPLICATION_CREDENTIALS=/tmp/google_credential.json
       - FASTAGI=${FASTAGI_HOSTNAME}
       - TZ=${TZ}
       - ASTERISK_LOCATION=
@@ -246,8 +249,10 @@ services:
     stop_grace_period: 1m30s
     volumes:
       - ${REPO_PATH}/omlacd/source/astconf:/etc/asterisk
-      - ${REPO_PATH}/omlacd/source/scripts:/opt/asterisk/scripts      
+      - ${REPO_PATH}/omlacd/source/scripts:/opt/asterisk/scripts
+      - ${REPO_PATH}/omlacd/source/agi-bin:/var/lib/asterisk/agi-bin
       - ./asterisk_custom/oml_extensions_custom.conf:/etc/asterisk/oml_extensions_custom.conf
+      - ./asterisk_custom/google_credential.json:/tmp/google_credential.json    
     working_dir: /etc/asterisk
 
   kamailio:
