@@ -318,6 +318,8 @@ services:
       - fastagi
     dns: 8.8.8.8
     environment:
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+      - GOOGLE_APPLICATION_CREDENTIALS=/tmp/google_credential.json
       - SCALE=True
       - ENV=${ENV}
       - FASTAGI=${FASTAGI_HOSTNAME}
