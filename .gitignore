@@ -9,3 +9,4 @@ ansible/instances
 ansible/.inventory.yml
 ansible/group_vars/aio_instances
 ansible/group_vars/cluster_instances
+docker-compose/.config/

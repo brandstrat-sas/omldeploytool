@@ -23,6 +23,7 @@ OMLACD_IMG=freetechsolutions/asterisk:240326.01
 OMLFASTAGI_IMG=${REPO}/fastagi:240228.01
 OMLAMI_IMG=${REPO}/astami:231230.01
 OMLNGINX_IMG=${REPO}/nginx:240105.01
+OMLSENTIMENT_IMG=${REPO}/sentiment_analysis:240403.01
 OMLWS_IMG=${REPO}/websockets:231125.01
 OMLKAM_IMG=${REPO}/kamailio:231125.01
 OMLRTPENGINE_IMG=${REPO}/rtpengine:231125.01
@@ -254,6 +255,7 @@ VIDEOCALLS_PASSWORD=098098ZZZ
 GOOGLE_MAPS_API_KEY=NULL
 GOOGLE_MAPS_CENTER='{ "lat": -31.416668, "lng": -64.183334 }'
 GOOGLE_API_KEY=jkjghjkgjk65467GHFGHF5646ghghfghFHGFghf
+GOOGLE_CLOUD_PROJECTID=your_project_id
 
 
 #########################################################################################################
