@@ -19,7 +19,7 @@ PUBLIC_IP=
 REPO=omnileads
 
 OMLAPP_IMG=${REPO}/omlapp:240326.01
-OMLACD_IMG=freetechsolutions/asterisk:240226.01
+OMLACD_IMG=freetechsolutions/asterisk:240326.01
 OMLFASTAGI_IMG=${REPO}/fastagi:240228.01
 OMLAMI_IMG=${REPO}/astami:231230.01
 OMLNGINX_IMG=${REPO}/nginx:240105.01
@@ -30,8 +30,6 @@ OMLREDIS_IMG=${REPO}/redis:231125.01
 
 OMLVIDEOCALLS_WIDGET_IMG=omnileads/videocalls_widget:230905.01
 OMLPSTNEMULATOR_IMG=omnileads/pstn_emulator:240229.01
-
-OMLAUDIOSOCKET_IMG=fabianpignataro/audiosocket:240319.01
 
 OMLPGSQL_IMG=postgres:14.9-bullseye
 OMLMINIO_IMG=quay.io/minio/minio:RELEASE.2023-09-27T15-22-50Z
@@ -249,37 +247,37 @@ MYSQL_ROOT_PASS=admin123
 VIDEOCALLS_USERNAME=click2video
 VIDEOCALLS_PASSWORD=098098ZZZ
 
-#######################################################################################
-# Subnet for the docker bridge network, change it if this subnet conflicts with yours #
-#######################################################################################
+
+#########################################################################################################
+#                                        Google integrations                                            #
+#########################################################################################################
+GOOGLE_MAPS_API_KEY=NULL
+GOOGLE_MAPS_CENTER='{ "lat": -31.416668, "lng": -64.183334 }'
+GOOGLE_API_KEY=jkjghjkgjk65467GHFGHF5646ghghfghFHGFghf
+
+
+#########################################################################################################
+#                                        OpenAI integrations                                            #
+#########################################################################################################
+
+OPENAI_API_KEY=fghsfdghshj5e4hjg2hj432ghj423ghj
+
+
+#########################################################################################################
+#       Subnet for the docker bridge network, change it if this subnet conflicts with yours             #
+#########################################################################################################
 SUBNET=10.12.12.0/24
 GATEWAY=10.12.12.254
 
-###########################
-# Django default settings #
-###########################
+#########################################################################################################
+#                                       Django default settings                                         #
+#########################################################################################################
 OMLAPP_VERSION=240201.01
 DJANGO_SETTINGS_MODULE=ominicontacto.settings.production
 PYTHONPATH=/opt/omnileads/ominicontacto
 INSTALL_PREFIX=/opt/omnileads/
 OML_COMMIT=XCOMIT
 OML_BRANCH=docker-compose
-OML_BUILD_DATE="20240216"
+OML_BUILD_DATE="20240403"
 KAMAILIO_CERTS_LOCATION=/etc/omnileads/certs
 MONITORFORMAT=mp3
-
-
-#########################################################################################################
-#                             Google Services integrations                                              #
-#########################################################################################################
-GOOGLE_MAPS_API_KEY=NULL
-GOOGLE_MAPS_CENTER='{ "lat": -31.416668, "lng": -64.183334 }'
-
-GOOGLE_API_KEY=igfdsjkhfjkh2345jkh23jk4h123jk4h123j
-
-
-#########################################################################################################
-#                              OpenAI Integrations                                                      #
-#########################################################################################################
-
-OPENAI_API_KEY=fjdhsfkhadsjkfhajksKJHJKHK876786HJGHJGfgsdf452345786dfs76sd
