@@ -19,11 +19,11 @@ PUBLIC_IP=
 REPO=omnileads
 
 OMLAPP_IMG=${REPO}/omlapp:240326.01-enterprise
-OMLACD_IMG=freetechsolutions/asterisk:240326.01
+OMLACD_IMG=freetechsolutions/asterisk:240403.01
 OMLFASTAGI_IMG=${REPO}/fastagi:240228.01
 OMLAMI_IMG=${REPO}/astami:231230.01
 OMLNGINX_IMG=${REPO}/nginx:240105.01
-OMLSENTIMENT_IMG=${REPO}/sentiment_analysis:240403.01
+OMLSENTIMENT_IMG=${REPO}/sentiment_analysis:240328.01
 OMLWS_IMG=${REPO}/websockets:231125.01
 OMLKAM_IMG=${REPO}/kamailio:231125.01
 OMLRTPENGINE_IMG=${REPO}/rtpengine:231125.01

@@ -27,8 +27,9 @@
 
 ```
     omnileads_img: docker.io/omnileads/omlapp:240308.01
-    asterisk_img: docker.io/freetechsolutions/asterisk:240326.01
+    asterisk_img: docker.io/freetechsolutions/asterisk:240403.01
     fastagi_img: docker.io/omnileads/fastagi:240128.01
+    sentiment_analysis_img: docker.io/omnileads//sentiment_analysis:240328.01
     astami_img: docker.io/omnileads/astami:231230.01
     nginx_img: docker.io/omnileads/nginx:240105.01
     websockets_img: docker.io/omnileads/websockets:231125.01
