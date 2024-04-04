@@ -314,7 +314,7 @@ services:
     dns: 8.8.8.8
     environment:
       - GOOGLE_API_KEY=${GOOGLE_API_KEY}
-      - GOOGLE_APPLICATION_CREDENTIALS=/tmp/google_credential.json
+      #- GOOGLE_APPLICATION_CREDENTIALS=/tmp/google_credential.json
       - ENV=${ENV}
       - FASTAGI=${FASTAGI_HOSTNAME}
       - TZ=${TZ}
@@ -344,6 +344,8 @@ services:
     restart: on-failure
     stop_grace_period: 1m30s
     working_dir: /etc/asterisk
+    #volumes:      
+      #- ./asterisk_custom/google_credential.json:/tmp/google_credential.json
 
   kamailio:
     command:
@@ -467,12 +469,11 @@ services:
     #   timeout: 10s
     #   retries: 10
   
-    rabbitmq:
-      container_name: oml-rabbit-mq
-      image: rabbitmq:management
-      networks:
-        - omnileads
-      
+  rabbitmq:
+    container_name: oml-rabbit-mq
+    image: rabbitmq:management
+    network_mode: host
+
   sentiment_analysis:
     image: ${OMLSENTIMENT_IMG}
     container_name: oml-sentiment
@@ -484,7 +485,7 @@ services:
     environment:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - GOOGLE_API_KEY=${GOOGLE_API_KEY}
-      - GOOGLE_APPLICATION_CREDENTIALS=/tmp/google_credential.json
+      #- GOOGLE_APPLICATION_CREDENTIALS=/tmp/google_credential.json
       - RABBITMQ_HOST=${RABBITMQ_HOSTNAME}
       - TZ=${TZ}
       - PGHOST=${PGHOST}
@@ -499,14 +500,13 @@ services:
       - AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION}
       - LANG=es
       - GCP_PROJECT_ID=${GOOGLE_CLOUD_PROJECTID}
-    networks:
-      - omnileads
+    network_mode: host
     privileged: true
-    command: python /app/app_gcp.py
+    command: python /app/${AI_ENGINE}
     restart: on-failure
     stop_grace_period: 1m30s
-    volumes:      
-      - ./asterisk_custom/google_credential.json:/tmp/google_credential.json
+    # volumes:      
+    #   - ./asterisk_custom/google_credential.json:/tmp/google_credential.json
 
   minio:
     tty: true

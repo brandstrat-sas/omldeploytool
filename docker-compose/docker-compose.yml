@@ -589,8 +589,8 @@ services:
     command: python /app/app_gcp.py
     restart: on-failure
     stop_grace_period: 1m30s
-    volumes:      
-      - ./asterisk_custom/google_credential.json:/tmp/google_credential.json
+    # volumes:      
+    #   - ./asterisk_custom/google_credential.json:/tmp/google_credential.json
 
   wombat:  
     command: >
