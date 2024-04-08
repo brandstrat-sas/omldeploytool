@@ -172,20 +172,17 @@ OMNILEADS_HOSTNAME=nginx
 NGINX_EXT_PORT=443
 
 
-
 # -----------------------------------------------------------------------------
-
-# ******** HIGH AVAILABILITY ******* # # ******** HIGH AVAILABILITY ******* #
-# ******** HIGH AVAILABILITY ******* # # ******** HIGH AVAILABILITY ******* #
-# *** redis or redis_lb in case of HA *** #
-
 # --- IP or hostname that each instance will invoke when locating the other    
 REDIS_HOSTNAME=redis
-
 
 # ------------------------------------------------------------------------------
 # --- IP or hostname that each instance will invoke when locating the other    
 RTPENGINE_HOSTNAME=rtpengine
+
+# ------------------------------------------------------------------------------
+# --- IP or hostname that each instance will invoke when locating the other    
+RABBITMQ_HOSTNAME=rabbitmq
 
 #########################################################################################################
 #                                Object Storage BUCKET config                                           #
