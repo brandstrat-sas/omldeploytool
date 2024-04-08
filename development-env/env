@@ -197,7 +197,7 @@ RTPENGINE_HOSTNAME=rtpengine
 #########################################################################################################
 
 # --- name for invoke bucket actions
-S3_BUCKET_NAME=omnileads
+S3_BUCKET_NAME=minio-omnileads-media
 
 # --- MinIO web and console credentials
 S3_HTTP_ADMIN_USER=minio
