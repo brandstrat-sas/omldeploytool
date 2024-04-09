@@ -18,7 +18,7 @@ PUBLIC_IP=
 
 REPO=omnileads
 
-OMLAPP_IMG=${REPO}/omlapp:240326.01-enterprise
+OMLAPP_IMG=freetechsolutions/omlapp:240407.01
 OMLACD_IMG=freetechsolutions/asterisk:240403.01
 OMLFASTAGI_IMG=${REPO}/fastagi:240228.01
 OMLAMI_IMG=${REPO}/astami:231230.01
