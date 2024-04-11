@@ -25,7 +25,7 @@ REPO_PATH=./omnileads-repos
 REPO=omnileads
 
 OMLAPP_IMG=freetechsolutions/omlapp:240410.01
-OMLACD_IMG=freetechsolutions/asterisk:240102.01
+OMLACD_IMG=freetechsolutions/asterisk:240410.01
 OMLFASTAGI_IMG=freetechsolutions/fastagi:240104.01
 OMLAMI_IMG=freetechsolutions/astami:231230.01
 OMLNGINX_IMG=freetechsolutions/nginx:240105.01
@@ -274,7 +274,11 @@ OML_COMMIT=XCOMIT
 OML_BUILD_DATE="20231210"
 KAMAILIO_CERTS_LOCATION=/etc/kamailio/certs
 <<<<<<< HEAD
+<<<<<<< HEAD
 MONITORFORMAT=mp3
 =======
 MONITORFORMAT=mp3
 >>>>>>> f6a71a9 (release 1.33.3)
+=======
+MONITORFORMAT=mp3
+>>>>>>> 24a7a02 (release-1.33.4)
