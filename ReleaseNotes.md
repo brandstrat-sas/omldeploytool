@@ -1,5 +1,5 @@
-# Release Notes - OMniLeads 1.33.3
-[2024-04-10]
+# Release Notes - OMniLeads 1.33.4
+[2024-04-13]
 
 ## Added
 
