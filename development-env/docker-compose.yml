@@ -63,6 +63,8 @@ services:
       #- WALLBOARD_VERSION=develop
       #- PREMIUM_REPORTS_VERSION=develop
       #- WEBPHONE_CLIENT_VERSION=develop
+      - MINIO_STORAGE_MEDIA_BUCKET_NAME=${S3_BUCKET_NAME}
+      - MINIO_STORAGE_MEDIA_URL=https://localhost/${S3_BUCKET_NAME}
     #image: ${OMLAPP_IMG}
     command: /opt/omnileads/bin/init_devenv.sh
     networks:
