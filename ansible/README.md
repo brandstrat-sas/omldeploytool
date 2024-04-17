@@ -16,11 +16,11 @@
 * [Deploy all in one (AIO) instance](#aio-deploy)
 * [TLS Certs provisioning](#tls-cert-provisioning)
 * [Security](#security)
-* [Deploy OMniLeads Enterprise](#omnileads-enterprise)
 * [OMniLeads Podman containers](#podman-systemd)
+* [Deploy an upgrade from CentOS7](#upgrade_from_centos7)
 * [Asterisk Dialplan & other customizations](#asterisk_customizations)
 * [Container image & tag customizations](#components_img)
-* [Deploy an upgrade from CentOS7](#upgrade_from_centos7)
+* [Deploy OMniLeads Enterprise](#oml_enterprise)
 * [Deploy an upgrade](#upgrades)
 * [Deploy a rollback](#rollback)
 * [Deploy a backup](#backups)
@@ -199,11 +199,22 @@ The important thing is that the selected distribution has a version of Podman (3
 Then you should work on the inventory.yml tenant file.
 
 ```
-algarrobo:
-  tenant_id: algarrobo
-  ansible_host: 190.19.150.18
-  omni_ip_lan: 172.16.101.44
-  infra_env: lan
+###############################################################################################################
+##############################   The complete list of host  ################################################### 
+###############################################################################################################
+all:
+  children:
+    # -----------------------------------------
+    # -----------------------------------------
+    aio_instances:
+      hosts:
+        algarrobo:
+          tenant_id: algarrobo
+          ansible_host: 190.19.150.18
+          omni_ip_lan: 172.16.101.44
+          infra_env: cloud
+          fqdn: tenant_name.omnileads.net
+          certs: certbot
 ```
 
 The ***infra_env*** variable can be initialized as "lan", "cloud" or "nat", depending on whether the instance will be accessible via WAN access (IPADDR or FQDN), LAN access (IP or FQDN) or behind a NAT (IPADDRR or FQDN).
@@ -213,6 +224,39 @@ The ***nat_ip_addr*** variable. In the case of selecting infra_env: nat, it's op
 The *bucket_url* and *postgres_host* parameters must be commented out, so that both (PostgreSQL and Object Storage MinIO) are deployed within the AIO instance.
 
 Then in the vars section, we have all the parameters that omnileads expects to work. These variables affect all the hosts that are going to be managed from this inventory.yml. 
+
+
+```
+    # ------------------------------------------------------------------------------------------------ #
+    # ------------------------------ Generic OMniLeads runtime variables ----------------------------- #
+    # ------------------------------------------------------------------------------------------------ #
+
+    # --- Asterisk & RTPengine scenary for SIP & RTP
+    # --- "cloud" instance (access through public IP)
+    # --- "lan" instance (access through private IP)
+    # --- "nat" instance (access through Public NAT IP)    
+    # --- or "all" in order to access through all NICs
+    infra_env: cloud
+    #nat_ip_addr: X.X.X.X
+    # --- If you have an DNS FQDN resolution, you must to uncomment and set this param
+    # --- otherwise leave commented to work invoking through an IP address
+    #fqdn: fts.sefirot.cloud
+    # --- If you want to work with Dialer, then you must install Wombat Dialer on a separate host 
+    # --- and indicate the IP address or FQDN of that host here (uncomment and set this param):
+    # --- time zone (for example: America/Argentina/Cordoba)
+    TZ: America/Argentina/Cordoba
+    # --- TLS/SSL Certs configuration (selfsigned, custom or certbot letsencrypt)
+    # --- https://gitlab.com/omnileads/omldeploytool/-/blob/develop/ansible/README.md?ref_type=heads#tls-cert-provisioning  
+    certs: selfsigned
+    # --- PostgreSQL    
+    postgres_port: 5432
+    postgres_user: omnileads
+    postgres_password: HJGKJHGDSAKJHK7856765DASDAS675765JHGJHSAjjhgjhaaa
+    postgres_database: omnileads
+    ....
+    ....
+    ....
+```
 
 Finally in the last section of the file, we must make sure that our tenant is listed in the omnileads_aio hosts group.
 
@@ -250,11 +294,12 @@ Let's run the bash scrip:
 ./deploy.sh --action=install --tenant=tenant_name_folder
 ```
 
-On OML App linux terminal, you must run reset_pass in order to perform a first login in the App.
-Once the URL is available with the App returning the login view,  we can log in with the user *admin*, password *admin*.
+We can log in:
 
 ```
-oml_manage --reset_pass
+https://tenant_name.omnileads.net
+user *admin*
+password *admin*. 
 ```
 
 
@@ -282,8 +327,16 @@ Custom certificates should be placed within the folder where we store the invent
 If we are going to use *certs: custom*, then the certificate and key files should be named *cert.pem* and *key.pem*. Although we can also use different names, in that case, instead of using *certs: custom*, we must change it to:
 
 ```
-cert_file_name: cert_custom_filename.pem
-key_file_name: key_custom_filename.pem 
+aio_instances:
+      hosts:
+        algarrobo:
+          tenant_id: algarrobo
+          ansible_host: 190.19.150.18
+          omni_ip_lan: 172.16.101.44
+          infra_env: cloud
+          fqdn: tenant_name.omnileads.net
+          cert_file_name: cert_custom_filename.pem
+          key_file_name: key_custom_filename.pem 
 ```
 
 ```
@@ -315,19 +368,6 @@ Below are the Firewall rules to be applied on All In One instance:
 
 * 9090/tcp Prometheus metrics: This is where the connections coming from the monitoring center. This port can be opened by restricting by origin in the IP of the monitoring center.
 
-
-## OMniLeads Enterprise
-
-What is OMniLeads Enterprise?
-
-It is an additional layer with complementary modules to OMniLeads Community (GPLV3). It includes functionalities such as advanced reports, wallboards, and automated satisfaction surveys implemented as modules.
-
-This version can be implemented simply by referencing the image for the container that implements the web application.
-Therefore, in our "inventory.yml" variable file, we must invoke the enterprise imag e. To do this, we add the string "-enterprise" to the end of the tag that describes the image of the omnileads_img component:
-
-```
-omnileads_img: docker.io/your_registry/omlapp:231227.01-enterprise
-```
 
 ## Systemd & Podman 🔧 <a name="podman-systemd"></a>
 
@@ -422,8 +462,7 @@ postgres_img: docker.io/omnileads/postgres:230624.01
 ```
 
 On the OMniLeads 1.X CentOS-7 instance run the following commands to generate a postgres backup on the one hand 
-and then upload to the Bucket Object Storage of the new OMniLeads version the recordings, telephony audios, Asterisk customizations (if any) _custom.conf & _override.conf. 
-(if any) Asterisk _custom.conf & _override_conf customizations and also the Postgres backup itself.
+and then upload to the Bucket Object Storage of the new OMniLeads version the call recordings, telephony audios and the Postgres DB backup.
 
 ```
 export NOMBRE_BACKUP=some_file_name
@@ -435,17 +474,17 @@ export S3_BUCKET_NAME=$your_new_instance_bucket_name
 
 If you are going to use the object storage self-hosted by OMnileads in an AIO instance:
 ```
-export S3_ENDPOINT=http://$OML_AIO_IP:9000 
+export S3_ENDPOINT=http://$YOUR_OML_AIO_IP:9000 
 ```
 
 If you are going to use the object storage self-hosted by OMnileads in an AIT cluster instance:
 ```
-export S3_ENDPOINT=http://$OML_DATA_IP:9000 
+export S3_ENDPOINT=http://$YOUR_OML_DATA_IP:9000 
 ```
 
 If you are going to use an external object storage service:
 ```
-export S3_ENDPOINT=https://$object_storage_url 
+export S3_ENDPOINT=https://$object_storage_url
 ```
 
 Finally, all backups are uploaded to the bucklet of the new OMniLeads instance:
@@ -462,10 +501,20 @@ At the end of the file there is the variable *restore_file_timestamp* which must
 previous step to refer to the backups taken.
 
 ```
-restore_file_timestamp: $NOMBRE_BACKUP
+aio_instances:
+      hosts:
+        algarrobo:
+          tenant_id: algarrobo
+          ansible_host: 190.19.150.18
+          omni_ip_lan: 172.16.101.44
+          infra_env: cloud
+          fqdn: tenant_name.omnileads.net
+          cert_file_name: cert_custom_filename.pem
+          key_file_name: key_custom_filename.pem 
+          restore_file_timestamp: $NOMBRE_BACKUP
 ```
 
-Execute the restore deploy on the tenant in question:
+Execute the restore deploy on the new instance with OML 2.0:
 
 ```
 ./deploy.sh --action=restore --tenant=$your_inventory_folder_name
@@ -492,7 +541,7 @@ Based on containers, code customizations made within the container are ephemeral
 
 An example of how to do this is outlined in this [repo](https://gitlab.com/omnileads/acd-customizations-example/)
 
-# Use your own container registry & images. OMniLeads-enterprise :office: <a name="components_img"></a>
+# Use your own container registry & images  <a name="components_img"></a>
 
 In the inventory file you can customize the tags of the images to display, as well as the registry from where to download them.
 
@@ -520,6 +569,18 @@ In the inventory file you can customize the tags of the images to display, as we
     enterprise_edition: false
 ```
 
+## OMniLeads Enterprise :office: <a name="oml_enterprise"></a>
+
+What is OMniLeads Enterprise?
+
+It is an additional layer with complementary modules to OMniLeads Community (GPLV3). It includes functionalities such as advanced reports, wallboards, and automated satisfaction surveys implemented as modules.
+
+This version can be implemented simply by referencing the image for the container that implements the web application.
+Therefore, in our "inventory.yml" variable file, we must invoke the enterprise imag e. To do this, we add the string "-enterprise" to the end of the tag that describes the image of the omnileads_img component:
+
+```
+omnileads_img: docker.io/your_registry/omlapp:231227.01-enterprise
+```
 
 # Perform a Backup :floppy_disk: <a name="backups"></a>
 
@@ -537,6 +598,8 @@ The backup is deposited in the bucket, being under the backup folder on one side
 another directory is generated with the timestamp date and there inside are the asterisk custom and override files.
 
 ![Diagrama deploy backup](./png/deploy-backup.png)
+
+>  Note: the unique numeric identifier forming the filename string of the database backup file is the value we should use when assigning it to the parameter: restore_file_timestamp: *restore_file_timestamp: 1681319391*
 
 # Upgrades :arrows_counterclockwise:  <a name="upgrades"></a>
 
@@ -604,8 +667,19 @@ Then the deploy.sh script must be called with the --upgrade parameter.
 You can proceed with a restore on a fresh installation as well as on a productive instance. 
 
 Apply restore on the new instance: The two final parameters of the inventory.yml must be uncommented. On the one hand to indicate that the bucket does not have trusted certificates and the second one is to indicate the restore that we want to execute.
+
 ```
-restore_file_timestamp: 1681215859 
+aio_instances:
+      hosts:
+        algarrobo:
+          tenant_id: algarrobo
+          ansible_host: 190.19.150.18
+          omni_ip_lan: 172.16.101.44
+          infra_env: cloud
+          fqdn: tenant_name.omnileads.net
+          cert_file_name: cert_custom_filename.pem
+          key_file_name: key_custom_filename.pem 
+          restore_file_timestamp: 458246873642
 ```
 
 Run restore deploy:
@@ -891,7 +965,6 @@ Once the URL is available with the App returning the login view,  we can log in 
 oml_manage --reset_pass
 ```
 
-<<<<<<< HEAD
 ## OMniLeads Enterprise
 
 What is OMniLeads Enterprise?
@@ -904,8 +977,16 @@ Therefore, in our "inventory.yml" variable file, we must invoke the enterprise i
 ```
 omnileads_img: docker.io/your_registry/omlapp:231227.01-enterprise
 ```
-=======
->>>>>>> ca59d49 (release-1.33.3)
+
+What is OMniLeads Enterprise?
+
+It is an additional layer with complementary modules to OMniLeads Community (GPLV3). It includes functionalities such as advanced reports, wallboards, and automated satisfaction surveys implemented as modules.
+
+This version can be implemented simply by referencing the image for the container that implements the web application.
+Therefore, in our "inventory.yml" variable file, we must invoke the enterprise imag e. To do this, we add the string "-enterprise" to the end of the tag that describes the image of the omnileads_img component:
+
+```
+omnileads_img: docker.io/your_registry/omlapp:231227.01-enterprise
 
 # Postgres Cluster actions :arrows_clockwise: <a name="cluster_ha_recovery"></a>
 
