@@ -54,6 +54,11 @@
     - inventory_hostname in groups['omnileads_data'] or inventory_hostname in groups['omnileads_aio']    
 
 
+- import_playbook: components/rabbitmq/playbook.yml
+  when: 
+    - inventory_hostname in groups['omnileads_data'] or inventory_hostname in groups['omnileads_aio']    
+
+
 - import_playbook: components/rtpengine/playbook.yml
   when: 
     - inventory_hostname in groups['omnileads_voice'] or inventory_hostname in groups['omnileads_aio']    
@@ -103,6 +108,12 @@
   when: 
     - inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_aio']
 
+
+- import_playbook: components/sentiment_analysis/playbook.yml
+  when: 
+    - inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_aio']
+    - ai_engine is defined
+    
 
 - import_playbook: components/nginx/playbook.yml
   when: 

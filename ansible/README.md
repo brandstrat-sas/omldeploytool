@@ -266,7 +266,6 @@ The possible options are:
 * **selfsigned**: which will display the self-signed certificates (not recommended for production).
 * **certbot**: deploy an instance with automatically generated Let's Encrypt SSL certificates.
 
-
 When working with self-generated certificates in the deployment using Certbot, we must ensure that our instance has DNS resolution based on our FQDN. Additionally, we must ensure that our port 80 is accessible from the certificate authority and set a valid email box in order to recieve TLS renew notifications from Let's & crypt.
 
 ```
@@ -274,7 +273,6 @@ certs: certbot
 fqdn: omlinstance.domain.com
 notification_email: your_email@domain.com
 ```
-
 
 * **custom**: if the idea is to implement your own certificates. Then you must place them inside instances/tenant_name_folder/ with the names: *cert.pem* for and *key.pem*
 
@@ -403,7 +401,7 @@ This is the standard for all components.
 # Upgrade from CentOS-7 OMniLeads instance :arrows_counterclockwise: <a name="upgrade_from_centos7"></a>
 
 
-You must deploy the new OMniLeads instances making sure that the inventory.yml variables listed below should be the same as their 
+You must deploy the new **OMniLeads Community** instance making sure that the inventory.yml variables listed below should be the same as their 
 counterparts in the CentOS 7 instance from which you want to migrate. below should be the same as their counterparts in the CentOS 7 instance from which you want to migrate.
 
 * ami_user
@@ -429,7 +427,7 @@ and then upload to the Bucket Object Storage of the new OMniLeads version the re
 
 ```
 export NOMBRE_BACKUP=some_file_name
-pg_dump -h ${PGHOST} -p ${PGPORT} -U ${PGUSER} -Fc -b -v -f /tmp/${NOMBRE_BACKUP}.sql -d ${PGDATABASE} --no-acl
+pg_dump -h ${PGHOST} -p ${PGPORT} -U ${PGUSER} -Fc -b -v -f /tmp/psql-backup-${NOMBRE_BACKUP}.sql -d ${PGDATABASE} --no-acl
 export AWS_ACCESS_KEY_ID=$your_new_instance_bucket_key
 export AWS_SECRET_ACCESS_KEY=$your_new_instance_bucket_secret_key
 export S3_BUCKET_NAME=$your_new_instance_bucket_name
@@ -893,6 +891,7 @@ Once the URL is available with the App returning the login view,  we can log in 
 oml_manage --reset_pass
 ```
 
+<<<<<<< HEAD
 ## OMniLeads Enterprise
 
 What is OMniLeads Enterprise?
@@ -905,6 +904,8 @@ Therefore, in our "inventory.yml" variable file, we must invoke the enterprise i
 ```
 omnileads_img: docker.io/your_registry/omlapp:231227.01-enterprise
 ```
+=======
+>>>>>>> ca59d49 (release-1.33.3)
 
 # Postgres Cluster actions :arrows_clockwise: <a name="cluster_ha_recovery"></a>
 

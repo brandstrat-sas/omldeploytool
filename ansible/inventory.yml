@@ -150,7 +150,7 @@ all:
 ##################################################################################################################
 # -- OMniLeads Common Variables                                                                                  #
 ##################################################################################################################
-  
+ 
   vars:
     # --- ansible user auth connection
     ansible_user: root
@@ -159,7 +159,6 @@ all:
     # ------------------------------------------------------------------------------------------------ #
     # ------------------------------ Generic OMniLeads runtime variables ----------------------------- #
     # ------------------------------------------------------------------------------------------------ #
-
     # --- Asterisk & RTPengine scenary for SIP & RTP
     # --- "cloud" instance (access through public IP)
     # --- "lan" instance (access through private IP)
@@ -219,9 +218,6 @@ all:
     ECCTL: 28800
     # --- is the attempts a user has to enter an incorrect password in login
     LOGIN_FAILURE_LIMIT: 10
-    # --- google maps integration credentials
-    google_maps_api_key: NULL
-    google_maps_center: '{ "lat": -31.416668, "lng": -64.183334 }'
     # --- SMTP server params, if you want to use your own SMTP, put true and
     # --- uncomment all necesary
     email_smtp_relay: false
@@ -236,11 +232,20 @@ all:
     #email_use_ssl:
     #email_use_tls:    
 
-
     # ------------------------------------------------------------------------------------------------ #
-    # ---------------------------- Integrations with external hosts ---------------------------------- #
+    # --------------------------------------- Integrations-------------------------------------------- #
     # ------------------------------------------------------------------------------------------------ #
+    # --- Generative AI integration
+    # --- if you want to use generatiev AI integration set with: "openai" or "gcp" (google cloud).
+    #ai_engine: openai
 
+    # --- google maps integration credentials
+    google_maps_api_key: NULL
+    google_maps_center: '{ "lat": -31.416668, "lng": -64.183334 }'
+    google_api_key:
+    google_cloud_projectid: 
+    # --- openai integrations
+    openai_api_key:
     # --- The Dialer Engine Host
     #dialer_host: 
     # --- set postgres_host if you have your own postgres (standalone host or cloud service)
@@ -267,12 +272,6 @@ all:
     # --- Put here the JITSI host URL
     #video_host: 
 
-    # --- BACKUPs: in case of implementing a separate bucket for backups
-    #backup_bucket: 
-    # --- Restore: in case of implementing a separate bucket for restore
-    #restore_bucket: 
-    
-    
     # ------------------------------------------------------------------------------------------------ #
     # ------------------------------------ Scale tunnings -------------------------------------------- #
     # ------------------------------------------------------------------------------------------------ #
@@ -289,7 +288,6 @@ all:
     # ------------------------------------ Upgrade from OML 1.X -------------------------------------- #
     # ------------------------------------ Restore filename ------------------------------------------ #
     # ------------------------------------------------------------------------------------------------ #
-
     # --- Restore filename id, request by restore filename
     #restore_file_timestamp: 1681215859
     
@@ -299,22 +297,14 @@ all:
     # ------------------------------------------------------------------------------------------------ #
     # ---------------------------- Container IMG TAG customization ----------------------------------- #
     # ------------------------------------------------------------------------------------------------ #
-    
     # --- For each OML Deploy Tool release, a versioned stack with the latest stable images of each component is maintained on inventory.yml
     # --- You can combine the versions as you like, also use your own TAGs, using the following TAG version variables
     # --- If you want to deploy OMniLeads Enterprise, you just need to add "-enterprise" as a suffix to the omnileads_img image tag
     # --- for example: omnileads_img: docker.io/omnileads/omlapp:240216.01-enterprise.
 
-    omnileads_img: docker.io/omnileads/omlapp:240410.01
-    asterisk_img: docker.io/omnileads/asterisk:240410.01
-    fastagi_img: docker.io/omnileads/fastagi:240228.01
-    astami_img: docker.io/omnileads/astami:231230.01
-    nginx_img: docker.io/omnileads/nginx:240105.01
-    websockets_img: docker.io/omnileads/websockets:231125.01
-    kamailio_img: docker.io/omnileads/kamailio:231125.01
-    rtpengine_img: docker.io/omnileads/rtpengine:231125.01
-    redis_img: docker.io/omnileads/redis:231125.01
-
+    omnileads_img: docker.io/freetechsolutions/omlapp:240415.01
+    asterisk_img: docker.io/freetechsolutions/asterisk:240415.01
+    
 ##############################################################################################################
 ## -- In this section the hosts are grouped based on the type of deployment (AIO, Cluster & Cluster HA).  -- #
 ## -- here you can control which host the action deployed by the deploy.sh script will be applied to      -- #

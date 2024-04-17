@@ -153,6 +153,7 @@ case ${oml_action} in
     ansible-playbook matrix.yml --extra-vars \
     "django_repo_path=$(pwd)/components/django/ \
     redis_repo_path=$(pwd)/components/redis/ \
+    rabbitmq_repo_path=$(pwd)/components/rabbitmq/ \
     pgsql_repo_path=$(pwd)/components/postgresql/ \
     kamailio_repo_path=$(pwd)/components/kamailio/ \
     asterisk_repo_path=$(pwd)/components/asterisk/ \
@@ -162,6 +163,7 @@ case ${oml_action} in
     ami_repo_path=$(pwd)/components/ami/ \
     websockets_repo_path=$(pwd)/components/websockets/ \
     nginx_repo_path=$(pwd)/components/nginx/ \
+    sentiment_analysis_repo_path=$(pwd)/components/sentiment_analysis/ \
     minio_repo_path=$(pwd)/components/minio/ \
     haproxy_repo_path=$(pwd)/components/haproxy/ \
     cron_repo_path=$(pwd)/components/cron/ \
