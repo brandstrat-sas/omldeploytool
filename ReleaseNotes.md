@@ -1,12 +1,14 @@
-# Release Notes - OMniLeads 1.33.3
-[2024-04-10]
+# Release Notes - OMniLeads 2.0.0
+[2024-04-17]
 
 ## Added
 
-* oml-2585 [WEB] [API] New endpoint to upload massive contacts from CRM.
-* oml-488 [WEB] [ANSIBLE] Now it's possible to deploy an instance with automatically generated Let's Encrypt SSL certificates.
+* WhatsApp: se ha adicionad la capacidad de transaccionar mensajes de whatsapp en todas  las campañas.
 
 ## Improvements
+
+* oml-2586 [WEB] Pending translations into English have been completed
+* oml-2586 [WEB] Pending translations into English and Portuguese have been completed
 
 ## Fixed
 
@@ -15,7 +17,6 @@
 
 ## Removed
 
-* oml-463 [ANSIBLE] Now it is possible to migrate to Omnileads Enterprise without inventory.yml flag "enterprise_edition:"
 
 ## OMniLeads Component versions
 
@@ -24,6 +25,7 @@
     asterisk_img: docker.io/freetechsolutions/asterisk:240409.01
     fastagi_img: docker.io/omnileads/fastagi:240228.01
     sentiment_analysis_img: docker.io/omnileads/sentiment_analysis:240409.01
+    fastagi_img: docker.io/omnileads/fastagi:240228.01
     astami_img: docker.io/omnileads/astami:231230.01
     nginx_img: docker.io/omnileads/nginx:240105.01
     websockets_img: docker.io/omnileads/websockets:231125.01

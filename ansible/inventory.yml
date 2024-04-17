@@ -159,6 +159,7 @@ all:
     # ------------------------------------------------------------------------------------------------ #
     # ------------------------------ Generic OMniLeads runtime variables ----------------------------- #
     # ------------------------------------------------------------------------------------------------ #
+
     # --- Asterisk & RTPengine scenary for SIP & RTP
     # --- "cloud" instance (access through public IP)
     # --- "lan" instance (access through private IP)
@@ -174,7 +175,8 @@ all:
     # --- time zone (for example: America/Argentina/Cordoba)
     TZ: America/Argentina/Cordoba
     # --- TLS/SSL Certs configuration (selfsigned, custom or certbot letsencrypt)
-    # --- https://gitlab.com/omnileads/omldeploytool/-/blob/develop/ansible/README.md?ref_type=heads#tls-cert-provisioning  
+    # --- docs:
+    # --- https://gitlab.com/omnileads/omldeploytool/-/blob/develop/ansible/README.md?ref_type=heads#tls-cert-provisioning
     certs: selfsigned
     notification_email: your_email@domain.com
     # --- PostgreSQL    
@@ -209,7 +211,6 @@ all:
     # ---  kamailio shm & pkg memory params
     shm_size: 64
     pkg_size: 8
-    django_commands: true
     # --- is the time in seconds that will last the https session when inactivity
     SCA: 3600
     # --- Ephemeral Credentials TTL (ECTTL) is the time in seconds            #
@@ -311,6 +312,7 @@ all:
 ## -- The Ansible playbooks are applied on the hosts below declared and classified according to the       -- #
 ## -- architecture of the instance on which they are deployed.                                            -- #
 ##############################################################################################################
+
 
 omnileads_aio:
   hosts:

@@ -65,17 +65,16 @@ However, we can intelligently use the **Cloud Firewall** technology when operati
 
 Below are the Firewall rules to be applied on All In One instance:
 
-* 443/TCP Nginx: This is where Web/WebRTC requests to Nginx are processed. Port 443 can be opened to the entire Internet.
+* 443/tcp Nginx: This is where Web/WebRTC requests to Nginx are processed. Port 443 can be opened to the entire Internet.
 
-* 40000-50000/UDP: WebRTC sRTP RTPengine: this port range can be opened to the entire Internet.
+* 20000/30000 UDP WebRTC sRTP RTPengine: this port range can be opened to the entire Internet.
 
 * 5060/UDP Asterisk: This is where SIP requests for incoming calls from the ITSP(s) are processed. This port must be opened by restricting by origin on the IP(s) of the PSTN SIP termination provider(s).
 
-* 20000-30000/UDP VoIP RTP Asterisk: this port range must be opened by restricting by origin on the IP(s) of the PSTN SIP termination provider(s).
+* 40000/50000 UDP: VoIP RTP Asterisk: this port range can be opened to the entire Internet.
 
-* 9090/TCP Prometheus (optional, only if you are going to monitor with grafana and prometheus): This is where the connections coming from the monitoring center, more precisely from Prometheus Master, are processed. This port can be opened by restricting by origin in the IP of the monitoring center.
+* 9090/tcp Prometheus metrics: This is where the connections coming from the monitoring center. This port can be opened by restricting by origin in the IP of the monitoring center.
 
-* 3100/TCP Loki (optional, only if you are going to centralize container logs with grafana and loki): this is where the connections coming from the monitoring center are processed, more precisely from Grafana, are processed. This port can be opened by restricting by origin on the IP of the monitoring center.
 
 ### **Onpremise Virtual Machine or Cloud VPS** <a name="vps_vm"></a>
 
@@ -101,7 +100,7 @@ export NIC=eth0 ENV=lan && ./first_boot_installer.sh
 There may be a need to deploy a specific release of the app. For this purpose, the BRANCH parameter can be used by adding BRANCH=release-1.33.2.
 
 ```
-export BRANCH=release-1.33.2 ENV=cloud && ./first_boot_installer.sh)
+export NIC=eth0 BRANCH=release-1.33.2 ENV=cloud && ./first_boot_installer.sh)
 ```
 
 #### NAT Environments:
@@ -109,7 +108,7 @@ export BRANCH=release-1.33.2 ENV=cloud && ./first_boot_installer.sh)
 It may be necessary to deploy the app behind some type of NAT where we want to explicitly specify the IP address that will traverse the NAT. For this, the parameter NAT_IPV4=xxx.xxx.xxx or NAT_IPV4=tenant.example.com can be added. If no NAT IP is specified, the script will resolve to assign the public IP detected using curl.
 
 ```
-export NIC=ens5 ENV=nat NAT_IPV4=182.333.20.12 && ./first_boot_installer.sh)
+export NIC=eth0 ENV=nat NAT_IPV4=182.333.20.12 && ./first_boot_installer.sh)
 ```
 
 #### Deploying with Wombat Dialer integration.
@@ -120,12 +119,6 @@ export  NIC=eth0 ENV=lan DIALER_HOST=X.X.X.X DIALER_USER=demo DIALER_PASS=demoad
 
 You must to specify the private ipv4 NIC and scenario (ENV) we'll be working with, which will be cloud if we're working on a VPS (cloud), and lan if we're using an on-premise Virtual Machine (lan).
 The BUCKE_NAME=NULL is necesary in order to work with the minio (localhost) object storage.
-
-You can invoke the docker-compose with:
-
-```
-$ docker-compose -f docker-compose_prod.yml up -d
-```
 
 You can invoke the docker-compose with:
 
