@@ -17,23 +17,20 @@
 
 ---
 
-- name: DAPHNE OMniLeads application installation
+- name: SENTIMENTAL_ANALYSIS OMniLeads application installation
   hosts: 
     - omnileads_app
     - omnileads_aio
   tags:
-    - app
-    - daphne
-  vars:    
-    INSTALL_PREFIX: "/opt/omnileads"
-    
+    - sentiment_analysis
+  vars:
 
   tasks:
 
-  - name: DAPHNE Channels Daphne environment variables
+  - name: SENTIMENTAL_ANALYSIS environment variables
     template:
-      src: "{{ daphne_repo_path }}templates/daphne.env"
-      dest: /etc/default/daphne.env
+      src: "{{ sentiment_analysis_repo_path }}templates/sentiment_analysis.env"
+      dest: /etc/default/sentiment_analysis.env
       mode: 666
       owner: "{{ usuario }}"
       group: "{{ usuario }}"
@@ -41,18 +38,28 @@
       - install
       - upgrade
       - update
-      
-  - name: DAPHNE Copy Daphne systemd service
+
+  - name: SENTIMENTAL_ANALYSIS Copy systemd service file
     template:
-      src: "{{ daphne_repo_path }}templates/daphne.service"
-      dest: /etc/systemd/system/daphne.service
+      src: "{{ sentiment_analysis_repo_path }}templates/sentiment_analysis.service"
+      dest: /etc/systemd/system/sentiment_analysis.service
     tags:
       - install
       - upgrade
       - update
-       
-  - name: DAPHNE Pull image
-    command: podman pull --quiet {{ omnileads_img }}
+
+  - name: SENTIMENTAL_ANALYSIS Copy google speech credentials json 
+    template:
+      src: "../../../instances/{{ tenant_folder }}/google_credential.json"
+      dest: /etc/omnileads/google_credential.json
+    tags:
+      - install
+      - upgrade
+      - update
+    when: ai_engine == "gcp"
+
+  - name: SENTIMENTAL_ANALYSIS Pull image
+    command: podman pull --quiet {{ sentiment_analysis_img }}
     register: podman_pull
     until: podman_pull is success
     tags:
@@ -60,9 +67,9 @@
       - upgrade
       - update
 
-  - name: DAPHNE Channels Enable and start Daphne systemd service
+  - name: SENTIMENTAL_ANALYSIS Enable and start systemd service
     systemd:
-      name: daphne.service
+      name: sentiment_analysis.service
       state: started
       enabled: yes
       daemon_reload: yes
@@ -70,16 +77,16 @@
       - install
       - upgrade
 
-  - name: DAPHNE Restart systemd service
+  - name: SENTIMENTAL_ANALYSIS ReStart systemd service
     systemd:
-      name: daphne.service
+      name: sentiment_analysis.service
       state: restarted
       enabled: yes
       daemon_reload: yes
     tags:
       - upgrade
       - restart
-      - restart_django
+      - restart_sentiment_analysis
       - restart_core
     when:       
       - inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_aio']  

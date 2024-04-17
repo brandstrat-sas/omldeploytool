@@ -31,7 +31,7 @@ OMLAMI_IMG=freetechsolutions/astami:231230.01
 OMLNGINX_IMG=freetechsolutions/nginx:240105.01
 OMLKAM_IMG=${REPO}/kamailio:231125.01
 OMLRTPENGINE_IMG=${REPO}/rtpengine:231125.01
-
+OMLREDIS_IMG=${REPO}/redis:231125.01
 
 OMLWS_IMG=${REPO}/websockets:develop
 OMLREDIS_IMG=${REPO}/redis:231125.01
@@ -89,12 +89,6 @@ CALIFICACION_REAGENDA=AGENDA
 # Decrease it if paranoic reasons
 LOGIN_FAILURE_LIMIT=10
 
-
-##############################################################
-#           google maps integration credentials              #
-##############################################################
-GOOGLE_MAPS_API_KEY=NULL
-GOOGLE_MAPS_CENTER='{ "lat": -31.416668, "lng": -64.183334 }'
 
 #####################################################################################################
 #                                       ASTERISK                                                    #
@@ -177,20 +171,17 @@ OMNILEADS_HOSTNAME=nginx
 NGINX_EXT_PORT=443
 
 
-
 # -----------------------------------------------------------------------------
-
-# ******** HIGH AVAILABILITY ******* # # ******** HIGH AVAILABILITY ******* #
-# ******** HIGH AVAILABILITY ******* # # ******** HIGH AVAILABILITY ******* #
-# *** redis or redis_lb in case of HA *** #
-
 # --- IP or hostname that each instance will invoke when locating the other    
 REDIS_HOSTNAME=redis
-
 
 # ------------------------------------------------------------------------------
 # --- IP or hostname that each instance will invoke when locating the other    
 RTPENGINE_HOSTNAME=rtpengine
+
+# ------------------------------------------------------------------------------
+# --- IP or hostname that each instance will invoke when locating the other    
+RABBITMQ_HOSTNAME=rabbitmq
 
 #########################################################################################################
 #                                Object Storage BUCKET config                                           #
@@ -254,6 +245,23 @@ MYSQL_ROOT_PASS=admin123
 
 VIDEOCALLS_USERNAME=click2video
 VIDEOCALLS_PASSWORD=098098ZZZ
+
+
+#########################################################################################################
+#                             Google Services integrations                                              #
+#########################################################################################################
+GOOGLE_MAPS_API_KEY=NULL
+GOOGLE_MAPS_CENTER='{ "lat": -31.416668, "lng": -64.183334 }'
+
+GOOGLE_API_KEY=igfdsjkhfjkh2345jkh23jk4h123jk4h123j
+
+
+#########################################################################################################
+#                              OpenAI Integrations                                                      #
+#########################################################################################################
+
+OPENAI_API_KEY=fjdhsfkhadsjkfhajksKJHJKHK876786HJGHJGfgsdf452345786dfs76sd
+
 
 
 #######################################################################################

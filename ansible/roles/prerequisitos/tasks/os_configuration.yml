@@ -1,4 +1,4 @@
-# Copyright (C) 2023 Freetech Solutions
+# Copyright (C) 2024 Freetech Solutions
 
 # This file is part of OMniLeads
 
@@ -106,6 +106,7 @@
   tags: 
     - install
     - upgrade
+    - update
   when:
     - certs == "selfsigned"
 
@@ -119,10 +120,11 @@
   tags: 
     - install
     - upgrade
+    - update
   when:
     - certs == "selfsigned"
 
-- name: OS_CONF Copy custom SSL cert.pem
+- name: OS_CONF Copy custom generic filename SSL cert.pem
   copy:
     src: "../../../instances/{{ tenant_folder }}/cert.pem"
     dest: /etc/omnileads/certs/cert.pem
@@ -132,11 +134,12 @@
   tags: 
     - install
     - upgrade
+    - update
   when:
     - certs == "custom"
     - cert_file_name is not defined
 
-- name: OS_CONF Copy custom tenant SSL cert.pem
+- name: OS_CONF Copy custom cert filename tenant SSL cert.pem
   copy:
     src: "../../../instances/{{ tenant_folder }}/{{ cert_file_name }}"
     dest: /etc/omnileads/certs/cert.pem
@@ -146,10 +149,11 @@
   tags: 
     - install
     - upgrade
+    - update
   when:
     - cert_file_name is defined
 
-- name: OS_CONF Copy custom SSL key.pem
+- name: OS_CONF Copy custom generic filename SSL key.pem
   copy:
     src: "../../../instances/{{ tenant_folder }}/key.pem"
     dest: /etc/omnileads/certs/key.pem
@@ -159,11 +163,12 @@
   tags: 
     - install
     - upgrade
+    - update
   when:
     - certs == "custom"
     - key_file_name is not defined
 
-- name: OS_CONF Copy custom tenant SSL key.pem
+- name: OS_CONF Copy custom key filename tenant SSL key.pem
   copy:
     src: "../../../instances/{{ tenant_folder }}/{{ key_file_name }}"
     dest: /etc/omnileads/certs/key.pem
@@ -173,6 +178,7 @@
   tags: 
     - install
     - upgrade
+    - update
   when:
     - key_file_name is defined
 
@@ -191,8 +197,6 @@
 
 - name: OS_CONF CERTBOT launch container to generate lets & crypt Certs
   become: yes
-  when: certs == "certbot"
-  
   shell: "podman run -it --rm --name nginx-certbot -e FQDN={{ fqdn }} -e EMAIL={{ notification_email }} -e RENEW_CERTIFICATE=false -v '/opt/certbot/letsencrypt:/etc/letsencrypt' -v '/opt/certbot/webroot:/var/www/certbot' -p 80:80 docker.io/omnileads/certbot:240201.01"
   tags:
     - install  
