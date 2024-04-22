@@ -20,11 +20,16 @@ ExecStart=/usr/bin/podman run \
   --log-driver=journald \
   --env-file=/etc/default/sentiment_analysis.env \
   --name=oml-sentiment_analysis-server \
-  {% if ai_engine == "gcp" %}
+{% if speech_analytics_model == "gcp" %}
   --volume=/etc/omnileads/google_credential.json:/tmp/google_credential.json \
-  {% endif %}
+{% endif %}
   --rm  \
-  {{ sentiment_analysis_img }} python /app/app_{{ ai_engine }}.py
+{% if speech_analytics_model == "local" %}
+  {{ sentiment_analysis_img }} python /app/app_psysent.py
+{% else %}
+{{ sentiment_analysis_img }} python /app/app_{{ speech_analytics_model }}.py
+{% endif %}  
+
 ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
 ExecStopPost=/usr/bin/podman rm -f --ignore --cidfile=%t/%n.ctr-id
 Type=notify

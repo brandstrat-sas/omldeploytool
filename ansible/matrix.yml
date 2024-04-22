@@ -112,7 +112,7 @@
 - import_playbook: components/sentiment_analysis/playbook.yml
   when: 
     - inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_aio']
-    - ai_engine is defined
+    - speech_analytics_model is defined
     
 
 - import_playbook: components/nginx/playbook.yml

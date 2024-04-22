@@ -260,14 +260,13 @@ services:
     networks:
       - omnileads
     privileged: true
-    command: python /app/app_${AI_ENGINE}.py
+    command: sleep 3600 #python /app/app_${MODEL}.py
     restart: on-failure
     stop_grace_period: 1m30s
     volumes:      
       - ./asterisk_custom/google_credential.json:/tmp/google_credential.json
-      - ${REPO_PATH}/oml_sentiment_analysis/app_openai.py:/app/app_openai.py
-      - ${REPO_PATH}/oml_sentiment_analysis/app_gcp.py:/app/app_gcp.py
-
+      - ${REPO_PATH}/oml_sentiment_analysis/:/app/
+      
   # speechanalysis:
   #   build:
   #     target: run

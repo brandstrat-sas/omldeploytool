@@ -3,7 +3,7 @@
 #################### containers img tags  ################################
 
 fastagi_img: docker.io/omnileads/fastagi:240228.01
-sentiment_analysis_img: docker.io/omnileads/sentiment_analysis:240409.01
+sentiment_analysis_img: docker.io/freetechsolutions/sentiment_analysis:240422.01
 astami_img: docker.io/omnileads/astami:231230.01
 nginx_img: docker.io/omnileads/nginx:240105.01
 websockets_img: docker.io/omnileads/websockets:231125.01
@@ -38,14 +38,8 @@ kamailio_wss_port: 14443
 ################################ paths ####################################
 
 INSTALL_PREFIX: /opt/omnileads/
-postgres_persistent_path: /var/lib/omnileads/pgsql
 django_deploy_path: /opt/omnileads/
 asterisk_location_conf: /etc/asterisk
-ast_agis_location: /var/lib/asterisk/agi-bin
-ast_conf_location: /etc/asterisk
-ast_logs_location: /var/log/asterisk
-ast_sounds_location: /var/lib/asterisk/sounds
-asterisk_sounds_host_path: /var/lib/omnileads/asterisk/sounds
 certs_location: "/etc/omnileads/certs"
 
 ##################### Journald system vars ################################
@@ -60,25 +54,14 @@ journald_runtime_keep_free: 32M
 
 USUARIO: omnileads
 MONITORFORMAT: mp3
-
 redis_ha_version: develop
 haproxy_version: 2.0-buster
 centos_postgresql_version: 11
-
-homer_enable: true
-prometheus_enable: true
 postgres_homer_db: homer7
-
-container_orchest: systemd
-
-redis_ha: false
-high_load: false
 schedule: Agenda
-
-admin_user: admin
 usuario: omnileads
-
 container_image_registry: docker.io
+container_orchest: systemd
 
 ##################### Dialer only QA deploy ################################
 

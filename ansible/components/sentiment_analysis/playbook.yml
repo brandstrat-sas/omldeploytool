@@ -56,7 +56,7 @@
       - install
       - upgrade
       - update
-    when: ai_engine == "gcp"
+    when: speech_analytics_model == "gcp"
 
   - name: SENTIMENTAL_ANALYSIS Pull image
     command: podman pull --quiet {{ sentiment_analysis_img }}

@@ -236,9 +236,9 @@ all:
     # ------------------------------------------------------------------------------------------------ #
     # --------------------------------------- Integrations-------------------------------------------- #
     # ------------------------------------------------------------------------------------------------ #
-    # --- Generative AI integration
-    # --- if you want to use generatiev AI integration set with: "openai" or "gcp" (google cloud).
-    #ai_engine: openai
+    # --- Speech analytics & sentiment analysis
+    # --- "openai" or "gcp" (google cloud) or "local" (whisper for transcription & psysentiment for analysis)
+    #speech_analytics_model: local
 
     # --- google maps integration credentials
     google_maps_api_key: NULL

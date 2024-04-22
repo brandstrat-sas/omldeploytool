@@ -84,18 +84,6 @@
   tags: 
     - install
 
-- name: OS_CONF Creates /var/lib/omnileads directory
-  file:
-    path: '{{ asterisk_sounds_host_path }}'
-    state: directory
-    owner: '{{ usuario }}'
-    group: '{{ usuario }}'
-    mode: 0764
-    recurse: yes
-  when: var_lib_omnileads.stat.exists == false
-  tags: 
-    - install
-
 - name: OS_CONF Copy selfsigned SSL certs
   copy:
     src: "certs/cert.pem"
