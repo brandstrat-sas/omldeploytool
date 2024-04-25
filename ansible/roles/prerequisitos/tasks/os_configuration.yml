@@ -185,11 +185,11 @@
 
 - name: OS_CONF CERTBOT launch container to generate lets & crypt Certs
   become: yes
-  shell: "podman run -it --rm --name nginx-certbot -e FQDN={{ fqdn }} -e EMAIL={{ notification_email }} -e RENEW_CERTIFICATE=false -v '/opt/certbot/letsencrypt:/etc/letsencrypt' -v '/opt/certbot/webroot:/var/www/certbot' -p 80:80 docker.io/omnileads/certbot:240201.01"
+  shell: "podman run -it --rm --name nginx-certbot -e FQDN={{ fqdn }} -e EMAIL={{ notification_email }} -e RENEW_CERTIFICATE=false -v '/opt/certbot/letsencrypt:/etc/letsencrypt' -v '/opt/certbot/webroot:/var/www/certbot' -p 80:80 {{ certbot_img }}"
   tags:
     - install  
   when:
-    - certs == "certbot"  
+    - certs == "certbot"
 
 - name: OS_CONF CERTBOT SSL Cert Copy
   become: yes

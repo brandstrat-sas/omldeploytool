@@ -24,6 +24,7 @@ pstn_emulator_img: docker.io/omnileads/pstn_emulator:240229.01
 wombat_img: docker.io/freetechsolutions/wombat:21.06.4-9
 mysql_img: docker.io/bitnami/mariadb:latest
 survey_worker_img: docker.io/omnileads/survey_worker:231201.01
+certbot_img: docker.io/omnileads/certbot:240201.01
 
 ################ Some components NETWORKING ports ########################
 
