@@ -149,8 +149,7 @@ all:
 
 ##################################################################################################################
 # -- OMniLeads Common Variables                                                                                  #
-##################################################################################################################
- 
+################################################################################################################## 
   vars:
     # --- ansible user auth connection
     ansible_user: root
@@ -163,7 +162,8 @@ all:
     # --- Asterisk & RTPengine scenary for SIP & RTP
     # --- "cloud" instance (access through public IP)
     # --- "lan" instance (access through private IP)
-    # --- "nat" instance (access through Public NAT IP)    
+    # --- "nat" instance (access through Public NAT IP)
+    # --- "hybrid" instance (agent WebRTC through Public NAT IP, but PSTN acces through LAN VoIP GW)
     # --- or "all" in order to access through all NICs
     infra_env: cloud
     #nat_ip_addr: X.X.X.X
@@ -303,7 +303,7 @@ all:
     # --- If you want to deploy OMniLeads Enterprise, you just need to add "-enterprise" as a suffix to the omnileads_img image tag
     # --- for example: omnileads_img: docker.io/omnileads/omlapp:240216.01-enterprise.
 
-    omnileads_img: docker.io/freetechsolutions/omlapp:240423.01
+    omnileads_img: docker.io/freetechsolutions/omlapp:240425.01
     asterisk_img: docker.io/freetechsolutions/asterisk:240423.01
     
 ##############################################################################################################
