@@ -109,6 +109,11 @@
     - inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_aio']
 
 
+- import_playbook: components/interaction_processor/playbook.yml
+  when: 
+    - inventory_hostname in groups['omnileads_voice'] or inventory_hostname in groups['omnileads_aio']
+    
+
 - import_playbook: components/sentiment_analysis/playbook.yml
   when: 
     - inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_aio']

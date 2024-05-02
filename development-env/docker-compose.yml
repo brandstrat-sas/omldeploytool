@@ -228,8 +228,8 @@ services:
       - ${REPO_PATH}/omlacd/source/astconf:/etc/asterisk
       - ${REPO_PATH}/omlacd/source/scripts:/opt/asterisk/scripts
       - ${REPO_PATH}/omlacd/source/agi-bin/:/var/lib/asterisk/agi-bin/
-      #- ./asterisk_custom/google_credential.json:/tmp/google_credential.json      
-      #- ./asterisk_custom/oml_extensions_custom.conf:/etc/asterisk/oml_extensions_custom.conf
+      - ./asterisk_custom/google_credential.json:/tmp/google_credential.json      
+      - ./asterisk_custom/oml_extensions_custom.conf:/etc/asterisk/oml_extensions_custom.conf
       - asterisk_callrec:/var/spool/asterisk/monitor/
     working_dir: /etc/asterisk
 
