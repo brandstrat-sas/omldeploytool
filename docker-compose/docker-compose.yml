@@ -271,7 +271,6 @@ services:
     tty: true
     working_dir: /opt/omnileads
 
-
   fastagi:
     depends_on:
       - postgresql
@@ -308,6 +307,60 @@ services:
     networks:
       - omnileads
 
+  # sentiment_analysis:
+  #   image: ${OMLSENTIMENT_IMG}
+  #   container_name: oml-sentiment_analisys
+  #   depends_on:
+  #     - postgresql
+  #     - minio
+  #     - rabbitmq
+  #   dns: 8.8.8.8
+  #   environment:
+  #     - OPENAI_API_KEY=${OPENAI_API_KEY}
+  #     - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+  #     - GOOGLE_APPLICATION_CREDENTIALS=/tmp/google_credential.json
+  #     - RABBITMQ_HOST=${RABBITMQ_HOSTNAME}
+  #     - TZ=${TZ}
+  #     - PGHOST=${PGHOST}
+  #     - PGPORT=${PGPORT}
+  #     - PGUSER=${PGUSER}
+  #     - PGDATABASE=${PGDATABASE}
+  #     - PGPASSWORD=${PGPASSWORD}
+  #     - S3_BUCKET_NAME=${S3_BUCKET_NAME}
+  #     - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+  #     - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+  #     - S3_ENDPOINT=${S3_ENDPOINT_MINIO}
+  #     - AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION}
+  #     - LANG=es
+  #     - GCP_PROJECT_ID=${GOOGLE_CLOUD_PROJECTID}
+  #   networks:
+  #     - omnileads
+  #   privileged: true
+  #   command: python /app/app_${AI_ENGINE}.py
+  #   restart: on-failure
+  #   stop_grace_period: 1m30s
+  #   # volumes:      
+  #   #   - ./asterisk_custom/google_credential.json:/tmp/google_credential.json
+
+  interaction_processor:
+    depends_on:
+      - rabbitmq
+      - minio
+    image: ${OMLINTERACTION_PROC_IMG}
+    command: python /app/app.py
+    container_name: oml-interaction_processor
+    environment:
+      - TZ={{ TZ}
+      - RABBITMQ_HOST=${RABBITMQ_HOSTNAME}
+      - S3_BUCKET_NAME=${S3_BUCKET_NAME}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - S3_ENDPOINT=${S3_ENDPOINT_MINIO}
+      - AWS_DEFAULT_REGION=us-east-1
+      - CALLREC_DEVICE=s3
+    networks:
+      - omnileads 
+
   acd:
     container_name: oml-asterisk
     depends_on:
@@ -318,6 +371,8 @@ services:
       - fastagi
     dns: 8.8.8.8
     environment:
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+      - GOOGLE_APPLICATION_CREDENTIALS=/tmp/google_credential.json
       - SCALE=True
       - ENV=${ENV}
       - FASTAGI=${FASTAGI_HOSTNAME}
@@ -332,6 +387,7 @@ services:
       - PGUSER=${PGUSER}
       - PGDATABASE=${PGDATABASE}
       - PGPASSWORD=${PGPASSWORD}
+      - RABBITMQ_HOST=${RABBITMQ_HOSTNAME}
       - CALLREC_DEVICE=${CALLREC_DEVICE}
       - S3_BUCKET_NAME=${S3_BUCKET_NAME}
       - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
@@ -353,9 +409,9 @@ services:
     restart: on-failure
     stop_grace_period: 1m30s
     working_dir: /etc/asterisk
-    #volumes:
-    #  - ./asterisk_custom/fidelio/oml_extensions_custom.conf:/etc/asterisk/oml_extensions_custom.conf
-    #  - ./asterisk_custom/fidelio/bot.py:/var/lib/asterisk/agi-bin/bot.py
+    volumes:
+      - ./asterisk_custom/oml_extensions_custom.conf:/etc/asterisk/oml_extensions_custom.conf
+      - ./asterisk_custom/google_credential.json:/tmp/google_credential.json
 
   kamailio:
     command:
@@ -548,6 +604,12 @@ services:
     stop_grace_period: 1m30s
     volumes:
       - mariadb:/bitnami
+
+  rabbitmq:
+    container_name: oml-rabbit-mq
+    image: rabbitmq:management
+    networks:
+      - omnileads
 
   wombat:  
     command: >

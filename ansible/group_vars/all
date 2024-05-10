@@ -2,12 +2,22 @@
 
 #################### containers img tags  ################################
 
+fastagi_img: docker.io/omnileads/fastagi:240228.01
+sentiment_analysis_img: docker.io/omnileads/sentiment_analysis:240427.01
+interaction_processor_img: docker.io/omnileads/interaction_processor:240506.01
+astami_img: docker.io/omnileads/astami:231230.01
+nginx_img: docker.io/omnileads/nginx:240105.01
+websockets_img: docker.io/omnileads/websockets:231125.01
+kamailio_img: docker.io/omnileads/kamailio:231125.01
+rtpengine_img: docker.io/freetechsolutions/rtpengine:240425.01
+redis_img: docker.io/omnileads/redis:231125.01
 postgres_img: docker.io/postgres:14.9-bullseye
-#postgres_img: docker.io/omnileads/postgres:230624.01
+#postgres_img: docker.io/omnileads/postgres:230624.01 # for upgrade from centos7 1.X
 prometheus_img: docker.io/prom/prometheus:v2.49.1
 prometheus_node_exp_img: docker.io/prom/node-exporter:v1.7.0
 promtail_img: docker.io/grafana/promtail:latest
 minio_img: quay.io/minio/minio:RELEASE.2023-09-27T15-22-50Z
+rabbitmq_img: docker.io/rabbitmq:3.12
 postgres_prometheus_img: docker.io/prometheuscommunity/postgres-exporter
 redis_prometheus_img: docker.io/oliver006/redis_exporter:latest
 nginxcgi_img: docker.io/omnileads/nginxqa:231117.01
@@ -15,6 +25,7 @@ pstn_emulator_img: docker.io/omnileads/pstn_emulator:240229.01
 wombat_img: docker.io/freetechsolutions/wombat:21.06.4-9
 mysql_img: docker.io/bitnami/mariadb:latest
 survey_worker_img: docker.io/omnileads/survey_worker:231201.01
+certbot_img: docker.io/omnileads/certbot:240201.01
 
 ################ Some components NETWORKING ports ########################
 
@@ -29,14 +40,8 @@ kamailio_wss_port: 14443
 ################################ paths ####################################
 
 INSTALL_PREFIX: /opt/omnileads/
-postgres_persistent_path: /var/lib/omnileads/pgsql
 django_deploy_path: /opt/omnileads/
 asterisk_location_conf: /etc/asterisk
-ast_agis_location: /var/lib/asterisk/agi-bin
-ast_conf_location: /etc/asterisk
-ast_logs_location: /var/log/asterisk
-ast_sounds_location: /var/lib/asterisk/sounds
-asterisk_sounds_host_path: /var/lib/omnileads/asterisk/sounds
 certs_location: "/etc/omnileads/certs"
 
 ##################### Journald system vars ################################
@@ -51,25 +56,14 @@ journald_runtime_keep_free: 32M
 
 USUARIO: omnileads
 MONITORFORMAT: mp3
-
 redis_ha_version: develop
 haproxy_version: 2.0-buster
 centos_postgresql_version: 11
-
-homer_enable: true
-prometheus_enable: true
 postgres_homer_db: homer7
-
-container_orchest: systemd
-
-redis_ha: false
-high_load: false
 schedule: Agenda
-
-admin_user: admin
 usuario: omnileads
-
 container_image_registry: docker.io
+container_orchest: systemd
 
 ##################### Dialer only QA deploy ################################
 
