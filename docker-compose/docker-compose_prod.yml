@@ -304,6 +304,24 @@ services:
     restart: on-failure  
     network_mode: host
 
+  interaction_processor:
+    depends_on:
+      - rabbitmq
+      - minio
+    image: ${OMLINTERACTION_PROC_IMG}
+    command: python /app/app.py
+    container_name: oml-interaction_processor
+    environment:
+      - TZ={{ TZ}
+      - RABBITMQ_HOST=${RABBITMQ_HOSTNAME}
+      - S3_BUCKET_NAME=${S3_BUCKET_NAME}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - S3_ENDPOINT=${S3_ENDPOINT_MINIO}
+      - AWS_DEFAULT_REGION=us-east-1
+      - CALLREC_DEVICE=s3
+    network_mode: host    
+
   acd:
     container_name: oml-asterisk
     depends_on:

@@ -298,31 +298,23 @@ services:
       - ./asterisk_custom/google_credential.json:/tmp/google_credential.json
       - ${REPO_PATH}/oml_sentiment_analysis/:/app/
       
-  # speechanalysis:
-  #   build:
-  #     target: run
-  #     context: ${REPO_PATH}/omlopenai
-  #   image: ${OMLOPENAI_IMG}
-  #   container_name: oml-speech-analysis
-  #   depends_on:
-  #     - minio
-  #   dns: 8.8.8.8
-  #   environment:
-  #     - TZ=${TZ}
-  #     - CALLREC_DEVICE=${CALLREC_DEVICE}
-  #     - S3_BUCKET_NAME=${S3_BUCKET_NAME}
-  #     - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-  #     - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
-  #     - S3_ENDPOINT=${S3_ENDPOINT_MINIO}
-  #     - AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION}
-  #   networks:
-  #     - omnileads
-  #   privileged: true
-  #   restart: on-failure
-  #   stop_grace_period: 1m30s
-  #   volumes:
-  #       - ${REPO_PATH}/omlopenai/app.py:/app/app.py
-  #   working_dir: /app
+  audiosocket:
+    build:
+      #target: run
+      context: ${REPO_PATH}/oml_audiosocket
+    image: audiosocket
+    container_name: oml-audiosocket
+    depends_on:
+      - acd
+    dns: 8.8.8.8
+    environment:
+      - TZ=${TZ}    
+    networks:
+      - omnileads
+    privileged: true
+    restart: on-failure
+    stop_grace_period: 1m30s
+    #command: sleep 3600
 
   kamailio:
     build:

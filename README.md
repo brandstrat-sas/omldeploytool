@@ -18,14 +18,15 @@ OML currently facilitates robust management and telephonic support using various
 * Manual Outbound Campaigns: Provide tools for agents to manually reach out to customers with ease. ✅ 
 * Web-Based Video Calls: Video call campaigns directly from web pages, enhancing the personal touch in customer interactions. ✅ 
 * WhatsApp Integration: Expand your reach and accessibility with WhatsApp communication capabilities. ✅ 
+* Multiple Text to Speech & Speech to text integractions from SaaS to opensource. ✅ 
 
 Additionally, it includes the typical functionalities of contact center management:
 
 * Agente & Supervisor console based on WebRTC. ✅ 
 * Differents user profiles: administrator, supervisor admin, supervisor customer & agent. ✅ 
-* Multiple campaigns: voice, video & WhatsApp (comming soon) management. ✅ 
+* Multiple campaigns: voice, video & WhatsApp management. ✅ 
 * Answering machine detection. ✅ 
-* Full Recording. ✅ 
+* Full Call & Chat registry. ✅ 
 * Productivity reports. ✅ 
 * Real time supervision. ✅ 
 * Simple creation of Web forms. ✅ 
@@ -33,7 +34,7 @@ Additionally, it includes the typical functionalities of contact center manageme
 * Remotes Agents mode. ✅ 
 * PBX integration. ✅ 
 
-with Whatsapp:
+with Whatsapp (Beta):
 
 * Have multiple users chating in same WhatsApp Number. ✅ 
 * Connect to multiple WhatsApp accounts and receive all messages in one place. ✅ 
