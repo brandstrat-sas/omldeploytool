@@ -18,23 +18,26 @@ PUBLIC_IP=
 
 REPO=omnileads
 
-OMLAPP_IMG=${REPO}/omlapp:240410.01
-OMLACD_IMG=${REPO}/asterisk:240410.01
+OMLAPP_IMG=${REPO}/omlapp:240509.01
+OMLACD_IMG=${REPO}/asterisk:240503.01
 OMLFASTAGI_IMG=${REPO}/fastagi:240228.01
 OMLAMI_IMG=${REPO}/astami:231230.01
 OMLNGINX_IMG=${REPO}/nginx:240105.01
-OMLWS_IMG=${REPO}/websockets:231125.01
 OMLKAM_IMG=${REPO}/kamailio:231125.01
 OMLRTPENGINE_IMG=${REPO}/rtpengine:231125.01
+OMLWS_IMG=${REPO}/websockets:231125.01
 OMLREDIS_IMG=${REPO}/redis:231125.01
+OMLSENTIMENT_IMG=${REPO}/sentiment_analysis:240427.01
+OMLINTERACTION_PROC_IMG=${REPO}/interaction_processor:240506.01
 
-OMLVIDEOCALLS_WIDGET_IMG=omnileads/videocalls_widget:230905.01
-OMLPSTNEMULATOR_IMG=omnileads/pstn_emulator:231118.01
+OMLPSTNEMULATOR_IMG=${REPO}/pstn_emulator:240229.01
+OMLVIDEOCALLS_WIDGET_IMG=${REPO}/videocalls_widget:230905.01
 
 OMLPGSQL_IMG=postgres:14.9-bullseye
 OMLMINIO_IMG=quay.io/minio/minio:RELEASE.2023-09-27T15-22-50Z
 MARIADB_IMG=bitnami/mariadb:latest
 WOMBAT_IMG=freetechsolutions/wombat:21.06.4-9
+
 
 
 ################################
@@ -85,12 +88,6 @@ CALIFICACION_REAGENDA=AGENDA
 # Decrease it if paranoic reasons
 LOGIN_FAILURE_LIMIT=10
 
-
-##############################################################
-#           google maps integration credentials              #
-##############################################################
-GOOGLE_MAPS_API_KEY=NULL
-GOOGLE_MAPS_CENTER='{ "lat": -31.416668, "lng": -64.183334 }'
 
 #####################################################################################################
 #                                       ASTERISK                                                    #
@@ -161,7 +158,7 @@ PKG_SIZE=8
 
 
 #########################################################################################################
-#                                       NGINX - RTPENGINE - REDIS                                       #
+#                                       NGINX - RTPENGINE - REDIS - RABBITMQ                            #
 #########################################################################################################
 # -----------------------------------------------------------------------------
 
@@ -174,21 +171,18 @@ OMNILEADS_HOSTNAME=nginx
 
 NGINX_EXT_PORT=443
 
-
-
 # -----------------------------------------------------------------------------
-
-# ******** HIGH AVAILABILITY ******* # # ******** HIGH AVAILABILITY ******* #
-# ******** HIGH AVAILABILITY ******* # # ******** HIGH AVAILABILITY ******* #
-# *** redis or redis_lb in case of HA *** #
-
 # --- IP or hostname that each instance will invoke when locating the other    
 REDIS_HOSTNAME=redis
-
 
 # ------------------------------------------------------------------------------
 # --- IP or hostname that each instance will invoke when locating the other    
 RTPENGINE_HOSTNAME=rtpengine
+
+# ------------------------------------------------------------------------------
+# --- IP or hostname that each instance will invoke when locating the other    
+RABBITMQ_HOSTNAME=rabbitmq
+
 
 #########################################################################################################
 #                                Object Storage BUCKET config                                           #
@@ -253,21 +247,41 @@ MYSQL_ROOT_PASS=admin123
 VIDEOCALLS_USERNAME=click2video
 VIDEOCALLS_PASSWORD=098098ZZZ
 
-#######################################################################################
-# Subnet for the docker bridge network, change it if this subnet conflicts with yours #
-#######################################################################################
+#########################################################################################################
+#                                        AI Engine                                                      #
+#########################################################################################################
+# openai or gcp
+AI_ENGINE=gcp
+
+#########################################################################################################
+#                                        Google integrations                                            #
+#########################################################################################################
+GOOGLE_MAPS_API_KEY=NULL
+GOOGLE_MAPS_CENTER='{ "lat": -31.416668, "lng": -64.183334 }'
+GOOGLE_API_KEY=jkjghjkgjk65467GHFGHF5646ghghfghFHGFghf
+GOOGLE_CLOUD_PROJECTID=your_project_id
+
+#########################################################################################################
+#                                        OpenAI integrations                                            #
+#########################################################################################################
+OPENAI_API_KEY=fghsfdghshj5e4hjg2hj432ghj423ghj
+
+
+#########################################################################################################
+#       Subnet for the docker bridge network, change it if this subnet conflicts with yours             #
+#########################################################################################################
 SUBNET=10.12.12.0/24
 GATEWAY=10.12.12.254
 
-###########################
-# Django default settings #
-###########################
+#########################################################################################################
+#                                       Django default settings                                         #
+#########################################################################################################
 OMLAPP_VERSION=240201.01
 DJANGO_SETTINGS_MODULE=ominicontacto.settings.production
 PYTHONPATH=/opt/omnileads/ominicontacto
 INSTALL_PREFIX=/opt/omnileads/
 OML_COMMIT=XCOMIT
 OML_BRANCH=docker-compose
-OML_BUILD_DATE="20240216"
+OML_BUILD_DATE="20240403"
 KAMAILIO_CERTS_LOCATION=/etc/omnileads/certs
 MONITORFORMAT=mp3

@@ -84,6 +84,9 @@ case ${oml_action} in
   redis_node_takeover_main)
     echo "deploy: $oml_action"
   ;;
+  recycle)
+    echo "deploy: $oml_action"
+  ;;
   *)
     echo "deploy: $oml_action";
 
@@ -148,11 +151,18 @@ case ${oml_action} in
     -i .inventory.yml
     Banner `echo $?`
   ;;
-  
+  recycle)
+    ansible-playbook ./components/recycle/playbook.yml --extra-vars \
+    "tenant_folder=$oml_tenant" \
+    --tags $oml_action \
+    -i .inventory.yml
+    Banner `echo $?`
+  ;;
   *)
     ansible-playbook matrix.yml --extra-vars \
     "django_repo_path=$(pwd)/components/django/ \
     redis_repo_path=$(pwd)/components/redis/ \
+    rabbitmq_repo_path=$(pwd)/components/rabbitmq/ \
     pgsql_repo_path=$(pwd)/components/postgresql/ \
     kamailio_repo_path=$(pwd)/components/kamailio/ \
     asterisk_repo_path=$(pwd)/components/asterisk/ \
@@ -162,6 +172,8 @@ case ${oml_action} in
     ami_repo_path=$(pwd)/components/ami/ \
     websockets_repo_path=$(pwd)/components/websockets/ \
     nginx_repo_path=$(pwd)/components/nginx/ \
+    interaction_processor_repo_path=$(pwd)/components/interaction_processor/ \
+    sentiment_analysis_repo_path=$(pwd)/components/sentiment_analysis/ \
     minio_repo_path=$(pwd)/components/minio/ \
     haproxy_repo_path=$(pwd)/components/haproxy/ \
     cron_repo_path=$(pwd)/components/cron/ \
@@ -229,7 +241,7 @@ do
     --action=keepalived|--action=kamailio|--action=rtpengine|--action=asterisk|--action=sentinel|\
     --action=redis|--action=pgsql_node_recovery_main|--action=pgsql_node_takeover_main|\
     --action=redis_node_takeover_main|--action=pgsql_node_recovery_backup|--action=minio|\
-    --action=restart|--action=restart_django|--action=restart_asterisk|--action=restart_core|\
+    --action=restart|--action=restart_django|--action=restart_asterisk|--action=restart_core|--action=recycle|\
     --action=update)
       oml_action="${i#*=}"
       shift
