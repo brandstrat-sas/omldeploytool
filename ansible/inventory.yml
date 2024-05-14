@@ -272,7 +272,9 @@ all:
     # --- Request by Web-Video Inbound Calls 
     # --- Put here the JITSI host URL
     #video_host: 
-
+    
+    # --- Request by CRM integration callrec search & list API endpoint
+    #CUSTOM_CORS_ALLOWED_ORIGINS=https://example1.net,https://example2.com,https://example3.tech
     # ------------------------------------------------------------------------------------------------ #
     # ------------------------------------ Scale tunnings -------------------------------------------- #
     # ------------------------------------------------------------------------------------------------ #
@@ -303,7 +305,7 @@ all:
     # --- If you want to deploy OMniLeads Enterprise, you just need to add "-enterprise" as a suffix to the omnileads_img image tag
     # --- for example: omnileads_img: docker.io/omnileads/omlapp:240216.01-enterprise.
 
-    omnileads_img: docker.io/omnileads/omlapp:240509.01
+    omnileads_img: docker.io/omnileads/omlapp:240513.01
     asterisk_img: docker.io/omnileads/asterisk:240503.01
     
 ##############################################################################################################
@@ -312,8 +314,6 @@ all:
 ## -- The Ansible playbooks are applied on the hosts below declared and classified according to the       -- #
 ## -- architecture of the instance on which they are deployed.                                            -- #
 ##############################################################################################################
-
-
 omnileads_aio:
   hosts:
     tenant_example_1:
