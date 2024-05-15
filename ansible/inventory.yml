@@ -236,15 +236,18 @@ all:
     # ------------------------------------------------------------------------------------------------ #
     # --------------------------------------- Integrations-------------------------------------------- #
     # ------------------------------------------------------------------------------------------------ #
+    # --- Text to Speech external "gcp", "aws", "ibm", etc.
+    #tts_external_engine: 
+
     # --- Speech analytics & sentiment analysis
     # --- "openai" or "gcp" (google cloud) or "local" (whisper for transcription & psysentiment for analysis)
     #speech_analytics_model: local
-
+  
     # --- google maps integration credentials
     google_maps_api_key: NULL
     google_maps_center: '{ "lat": -31.416668, "lng": -64.183334 }'
-    google_api_key:
-    google_cloud_projectid: 
+    google_api_key: AIzaSyCZxZXXdgslILtWuGdy42t6JmLJKw9IYrM
+    google_cloud_projectid: 487534604960
     # --- openai integrations
     openai_api_key:
     # --- The Dialer Engine Host
@@ -274,7 +277,7 @@ all:
     #video_host: 
     
     # --- Request by CRM integration callrec search & list API endpoint
-    #CUSTOM_CORS_ALLOWED_ORIGINS: https://example1.net,https://example2.com,https://example3.tech
+    #CUSTOM_CORS_ALLOWED_ORIGINS=https://example1.net,https://example2.com,https://example3.tech
     # ------------------------------------------------------------------------------------------------ #
     # ------------------------------------ Scale tunnings -------------------------------------------- #
     # ------------------------------------------------------------------------------------------------ #
@@ -286,7 +289,6 @@ all:
     #asterisk_mem_limit: 1G
     #pjsip_threadpool_idle_timeout: 120
     #pjsip_threadpool_max_size: 150
-
     # ------------------------------------------------------------------------------------------------ #
     # ------------------------------------ Upgrade from OML 1.X -------------------------------------- #
     # ------------------------------------ Restore filename ------------------------------------------ #
@@ -296,7 +298,6 @@ all:
     
     # Uncomment in case of upgrading from OML 1.X
     #upgrade_from_oml_1: true
-    
     # ------------------------------------------------------------------------------------------------ #
     # ---------------------------- Container IMG TAG customization ----------------------------------- #
     # ------------------------------------------------------------------------------------------------ #
@@ -306,8 +307,7 @@ all:
     # --- for example: omnileads_img: docker.io/omnileads/omlapp:240216.01-enterprise.
 
     omnileads_img: docker.io/omnileads/omlapp:240513.01
-    asterisk_img: docker.io/omnileads/asterisk:240503.01
-    
+    asterisk_img: docker.io/omnileads/asterisk:240503.01    
 ##############################################################################################################
 ## -- In this section the hosts are grouped based on the type of deployment (AIO, Cluster & Cluster HA).  -- #
 ## -- here you can control which host the action deployed by the deploy.sh script will be applied to      -- #
@@ -316,8 +316,8 @@ all:
 ##############################################################################################################
 omnileads_aio:
   hosts:
-    tenant_example_1:
-    #tenant_example_2:
+    staging:
+    #demo:
     #tenant_example_nat:
     #tenant_example_3:
     #tenant_example_4:

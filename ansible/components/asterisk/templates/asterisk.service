@@ -26,6 +26,9 @@ ExecStart=/usr/bin/podman run \
   --env-file=/etc/default/asterisk.env \
   --name=oml-asterisk-server \
   --volume=asterisk_callrec:/var/spool/asterisk/monitor \
+{% if tts_external_engine is defined and tts_external_engine == "gcp" %} 
+  --volume=/etc/omnileads/google_credential.json:/tmp/google_credential.json \
+{% endif %}
   --rm  \
   {{ asterisk_img }}
 ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id

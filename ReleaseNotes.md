@@ -31,7 +31,7 @@
 ## OMniLeads Component versions
 
 ```
-    omnileads_img: docker.io/omnileads/omlapp:240509.01
+    omnileads_img: docker.io/omnileads/omlapp:240513.01
     asterisk_img: docker.io/omnileads/asterisk:240503.01
     fastagi_img: docker.io/omnileads/fastagi:240228.01
     interaction_processor_img: docker.io/omnileads/interaction_processor:240506.01
