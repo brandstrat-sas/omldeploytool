@@ -555,14 +555,7 @@ In the inventory file you can customize the tags of the images to display, as we
     
     omnileads_img: your_registry/omlapp:231227.01
     asterisk_img: your_registry/asterisk:240102.01
-    fastagi_img: your_registry/fastagi:240104.01
-    astami_img: your_registry/astami:231230.01
-    nginx_img: your_registry/nginx:240105.01
-    websockets_img: your_registry/websockets:231125.01
-    kamailio_img: your_registry/kamailio:231125.01
-    rtpengine_img: your_registry/rtpengine:231125.01
-    redis_img: your_registry/redis:231125.01
-
+    
     # --- Activate the OMniLeads Enterprise Edition.
     # --- on the contrary you will deploy OMniLeads OSS Edition with GPLV3 licensed. 
     
@@ -613,7 +606,7 @@ Therefore to apply updates we must first launch on this repository:
 
 ```
 git pull origin main
-git checkout release-1.33.3
+git checkout release-2.0.0
 ```
 
 Then indicate at the inventory.yml level within the corresponding tenant folder, the versions
@@ -622,13 +615,6 @@ desired, for example:
 ```
 omnileads_img: docker.io/omnileads/omlapp:240201.01
 asterisk_img: docker.io/omnileads/asterisk:240102.01
-fastagi_img: docker.io/omnileads/fastagi:240104.01
-astami_img: docker.io/omnileads/astami:231230.01
-nginx_img: docker.io/omnileads/nginx:240105.01
-websockets_img: docker.io/omnileads/websockets:231125.01
-kamailio_img: docker.io/omnileads/kamailio:231125.01
-rtpengine_img: docker.io/omnileads/rtpengine:231125.01
-redis_img: docker.io/omnileads/redis:231125.01
 ```
 
 Then the deploy.sh script must be called with the --upgrade parameter.
@@ -824,7 +810,12 @@ oml_manage --reset_pass
 # Install on HA (Postgres & OML AIO) cluster instances. 🚀 <a name="cluster-ha-deploy"></a>
 
 You must have four Linux instances with Internet access and **your public key (ssh) available**, since
-Ansible needs to establish an SSH connection to deploy the actions.
+Ansible needs to establish an SSH connection to deploy the actions. 
+
+* Postgresql main Node: CentOS7
+* Postgresql backup Node: CentOS7
+* OMniLeads AIO main Node: Debian12 or Rocky9
+* OMniLeads AIO backup Node: Debian12 or Rocky9
 
 ![Diagrama deploy cloud services](./png/deploy-tool-tenant-components-ha.png)
 
