@@ -317,8 +317,8 @@ all:
 omnileads_aio:
   hosts:
     staging:
-    #demo:
-    #tenant_example_nat:
+    #tenant_example_1:
+    #tenant_example_2:
     #tenant_example_3:
     #tenant_example_4:
     #tenant_example_7_aio_A:
