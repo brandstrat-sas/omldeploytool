@@ -308,6 +308,7 @@ all:
 
     omnileads_img: docker.io/omnileads/omlapp:240513.01
     asterisk_img: docker.io/omnileads/asterisk:240503.01    
+
 ##############################################################################################################
 ## -- In this section the hosts are grouped based on the type of deployment (AIO, Cluster & Cluster HA).  -- #
 ## -- here you can control which host the action deployed by the deploy.sh script will be applied to      -- #
@@ -316,8 +317,7 @@ all:
 ##############################################################################################################
 omnileads_aio:
   hosts:
-    staging:
-    #tenant_example_1:
+    tenant_example_1:
     #tenant_example_2:
     #tenant_example_3:
     #tenant_example_4:
