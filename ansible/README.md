@@ -598,11 +598,16 @@ another directory is generated with the timestamp date and there inside are the 
 
 The OMniLeads project builds images of all its components to be hosted in docker hub: https://hub.docker.com/repositories/omnileads.
 
-Every time a new Release of the application becomes available as an image in the container registry, it will be impacted.
+Each new release involves an update of code and variables on the **omldeploytool** repository. 
+You can verify the image behind the component by inspecting the 'group_vars/all' file.
+
+Therefore a new Release of the application becomes available as an image in the container registry, it will be impacted
 the **Releases-Notes.md** file available in the root of this repository, which exposes the mapping between the
 versions of the images of each component for each release.
 
-Therefore to apply updates we must first launch on this repository:
+
+
+https://gitlab.com/omnileads/omldeploytool/-/blob/main/ansible/group_vars/all?ref_type=heads
 
 ```
 git pull origin main
