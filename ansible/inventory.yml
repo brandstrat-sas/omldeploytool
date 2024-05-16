@@ -245,8 +245,8 @@ all:
     # --- google maps integration credentials
     google_maps_api_key: NULL
     google_maps_center: '{ "lat": -31.416668, "lng": -64.183334 }'
-    google_api_key: 
-    google_cloud_projectid: 
+    google_api_key: jhghjfdaghjkfdgsa43423hg4hg3f4ghjf2j
+    google_cloud_projectid: your_project_id
     # --- openai integrations
     openai_api_key:
     # --- The Dialer Engine Host
@@ -278,7 +278,7 @@ all:
     # ------------------------------------------------------------------------------------------------ #
     # ------------------------------------ Scale tunnings -------------------------------------------- #
     # ------------------------------------------------------------------------------------------------ #
-    swap_space: 1G
+    
     #scale_uwsgi: true
     #processes: 8
     #threads: 1
