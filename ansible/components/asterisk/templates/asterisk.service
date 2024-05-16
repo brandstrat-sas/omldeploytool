@@ -15,6 +15,7 @@ MemoryLimit={{ asterisk_mem_limit }}
 MemoryLimit=
 {% endif %}
 ExecStartPre=/bin/rm -f %t/%n.ctr-id
+{% if tts_external_engine is defined and tts_external_engine == "gcp" %}  
 ExecStart=/usr/bin/podman run \
   --cidfile=%t/%n.ctr-id \
   --cgroups=no-conmon \
@@ -25,12 +26,26 @@ ExecStart=/usr/bin/podman run \
   --log-driver=journald \
   --env-file=/etc/default/asterisk.env \
   --name=oml-asterisk-server \
-  --volume=asterisk_callrec:/var/spool/asterisk/monitor \
-{% if tts_external_engine is defined and tts_external_engine == "gcp" %} 
-  --volume=/etc/omnileads/google_credential.json:/tmp/google_credential.json \
-{% endif %}
   --rm  \
+  --volume=asterisk_callrec:/var/spool/asterisk/monitor \
+  --volume=/etc/omnileads/google_credential.json:/tmp/google_credential.json \
+  {{ asterisk_img }}  
+{% else %}
+ExecStart=/usr/bin/podman run \
+  --cidfile=%t/%n.ctr-id \
+  --cgroups=no-conmon \
+  --sdnotify=conmon \
+  --replace \
+  --detach \
+  --network=host \
+  --log-driver=journald \
+  --env-file=/etc/default/asterisk.env \
+  --name=oml-asterisk-server \
+  --rm  \
+  --volume=asterisk_callrec:/var/spool/asterisk/monitor \
   {{ asterisk_img }}
+{% endif %}
+
 ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
 ExecStopPost=/usr/bin/podman rm -f --ignore --cidfile=%t/%n.ctr-id
 StandardOutput=journal

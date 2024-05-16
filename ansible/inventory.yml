@@ -232,17 +232,16 @@ all:
     #email_ssl_keyfile:
     #email_use_ssl:
     #email_use_tls:    
-
+    
     # ------------------------------------------------------------------------------------------------ #
     # --------------------------------------- Integrations-------------------------------------------- #
     # ------------------------------------------------------------------------------------------------ #
+    
     # --- Text to Speech external "gcp", "aws", "ibm", etc.
     #tts_external_engine: 
-
     # --- Speech analytics & sentiment analysis
     # --- "openai" or "gcp" (google cloud) or "local" (whisper for transcription & psysentiment for analysis)
     #speech_analytics_model: local
-  
     # --- google maps integration credentials
     google_maps_api_key: NULL
     google_maps_center: '{ "lat": -31.416668, "lng": -64.183334 }'
@@ -254,7 +253,7 @@ all:
     #dialer_host: 
     # --- set postgres_host if you have your own postgres (standalone host or cloud service)
     # --- otherwise leave commented to deploy PostgreSQL on Application Host instance
-    #postgres_host: 
+    #postgres_host:
     # --- Read Only connection host address (in case of RW/RO postgres cluster):
     #postgres_ro_vip: 
     # --- if you have your own bucket (standalone host or cloud service) put here the URL
@@ -265,19 +264,17 @@ all:
     #bucket_url: https://sfo3.digitaloceanspaces.com
     # --- RTPEngine if you have your own instances put here the IP or hostname
     #rtpengine_host: 
-
     # --- Observability integrations with Loki & Homer
     # --- Request by promtail:
     #loki_host:
     # --- Request by Asterisk hep module:
     #homer_host:
-    
     # --- Request by Web-Video Inbound Calls 
     # --- Put here the JITSI host URL
     #video_host: 
-    
     # --- Request by CRM integration callrec search & list API endpoint
     #CUSTOM_CORS_ALLOWED_ORIGINS=https://example1.net,https://example2.com,https://example3.tech
+    
     # ------------------------------------------------------------------------------------------------ #
     # ------------------------------------ Scale tunnings -------------------------------------------- #
     # ------------------------------------------------------------------------------------------------ #
@@ -289,15 +286,17 @@ all:
     #asterisk_mem_limit: 1G
     #pjsip_threadpool_idle_timeout: 120
     #pjsip_threadpool_max_size: 150
+
     # ------------------------------------------------------------------------------------------------ #
     # ------------------------------------ Upgrade from OML 1.X -------------------------------------- #
     # ------------------------------------ Restore filename ------------------------------------------ #
     # ------------------------------------------------------------------------------------------------ #
+    
     # --- Restore filename id, request by restore filename
     #restore_file_timestamp: 1681215859
-    
     # Uncomment in case of upgrading from OML 1.X
     #upgrade_from_oml_1: true
+
     # ------------------------------------------------------------------------------------------------ #
     # ---------------------------- Container IMG TAG customization ----------------------------------- #
     # ------------------------------------------------------------------------------------------------ #
@@ -315,6 +314,7 @@ all:
 ## -- The Ansible playbooks are applied on the hosts below declared and classified according to the       -- #
 ## -- architecture of the instance on which they are deployed.                                            -- #
 ##############################################################################################################
+
 omnileads_aio:
   hosts:
     tenant_example_1:

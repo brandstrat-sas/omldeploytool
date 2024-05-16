@@ -57,6 +57,14 @@
       - upgrade
       - update
 
+  - name: ASTERISK daemon-reload Update
+    systemd:
+      name: asterisk.service
+      state: started
+      daemon_reload: yes
+    tags:
+      - update      
+
   - name: ASTERISK Enable and start systemd service
     systemd:
       name: asterisk.service
