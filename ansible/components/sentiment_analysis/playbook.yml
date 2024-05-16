@@ -48,16 +48,6 @@
       - upgrade
       - update
 
-  - name: SENTIMENTAL_ANALYSIS Copy google speech credentials json 
-    template:
-      src: "../../../instances/{{ tenant_folder }}/google_credential.json"
-      dest: /etc/omnileads/google_credential.json
-    tags:
-      - install
-      - upgrade
-      - update
-    when: speech_analytics_model == "gcp"
-
   - name: SENTIMENTAL_ANALYSIS Pull image
     command: podman pull --quiet {{ sentiment_analysis_img }}
     register: podman_pull
