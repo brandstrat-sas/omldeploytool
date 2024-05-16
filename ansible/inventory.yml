@@ -245,8 +245,8 @@ all:
     # --- google maps integration credentials
     google_maps_api_key: NULL
     google_maps_center: '{ "lat": -31.416668, "lng": -64.183334 }'
-    google_api_key: AIzaSyCZxZXXdgslILtWuGdy42t6JmLJKw9IYrM
-    google_cloud_projectid: 487534604960
+    google_api_key: 
+    google_cloud_projectid: 
     # --- openai integrations
     openai_api_key:
     # --- The Dialer Engine Host
