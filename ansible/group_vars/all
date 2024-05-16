@@ -43,6 +43,7 @@ INSTALL_PREFIX: /opt/omnileads/
 django_deploy_path: /opt/omnileads/
 asterisk_location_conf: /etc/asterisk
 certs_location: "/etc/omnileads/certs"
+swap_file: "/swapfile"
 
 ##################### Journald system vars ################################
 

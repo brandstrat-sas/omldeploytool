@@ -135,7 +135,8 @@
     shell: "podman run --network=host --env-file /etc/default/django.env --rm {{ omnileads_img }} python /opt/omnileads/ominicontacto/manage.py cambiar_admin_password"
     tags:
       - install
-    when:       
+    when:
+      - upgrade_from_oml_1 is not defined
       - omnileads_ha is defined  
       - ha_rol == "main"  
 
@@ -143,7 +144,8 @@
     shell: "podman run --network=host --env-file /etc/default/django.env --rm {{ omnileads_img }} python /opt/omnileads/ominicontacto/manage.py cambiar_admin_password"
     tags:
       - install
-    when:       
+    when:
+      - upgrade_from_oml_1 is not defined
       - omnileads_ha is not defined
     
   - name: DJANGO Restart systemd UWSGI service
