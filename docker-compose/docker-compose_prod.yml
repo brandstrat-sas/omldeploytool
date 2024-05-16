@@ -321,6 +321,8 @@ services:
       - AWS_DEFAULT_REGION=us-east-1
       - CALLREC_DEVICE=s3
     network_mode: host    
+    volumes:
+      - acd_callrec:/var/spool/asterisk/monitor
 
   acd:
     container_name: oml-asterisk
@@ -363,7 +365,8 @@ services:
     restart: on-failure
     stop_grace_period: 1m30s
     working_dir: /etc/asterisk
-    #volumes:      
+    volumes:      
+      - acd_callrec:/var/spool/asterisk/monitor
       #- ./asterisk_custom/google_credential.json:/tmp/google_credential.json
 
   kamailio:
@@ -569,3 +572,4 @@ volumes:
   minio_data:
   django_static:
   django_callrec_zip:
+  acd_callrec:
