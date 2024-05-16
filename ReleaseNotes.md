@@ -1,6 +1,6 @@
 # Release Notes - OMniLeads 2.0.0
 
-[2024-05-10]
+[2024-05-15]
 
 ## Added
 
@@ -31,15 +31,6 @@
 ## OMniLeads Component versions
 
 ```
-    omnileads_img: docker.io/omnileads/omlapp:240509.01
-    asterisk_img: docker.io/omnileads/asterisk:240503.01
-    fastagi_img: docker.io/omnileads/fastagi:240228.01
-    interaction_processor_img: docker.io/omnileads/interaction_processor:240506.01
-    sentiment_analysis_img: docker.io/omnileads/sentiment_analysis:240427.01
-    astami_img: docker.io/omnileads/astami:231230.01
-    nginx_img: docker.io/omnileads/nginx:240105.01
-    websockets_img: docker.io/omnileads/websockets:231125.01
-    kamailio_img: docker.io/omnileads/kamailio:231125.01
-    rtpengine_img: docker.io/omnileads/rtpengine:231125.01
-    redis_img: docker.io/omnileads/redis:231125.01
+    omnileads_img: docker.io/omnileads/omlapp:240513.01
+    asterisk_img: docker.io/omnileads/asterisk:240503.01    
 ```
