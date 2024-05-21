@@ -317,30 +317,30 @@ all:
 
 omnileads_aio:
   hosts:
-    tenant_example_1:
+    #tenant_example_1:
     #tenant_example_2:
     #tenant_example_3:
     #tenant_example_4:
-    #tenant_example_7_aio_A:
-    #tenant_example_7_aio_B:
+    #tenant_example_7_HA_1:
+    #tenant_example_7_HA_2:
 ################################################    
 
 omnileads_data:
   hosts:
-    tenant_example_5_data:  
+    #tenant_example_5_data:  
     
 omnileads_voice:
   hosts:
-    tenant_example_5_voice:
+    #tenant_example_5_voice:
 
 omnileads_app:
   hosts:
-    tenant_example_5_app:
+    #tenant_example_5_app:
 
 ################################################
 
 ha_omnileads_sql:
   hosts:
-    #tenant_example_7_sql_A:
-    #tenant_example_7_sql_B:
+    #tenant_example_7_HA_1:
+    #tenant_example_7_HA_2:
     
