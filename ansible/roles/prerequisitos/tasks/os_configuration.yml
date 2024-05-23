@@ -328,81 +328,88 @@
 
 - name: OS_CONF stop OMniLeads App for Upgrade
   systemd:
-    name: omnileads.service
-    state: restarted
+    name: "{{ item }}"
+    state: stopped
     enabled: yes
     daemon_reload: yes
+  loop:
+    - omnileads.service
+    - nginx.service
   tags:
     - upgrade
-  when:       
-    - inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_aio']  
-    
-# - name: OS_CONF Check if swap file exists
-#   stat:
-#     path: "{{ swap_file }}"
-#   register: swap_file_check
-#   when: swap_space
-#   tags: 
-#     - install
-#     - upgrade
+  when:
+    - inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_aio']
 
-# - name: OS_CONF Create swap file if it doesn't exist
-#   command:
-#     cmd: "fallocate -l {{ swap_space }} {{ swap_file }}"
-#   when: 
-#     - not swap_file_check.stat.exists
-#     - swap_space is defined
-#   tags: 
-#     - install
-#     - upgrade  
+- name: OS_CONF rm Django static_files
+  become: yes
+  shell: "podman volume rm django_static"
+  tags:
+    - upgrade    
+  when:
+    - inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_aio']
+  ignore_errors: yes  
 
-# - name: OS_CONF Set permissions on swap file
-#   file:
-#     path: "{{ swap_file }}"
-#     mode: "0600"
-#   when: 
-#     - not swap_file_check.stat.exists
-#     - swap_space is defined
-#   tags: 
-#     - install
-#     - upgrade  
+- name: OS_CONF Check if swap file exists
+  stat:
+    path: "{{ swap_file }}"
+  register: swap_file_check  
+  tags: 
+    - install
+    - upgrade
 
-# - name: OS_CONF Format swap file
-#   command:
-#     cmd: "mkswap {{ swap_file }}"
-#   when: 
-#     - not swap_file_check.stat.exists
-#     - swap_space is defined
-#   tags: 
-#     - install
-#     - upgrade  
+- name: OS_CONF Create swap file if it doesn't exist
+  command:
+    cmd: "fallocate -l {{ swap_space }} {{ swap_file }}"
+  when: 
+    - not swap_file_check.stat.exists and swap_space is defined
+  tags: 
+    - install
+    - upgrade  
 
-# - name: OS_CONF Add swap file to fstab
-#   lineinfile:
-#     path: /etc/fstab
-#     line: "{{ swap_file }} none swap sw 0 0"
-#     state: present
-#   when: 
-#     - not swap_file_check.stat.exists
-#     - swap_space is defined
-#   tags: 
-#     - install
-#     - upgrade  
+- name: OS_CONF Set permissions on swap file
+  file:
+    path: "{{ swap_file }}"
+    mode: "0600"
+  when: 
+    - not swap_file_check.stat.exists and swap_space is defined
+  tags: 
+    - install
+    - upgrade  
 
-# - name: OS_CONF Turn on swap
-#   command:
-#     cmd: "swapon -a"
-#   when: 
-#     - not swap_file_check.stat.exists
-#     - swap_space is defined
-#   tags: 
-#     - install
-#     - upgrade  
+- name: OS_CONF Format swap file
+  command:
+    cmd: "mkswap {{ swap_file }}"
+  when: 
+    - not swap_file_check.stat.exists
+    - swap_space is defined
+  tags: 
+    - install
+    - upgrade  
 
-# - name: OS_CONF Set swappiness
-#   sysctl:
-#     name: vm.swappiness
-#     value: "1"
-#   tags: 
-#     - install
-#     - upgrade  
+- name: OS_CONF Add swap file to fstab
+  lineinfile:
+    path: /etc/fstab
+    line: "{{ swap_file }} none swap sw 0 0"
+    state: present
+  when: 
+    - not swap_file_check.stat.exists and swap_space is defined
+  tags: 
+    - install
+    - upgrade  
+
+- name: OS_CONF Turn on swap
+  command:
+    cmd: "swapon -a"
+  when: 
+    - not swap_file_check.stat.exists and swap_space is defined
+  tags: 
+    - install
+    - upgrade  
+
+- name: OS_CONF Set swappiness
+  sysctl:
+    name: vm.swappiness
+    value: "1"
+  tags: 
+    - install
+    - upgrade  
