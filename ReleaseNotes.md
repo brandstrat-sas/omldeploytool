@@ -1,6 +1,6 @@
 # Release Notes - OMniLeads 2.0.0
 
-[2024-05-15]
+[2024-05-25]
 
 ## Added
 
@@ -31,6 +31,6 @@
 ## OMniLeads Component versions
 
 ```
-    omnileads_img: docker.io/omnileads/omlapp:240513.01
+    omnileads_img: docker.io/omnileads/omlapp:24023.01
     asterisk_img: docker.io/omnileads/asterisk:240503.01    
 ```
