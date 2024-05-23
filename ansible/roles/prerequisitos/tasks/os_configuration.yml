@@ -376,15 +376,15 @@
     - install
     - upgrade  
 
-- name: OS_CONF Format swap file
-  command:
-    cmd: "mkswap {{ swap_file }}"
-  when: 
-    - not swap_file_check.stat.exists
-    - swap_space is defined
-  tags: 
-    - install
-    - upgrade  
+# - name: OS_CONF Format swap file
+#   command:
+#     cmd: "mkswap {{ swap_file }}"
+#   when: 
+#     - not swap_file_check.stat.exists
+#     - swap_space is defined
+#   tags: 
+#     - install
+#     - upgrade  
 
 - name: OS_CONF Add swap file to fstab
   lineinfile:
@@ -406,10 +406,10 @@
     - install
     - upgrade  
 
-- name: OS_CONF Set swappiness
-  sysctl:
-    name: vm.swappiness
-    value: "1"
-  tags: 
-    - install
-    - upgrade  
+# - name: OS_CONF Set swappiness
+#   sysctl:
+#     name: vm.swappiness
+#     value: "1"
+#   tags: 
+#     - install
+#     - upgrade  
