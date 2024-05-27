@@ -20,7 +20,7 @@ fi
 cd omnileads-repos
 
 echo "***[OML devenv] Cloning the repositories of modules"
-repositories=("acd" "kamailio" "nginx" "pgsql" "rtpengine" "fastagi" "ami" "redis" "pgsql")
+repositories=("acd" "kamailio" "nginx" "pgsql" "rtpengine" "fastagi" "ami" "redis" "pgsql" "oml_interaction_processor" "oml_sentiment_analysis")
 for i in "${repositories[@]}"; do
   if [ ! -d "oml${i}" ]; then
     if [ "$gitlab_clone" == "ssh" ]; then
