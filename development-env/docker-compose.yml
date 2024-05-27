@@ -288,6 +288,7 @@ services:
   #     - AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION}
   #     - LANG=es
   #     - GCP_PROJECT_ID=${GOOGLE_CLOUD_PROJECTID}
+  #     - MODEL=${MODEL}
   #   networks:
   #     - omnileads
   #   privileged: true
