@@ -236,7 +236,7 @@ services:
   interaction_processor:
     build:
       target: run
-      context: ${REPO_PATH}/omlinteraction_processor
+      context: ${REPO_PATH}/oml_interaction_processor
     image: ${OMLINTERACTION_PROC_IMG}
     container_name: oml-interaction-proc
     depends_on:
