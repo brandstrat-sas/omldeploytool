@@ -40,7 +40,6 @@ if [ "$gitlab_clone" == "ssh" ]; then
 else
   git clone https://gitlab.com/omnileads/omnileads-websockets.git omlwebsockets
   git clone https://gitlab.com/omnileads/ominicontacto omlapp
-  git clone https://gitlab.com/omnileads/oml_sentiment_analysis.git
 fi
 
 # Addons
