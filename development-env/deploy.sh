@@ -54,7 +54,7 @@ fi
 echo "********* [OML devenv] All repositories were cloned in $(pwd)"
 sleep 5
 
-repositories=("acd" "kamailio" "nginx" "rtpengine" "websockets" "app")
+repositories=("acd" "kamailio" "nginx" "rtpengine" "websockets")
 for i in "${repositories[@]}"; do
 cd oml${i} && git checkout master-2.0 && cd ..
 done
