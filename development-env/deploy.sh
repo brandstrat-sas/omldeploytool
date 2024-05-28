@@ -20,7 +20,7 @@ fi
 cd omnileads-repos
 
 echo "***[OML devenv] Cloning the repositories of modules"
-repositories=("acd" "kamailio" "nginx" "pgsql" "rtpengine" "fastagi" "ami" "redis" "pgsql")
+repositories=("acd" "kamailio" "nginx" "pgsql" "rtpengine" "fastagi" "ami" "redis" "pgsql" "_interactions_processor" "_sentiment_analysis")
 for i in "${repositories[@]}"; do
   if [ ! -d "oml${i}" ]; then
     if [ "$gitlab_clone" == "ssh" ]; then
@@ -40,7 +40,6 @@ if [ "$gitlab_clone" == "ssh" ]; then
 else
   git clone https://gitlab.com/omnileads/omnileads-websockets.git omlwebsockets
   git clone https://gitlab.com/omnileads/ominicontacto omlapp
-  git clone https://gitlab.com/omnileads/oml_sentiment_analysis.git
 fi
 
 # Addons
@@ -54,7 +53,7 @@ fi
 echo "********* [OML devenv] All repositories were cloned in $(pwd)"
 sleep 5
 
-repositories=("acd" "kamailio" "nginx" "rtpengine" "websockets" "app")
+repositories=("acd" "kamailio" "nginx" "rtpengine" "websockets")
 for i in "${repositories[@]}"; do
 cd oml${i} && git checkout master-2.0 && cd ..
 done
