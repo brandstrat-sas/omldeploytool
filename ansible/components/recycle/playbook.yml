@@ -40,9 +40,3 @@
     shell: "podman image prune -f -a"
     tags:
       - reclyce
-
-  - name: RECYCLE prune volume
-    shell: "podman volume prune -f"
-    tags:
-      - reclyce
-
