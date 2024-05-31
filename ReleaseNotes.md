@@ -31,6 +31,6 @@
 ## OMniLeads Component versions
 
 ```
-    omnileads_img: docker.io/omnileads/omlapp:24023.01
+    omnileads_img: docker.io/omnileads/omlapp:240531.01
     asterisk_img: docker.io/omnileads/asterisk:240503.01    
 ```
