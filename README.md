@@ -54,14 +54,14 @@ and video calls capabilities
 To launch the application on your workstation (MAC, Linux, Windows) or generic linux host, ideal to obtain an instance of
 the application practically without configuration.
 
-[docker-compose](docker-compose/README.md)
+[docker-compose](https://docs.omnileads.net/instalacion-de-omnileads/deploy-utilizando-docker)
 
 ## Run OMnileads with Ansible Multi Tenant automations 🏢 
 
 To launch the application using Ansible on any modern Linux instance with [Podman](https://docs.podman.io/en/latest/) support.
 Under this format, hundreds of instances of the application can be managed using Ansible.
 
-[Ansible](ansible/README.md)
+[Ansible](https://docs.omnileads.net/instalacion-de-omnileads/deploy-utilizando-ansible)
 
 ## Documentation 📚
 
