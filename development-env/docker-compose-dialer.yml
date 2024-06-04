@@ -1,0 +1,9 @@
+services:
+  api:
+    container_name: omnidialer-api
+    volumes:
+      - .:/opt/omnidialer
+networks:
+  network1:
+    name: my-pre-existing-network
+    external: true
