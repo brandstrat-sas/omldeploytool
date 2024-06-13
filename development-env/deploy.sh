@@ -99,10 +99,6 @@ done
 Deploy
 
 # starting the dialer infraestructure
-
-# Gearman job server(s)
-docker run --rm -itd -p 4730:4730 --network=devenv_omnileads --name=gearman_job_server_1 artefactual/gearmand:1.1.19.1-alpine
-
 cd omnileads-repos/omnidialer/interface
 
 docker-compose up -d
