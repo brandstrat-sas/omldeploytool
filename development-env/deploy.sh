@@ -50,6 +50,8 @@ if [ "$gitlab_clone" == "ssh" ]; then
   git clone git@gitlab.com:omnileads/webphone_client_app.git
 fi
 
+git clone https://gitlab.com/alejandrozf/omnidialer.git --branch gearman
+
 echo "********* [OML devenv] All repositories were cloned in $(pwd)"
 sleep 5
 
@@ -64,6 +66,25 @@ docker-compose pull
 docker-compose up -d --no-build
 
 }
+
+# starting the dialer infraestructure
+
+# Gearman job server(s)
+docker run --rm -itd -p 4730:4730 --network=devenv_omnileads --name=gearman_job_server_1 artefactual/gearmand:1.1.19.1-alpine
+
+cd omnileads-repos/omnidialer/interface
+
+docker-compose up -d
+
+# Gearman worker(s)
+cd ../workers/handle-campaign
+
+cd src
+
+docker build -t handle_campaign_worker .
+
+docker run --rm -itd --network=devenv_omnileads --name=handle_campaign_1 handle_campaign_worker
+
 
 #############################################################################
 #############################################################################
