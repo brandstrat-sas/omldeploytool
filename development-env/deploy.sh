@@ -67,25 +67,6 @@ docker-compose up -d --no-build
 
 }
 
-# starting the dialer infraestructure
-
-# Gearman job server(s)
-docker run --rm -itd -p 4730:4730 --network=devenv_omnileads --name=gearman_job_server_1 artefactual/gearmand:1.1.19.1-alpine
-
-cd omnileads-repos/omnidialer/interface
-
-docker-compose up -d
-
-# Gearman worker(s)
-cd ../workers/handle-campaign
-
-cd src
-
-docker build -t handle_campaign_worker .
-
-docker run --rm -itd --network=devenv_omnileads --name=handle_campaign_1 handle_campaign_worker
-
-
 #############################################################################
 #############################################################################
 
@@ -116,3 +97,21 @@ How to use it:
 done
 
 Deploy
+
+# starting the dialer infraestructure
+
+# Gearman job server(s)
+docker run --rm -itd -p 4730:4730 --network=devenv_omnileads --name=gearman_job_server_1 artefactual/gearmand:1.1.19.1-alpine
+
+cd omnileads-repos/omnidialer/interface
+
+docker-compose up -d
+
+# Gearman worker(s)
+cd ../workers/handle-campaign
+
+cd src
+
+docker build -t handle_campaign_worker .
+
+docker run --rm -itd --network=devenv_omnileads --name=handle_campaign_1 handle_campaign_worker
