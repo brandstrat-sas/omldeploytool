@@ -101,13 +101,4 @@ Deploy
 # starting the dialer infraestructure
 cd omnileads-repos/omnidialer/interface
 
-docker-compose up -d
-
-# Gearman worker(s)
-cd ../workers/handle-campaign
-
-cd src
-
-docker build -t handle_campaign_worker .
-
-docker run --rm -itd --network=devenv_omnileads --name=handle_campaign_1 handle_campaign_worker
+docker-compose up --build -d
