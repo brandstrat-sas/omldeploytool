@@ -208,9 +208,6 @@ all:
     # --- Wombat Dialer API user & pass
     dialer_user: demoadmin
     dialer_password: demo
-    # ---  kamailio shm & pkg memory params
-    shm_size: 64
-    pkg_size: 8
     # --- is the time in seconds that will last the https session when inactivity
     SCA: 3600
     # --- Ephemeral Credentials TTL (ECTTL) is the time in seconds            #
@@ -279,14 +276,44 @@ all:
     # ------------------------------------------------------------------------------------------------ #
     # ------------------------------------ Scale tunnings -------------------------------------------- #
     # ------------------------------------------------------------------------------------------------ #
-    #swap_space: 2G
+    # OS swap memory setting
+    
+    #swap_space: 1G
+    
+    # If you set scale_uwsgi to true, then you must assign values to 
+    # processes, threads, listen_queue_size, and worker_reload_mercy.
+    # https://uwsgi-docs.readthedocs.io/en/latest/index.html
+    
     #scale_uwsgi: true
-    #processes: 8
-    #threads: 1
+    #uwsgi_processes: 8
+    #uwsgi_threads: 1
+    #uwsgi_listen_queue_size: 2048
+    #uwsgi_worker_reload_mercy: 60
+
+    # If you set scale_asterisk to true, then you must assign values to 
+    # asterisk_mem_limit, pjsip_threadpool_idle_timeout & pjsip_threadpool_max_size
+    # https://docs.asterisk.org/Deployment/Performance-Tuning/ 
+    
     #scale_asterisk: true
     #asterisk_mem_limit: 1G
     #pjsip_threadpool_idle_timeout: 120
     #pjsip_threadpool_max_size: 150
+
+    # If you set scale_rtpengine to true, then you must assign values to 
+    # rtpengine_timeout, rtpengine_offer-timeout, rtpengine_silent-timeout & rtpengine_final-timeout
+    # https://rtpengine.readthedocs.io/en/latest/rtpengine.html
+    
+    #scale_rtpengine: true
+    #rtpengine_timeout: 15
+    #rtpengine_offer_timeout: 15
+    #rtpengine_silent_timeout: 120
+    #rtpengine_final_timeout: 3600
+
+    # kamailio shm & pkg memory params 
+    # https://www.kamailio.org/wiki/tutorials/troubleshooting/memory
+    
+    #kamailio_shm_size: 64
+    #kamailio_pkg_size: 8
 
     # ------------------------------------------------------------------------------------------------ #
     # ------------------------------------ Upgrade from OML 1.X -------------------------------------- #
@@ -306,8 +333,8 @@ all:
     # --- If you want to deploy OMniLeads Enterprise, you just need to add "-enterprise" as a suffix to the omnileads_img image tag
     # --- for example: omnileads_img: docker.io/omnileads/omlapp:240216.01-enterprise.
 
-    omnileads_img: docker.io/freetechsolutions/omlapp:240531.01
-    asterisk_img: docker.io/omnileads/asterisk:240503.01    
+    omnileads_img: docker.io/omnileads/omlapp:240625.01
+    asterisk_img: docker.io/omnileads/asterisk:240503.01
 
 ##############################################################################################################
 ## -- In this section the hosts are grouped based on the type of deployment (AIO, Cluster & Cluster HA).  -- #
