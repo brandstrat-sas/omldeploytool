@@ -14,5 +14,5 @@
 
 ```
     omnileads_img: docker.io/omnileads/omlapp:240625.01
-    asterisk_img: docker.io/omnileads/asterisk:240625.01
+    asterisk_img: docker.io/omnileads/asterisk:240503.01
 ```
