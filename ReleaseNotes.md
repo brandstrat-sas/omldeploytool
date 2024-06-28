@@ -6,6 +6,10 @@
 
 - oml-557 [ANSIBLE]: Parameters for scalability are added (uwsgi, kamailio & rtpengine)
 
+## Fixes
+
+- oml-557 [ANSIBLE]: Fix swap create
+
 ## OMniLeads Component versions
 
 ```
