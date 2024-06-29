@@ -120,10 +120,8 @@ This are the IAX2 account credentials:
 ```
 username: 1234567
 secret: omnileads
-domain: YOUR_HOSTNAME
+domain: localhost
 ```
-
-(Change "YOUR_HOSTNAME" with the VM hostname/IPADDR  or localhost)
 
 Then you can send calls to DID 01177660010 to 01177660015, an also send calls from an agent to this IAX2 account phone calling 1234567.
 
@@ -133,9 +131,4 @@ Then you can send calls to DID 01177660010 to 01177660015, an also send calls fr
 You only need to do this if you are going to work with Predictive Dialer campaigns
 
 When you enter to http://localhost:8082 or http://hostname-or-ipaddr:8082 you go to Wombat Dialer to begin its configuration. 
-
-Check our official documentation to check this: https://documentacion-omnileads.readthedocs.io/es/stable/maintance.html#configuracion-del-modulo-de-discador-predictivo
-
-Note: when configuring initial mariadb credentials the root pass is admin123, then on the AMI connection, the server address is acd.
-
 

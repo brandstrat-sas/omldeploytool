@@ -221,38 +221,6 @@ deploy-aio-cloud-norm:
     - if: '$RUN_NORM_DEPLOY_AIO == "true"'
 
 
-deploy-aio-donweb-norm:
-  stage: deploy
-  environment: SYSTEMD_AIO
-  script:
-    - rm -rf ~/omldeploytool
-    - git clone https://gitlab.com/omnileads/omldeploytool.git ~/omldeploytool
-    - cd ~/omldeploytool/ansible
-    - |
-      if [ -n "${OMLOSS_BRANCH}" ]; then
-        echo "OMLOSS_BRANCH is defined: ${OMLOSS_BRANCH}"
-        git checkout ${OMLOSS_BRANCH}
-      fi
-    - echo "Cloning the repository with authentication"
-    - 'git clone https://$CI_REGISTRY_USER:$TENANTS_TOKEN@gitlab.com/$CI_REGISTRY_USER/$CI_REPO_TENANTS.git instances/'    
-    - cp inventory.yml instances/qa_staging/inventory.yml
-    - sed -i "60 s/172.16.101.109/$DONWEB_VM_ADDR/g" ./instances/qa_staging/inventory.yml
-    - sed -i "61 s/172.16.101.109/$DONWEB_VM_PRIVATE/g" ./instances/qa_staging/inventory.yml
-    - sed -i "62 s/lan/cloud/g" ./instances/qa_staging/inventory.yml
-    - sed -i "64 s/2234/$DONWEB_VM_PORT/g" ./instances/qa_staging/inventory.yml
-    - sed -i "171 s/#fqdn/fqdn/g" ./instances/qa_staging/inventory.yml
-    - sed -i "171 s/fts.sefirot.cloud/${DONWEB_URL}/g" ./instances/qa_staging/inventory.yml
-    - sed -i "179 s/selfsigned/custom/g" ./instances/qa_staging/inventory.yml
-    - sed -i "s|\(omnileads_img:.*\)|\1-enterprise|" ./instances/qa_staging/inventory.yml
-    - sed -i "s/#tenant_example_4/tenant_example_4/g" ./instances/qa_staging/inventory.yml
-    - bash -x deploy.sh --action=install --tenant=qa_staging
-    - until curl -sk --head --request GET https://$DONWEB_URL|grep "302" > /dev/null; do echo "Environment still being installed, sleeping 60 seconds"; sleep 60; done; echo "Environment is up"
-  tags:
-    - deploy-ent
-  rules:
-    - if: '$RUN_NORM_DEPLOY_DONWEB == "true"'
-
-
 deploy-ait-cloud-norm:
   stage: deploy
   environment: SYSTEMD_CLUSTER
