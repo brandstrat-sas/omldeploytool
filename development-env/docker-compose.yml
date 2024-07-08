@@ -175,6 +175,31 @@ services:
     networks:
       - omnileads  
 
+  acd_config_retrieve:
+    image: ${OMLACD_IMG}
+    container_name: oml-asterisk-conf-retrieve
+    entrypoint: su omnileads -c "python3 /opt/asterisk/scripts/regenerar_asterisk.py"
+    depends_on:
+      - postgresql
+      - redis
+      - minio
+    dns: 8.8.8.8
+    environment:
+      - TZ=${TZ}
+      - ASTERISK_LOCATION=
+      - AMI_USER=${AMI_USER}
+      - AMI_PASSWORD=${AMI_PASSWORD}
+      - OMNILEADS_HOSTNAME=${OMNILEADS_HOSTNAME}
+    networks:
+      - omnileads
+    privileged: true
+    restart: on-failure
+    stop_grace_period: 1m30s
+    volumes:
+      - ${REPO_PATH}/omlacd/source/astconf:/etc/asterisk
+      - ${REPO_PATH}/omlacd/source/scripts:/opt/asterisk/scripts
+    working_dir: /etc/asterisk
+
   acd:
     build:
       target: run
@@ -185,6 +210,7 @@ services:
       - postgresql
       - redis
       - minio
+      - acd_config_retrieve
     dns: 8.8.8.8
     environment:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
