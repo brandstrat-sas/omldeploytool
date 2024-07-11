@@ -334,7 +334,7 @@ all:
     # --- for example: omnileads_img: docker.io/omnileads/omlapp:240216.01-enterprise.
 
     omnileads_img: docker.io/omnileads/omlapp:240625.01
-    asterisk_img: docker.io/omnileads/asterisk:240503.01
+    asterisk_img: docker.io/freetechsolutions/asterisk:240709.01
 
 ##############################################################################################################
 ## -- In this section the hosts are grouped based on the type of deployment (AIO, Cluster & Cluster HA).  -- #
