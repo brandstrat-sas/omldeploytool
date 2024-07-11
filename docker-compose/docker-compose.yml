@@ -1,4 +1,4 @@
-version: '3.3'
+
 services:
   app:
     container_name: oml-uwsgi
@@ -359,9 +359,32 @@ services:
       - AWS_DEFAULT_REGION=us-east-1
       - CALLREC_DEVICE=s3
     networks:
-      - omnileads 
+      - omnileads
     volumes:
       - acd_callrec:/var/spool/asterisk/monitor
+
+  acd_config_retrieve:
+    image: ${OMLACD_IMG}
+    container_name: oml-asterisk-conf-retrieve
+    entrypoint: su omnileads -c "python3 /opt/asterisk/scripts/regenerar_asterisk.py"
+    depends_on:      
+      - websockets
+    dns: 8.8.8.8
+    environment:
+      - TZ=${TZ}
+      - ASTERISK_LOCATION=
+      - ARI_HOST=acd
+      - ARI_USER=omnileads
+      - ARI_PASS=5_MeO_DMT
+      - OMNILEADS_HOSTNAME=${OMNILEADS_HOSTNAME}
+    networks:
+      - omnileads
+    privileged: true
+    restart: on-failure
+    stop_grace_period: 1m30s
+    volumes:
+      - acd_conf:/etc/asterisk      
+    working_dir: /etc/asterisk
 
   acd:
     container_name: oml-asterisk
@@ -413,6 +436,7 @@ services:
     working_dir: /etc/asterisk
     volumes:
       - acd_callrec:/var/spool/asterisk/monitor
+      - acd_conf:/etc/asterisk
       #- ./asterisk_custom/oml_extensions_custom.conf:/etc/asterisk/oml_extensions_custom.conf
       #- ./asterisk_custom/google_credential.json:/tmp/google_credential.json
 
@@ -697,3 +721,4 @@ volumes:
   mariadb:
   portainer_data:
   acd_callrec:
+  acd_conf:
