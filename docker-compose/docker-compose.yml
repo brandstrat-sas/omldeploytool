@@ -364,9 +364,8 @@ services:
       - acd_callrec:/var/spool/asterisk/monitor
 
   acd_config_retrieve:
-    image: ${OMLACD_IMG}
-    container_name: oml-asterisk-conf-retrieve
-    entrypoint: su omnileads -c "python3 /opt/asterisk/scripts/regenerar_asterisk.py"
+    image: freetechsolutions/acd_retrieve_conf:240709.01
+    container_name: oml-asterisk-conf-retrieve    
     depends_on:      
       - websockets
     dns: 8.8.8.8
@@ -374,7 +373,7 @@ services:
       - TZ=${TZ}
       - ASTERISK_LOCATION=
       - ARI_HOST=acd
-      - ARI_USER=omnileads
+      - ARI_USER=omnileadsami
       - ARI_PASS=5_MeO_DMT
       - OMNILEADS_HOSTNAME=${OMNILEADS_HOSTNAME}
     networks:
@@ -383,8 +382,7 @@ services:
     restart: on-failure
     stop_grace_period: 1m30s
     volumes:
-      - acd_conf:/etc/asterisk      
-    working_dir: /etc/asterisk
+      - acd_conf:/etc/asterisk          
 
   acd:
     container_name: oml-asterisk

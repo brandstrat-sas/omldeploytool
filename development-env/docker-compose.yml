@@ -179,16 +179,15 @@ services:
     image: ${OMLACD_IMG}
     container_name: oml-asterisk-conf-retrieve
     entrypoint: su omnileads -c "python3 /opt/asterisk/scripts/regenerar_asterisk.py"
-    depends_on:
-      - postgresql
-      - redis
-      - minio
+    depends_on:      
+      - websockets
     dns: 8.8.8.8
     environment:
       - TZ=${TZ}
       - ASTERISK_LOCATION=
-      - AMI_USER=${AMI_USER}
-      - AMI_PASSWORD=${AMI_PASSWORD}
+      - ARI_HOST=acd
+      - ARI_USER=omnileads
+      - ARI_PASS=5_MeO_DMT
       - OMNILEADS_HOSTNAME=${OMNILEADS_HOSTNAME}
     networks:
       - omnileads
