@@ -26,8 +26,8 @@ ExecStart=/usr/bin/podman run \
   --env-file=/etc/default/asterisk_retrieve_conf.env \
   --name=oml-asterisk-retrieve-conf \
   --rm  \
-  --volume=asterisk_conf:/etc/asterisk \
-  --volume=asterisk_sounds:/var/lib/asterisk/sounds/oml \
+  --volume=asterisk_conf:/home/omnileads/astconf \
+  --volume=asterisk_sounds:/home/omnileads/sounds \
   {{ asterisk_retrieve_conf_img }}
 
 ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
