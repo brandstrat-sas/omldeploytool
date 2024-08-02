@@ -22,7 +22,11 @@ ExecStart=/usr/bin/podman run \
   --volume=oml_minio:/data \
   --rm  \
   {% if inventory_hostname in groups['omnileads_aio'] %}
-  {{ minio_img }} server /data --console-address "localhost:9001"
+  {% if infra_env == "cloud" %}
+  {{ minio_img }} server /data --console-address "{{ omni_ip_wan }}:9001"
+  {% else %}
+  {{ minio_img }} server /data --console-address "{{ omni_ip_lan }}:9001"
+  {% endif %}
   {% else %}
   {{ minio_img }} server /data --console-address "{{ data_host }}:9001"
   {% endif %}
