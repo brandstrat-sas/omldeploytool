@@ -1,4 +1,4 @@
-# qa_repoCopyright (C) 2024 Freetech Solutions
+# Copyright (C) 2024 Freetech Solutions
 
 # This file is part of OMniLeads
 
@@ -81,7 +81,7 @@
       - upgrade
     when: 
       - omnileads_ha is defined  
-      - ha_rol == "main"    
+      - ha_role == "main"    
 
   - name: CRON Crones Restart systemd service
     systemd:
@@ -106,4 +106,4 @@
       - restart
     when:         
       - omnileads_ha is defined  
-      - ha_rol == "main"
+      - ha_role == "main"

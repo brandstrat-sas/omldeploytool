@@ -10,19 +10,30 @@ Environment=PODMAN_SYSTEMD_UNIT=%n
 Restart=on-failure
 TimeoutStopSec=70
 ExecStartPre=/bin/rm -f %t/%n.ctr-id
+
+# Ensure proper Jinja2 condition handling
 ExecStart=/usr/bin/podman run \
   --cidfile=%t/%n.ctr-id \
   --cgroups=no-conmon \
   --sdnotify=conmon \
   --replace \
   --detach \
+  --rm \
   --network=host \
   --log-driver=journald \
   --env-file=/etc/default/postgres.env \
   --name=oml-postgresql-server \
   --volume=oml_postgres:/var/lib/postgresql/data \
-  --rm  \
-  {{ postgres_img }} postgres -c listen_addresses={{ postgres_host }} 
+{% if omnileads_ha is defined %}
+  --volume=/etc/omnileads/repmgr.conf:/etc/postgresql/repmgr.conf \
+  --volume=/etc/omnileads/postgresql.conf:/etc/postgresql/postgresql.conf \
+  --volume=/etc/omnileads/pg_hba.conf:/etc/postgresql/pg_hba.conf \
+  --volume=/etc/omnileads/pgpass:/var/lib/postgresql/.pgpass \
+  {{ postgres_ha_img }} postgres -c config_file=/etc/postgresql/postgresql.conf -c hba_file=/etc/postgresql/pg_hba.conf
+{% else %}
+  {{ postgres_img }} postgres -c listen_addresses={{ postgres_host }}
+{% endif %}
+
 ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
 ExecStopPost=/usr/bin/podman rm -f --ignore --cidfile=%t/%n.ctr-id
 Type=notify

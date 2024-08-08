@@ -1,5 +1,5 @@
 
-# qa_repoCopyright (C) 2024 Freetech Solutions
+# Copyright (C) 2024 Freetech Solutions
 
 # This file is part of OMniLeads
 
@@ -20,53 +20,60 @@
 ---
 
 - name: POSTGRES HA-Cluster Takeover Main Node
-  hosts: ha_omnileads_sql #sql_1
+  hosts: omnileads_aio
   tags:
     - pgsql_node_takeover_main
-
   vars:
-    repmgr_bin: /usr/local/bin/
-    pg_lib_location_no_version: /var/lib/pgsql
-    pg_lib_location: "{{ pg_lib_location_no_version }}/{{ centos_postgresql_version }}/data"
+    postgres_env: /etc/default/postgres.env
   
   tasks:
-  
-##################### Postgresql Node Bakcup #########################
 
-    - name: Stopped postgres service HA
+    - name: POSTGRESQL Stopped postgres service HA
       service:
-        name: postgresql-11
+        name: postgresql.service
         state: stopped
         enabled: no
       when:
-        - ha_rol == "backup"
+        - ha_role == "backup"
     
-    - name: Recovery BACKUP RO Repmgr standby clone
-      shell: "sudo -u postgres {{ repmgr_bin }}repmgr -h {{ postgres_1 }} -U repmgr -d repmgr -f {{ pg_lib_location_no_version }}/repmgr.conf standby clone --dry-run"
+    - name: POSTGRESQL Stopped
+      pause:
+        seconds: 10
+      when:
+        - ha_role == "backup"
+
+    - name: POSTGRESQL Recovery BACKUP RO Repmgr standby clone
+      shell: "podman run  --cgroups=no-conmon --sdnotify=conmon --replace --rm --network=host --env-file={{ postgres_env }} --name=oml-repmgr-dry-run --volume=/etc/omnileads/pgpass:/var/lib/postgresql/.pgpass  --volume=oml_postgres:/var/lib/postgresql/data --volume=/etc/omnileads/repmgr.conf:/etc/postgresql/repmgr.conf --user=postgres {{ postgres_ha_img }} repmgr -h {{ aio_1 }} -U repmgr -d repmgr -f /etc/postgresql/repmgr.conf standby clone --dry-run"
       args:
         executable: /bin/bash
       register: dry_run
       when:
-        - ha_rol == "backup"
+        - ha_role == "backup"
 
-    - name: Recovery BACKUP RO Repmgr standby clone -F
-      shell: "sudo -u postgres {{ repmgr_bin }}repmgr -h {{ postgres_1 }} -U repmgr -d repmgr -f {{ pg_lib_location_no_version }}/repmgr.conf standby clone -F"
+    - name: POSTGRESQL Recovery BACKUP RO Repmgr standby clone -F
+      shell: "podman run  --cgroups=no-conmon --sdnotify=conmon --replace --rm --network=host --env-file={{ postgres_env }} --name=oml-repmgr-dry-run --volume=/etc/omnileads/pgpass:/var/lib/postgresql/.pgpass  --volume=oml_postgres:/var/lib/postgresql/data --volume=/etc/omnileads/repmgr.conf:/etc/postgresql/repmgr.conf --user=postgres {{ postgres_ha_img }} repmgr -h {{ aio_1 }} -U repmgr -d repmgr -f /etc/postgresql/repmgr.conf standby clone -F"
       args:
         executable: /bin/bash
       register: dry_run
       when: 
-        - ha_rol == "backup"
+        - ha_role == "backup"
 
-    - name: Start postgresql after resync
+    - name: POSTGRESQL Start postgresql after resync
       service:
-        name: postgresql-11
+        name: postgresql
         state: started
       when: 
-        - ha_rol == "backup"
+        - ha_role == "backup"
     
-    - name: Recovery BACKUP RO Repmgr standby register
-      shell: "sudo -u postgres {{ repmgr_bin }}repmgr -f {{ pg_lib_location_no_version }}/repmgr.conf standby register -F"      
+    - name: POSTGRESQL Start
+      pause:
+        seconds: 10
+      when:
+        - ha_role == "backup"
+
+    - name: POSTGRESQL Recovery BACKUP RO Repmgr standby register
+      shell: "podman run  --cgroups=no-conmon --sdnotify=conmon --replace --rm --network=host --env-file={{ postgres_env }} --name=oml-repmgr-stand-by-reg --volume=/etc/omnileads/pgpass:/var/lib/postgresql/.pgpass  --volume=oml_postgres:/var/lib/postgresql/data --volume=/etc/omnileads/repmgr.conf:/etc/postgresql/repmgr.conf --user=postgres {{ postgres_ha_img }} repmgr -h {{ aio_2 }} -U repmgr -d repmgr -f /etc/postgresql/repmgr.conf standby register -F"
       args:
         executable: /bin/bash
       when: 
-        - ha_rol == "backup"    
+        - ha_role == "backup"    

@@ -1,5 +1,5 @@
 
-# qa_repoCopyright (C) 2024 Freetech Solutions
+# Copyright (C) 2024 Freetech Solutions
 
 # This file is part of OMniLeads
 
@@ -34,38 +34,38 @@
 ##################### Postgresql Node Backup #########################
 
     - name: Recovery BACKUP RW Node standby clone
-      shell: "sudo -u postgres {{ repmgr_bin }}repmgr -h {{ postgres_1 }} -U repmgr -d repmgr -f {{ pg_lib_location_no_version }}/repmgr.conf standby clone --dry-run"
+      shell: "sudo -u postgres {{ repmgr_bin }}repmgr -h {{ aio_1 }} -U repmgr -d repmgr -f {{ pg_lib_location_no_version }}/repmgr.conf standby clone --dry-run"
       args:
         executable: /bin/bash
       register: dry_run
       when: 
-        - ha_rol == "backup"
+        - ha_role == "backup"
     
     - name: Recovery BACKUP RW Node
-      shell: "sudo -u postgres {{ repmgr_bin }}repmgr -h {{ postgres_1 }} -U repmgr -d repmgr -f {{ pg_lib_location_no_version }}/repmgr.conf standby clone -F"
+      shell: "sudo -u postgres {{ repmgr_bin }}repmgr -h {{ aio_1 }} -U repmgr -d repmgr -f {{ pg_lib_location_no_version }}/repmgr.conf standby clone -F"
       args:
         executable: /bin/bash
       when: 
-        - ha_rol == "backup"
+        - ha_role == "backup"
 
     - name: Restart postgres service HA
       service:
         name: postgresql-11
         state: started
       when:
-        - ha_rol == "backup"
+        - ha_role == "backup"
 
     - name: Recovery BACKUP RW Node standby register
       shell: "sudo -u postgres {{ repmgr_bin }}repmgr -f {{ pg_lib_location_no_version }}/repmgr.conf standby register -F"
       args:
         executable: /bin/bash
       when: 
-        - ha_rol == "backup"
+        - ha_role == "backup"
 
     - name: Start repmgr cluster manager
       service:
         name: repmgr11
         state: started
       when: 
-        - ha_rol == "backup"
+        - ha_role == "backup"
 

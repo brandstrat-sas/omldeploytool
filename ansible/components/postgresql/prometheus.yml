@@ -2,7 +2,7 @@
 
 # This file is part of OMniLeads
 
-# This program is free software: you can nginxtribute it and/or modify
+# This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
@@ -15,65 +15,51 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see http://www.gnu.org/licenses/.
 #
+---
 
-- name: KAMAILIO Kamailio installation and configuration
-  hosts: 
-    - omnileads_app
+- name: POSTGRESQL Prometheus component deploy
+  hosts:
+    - omnileads_data
     - omnileads_aio
   tags:
     - all_components
-    - kamailio
-    - app
+    - data
+    - postgres    
+
   tasks:
 
-    - name: KAMAILIO environment variables for this installation
+    - name: POSTGRESQL Prometheus Set environment variables for this installation
       template:
-        src: "{{ kamailio_repo_path }}templates/kamailio.env"
-        dest: /etc/default/kamailio.env
-        mode: 664
+        src: "{{ pgsql_repo_path }}templates/prometheus.env"
+        dest: /etc/default/prometheus_postgres.env
+        mode: '0664'
         owner: "{{ usuario }}"
         group: "{{ usuario }}"
       tags:
         - install
         - upgrade
-        - update
 
-    - name: KAMAILIO Copy kamailio.service Systemd file
+    - name: POSTGRESQL Prometheus Copy systemd file
       template:
-        src: "{{ kamailio_repo_path }}templates/kamailio.service"
-        dest: /etc/systemd/system/kamailio.service
+        src: "{{ pgsql_repo_path }}templates/prometheus.service"
+        dest: /etc/systemd/system/prometheus_postgres.service
       tags:
         - install
         - upgrade
-        - update
 
-    - name: KAMAILIO Pull image
-      command: podman pull --quiet {{ kamailio_img }}
+    - name: POSTGRESQL Prometheus Pull image
+      command: podman pull --quiet {{ postgres_prometheus_img }}
       register: podman_pull
       until: podman_pull is success
       tags:
         - install
         - upgrade
-        - update
 
-    - name: KAMAILIO Enable and start service
+    - name: POSTGRESQL Prometheus Enable and start service
       systemd:
-        name: kamailio.service
+        name: prometheus_postgres.service
         state: started
-        enabled: yes
         daemon_reload: yes
       tags:
         - install
         - upgrade
-
-    - name: KAMAILIO ReStart service
-      systemd:
-        name: kamailio.service
-        state: restarted
-        enabled: yes
-        daemon_reload: yes
-      tags:
-        - upgrade
-        - restart
-      when:       
-        - inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_aio']    
