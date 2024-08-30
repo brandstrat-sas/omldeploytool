@@ -1,4 +1,4 @@
-# qa_repoCopyright (C) 2024 Freetech Solutions
+# Copyright (C) 2024 Freetech Solutions
 
 # This file is part of OMniLeads
 
@@ -17,12 +17,13 @@
 #
 
 - name: OBSERVABILITY Prometheus installation and configuration
-  hosts: 
+  hosts:
     - omnileads_app
     - omnileads_aio
   tags:
     - all_components
     - observability
+
   tasks:
 
   - name: OBSERVABILITY Prometheus setting config & variables

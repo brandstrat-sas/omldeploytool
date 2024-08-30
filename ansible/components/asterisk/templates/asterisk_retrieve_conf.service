@@ -1,5 +1,5 @@
 [Unit]
-Description=Podman container-oml-nginx-server.service
+Description=Podman asterisk.service
 Documentation=man:podman-generate-systemd(1)
 Wants=network-online.target
 After=network-online.target
@@ -9,6 +9,7 @@ RequiresMountsFor=%t/containers
 Environment=PODMAN_SYSTEMD_UNIT=%n
 Restart=on-failure
 TimeoutStopSec=70
+MemoryLimit=
 ExecStartPre=/bin/rm -f %t/%n.ctr-id
 ExecStart=/usr/bin/podman run \
   --cidfile=%t/%n.ctr-id \
@@ -17,21 +18,18 @@ ExecStart=/usr/bin/podman run \
   --replace \
   --detach \
   --network=host \
-  --env-file=/etc/default/minio.env \
-  --name=oml-minio-server \
-  --volume=oml_minio:/data \
+  --log-driver=journald \
+  --env-file=/etc/default/asterisk_retrieve_conf.env \
+  --name=oml-asterisk-retrieve-conf \
   --rm  \
-  {% if inventory_hostname in groups['omnileads_aio'] %}
-  {% if infra_env == "cloud" %}
-  {{ minio_img }} server /data --console-address "{{ omni_ip_wan }}:9001"
-  {% else %}
-  {{ minio_img }} server /data --console-address "{{ omni_ip_lan }}:9001"
-  {% endif %}
-  {% else %}
-  {{ minio_img }} server /data --console-address "{{ data_host }}:9001"
-  {% endif %}
+  --volume=asterisk_conf:/home/omnileads/astconf \
+  --volume=asterisk_sounds:/home/omnileads/sounds \
+  {{ asterisk_retrieve_conf_img }}
+
 ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
 ExecStopPost=/usr/bin/podman rm -f --ignore --cidfile=%t/%n.ctr-id
+StandardOutput=journal
+StandardError=journal
 Type=notify
 NotifyAccess=all
 

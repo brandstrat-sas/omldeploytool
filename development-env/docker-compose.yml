@@ -1,4 +1,3 @@
-version: '3.8'
 services:
   app:
     build:
@@ -175,6 +174,29 @@ services:
     networks:
       - omnileads  
 
+  acd_config_retrieve:
+    image: ${OMLACD_RETRIEVE_CONF_IMG}
+    container_name: oml-asterisk-conf-retrieve    
+    depends_on:      
+      - nginx
+      - redis
+    dns: 8.8.8.8
+    environment:
+      - TZ=${TZ}
+      - ASTERISK_LOCATION=
+      - ARI_HOST=acd
+      - ARI_USER=omnileadsami
+      - ARI_PASS=5_MeO_DMT
+      - OMNILEADS_HOSTNAME=${OMNILEADS_HOSTNAME}
+    networks:
+      - omnileads
+    privileged: true
+    restart: on-failure
+    stop_grace_period: 1m30s
+    volumes:
+      - asterisk_conf:/home/omnileads/astconf
+      - asterisk_sounds:/home/omnileads/sounds
+
   acd:
     build:
       target: run
@@ -182,9 +204,7 @@ services:
     image: ${OMLACD_IMG}
     container_name: oml-asterisk
     depends_on:
-      - postgresql
-      - redis
-      - minio
+      - fastagi
     dns: 8.8.8.8
     environment:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
@@ -193,27 +213,11 @@ services:
       - RABBITMQ_HOST=${RABBITMQ_HOSTNAME}
       - FASTAGI=${FASTAGI_HOSTNAME}
       - TZ=${TZ}
-      - ASTERISK_LOCATION=
       - AMI_USER=${AMI_USER}
       - AMI_PASSWORD=${AMI_PASSWORD}
-      - OMNILEADS_HOSTNAME=${OMNILEADS_HOSTNAME}
-      - REDIS_HOSTNAME=${REDIS_HOSTNAME}
-      - PGHOST=${PGHOST}
-      - PGPORT=${PGPORT}
-      - PGUSER=${PGUSER}
-      - PGDATABASE=${PGDATABASE}
-      - PGPASSWORD=${PGPASSWORD}
-      - CALLREC_DEVICE=${CALLREC_DEVICE}
-      - S3_BUCKET_NAME=${S3_BUCKET_NAME}
-      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
-      - S3_ENDPOINT=${S3_ENDPOINT_MINIO}
-      - AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION}
       - HOMERHOST=${HOMERHOST}
       - HOMERPORT=${HOMERPORT}
       - HOMER_ENABLE=True
-      - NETWORK_MODE=bridge
-      - ENV=devenv
       - CALLREC_SPLIT_CHANNELS=${CALLREC_SPLIT_CHANNELS}
     networks:
       - omnileads
@@ -231,6 +235,8 @@ services:
       #- ./asterisk_custom/google_credential.json:/tmp/google_credential.json      
       #- ./asterisk_custom/oml_extensions_custom.conf:/etc/asterisk/oml_extensions_custom.conf
       - asterisk_callrec:/var/spool/asterisk/monitor/
+      - asterisk_conf:/etc/asterisk/retrieve_conf
+      - asterisk_sounds:/var/lib/asterisk/sounds/oml
     working_dir: /etc/asterisk
 
   interaction_processor:
@@ -636,3 +642,5 @@ volumes:
   django_callrec_zip:
   vuejs:
   asterisk_callrec:
+  asterisk_sounds:
+  asterisk_conf:
