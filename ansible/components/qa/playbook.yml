@@ -105,7 +105,7 @@
       - upgrade
 
   - name: QA init environment
-    shell: podman exec -it oml-uwsgi-server python3 /opt/omnileads/ominicontacto/manage.py inicializar_entorno
+    shell: podman exec -it oml-uwsgi-server python3 /opt/omnileads/ominicontacto/manage.py inicializar_entorno 
     tags:
       - install
 

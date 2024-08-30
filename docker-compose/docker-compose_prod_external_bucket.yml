@@ -317,6 +317,28 @@ services:
     volumes:
       - acd_callrec:/var/spool/asterisk/monitor
 
+  acd_config_retrieve:
+    image: ${OMLACD_RETRIEVE_CONF_IMG}
+    container_name: oml-asterisk-conf-retrieve    
+    depends_on:      
+      - nginx
+      - redis
+    dns: 8.8.8.8
+    environment:
+      - TZ=${TZ}
+      - ASTERISK_LOCATION=
+      - ARI_HOST=acd
+      - ARI_USER=omnileadsami
+      - ARI_PASS=5_MeO_DMT
+      - OMNILEADS_HOSTNAME=${OMNILEADS_HOSTNAME}
+    network_mode: host
+    privileged: true
+    restart: on-failure
+    stop_grace_period: 1m30s
+    volumes:
+      - asterisk_conf:/home/omnileads/astconf
+      - asterisk_sounds:/home/omnileads/sounds
+
   acd:
     container_name: oml-asterisk
     depends_on:
@@ -358,7 +380,9 @@ services:
     stop_grace_period: 1m30s
     working_dir: /etc/asterisk
     volumes:    
-      - acd_callrec:/var/spool/asterisk/monitor
+      - asterisk_callrec:/var/spool/asterisk/monitor
+      - asterisk_conf:/etc/asterisk/retrieve_conf
+      - asterisk_sounds:/var/lib/asterisk/sounds/oml
       #- ./asterisk_custom/google_credential.json:/tmp/google_credential.json
       
   kamailio:
@@ -528,4 +552,8 @@ volumes:
   minio_data:
   django_static:
   django_callrec_zip:
-  acd_callrec:
+  asterisk_callrec:
+  asterisk_conf:
+  asterisk_sounds:
+
+
