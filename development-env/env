@@ -24,7 +24,7 @@ REPO_PATH=./omnileads-repos
 
 REPO=omnileads
 
-OMLAPP_IMG=${REPO}/omlapp:240523.01
+OMLAPP_IMG=${REPO}/omlapp:240829.01
 OMLACD_IMG=${REPO}/asterisk:240728.01
 OMLACD_RETRIEVE_CONF_IMG=${REPO}/acd_retrieve_conf:240729.01
 OMLFASTAGI_IMG=${REPO}/fastagi:240228.01
