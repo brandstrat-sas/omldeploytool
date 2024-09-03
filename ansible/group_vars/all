@@ -2,7 +2,7 @@
 
 #################### containers img tags  ################################
 
-fastagi_img: docker.io/omnileads/fastagi:240228.01
+fastagi_img: docker.io/freetechsolutions/fastagi:240829.01-2729
 sentiment_analysis_img: docker.io/omnileads/sentiment_analysis:240427.01
 interaction_processor_img: docker.io/omnileads/interaction_processor:240506.01
 asterisk_retrieve_conf_img: docker.io/omnileads/acd_retrieve_conf:240729.01
