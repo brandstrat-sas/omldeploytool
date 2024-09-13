@@ -26,11 +26,22 @@
       - jq
       - sngrep
       - python3-boto3
-      - python3-psycopg2
-      - postgresql-client-{{ ha_postgresql_version }}
+      - python3-psycopg2      
     update_cache: yes
     state: latest
   when: ansible_os_family == "Debian"
+  tags: 
+    - install
+
+- name: MAIN Install required Debian packages
+  apt:
+    name:
+      - postgresql-client-{{ ha_postgresql_version }}
+    update_cache: yes
+    state: latest
+  when: 
+    - ansible_os_family == "Debian"
+    - omnileads_ha is defined
   tags: 
     - install
 
