@@ -127,7 +127,7 @@
   changed_when: false
   when:
     - postgres_host is not defined
-    - inventory_hostname in groups['omnileads_aio'] or inventory_hostname in groups['ha_omnileads_sql']
+    - inventory_hostname in groups['omnileads_aio'] # or inventory_hostname in groups['ha_omnileads_sql']
     - omnileads_ha is defined
   tags: 
     - install

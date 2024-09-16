@@ -26,7 +26,6 @@
     - omnileads_voice
     - omnileads_app
     - omnileads_aio
-    - ha_omnileads_sql
   gather_facts: True
   roles:
     - prerequisitos

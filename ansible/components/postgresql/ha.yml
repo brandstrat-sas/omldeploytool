@@ -90,7 +90,7 @@
         - upgrade
 
     - name:   
-      community.postgresql.postgresql_user:
+      postgresql_user:
         name: "{{ postgres_user }}"
         password: "{{ postgres_password }}"
         db: "{{ postgres_database }}"
@@ -105,7 +105,7 @@
         - install
 
     - name: POSTGRESQL Create replication user
-      community.postgresql.postgresql_query:
+      postgresql_query:
         query: "DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'replicador') THEN CREATE USER replicador WITH REPLICATION LOGIN PASSWORD '{{ postgres_password }}'; END IF; END $$;"
         login_user: "{{ postgres_user }}"
         login_password: "{{ postgres_password }}"
@@ -117,7 +117,7 @@
         - install
 
     - name: POSTGRESQL Create superuser repmgr
-      community.postgresql.postgresql_query:
+      postgresql_query:
         query: "DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'repmgr') THEN CREATE USER repmgr WITH SUPERUSER PASSWORD '{{ postgres_password }}'; END IF; END $$;"
         login_user: "{{ postgres_user }}"
         login_password: "{{ postgres_password }}"
@@ -129,7 +129,7 @@
         - install
 
     - name: POSTGRESQL Create database repmgr
-      community.postgresql.postgresql_db:
+      postgresql_db:
         name: repmgr
         owner: repmgr
         login_user: "{{ postgres_user }}"
