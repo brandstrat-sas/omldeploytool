@@ -10,9 +10,9 @@ Environment=PODMAN_SYSTEMD_UNIT=%n
 Restart=on-failure
 TimeoutStopSec=70
 {% if scale_asterisk is defined %}
-MemoryLimit={{ asterisk_mem_limit }}
+MemoryMax={{ asterisk_mem_limit }}
 {% else %}
-MemoryLimit=
+MemoryMax=
 {% endif %}
 ExecStartPre=/bin/rm -f %t/%n.ctr-id
 {% if tts_external_engine is defined and tts_external_engine == "gcp" %}  

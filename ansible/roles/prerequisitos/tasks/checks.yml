@@ -127,7 +127,7 @@
   changed_when: false
   when:
     - postgres_host is not defined
-    - inventory_hostname in groups['omnileads_aio'] or inventory_hostname in groups['ha_omnileads_sql']
+    - inventory_hostname in groups['omnileads_aio'] # or inventory_hostname in groups['ha_omnileads_sql']
     - omnileads_ha is defined
   tags: 
     - install
@@ -142,6 +142,7 @@
   when:
     - bucket_url is not defined
     - inventory_hostname in groups['omnileads_app'] or inventory_hostname in groups['omnileads_voice'] or inventory_hostname in groups['omnileads_data']
+    - omnileads_ha is not defined
   tags: 
     - install
     - upgrade
@@ -155,6 +156,21 @@
   when:
     - bucket_url is not defined
     - inventory_hostname in groups['omnileads_aio']
+    - omnileads_ha is not defined
+  tags: 
+    - install
+    - upgrade
+    - update
+
+# Set minio_host as omnileads_vip on App instance when minios_host is not explicitly defined
+- name: CHECKS Setting minio_host AIO High Availability
+  set_fact:
+    minio_host: http://{{ omnileads_vip }}:9000
+  changed_when: false
+  when:
+    - bucket_url is not defined
+    - inventory_hostname in groups['omnileads_aio']
+    - omnileads_ha is defined
   tags: 
     - install
     - upgrade

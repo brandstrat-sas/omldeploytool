@@ -1,4 +1,4 @@
-# qa_repoCopyright (C) 2024 Freetech Solutions
+# Copyright (C) 2024 Freetech Solutions
 
 # This file is part of OMniLeads
 
@@ -29,41 +29,26 @@
 
   - name: ASTERISK Set environment variables for this installation
     template:
-      src: "{{ asterisk_repo_path }}templates/asterisk.env"
-      dest: /etc/default/asterisk.env
-      mode: 664
-      owner: '{{ usuario }}'
-      group: '{{ usuario }}'
+      src: "{{ item.src }}"
+      dest: "{{ item.dest }}"
+      mode: "0664"
+      owner: "omnileads"
+      group: "omnileads"
+    loop:
+      - { src: "{{ asterisk_repo_path }}templates/asterisk.env", dest: "/etc/default/asterisk.env" }
+      - { src: "{{ asterisk_repo_path }}templates/asterisk_retrieve_conf.env", dest: "/etc/default/asterisk_retrieve_conf.env" }
     tags:
       - install
       - upgrade
       - update
 
-  - name: ASTERISK Retrieve Conf Set environment variables for this installation
+  - name: ASTERISK Copy systemd services
     template:
-      src: "{{ asterisk_repo_path }}templates/asterisk_retrieve_conf.env"
-      dest: /etc/default/asterisk_retrieve_conf.env
-      mode: 664
-      owner: '{{ usuario }}'
-      group: '{{ usuario }}'
-    tags:
-      - install
-      - upgrade
-      - update
-
-  - name: ASTERISK Copy systemd service
-    template:
-      src: "{{ asterisk_repo_path }}templates/asterisk.service"
-      dest: /etc/systemd/system/asterisk.service
-    tags:
-      - install
-      - upgrade
-      - update
-
-  - name: ASTERISK retrieve conf copy systemd service
-    template:
-      src: "{{ asterisk_repo_path }}templates/asterisk_retrieve_conf.service"
-      dest: /etc/systemd/system/asterisk_retrieve_conf.service
+      src: "{{ item.src }}"
+      dest: "{{ item.dest }}"
+    loop:
+      - { src: "{{ asterisk_repo_path }}templates/asterisk.service", dest: "/etc/systemd/system/asterisk.service" }
+      - { src: "{{ asterisk_repo_path }}templates/asterisk_retrieve_conf.service", dest: "/etc/systemd/system/asterisk_retrieve_conf.service" }
     tags:
       - install
       - upgrade
@@ -74,93 +59,56 @@
     register: podman_pull_result
     until: podman_pull_result is success
     loop:
-      - { image: "{{ asterisk_img }}", tags: ["install", "upgrade", "update"] }
-      - { image: "{{ asterisk_retrieve_conf_img }}", tags: ["install", "upgrade", "update"] }
+      - { image: "{{ asterisk_img }}" }
+      - { image: "{{ asterisk_retrieve_conf_img }}" }
     tags:
       - install
       - upgrade
       - update
 
-  - name: ASTERISK daemon-reload Update
+  - name: ASTERISK Enable and start systemd services
     systemd:
-      name: asterisk.service
-      state: started
-      daemon_reload: yes
-    tags:
-      - update      
-
-  - name: ASTERISK Retrieve config enable and start systemd service
-    systemd:
-      name: asterisk_retrieve_conf.service
+      name: "{{ item.name }}"
       state: started
       enabled: yes
       daemon_reload: yes
+    loop:
+      - { name: 'asterisk_retrieve_conf.service' }
+      - { name: 'asterisk.service' }
+    when: omnileads_ha is not defined
     tags:
       - install
       - upgrade
 
-  - name: ASTERISK Enable and start systemd service
+  - name: ASTERISK Start systemd services on HA scenary
     systemd:
-      name: asterisk.service
-      state: started
-      enabled: yes
-      daemon_reload: yes
-    tags:
-      - install
-      - upgrade
-    when:       
-      - omnileads_ha is not defined
-
-  - name: ASTERISK Enable and start systemd service HA scenary
-    systemd:
-      name: asterisk.service
+      name: "{{ item.name }}"
       state: started
       enabled: no
       daemon_reload: yes
+    loop:
+      - { name: 'asterisk_retrieve_conf.service' }
+      - { name: 'asterisk.service' }
+    when: 
+      - omnileads_ha is defined
+      - ha_role == 'main'
     tags:
       - install
       - upgrade
-    when:       
-      - omnileads_ha is defined 
-      - ha_rol == "main"  
 
-  - name: ASTERISK Restart systemd service
+  - name: ASTERISK Restart systemd services
     systemd:
-      name: asterisk.service
+      name: "{{ item.name }}"
       state: restarted
       enabled: yes
       daemon_reload: yes
+    loop:
+      - { name: 'asterisk.service' }
+      - { name: 'asterisk_retrieve_conf.service' }
     tags:
       - upgrade
       - restart
       - restart_core
       - restart_asterisk
-    when:               
+    when: 
       - omnileads_ha is not defined
-
-  - name: ASTERISK Retrieve Conf Restart systemd service
-    systemd:
-      name: asterisk_retrieve_conf.service
-      state: restarted
-      enabled: yes
-      daemon_reload: yes
-    tags:
-      - upgrade
-      - restart
-      - restart_core
-      - restart_asterisk
-  
-  - name: ASTERISK Restart systemd service HA Scenary
-    systemd:
-      name: asterisk.service
-      state: restarted
-      enabled: no
-      daemon_reload: yes
-    tags:
-      - upgrade
-      - restart
-      - restart_core
-      - restart_asterisk
-    when:      
-      - omnileads_ha is defined 
-      - ha_rol == "main"  

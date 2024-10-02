@@ -1,4 +1,4 @@
-# qa_repoCopyright (C) 2024 Freetech Solutions
+# Copyright (C) 2024 Freetech Solutions
 
 # This file is part of OMniLeads
 
@@ -68,7 +68,7 @@
       - upgrade
     when:       
       - omnileads_ha is defined  
-      - ha_rol == "main"
+      - ha_role == "main"
   
   - name: AMI Enable and start systemd service
     systemd:
@@ -93,18 +93,4 @@
       - restart
       - restart_core
     when:       
-      - omnileads_ha is not defined  
-
-  - name: AMI ReStart systemd service HA scenary
-    systemd:
-      name: ami.service
-      state: restarted
-      enabled: no
-      daemon_reload: yes
-    tags:
-      - upgrade
-      - restart
-      - restart_core
-    when:       
-      - omnileads_ha is defined  
-      - ha_rol == "main"
+      - omnileads_ha is not defined

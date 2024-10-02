@@ -8,35 +8,40 @@ log_transition() {
 
 case $ENDSTATE in
     "BACKUP") # Acción para la transición al estado BACKUP
-            log_transition "transition to BACKUP"
-            systemctl stop nginx
-            systemctl stop ami
-            systemctl stop omnileads
-            systemctl stop omlcron
-            systemctl stop asterisk            
-            ;;
+        log_transition "transition to BACKUP"
+        systemctl stop nginx
+        systemctl stop ami
+        systemctl stop omnileads
+        systemctl stop omlcron
+        systemctl stop asterisk            
+        systemctl stop asterisk_retrieve_conf
+        ;;
     "FAULT")  # Acción para la transición al estado FAULT
-            log_transition "transition to FAULT"
-        #     systemctl stop asterisk
-        #     systemctl stop omnileads
-        #     systemctl stop nginx
-            ;;
+        log_transition "transition to FAULT"
+        systemctl stop nginx
+        systemctl stop ami
+        systemctl stop omnileads
+        systemctl stop omlcron
+        systemctl stop asterisk            
+        systemctl stop asterisk_retrieve_conf
+        ;;
     "MASTER") # Acción para la transición al estado MASTER
-            log_transition "transition to MASTER"
-            systemctl restart asterisk
-            sleep 5
-            systemctl restart ami
-            sleep 2
-            systemctl restart omnileads            
-            sleep 5
-            systemctl restart nginx
-            sleep 1
-            systemctl restart omlcron
-            ;;
-
-    *)      log_transition "Unknown state ${ENDSTATE}"
-            exit 1
-            ;;
+        log_transition "transition to MASTER"
+        systemctl start asterisk
+        sleep 5
+        systemctl start ami
+        systemctl start omnileads            
+        sleep 10
+        systemctl start nginx
+        sleep 2
+        systemctl start asterisk_retrieve_conf
+        systemctl start omlcron
+        oml_manage --redis_sync
+        ;;
+    *)      
+        log_transition "Unknown state ${ENDSTATE}"
+        exit 1
+        ;;
 esac
 
 exit 0

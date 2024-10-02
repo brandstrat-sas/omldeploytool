@@ -83,7 +83,7 @@
       - update
     when:       
       - omnileads_ha is defined  
-      - ha_rol == "main"  
+      - ha_role == "main"  
 
   - name: NGINX ReStart oml nginx service
     systemd:
@@ -112,4 +112,4 @@
       - restart_core
     when:       
       - omnileads_ha is defined  
-      - ha_rol == "main"
+      - ha_role == "main"
