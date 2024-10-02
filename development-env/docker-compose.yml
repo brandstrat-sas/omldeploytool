@@ -1,7 +1,7 @@
 services:
   app:
     build:
-      target: run    
+      target: run
       context: ${REPO_PATH}/omlapp
     image: ${OMLAPP_IMG}
     container_name: oml-django
@@ -68,7 +68,7 @@ services:
     stop_grace_period: 1m30s
     tty: true
     working_dir: /opt/omnileads/ominicontacto
-    volumes:      
+    volumes:
       - django_callrec_zip:/opt/omnileads/asterisk/var/spool/asterisk/monitor
       - ${REPO_PATH}/omlapp/:/opt/omnileads/ominicontacto/
       - ${REPO_PATH}/survey_app/:/opt/omnileads/ominicontacto/survey_app
@@ -126,7 +126,7 @@ services:
     image: ${OMLAPP_IMG}
     command: /opt/omnileads/bin/init_cronos.sh
     networks:
-      - omnileads 
+      - omnileads
     privileged: true
     restart: on-failure
     stdin_open: true
@@ -136,7 +136,7 @@ services:
 
   fastagi:
     build:
-      target: run    
+      target: run
       context: ${REPO_PATH}/omlfastagi
     image: ${OMLFASTAGI_IMG}
     container_name: oml-fastagi
@@ -154,30 +154,30 @@ services:
       - ${REPO_PATH}/omlfastagi/fastagi.py:/app/fastagi.py
     restart: on-failure
     networks:
-      - omnileads  
-  
-  ami: 
+      - omnileads
+
+  ami:
     build:
-      target: run    
+      target: run
       context: ${REPO_PATH}/omlami
     image: ${OMLAMI_IMG}
     container_name: oml-astami
     environment:
-      - TZ=${TZ}      
+      - TZ=${TZ}
       - ASTERISK_HOSTNAME=${ASTERISK_HOSTNAME}
       - AMI_USER=${AMI_USER}
       - AMI_PASSWORD=${AMI_PASSWORD}
-      - REDIS_HOSTNAME=${REDIS_HOSTNAME}      
-    restart: on-failure  
+      - REDIS_HOSTNAME=${REDIS_HOSTNAME}
+    restart: on-failure
     volumes:
-     - ${REPO_PATH}/omlami/ami.py:/app/ami.py
+      - ${REPO_PATH}/omlami/ami.py:/app/ami.py
     networks:
-      - omnileads  
+      - omnileads
 
   acd_config_retrieve:
     image: ${OMLACD_RETRIEVE_CONF_IMG}
-    container_name: oml-asterisk-conf-retrieve    
-    depends_on:      
+    container_name: oml-asterisk-conf-retrieve
+    depends_on:
       - nginx
       - redis
     dns: 8.8.8.8
@@ -232,7 +232,7 @@ services:
       - ${REPO_PATH}/omlacd/source/astconf:/etc/asterisk
       - ${REPO_PATH}/omlacd/source/scripts:/opt/asterisk/scripts
       - ${REPO_PATH}/omlacd/source/agi-bin/:/var/lib/asterisk/agi-bin/
-      #- ./asterisk_custom/google_credential.json:/tmp/google_credential.json      
+      #- ./asterisk_custom/google_credential.json:/tmp/google_credential.json
       #- ./asterisk_custom/oml_extensions_custom.conf:/etc/asterisk/oml_extensions_custom.conf
       - asterisk_callrec:/var/spool/asterisk/monitor/
       - asterisk_conf:/etc/asterisk/retrieve_conf
@@ -301,10 +301,10 @@ services:
   #   command: python /app/app_${MODEL}.py
   #   restart: on-failure
   #   stop_grace_period: 1m30s
-  #   volumes:      
+  #   volumes:
   #     - ./asterisk_custom/google_credential.json:/tmp/google_credential.json
   #     - ${REPO_PATH}/oml_sentiment_analysis/:/app/
-      
+
   # audiosocket:
   #   build:
   #     #target: run
@@ -315,7 +315,7 @@ services:
   #     - acd
   #   dns: 8.8.8.8
   #   environment:
-  #     - TZ=${TZ}    
+  #     - TZ=${TZ}
   #   networks:
   #     - omnileads
   #   privileged: true
@@ -327,7 +327,7 @@ services:
     build:
       target: run
       context: ${REPO_PATH}/omlkamailio
-    image: ${OMLKAM_IMG}  
+    image: ${OMLKAM_IMG}
     container_name: oml-kamailio
     depends_on:
       - redis
@@ -343,7 +343,7 @@ services:
       - RTPENGINE_HOSTNAME=${RTPENGINE_HOSTNAME}
       - SHM_SIZE=${SHM_SIZE}
       - PKG_SIZE=${PKG_SIZE}
-      - KAMAILIO_CERTS_LOCATION=${KAMAILIO_CERTS_LOCATION}    
+      - KAMAILIO_CERTS_LOCATION=${KAMAILIO_CERTS_LOCATION}
     networks:
       - omnileads
     privileged: true
@@ -355,8 +355,8 @@ services:
   nginx:
     build:
       target: run
-      context: ${REPO_PATH}/omlnginx    
-    image: ${OMLNGINX_IMG}  
+      context: ${REPO_PATH}/omlnginx
+    image: ${OMLNGINX_IMG}
     container_name: oml-nginx
     depends_on:
       - app
@@ -365,7 +365,7 @@ services:
     dns: 8.8.8.8
     environment:
       - ENV=devenv
-      - TZ=${TZ}      
+      - TZ=${TZ}
       - DJANGO_HOSTNAME=${DJANGO_HOSTNAME}
       - WSGI_PORT=8099
       - DAPHNE_HOSTNAME=${DJANGO_HOSTNAME}
@@ -373,7 +373,7 @@ services:
       - KAMAILIO_HOSTNAME=${KAMAILIO_HOSTNAME}
       - KAMAILIO_PORT=14443
       - WEBSOCKETS_HOSTNAME=${WEBSOCKET_HOSTNAME}
-      - WEBSOCKETS_PORT=8000      
+      - WEBSOCKETS_PORT=8000
       - CALLREC_DEVICE=${CALLREC_DEVICE}
       - S3_ENDPOINT=${S3_ENDPOINT_MINIO}
     networks:
@@ -419,7 +419,7 @@ services:
     networks:
       - omnileads
     ports:
-      - 16379:6379  
+      - 16379:6379
     image: ${OMLREDIS_IMG}
     privileged: true
     restart: on-failure
@@ -436,7 +436,7 @@ services:
     dns: 8.8.8.8
     environment:
       - ENV=devenv
-      - TZ=${TZ}    
+      - TZ=${TZ}
     networks:
       - omnileads
     privileged: true
@@ -517,7 +517,7 @@ services:
       #- ${REPO_PATH}/omlapp/omnileads_ui/:/home/app
       - ${REPO_PATH}/survey_app/:/home/survey/
       - ${REPO_PATH}/wallboard_app/:/home/wallboard/
-      - vuejs:/home/app/supervision/node_modules/      
+      - vuejs:/home/app/supervision/node_modules/
 
   rabbitmq:
     container_name: oml-rabbit-mq
@@ -551,7 +551,7 @@ services:
     #   timeout: 20s
     #   retries: 3
 
-  createbuckets:  
+  createbuckets:
     tty: true
     image: minio/mc
     container_name: oml-initminio
@@ -568,7 +568,7 @@ services:
       /usr/bin/mc admin policy attach local readwrite --user omlminio;
       exit 0;
       "
-      
+
   pbxemulator:
     container_name: oml-pstn-emulator
     hostname: pbxemulator
@@ -597,7 +597,7 @@ services:
       - PGHOST=${PGHOST}
       - PGPASSWORD=${PGPASSWORD}
       - PSTN_HOSTNAME=pbxemulator
-    networks: 
+    networks:
       - omnileads
     ports:
       - 8888:8888
@@ -614,7 +614,7 @@ services:
     environment:
       - CLIENT_USERNAME=${VIDEOCALLS_USERNAME}
       - CLIENT_PASSWORD=${VIDEOCALLS_PASSWORD}
-    networks: 
+    networks:
       - omnileads
     ports:
       - 8889:5000
@@ -625,7 +625,19 @@ services:
     tty: true
     volumes:
       - ${REPO_PATH}/webphone_client_app/demo/:/usr/src/app
-    
+
+  pgadmin:
+    container_name: pgadmin-container
+    image: dpage/pgadmin4
+    ports:
+      - "5050:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: user@domain.com
+      PGADMIN_DEFAULT_PASSWORD: catsarecool
+    restart: on-failure
+    networks:
+      - omnileads
+
 networks:
   omnileads:
     ipam:

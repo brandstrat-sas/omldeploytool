@@ -26,10 +26,34 @@
       - jq
       - sngrep
       - python3-boto3
-      - python3-psycopg2
+      - python3-psycopg2      
     update_cache: yes
     state: latest
   when: ansible_os_family == "Debian"
+  tags: 
+    - install
+
+- name: MAIN Install postgresql-client for Ubuntu
+  apt:
+    name:
+      - postgresql-client-{{ ha_postgresql_version }}
+    update_cache: yes
+    state: latest
+  when: 
+    - ansible_facts['distribution'] == "Ubuntu"
+    - omnileads_ha is defined
+  tags: 
+    - install
+
+- name: MAIN Install postgresql-client for Debian
+  apt:
+    name:
+      - postgresql-client-15
+    update_cache: yes
+    state: latest
+  when: 
+    - ansible_facts['distribution'] == "Debian"
+    - omnileads_ha is defined
   tags: 
     - install
 

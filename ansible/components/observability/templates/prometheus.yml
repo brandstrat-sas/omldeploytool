@@ -34,7 +34,7 @@ scrape_configs:
 
   - job_name: '{{ tenant_id }}_postgres_main_host'
     static_configs:
-      - targets: ['{{ postgres_1 }}:9100']
+      - targets: ['{{ aio_1 }}:9100']
         labels:
           tenant: '{{ tenant_id }}'
           arq: 'ha'
@@ -42,7 +42,7 @@ scrape_configs:
 
   - job_name: '{{ tenant_id }}_postgres_backup_host'
     static_configs:
-      - targets: ['{{ postgres_2 }}:9100']
+      - targets: ['{{ aio_2 }}:9100']
         labels:
           tenant: '{{ tenant_id }}'
           arq: 'ha'

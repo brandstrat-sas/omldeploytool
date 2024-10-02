@@ -11,10 +11,10 @@ vrrp_script check_component {
 } 
 
 vrrp_instance oml_aio {
-   state {% if ha_rol == "main" %} MASTER {% else %} BACKUP {% endif %} 
+   state {% if ha_role == "main" %} MASTER {% else %} BACKUP {% endif %} 
    interface {{ ha_vip_nic }}
    virtual_router_id 51
-   priority {% if ha_rol == "main" %} 100 {% else %} 50 {% endif %} 
+   priority {% if ha_role == "main" %} 100 {% else %} 50 {% endif %} 
    advert_int 1
    notify_master "/usr/bin/oml_cluster_transition.sh MASTER"
    notify_backup "/usr/bin/oml_cluster_transition.sh BACKUP"
