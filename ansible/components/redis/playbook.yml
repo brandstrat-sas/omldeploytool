@@ -55,6 +55,18 @@
       - update
     when: omnileads_ha is not defined   
 
+  - name: REDIS Template files for scale tunnings are rendered
+    template:
+      src: '{{ item.src }}'
+      dest: '{{ item.dest }}'
+    loop:
+      - { src: 'templates/redis.conf', dest: '/etc/omnileads/redis.conf' }
+    tags:
+      - install
+      - upgrade
+      - update
+    when: scale_redis is defined and scale_redis  
+
   - name: REDIS Enable and start service
     systemd:
       name: redis.service

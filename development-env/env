@@ -24,18 +24,21 @@ REPO_PATH=./omnileads-repos
 
 REPO=omnileads
 
-OMLAPP_IMG=${REPO}/omlapp:240829.01
-OMLACD_IMG=${REPO}/asterisk:240728.01
+OMLAPP_IMG=${REPO}/omlapp:240802.01
+OMLACD_IMG=freetechsolutions/asterisk:240728.dialer
 OMLACD_RETRIEVE_CONF_IMG=${REPO}/acd_retrieve_conf:240729.01
 OMLFASTAGI_IMG=${REPO}/fastagi:240228.01
 OMLAMI_IMG=${REPO}/astami:231230.01
-OMLNGINX_IMG=${REPO}/nginx:240105.01
-OMLKAM_IMG=${REPO}/kamailio:231125.01
-OMLRTPENGINE_IMG=${REPO}/rtpengine:231125.01
-OMLWS_IMG=${REPO}/websockets:231125.01
+OMLNGINX_IMG=${REPO}/nginx:240705.01
+OMLKAM_IMG=${REPO}/kamailio:240625.01
+OMLRTPENGINE_IMG=${REPO}/rtpengine:240625.01
+OMLWS_IMG=${REPO}/websockets:240705.01
 OMLREDIS_IMG=${REPO}/redis:231125.01
 OMLSENTIMENT_IMG=${REPO}/sentiment_analysis:240427.01
 OMLINTERACTION_PROC_IMG=${REPO}/interaction_processor:240506.01
+
+OMLDIALER_ACD_IMG=${REPO}/asterisk_dialer:240820.01
+OMLDIALER_CALL_MANAGER_IMG=freetechsolutions/omlcall_manager_dialer:240729.01
 
 OMLVIDEOCALLS_WIDGET_IMG=omnileads/videocalls_widget:230905.01
 OMLPSTNEMULATOR_IMG=omnileads/pstn_emulator:231118.01
@@ -242,6 +245,13 @@ WOMBAT_DB_PASS=dials
 # --- IP or hostname that each instance will invoke when locating the other    
 MYSQL_HOST=mariadb
 MYSQL_ROOT_PASS=admin123
+
+# --- OMni Dialer
+
+DIALER_ACD_SIP_USER=omnidialer
+DIALER_ACD_SIP_PASS=OMn1P455098#
+ACD_SIP_TRUNK_ADDR=acd:5060
+DIALER_ACD_HOST=dialer_acd
 
 #########################################################################################################
 #                                    VIDEOCALLS WIDGET                                                  #

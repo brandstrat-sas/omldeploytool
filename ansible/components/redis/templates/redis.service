@@ -22,7 +22,13 @@ ExecStart=/usr/bin/podman run \
   --name=oml-redis-server \
   --volume=oml_redis:/data \
   --rm \
+{% if scale_redis is defined and scale_redis %}
+  --volume=/etc/omnileads/redis.conf:/etc/redis/redis.conf \
+  --entrypoint redis-server \
+  {{ redis_img }} /etc/redis/redis.conf
+{% else %}
   {{ redis_img }}
+{% endif %}
 ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
 ExecStopPost=/usr/bin/podman rm -f --ignore --cidfile=%t/%n.ctr-id
 Type=notify
