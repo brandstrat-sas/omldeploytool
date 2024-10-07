@@ -48,6 +48,18 @@
         - upgrade
         - update
 
+    - name: POSTGRESQL Template files for scale tunnings are rendered
+      template:
+        src: '{{ item.src }}'
+        dest: '{{ item.dest }}'
+      loop:
+        - { src: 'templates/postgresql.conf', dest: '/etc/omnileads/postgresql.conf' }
+      tags:
+        - install
+        - upgrade
+        - update
+      when: scale_postgres is defined and scale_postgres  
+
     - name: POSTGRESQL Pull image
       command: podman pull --quiet {{ postgres_img }}
       register: podman_pull

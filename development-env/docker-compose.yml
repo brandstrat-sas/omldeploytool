@@ -217,14 +217,10 @@ services:
       - AMI_PASSWORD=${AMI_PASSWORD}
       - HOMERHOST=${HOMERHOST}
       - HOMERPORT=${HOMERPORT}
-      - HOMER_ENABLE=True
+      - HOMER_ENABLE=False
       - CALLREC_SPLIT_CHANNELS=${CALLREC_SPLIT_CHANNELS}
     networks:
       - omnileads
-    ports:
-      - ${SIP_EXT_PORT}:5060/udp
-      - 7088:7088
-      - 5038:5038
     privileged: true
     restart: on-failure
     stop_grace_period: 1m30s
@@ -239,6 +235,29 @@ services:
       - asterisk_sounds:/var/lib/asterisk/sounds/oml
     working_dir: /etc/asterisk
 
+  acd_config_retrieve:
+    image: ${OMLACD_RETRIEVE_CONF_IMG}
+    container_name: oml-asterisk-conf-retrieve    
+    depends_on:
+      - websockets
+    dns: 8.8.8.8
+    environment:
+      - TZ=${TZ}
+      - ASTERISK_LOCATION=
+      - ARI_HOST=acd
+      - ARI_USER=omnileadsami
+      - ARI_PASS=5_MeO_DMT
+      - OMNILEADS_HOSTNAME=${OMNILEADS_HOSTNAME}
+    networks:
+      - omnileads
+    privileged: true
+    restart: on-failure
+    stop_grace_period: 1m30s
+    volumes:      
+      - asterisk_conf:/home/omnileads/astconf
+      - asterisk_sounds:/home/omnileads/sounds
+      - ${REPO_PATH}/acd_retrieve_conf/:/home/omnileads
+
   interaction_processor:
     build:
       target: run
@@ -248,6 +267,7 @@ services:
     depends_on:
       - minio
       - rabbitmq
+      - acd
     dns: 8.8.8.8
     environment:
       - RABBITMQ_HOST=${RABBITMQ_HOSTNAME}
@@ -267,6 +287,87 @@ services:
     volumes:
       - ${REPO_PATH}/oml_interactions_processor/app.py:/app/app.py
       - asterisk_callrec:/var/spool/asterisk/monitor/
+
+  dialer_acd:
+    build:
+      target: run
+      context: ${REPO_PATH}/omldialer_acd
+    image: ${OMLDIALER_ACD_IMG}
+    container_name: oml-asterisk_dialer
+    dns: 8.8.8.8
+    environment:
+      - TZ=${TZ}
+      - ACD_SIP_USER=${DIALER_ACD_SIP_USER}
+      - ACD_SIP_PASS=${DIALER_ACD_SIP_PASS}
+      - ACD_HOSTNAME=${ACD_SIP_TRUNK_ADDR}
+      - ARI_USER=${AMI_USER}
+      - ARI_PASS=${AMI_PASSWORD}
+      - ASTERISK_DIALER_HOSTNAME=0.0.0.0
+    networks:
+      - omnileads
+    privileged: true
+    restart: on-failure
+    stop_grace_period: 1m30s
+    working_dir: /etc/asterisk
+
+  dialer_call_manager:
+    build:
+      target: run
+      context: ${REPO_PATH}/asterisk_ari
+    depends_on:
+      - dialer_acd
+    image: ${OMLDIALER_CALL_MANAGER_IMG}
+    container_name: oml-dialer_call_manager
+    command: python /app/dialer_call_manager.py
+    environment:
+      - TZ=${TZ}
+      - ARI_HOST=${DIALER_ACD_HOST}
+      - ARI_PORT=8888
+      - ARI_USER=${AMI_USER}
+      - ARI_PASS=${AMI_PASSWORD}
+    restart: on-failure
+    networks:
+      - omnileads
+    volumes:
+      - ${REPO_PATH}/omldialer_call_manager/:/app/
+      
+
+  # voice_queue_delivery:
+  #   image: ${OMLFASTAGI_IMG}
+  #   container_name: oml-voice_queue_delivery
+  #   command: python /app/queue_call_delivery.py
+  #   environment:
+  #     - TZ=${TZ}
+  #     - ARI_HOST=acd_dialer
+  #     - ARI_PORT=7088
+  #     - ARI_USER=omnileads
+  #     - ARI_PASS=5_MeO_DMT
+  #     - ARI_APP=call_manager
+  #     - REDIS_HOSTNAME=${REDIS_HOSTNAME}
+  #     - RABBITMQ_HOSTNAME=rabbitmq      
+  #   restart: on-failure  
+  #   volumes:
+  #    - ${REPO_PATH}/asterisk_ari:/app
+  #   networks:
+  #     - omnileads  
+
+  # acd_call_linker:
+  #   image: ${OMLFASTAGI_IMG}
+  #   container_name: oml-call_linker
+  #   command: python /app/call_linker.py
+  #   environment:
+  #     - TZ=${TZ}
+  #     - ARI_HOST=acd
+  #     - ARI_PORT=7088
+  #     - ARI_USER=omnileads
+  #     - ARI_PASS=5_MeO_DMT
+  #     - REDIS_HOSTNAME=${REDIS_HOSTNAME}
+  #     - RABBITMQ_HOSTNAME=rabbitmq
+  #   restart: on-failure  
+  #   volumes:
+  #    - ${REPO_PATH}/asterisk_ari:/app
+  #   networks:
+  #     - omnileads  
 
   # sentiment_analysis:
   #   image: ${OMLSENTIMENT_IMG}
@@ -294,7 +395,6 @@ services:
   #     - AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION}
   #     - LANG=es
   #     - GCP_PROJECT_ID=${GOOGLE_CLOUD_PROJECTID}
-  #     - MODEL=${MODEL}
   #   networks:
   #     - omnileads
   #   privileged: true
@@ -382,10 +482,11 @@ services:
     ports:
       - ${NGINX_EXT_PORT}:443/tcp
     restart: on-failure
-    stop_grace_period: 1m30s
+    stop_grace_period: 15s
     volumes:
       - django_static:/opt/omnileads/static
       - ${REPO_PATH}/omlnginx/source/conf:/etc/nginx/
+      - ${REPO_PATH}/omlnginx/source/set_environment.sh:/docker-entrypoint.d/set_environment.sh
       - django_callrec_zip:/opt/omnileads/asterisk/var/spool/asterisk/monitor
 
   postgresql:
@@ -508,8 +609,10 @@ services:
     tty: true
     container_name: oml-vuejs-cli
     image: ${OMLVUEJS_IMG}
+    #environment:
+    #  - NODE_OPTIONS=--openssl-legacy-provider
     ports:
-      - 8080:8080
+      - 8081:8080
     networks:
       - omnileads
     volumes:

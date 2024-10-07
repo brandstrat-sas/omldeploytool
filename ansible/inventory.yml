@@ -299,6 +299,29 @@ all:
     #kamailio_shm_size: 64
     #kamailio_pkg_size: 8
 
+    # Postgres performance tuning
+    # https://wiki.postgresql.org/wiki/Tuning_Your_PostgreSQL_Server
+    #scale_postgres: True
+    #postgres_max_connections: 20 # max(4 * number of CPU cores, 100)
+    #postgres_shared_buffers: 1GB #  Min 128kB Max 25% of total MEM RAM 
+    #postgres_statement_timeout: 60000 # query timeout in milliseconds, 0 is disabled
+    #postgres_effective_cache_size: 4GB # between 50% and 75% of total MEM RAM
+    #postgres_wal_buffers: 32MB # between 64KB & 16MB
+    #postgres_checkpoint_timeout: 10min # range 30s-1d s (sec), min (minutes), h (hour) or d (days)
+    #postgres_work_mem:  12MB # Increase the working memory to allow for more complex query operations
+    #postgres_maintenance_work_mem: 128MB # Increase the maintenance memory to speed up vacuum and index creation operations
+
+    # Redis performance tuning
+    # https://loadforge.com/guides/enhancing-redis-performance-top-configuration-tweaks-to-accelerate-data-access
+    #scale_redis: True
+    #redis_maxmemory: 2gb
+    #redis_maxmemory_policy: allkeys-lru
+    #redis_tcp_backlog: 511
+    #redis_maxclients: 2000
+    #redis_lazyfree_lazy_eviction: yes
+    #redis_lazyfree_lazy_expire: yes
+
+
     # ------------------------------------------------------------------------------------------------ #
     # ---------------------------------- Backup Automation ------------------------------------------- #
     # ------------------------------------------------------------------------------------------------ #
@@ -332,7 +355,7 @@ all:
     # --- If you want to deploy OMniLeads Enterprise, you just need to add "-enterprise" as a suffix to the omnileads_img image tag
     # --- for example: omnileads_img: docker.io/omnileads/omlapp:240216.01-enterprise.
 
-    omnileads_img: docker.io/freetechsolutions/omlapp:241001.01
+    omnileads_img: docker.io/freetechsolutions/omlapp:241002.01-2779
     asterisk_img: docker.io/freetechsolutions/asterisk:240920.01
 
 ##############################################################################################################
