@@ -1,7 +1,7 @@
 #############################
 #   Name of the project     #
 #############################
-COMPOSE_PROJECT_NAME=omnileads
+COMPOSE_PROJECT_NAME=oml
 
 # --- "cloud" instance (access through public IP)
 # --- "lan" instance (access through private IP)
@@ -162,18 +162,18 @@ PKG_SIZE=8
 
 
 #########################################################################################################
-#                                       NGINX - RTPENGINE - REDIS - RABBITMQ                            #
+#                                    UWSGI - NGINX - RTPENGINE - REDIS - RABBITMQ                            #
 #########################################################################################################
 # -----------------------------------------------------------------------------
 
-# ******** HIGH AVAILABILITY ******* # # ******** HIGH AVAILABILITY ******* #
-# ******** HIGH AVAILABILITY ******* # # ******** HIGH AVAILABILITY ******* #
-# *** nginx or app_lb in case of HA *** #
+UWSGI_PORT=8099
+DAPHNE_PORT=8098
 
 # --- IP or hostname that each instance will invoke when locating the other    
 OMNILEADS_HOSTNAME=nginx
 
 NGINX_EXT_PORT=443
+REDIS_PORT=6379
 
 # -----------------------------------------------------------------------------
 # --- IP or hostname that each instance will invoke when locating the other    

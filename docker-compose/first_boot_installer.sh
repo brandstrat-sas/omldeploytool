@@ -98,18 +98,11 @@ cd ./omldeploytool/docker-compose
 cp env .env
 
 sed -i "s/ENV=devenv/ENV=$env/g" .env
-sed -i "s/DJANGO_HOSTNAME=app/DJANGO_HOSTNAME=localhost/g" .env
 sed -i "s/PUBLIC_IP=/PUBLIC_IP=$nat_addr/g" .env
-sed -i "s/DAPHNE_HOSTNAME=channels/DAPHNE_HOSTNAME=localhost/g" .env
 sed -i "s/ASTERISK_HOSTNAME=acd/ASTERISK_HOSTNAME=$lan_ipv4/g" .env
 sed -i "s/FASTAGI_HOSTNAME=fastagi/FASTAGI_HOSTNAME=$lan_ipv4/g" .env
-sed -i "s/WEBSOCKET_HOSTNAME=websockets/WEBSOCKET_HOSTNAME=localhost/g" .env
 sed -i "s/KAMAILIO_HOSTNAME=kamailio/KAMAILIO_HOSTNAME=localhost/g" .env
-sed -i "s/OMNILEADS_HOSTNAME=nginx/OMNILEADS_HOSTNAME=$lan_ipv4/g" .env
-sed -i "s/^REDIS_HOSTNAME=redis/REDIS_HOSTNAME=localhost/g" .env
 sed -i "s/RTPENGINE_HOSTNAME=rtpengine/RTPENGINE_HOSTNAME=$lan_ipv4/g" .env
-sed -i "s/RABBITMQ_HOSTNAME=rabbitmq/RABBITMQ_HOSTNAME=$lan_ipv4/g" .env
-sed -i "s/redis:6379/localhost:6379/g" .env
 
 if [ ! -z "$dialer_host" ];then
     sed -i "s/WOMBAT_HOSTNAME=wombat/WOMBAT_HOSTNAME=$dialer_host/g" .env

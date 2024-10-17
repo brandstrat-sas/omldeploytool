@@ -1,7 +1,6 @@
-version: '3.3'
 services:
-  app:
-    container_name: oml-uwsgi
+
+  app:    
     depends_on:
       - postgresql
       - redis
@@ -9,58 +8,11 @@ services:
       - minio
       - django_commands
     dns: 8.8.8.8
-    environment:
-      - CRON_ENABLE=false
-      - TZ=${TZ}
-      - DJANGO_HOSTNAME=${DJANGO_HOSTNAME}
-      - UWSGI_PORT=8099
-      - ASTERISK_HOSTNAME=${ASTERISK_HOSTNAME}
-      - AMI_USER=${AMI_USER}
-      - AMI_PASSWORD=${AMI_PASSWORD}
-      - KAMAILIO_HOSTNAME=${KAMAILIO_HOSTNAME}
-      - PGHOST=${PGHOST}
-      - PGDATABASE=${PGDATABASE}
-      - PGPORT=${PGPORT}
-      - PGUSER=${PGUSER}
-      - PGPASSWORD=${PGPASSWORD}
-      - PGHOSTHA=${PGHOSTHA}
-      - PGHOSTRO=${PGHOSTRO}
-      - REDIS_HOSTNAME=${REDIS_HOSTNAME}
-      - WEBSOCKET_HOST=${WEBSOCKET_HOSTNAME}
-      - WEBSOCKET_PORT=${WEBSOCKET_PORT}
-      - CALIFICACION_REAGENDA=${CALIFICACION_REAGENDA}
-      - DJANGO_SETTINGS_MODULE=${DJANGO_SETTINGS_MODULE}
-      - EPHEMERAL_USER_TTL=${EPHEMERAL_USER_TTL}
-      - INSTALL_PREFIX=${INSTALL_PREFIX}
-      - LOGIN_FAILURE_LIMIT=${LOGIN_FAILURE_LIMIT}
-      - OMNILEADS_HOSTNAME=${OMNILEADS_HOSTNAME}
-      - PYTHONPATH=${PYTHONPATH}
-      - SESSION_COOKIE_AGE=${SESSION_COOKIE_AGE}
-      - CALLREC_DEVICE=${CALLREC_DEVICE}
-      - MONITORFORMAT=mp3
-      - S3_STORAGE_ENABLED=true
-      - S3_BUCKET_NAME=${S3_BUCKET_NAME}
-      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
-      - S3_ENDPOINT=${S3_ENDPOINT}
-      - S3_ENDPOINT_MINIO=${S3_ENDPOINT_MINIO}
-      - AWS_DEFAULT_REGION=us-east-1
-      - GOOGLE_MAPS_API_KEY=${GOOGLE_MAPS_API_KEY}
-      - GOOGLE_MAPS_CENTER='${GOOGLE_MAPS_CENTER}'
-      - EMAIL_BACKEND=django.core.mail.backends.dummy.EmailBackend
-      - OML_BRANCH=${OMLAPP_IMG}
-      - OML_COMMIT=${OML_COMMIT}
-      - OML_BUILD_DATE=${OML_BUILD_DATE}
-      - WOMBAT_HOSTNAME=${WOMBAT_HOSTNAME}
-      - WOMBAT_USER=${WOMBAT_USER}
-      - WOMBAT_PASSWORD=${WOMBAT_PASSWORD}
-      - OML_LOGGING_SLOWSQL_ENABLED=
-      - OML_LOGGING_SLOWSQL_OUTPUT="-"
-      - OML_LOGGING_SLOWSQL_DURATION=1
-      - DJANGO_ALLOW_ASYNC_UNSAFE=true
+    env_file: .env
     image: ${OMLAPP_IMG}
     command: /opt/omnileads/bin/init_uwsgi.sh
-    network_mode: host
+    networks:
+      - omnileads
     privileged: true
     restart: on-failure
     stdin_open: true
@@ -72,69 +24,19 @@ services:
       - django_callrec_zip:/opt/omnileads/asterisk/var/spool/asterisk/monitor
 
   django_commands:
-    container_name: oml-django-commands
     depends_on:
       - postgresql
       - redis
       - acd
+      - minio
     dns: 8.8.8.8
-    environment:
-      - CRON_ENABLE=false
-      - TZ=${TZ}
-      - DJANGO_HOSTNAME=${DJANGO_HOSTNAME}
-      - UWSGI_PORT=8099
-      - ASTERISK_HOSTNAME=${ASTERISK_HOSTNAME}
-      - AMI_USER=${AMI_USER}
-      - AMI_PASSWORD=${AMI_PASSWORD}
-      - KAMAILIO_HOSTNAME=${KAMAILIO_HOSTNAME}
-      - PGHOST=${PGHOST}
-      - PGDATABASE=${PGDATABASE}
-      - PGPORT=${PGPORT}
-      - PGUSER=${PGUSER}
-      - PGPASSWORD=${PGPASSWORD}
-      - PGHOSTHA=${PGHOSTHA}
-      - PGHOSTRO=${PGHOSTRO}
-      - REDIS_HOSTNAME=${REDIS_HOSTNAME}
-      - WEBSOCKET_HOST=${WEBSOCKET_HOSTNAME}
-      - WEBSOCKET_PORT=${WEBSOCKET_PORT}
-      - CALIFICACION_REAGENDA=${CALIFICACION_REAGENDA}
-      - DJANGO_SETTINGS_MODULE=${DJANGO_SETTINGS_MODULE}
-      - EPHEMERAL_USER_TTL=${EPHEMERAL_USER_TTL}
-      - INSTALL_PREFIX=${INSTALL_PREFIX}
-      - LOGIN_FAILURE_LIMIT=${LOGIN_FAILURE_LIMIT}
-      - OMNILEADS_HOSTNAME=${OMNILEADS_HOSTNAME}
-      - PYTHONPATH=${PYTHONPATH}
-      - SESSION_COOKIE_AGE=${SESSION_COOKIE_AGE}
-      - CALLREC_DEVICE=${CALLREC_DEVICE}
-      - MONITORFORMAT=mp3
-      - S3_STORAGE_ENABLED=true
-      - S3_BUCKET_NAME=${S3_BUCKET_NAME}
-      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
-      - S3_ENDPOINT=${S3_ENDPOINT}
-      - S3_ENDPOINT_MINIO=${S3_ENDPOINT_MINIO}
-      - AWS_DEFAULT_REGION=us-east-1
-      - GOOGLE_MAPS_API_KEY=${GOOGLE_MAPS_API_KEY}
-      - GOOGLE_MAPS_CENTER='${GOOGLE_MAPS_CENTER}'
-      - EMAIL_BACKEND=django.core.mail.backends.dummy.EmailBackend
-      - OML_BRANCH=${OMLAPP_IMG}
-      - OML_COMMIT=${OML_COMMIT}
-      - OML_BUILD_DATE=${OML_BUILD_DATE}
-      - WOMBAT_HOSTNAME=${WOMBAT_HOSTNAME}
-      - WOMBAT_USER=${WOMBAT_USER}
-      - WOMBAT_PASSWORD=${WOMBAT_PASSWORD}
-      - OML_LOGGING_SLOWSQL_ENABLED=
-      - OML_LOGGING_SLOWSQL_OUTPUT="-"
-      - OML_LOGGING_SLOWSQL_DURATION=1
-      #- SURVEY_VERSION=develop
-      #- WALLBOARD_VERSION=develop
-      #- PREMIUM_REPORTS_VERSION=develop
-      #- WEBPHONE_CLIENT_VERSION=develop
+    env_file: .env    
     image: ${OMLAPP_IMG}
     command: /opt/omnileads/bin/django_commands.sh
-    network_mode: host
+    networks:
+      - omnileads
     privileged: true
-    restart: on-failure
+    #restart: on-failure
     stdin_open: true
     stop_grace_period: 1m30s
     tty: true
@@ -144,61 +46,14 @@ services:
       - django_callrec_zip:/opt/omnileads/asterisk/var/spool/asterisk/monitor
 
   channels:
-    container_name: oml-django-channels
     depends_on:
-      - redis
+      - redis    
     dns: 8.8.8.8
-    environment:
-      - DAPHNE_ENABLE=True
-      - TZ=${TZ}
-      - DJANGO_HOSTNAME=${DJANGO_HOSTNAME}
-      - DAPHNE_PORT=8098
-      - ASTERISK_HOSTNAME=${ASTERISK_HOSTNAME}
-      - AMI_USER=${AMI_USER}
-      - AMI_PASSWORD=${AMI_PASSWORD}
-      - KAMAILIO_HOSTNAME=${KAMAILIO_HOSTNAME}
-      - PGHOST=${PGHOST}
-      - PGDATABASE=${PGDATABASE}
-      - PGPORT=${PGPORT}
-      - PGUSER=${PGUSER}
-      - PGPASSWORD=${PGPASSWORD}
-      - PGHOSTHA=${PGHOSTHA}
-      - PGHOSTRO=${PGHOSTRO}
-      - REDIS_HOSTNAME=${REDIS_HOSTNAME}
-      - WEBSOCKET_HOST=${WEBSOCKET_HOSTNAME}
-      - WEBSOCKET_PORT=${WEBSOCKET_PORT}
-      - CALIFICACION_REAGENDA=${CALIFICACION_REAGENDA}
-      - DJANGO_SETTINGS_MODULE=${DJANGO_SETTINGS_MODULE}
-      - EPHEMERAL_USER_TTL=${EPHEMERAL_USER_TTL}
-      - INSTALL_PREFIX=${INSTALL_PREFIX}
-      - LOGIN_FAILURE_LIMIT=${LOGIN_FAILURE_LIMIT}
-      - OMNILEADS_HOSTNAME=${OMNILEADS_HOSTNAME}
-      - PYTHONPATH=${PYTHONPATH}
-      - SESSION_COOKIE_AGE=${SESSION_COOKIE_AGE}
-      - CALLREC_DEVICE=${CALLREC_DEVICE}
-      - MONITORFORMAT=mp3
-      - S3_STORAGE_ENABLED=true
-      - S3_BUCKET_NAME=${S3_BUCKET_NAME}
-      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
-      - S3_ENDPOINT=${S3_ENDPOINT}
-      - S3_ENDPOINT_MINIO=${S3_ENDPOINT_MINIO}
-      - AWS_DEFAULT_REGION=us-east-1
-      - GOOGLE_MAPS_API_KEY=${GOOGLE_MAPS_API_KEY}
-      - GOOGLE_MAPS_CENTER='${GOOGLE_MAPS_CENTER}'
-      - EMAIL_BACKEND=django.core.mail.backends.dummy.EmailBackend
-      - OML_BRANCH=${OML_BRANCH}
-      - OML_COMMIT=${OML_COMMIT}
-      - OML_BUILD_DATE=${OML_BUILD_DATE}
-      - WOMBAT_HOSTNAME=localhost
-      - WOMBAT_USER=${WOMBAT_USER}
-      - WOMBAT_PASSWORD=${WOMBAT_PASSWORD}
-      - OML_LOGGING_SLOWSQL_ENABLED=
-      - OML_LOGGING_SLOWSQL_OUTPUT="-"
-      - OML_LOGGING_SLOWSQL_DURATION=1
+    env_file: .env
     image: ${OMLAPP_IMG}
     command: /opt/omnileads/bin/init_daphne.sh
-    network_mode: host
+    networks:
+      - omnileads
     privileged: true
     restart: on-failure
     stdin_open: true
@@ -207,62 +62,19 @@ services:
     working_dir: /opt/omnileads/ominicontacto
 
   crones:
-    container_name: oml-django-cron
     depends_on:
       - postgresql
-      - redis
-      - acd
+      - acd 
       - minio
+      - redis
     dns: 8.8.8.8
+    env_file: .env
     environment:
-      - TZ=${TZ}
-      - ASTERISK_HOSTNAME=${ASTERISK_HOSTNAME}
-      - AMI_USER=${AMI_USER}
-      - AMI_PASSWORD=${AMI_PASSWORD}
-      - DJANGO_HOSTNAME=${DJANGO_HOSTNAME}
       - UWSGI_PORT=8097
-      - KAMAILIO_HOSTNAME=${KAMAILIO_HOSTNAME}
-      - PGHOST=${PGHOST}
-      - PGDATABASE=${PGDATABASE}
-      - PGPORT=${PGPORT}
-      - PGUSER=${PGUSER}
-      - PGPASSWORD=${PGPASSWORD}
-      - PGHOSTHA=${PGHOSTHA}
-      - PGHOSTRO=${PGHOSTRO}
-      - REDIS_HOSTNAME=${REDIS_HOSTNAME}
-      - WEBSOCKET_HOST=${WEBSOCKET_HOSTNAME}
-      - WEBSOCKET_PORT=${WEBSOCKET_PORT}
-      - CALIFICACION_REAGENDA=${CALIFICACION_REAGENDA}
-      - DJANGO_SETTINGS_MODULE=${DJANGO_SETTINGS_MODULE}
-      - EPHEMERAL_USER_TTL=${EPHEMERAL_USER_TTL}
-      - INSTALL_PREFIX=${INSTALL_PREFIX}
-      - LOGIN_FAILURE_LIMIT=${LOGIN_FAILURE_LIMIT}
-      - OMNILEADS_HOSTNAME=${OMNILEADS_HOSTNAME}
-      - PYTHONPATH=${PYTHONPATH}
-      - SESSION_COOKIE_AGE=${SESSION_COOKIE_AGE}
-      - CALLREC_DEVICE=${CALLREC_DEVICE}
-      - MONITORFORMAT=mp3
-      - S3_STORAGE_ENABLED=true
-      - S3_BUCKET_NAME=${S3_BUCKET_NAME}
-      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
-      - S3_ENDPOINT=${S3_ENDPOINT_MINIO}
-      - AWS_DEFAULT_REGION=us-east-1
-      - GOOGLE_MAPS_API_KEY=${GOOGLE_MAPS_API_KEY}
-      - GOOGLE_MAPS_CENTER='${GOOGLE_MAPS_CENTER}'
-      - EMAIL_BACKEND=django.core.mail.backends.dummy.EmailBackend
-      - OML_BRANCH=${OML_BRANCH}
-      - OML_COMMIT=${OML_COMMIT}
-      - OML_BUILD_DATE=${OML_BUILD_DATE}
-      - WOMBAT_HOSTNAME=localhost
-      - WOMBAT_USER=${WOMBAT_USER}
-      - WOMBAT_PASSWORD=${WOMBAT_PASSWORD}
-      - OML_LOGGING_SLOWSQL_ENABLED=
-      - OML_LOGGING_SLOWSQL_OUTPUT="-"
-      - OML_LOGGING_SLOWSQL_DURATION=1
     image: ${OMLAPP_IMG}
     command: /opt/omnileads/bin/docker-entrypoint.sh
-    network_mode: host
+    networks:
+      - omnileads
     privileged: true
     restart: on-failure
     stdin_open: true
@@ -276,7 +88,6 @@ services:
       - redis
     image: ${OMLFASTAGI_IMG}
     command: python /app/fastagi.py
-    container_name: oml-fastagi
     environment:
       - TZ=${TZ}
       - FASTAGI_HOSTNAME=${FASTAGI_HOSTNAME}
@@ -287,14 +98,14 @@ services:
       - PGPASSWORD=${PGPASSWORD}
       - REDIS_HOSTNAME=${REDIS_HOSTNAME}
       - REDIS_PORT=6379
-    network_mode: host
-
+    networks:
+      - omnileads  
+  
   ami:
     depends_on:
       - acd
       - redis
     image: ${OMLAMI_IMG}
-    container_name: oml-astami
     environment:
       - TZ=${TZ}
       - ASTERISK_HOSTNAME=${ASTERISK_HOSTNAME}
@@ -302,7 +113,8 @@ services:
       - AMI_PASSWORD=${AMI_PASSWORD}
       - REDIS_HOSTNAME=${REDIS_HOSTNAME}
     restart: on-failure  
-    network_mode: host
+    networks:
+      - omnileads
 
   interaction_processor:
     depends_on:
@@ -310,7 +122,6 @@ services:
       - minio
     image: ${OMLINTERACTION_PROC_IMG}
     command: python /app/app.py
-    container_name: oml-interaction_processor
     environment:
       - TZ={{ TZ}
       - RABBITMQ_HOST=${RABBITMQ_HOSTNAME}
@@ -320,25 +131,25 @@ services:
       - S3_ENDPOINT=${S3_ENDPOINT_MINIO}
       - AWS_DEFAULT_REGION=us-east-1
       - CALLREC_DEVICE=s3
-    network_mode: host
+    networks:
+      - omnileads
     volumes:
       - asterisk_callrec:/var/spool/asterisk/monitor
 
   acd_config_retrieve:
     image: ${OMLACD_RETRIEVE_CONF_IMG}
-    container_name: oml-asterisk-conf-retrieve    
     depends_on:      
       - nginx
       - redis
     dns: 8.8.8.8
     environment:
       - TZ=${TZ}
-      - ASTERISK_LOCATION=
-      - ARI_HOST=acd
-      - ARI_USER=omnileadsami
-      - ARI_PASS=5_MeO_DMT
+      - ARI_HOST=${ASTERISK_HOSTNAME}
+      - ARI_USER=${AMI_USER}
+      - ARI_PASS=${AMI_PASSWORD}
       - OMNILEADS_HOSTNAME=${OMNILEADS_HOSTNAME}
-    network_mode: host
+    networks:
+      - omnileads
     privileged: true
     restart: on-failure
     stop_grace_period: 1m30s
@@ -347,60 +158,72 @@ services:
       - asterisk_sounds:/home/omnileads/sounds
 
   acd:
-    container_name: oml-asterisk
     depends_on:
-      - postgresql
-      - redis
-      - websockets
-      - minio
+      - fastagi      
     dns: 8.8.8.8
     environment:
-      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
-      #- GOOGLE_APPLICATION_CREDENTIALS=/tmp/google_credential.json
-      - ENV=${ENV}
-      - FASTAGI=${FASTAGI_HOSTNAME}
       - TZ=${TZ}
-      - ASTERISK_LOCATION=
+      - ENV=${ENV}
+      - SCALE=False      
+      - FASTAGI=localhost
+      - RABBITMQ_HOST=localhost
       - AMI_USER=${AMI_USER}
-      - AMI_PASSWORD=${AMI_PASSWORD}
-      - OMNILEADS_HOSTNAME=${OMNILEADS_HOSTNAME}
-      - ASTERISK_HOSTNAME=${ASTERISK_HOSTNAME}
-      - REDIS_HOSTNAME=${REDIS_HOSTNAME}
-      - PGHOST=${PGHOST}
-      - PGPORT=${PGPORT}
-      - PGUSER=${PGUSER}
-      - PGDATABASE=${PGDATABASE}
-      - PGPASSWORD=${PGPASSWORD}
-      - RABBITMQ_HOST=${RABBITMQ_HOSTNAME}
-      - CALLREC_DEVICE=${CALLREC_DEVICE}
-      - S3_BUCKET_NAME=${S3_BUCKET_NAME}
-      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
-      - S3_ENDPOINT=${S3_ENDPOINT_MINIO}
-      - AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION}
+      - AMI_PASSWORD=${AMI_PASSWORD}      
       - HOMERHOST=${HOMERHOST}
       - HOMERPORT=${HOMERPORT}
-      - HOMER_ENABLE=False
+      - HOMER_ENABLE=${HOMER_ENABLE}      
     image: ${OMLACD_IMG}
     network_mode: host
     privileged: true
     restart: on-failure
     stop_grace_period: 1m30s
     working_dir: /etc/asterisk
-    volumes:            
+    volumes:
       - asterisk_callrec:/var/spool/asterisk/monitor
       - asterisk_conf:/etc/asterisk/retrieve_conf
       - asterisk_sounds:/var/lib/asterisk/sounds/oml
-      #- ./asterisk_custom/google_credential.json:/tmp/google_credential.json
+
+  dialer_acd:
+    image: ${OMLDIALER_ACD_IMG}
+    dns: 8.8.8.8
+    environment:
+      - TZ=${TZ}
+      - ACD_SIP_USER=${DIALER_ACD_SIP_USER}
+      - ACD_SIP_PASS=${DIALER_ACD_SIP_PASS}
+      - ACD_HOSTNAME=${ASTERISK_HOSTNAME}
+      - ARI_USER=${AMI_USER}
+      - ARI_PASS=${AMI_PASSWORD}
+      - ASTERISK_DIALER_HOSTNAME=0.0.0.0
+    network_mode: host
+    privileged: true
+    restart: on-failure
+    stop_grace_period: 1m30s
+    working_dir: /etc/asterisk
+
+  dialer_call_manager:
+    depends_on:
+      - dialer_acd
+    image: ${OMLDIALER_CALL_MANAGER_IMG}
+    command: python /app/dialer_call_manager.py
+    environment:
+      - TZ=${TZ}
+      - REDIS_HOSTNAME=${REDIS_HOSTNAME}
+      - REDIS_PORT=${REDIS_PORT}
+      - ARI_HOST=${ASTERISK_HOSTNAME}
+      - ARI_PORT=8888
+      - ARI_USER=${AMI_USER}
+      - ARI_PASS=${AMI_PASSWORD}
+    restart: on-failure
+    networks:
+      - omnileads  
 
   kamailio:
     command:
       - /bin/bash
-    container_name: oml-kamailio
     depends_on:
       - redis
       - acd
-      - rtpengine 
+      - rtpengine
     dns: 8.8.8.8
     environment:
       - TZ=${TZ}
@@ -418,10 +241,9 @@ services:
     restart: on-failure
     stop_grace_period: 1m30s
     volumes:
-      - ./certs:/${KAMAILIO_CERTS_LOCATION}
+     - ./certs:/${KAMAILIO_CERTS_LOCATION}
 
   nginx:
-    container_name: oml-nginx
     depends_on:
       - app
       - kamailio
@@ -442,17 +264,18 @@ services:
       - S3_ENDPOINT=${S3_ENDPOINT_MINIO}
       - CALLREC_DEVICE=${CALLREC_DEVICE}
     image: ${OMLNGINX_IMG}
-    network_mode: host
+    networks:
+      - omnileads
     privileged: true
+    ports:
+      - ${NGINX_EXT_PORT}:443/tcp
     restart: on-failure
     stop_grace_period: 1m30s
     volumes:
       - django_static:/opt/omnileads/static
       - django_callrec_zip:/opt/omnileads/asterisk/var/spool/asterisk/monitor
-      - ./certs:/etc/omnileads/certs
 
   postgresql:
-    container_name: oml-postgres
     dns: 8.8.8.8
     environment:
       - TZ=${TZ}
@@ -460,113 +283,82 @@ services:
       - POSTGRES_PASSWORD=${PGPASSWORD}
       - POSTGRES_DB=${PGDATABASE}
     image: ${OMLPGSQL_IMG}
-    command: postgres -c listen_addresses=${PGHOST}
-    network_mode: host
+    networks:
+      - omnileads
+    ports:
+      - ${PG_EXT_PORT}:5432/tcp
     privileged: true
     restart: on-failure
     stop_grace_period: 1m30s
     volumes:
-      - postgresql_data:/var/lib/postgresql/data
+      - postgresql:/var/lib/postgresql/data
 
   redis:
-    container_name: oml-redis
     dns: 8.8.8.8
     environment:
       - TZ=${TZ}
-      - BIND_IP=${REDIS_HOSTNAME}
-    network_mode: host
+      - BIND_IP=0.0.0.0
+    networks:
+      - omnileads
+    ports:
+      - 16379:6379  
     image: ${OMLREDIS_IMG}
-    command: redis-server --bind ${BIND_IP}
     privileged: true
     restart: on-failure
     stop_grace_period: 1m30s
     volumes:
-      - redis_data:/data
+      - redis:/data
 
   rtpengine:
-    container_name: oml-rtpengine
     dns: 8.8.8.8
     environment:
       - TZ=${TZ}
       - ENV=${ENV}
-      - RTPENGINE_HOSTNAME=${RTPENGINE_HOSTNAME}
+      - SCALE=False
     image: ${OMLRTPENGINE_IMG}
-    network_mode: host
+    networks:
+      - omnileads
     privileged: true
     restart: on-failure
     stop_grace_period: 1m30s
-        
+
   websockets:
     tty: true
-    container_name: oml-websockets
+    image: ${OMLWS_IMG}
     depends_on:
       - redis
-    image: ${OMLWS_IMG}
     environment:
-      - BIND_ADDRESS=${WEBSOCKET_HOSTNAME}:8000
+      - BIND_ADDRESS=0.0.0.0:8000
       - EVENT_LOOP=uvloop
       - LOGGERS=${WEBSOCKET_LOGGER}
       - REDIS_HOST=${WEBSOCKET_REDIS_HOSTNAME}
       - PYTHONUNBUFFERED=1
-    network_mode: host
+    ports:
+      - "${WEBSOCKET_EXT_PORT}:8000"
+    networks:
+      - omnileads
     # healthcheck:
     #   test: ["CMD", "curl", "-f", "http://localhost:8000/health-checks"]
     #   interval: 1s
     #   timeout: 10s
     #   retries: 10
-  
-  rabbitmq:
-    container_name: oml-rabbit-mq
-    image: rabbitmq:management
-    network_mode: host
-
-  sentiment_analysis:
-    image: ${OMLSENTIMENT_IMG}
-    container_name: oml-sentiment
-    depends_on:
-      - postgresql
-      - minio
-      - rabbitmq
-    dns: 8.8.8.8
-    environment:
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
-      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
-      #- GOOGLE_APPLICATION_CREDENTIALS=/tmp/google_credential.json
-      - RABBITMQ_HOST=${RABBITMQ_HOSTNAME}
-      - TZ=${TZ}
-      - PGHOST=${PGHOST}
-      - PGPORT=${PGPORT}
-      - PGUSER=${PGUSER}
-      - PGDATABASE=${PGDATABASE}
-      - PGPASSWORD=${PGPASSWORD}
-      - S3_BUCKET_NAME=${S3_BUCKET_NAME}
-      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
-      - S3_ENDPOINT=${S3_ENDPOINT_MINIO}
-      - AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION}
-      - LANG=es
-      - GCP_PROJECT_ID=${GOOGLE_CLOUD_PROJECTID}
-    network_mode: host
-    privileged: true
-    command: python /app/app_${AI_ENGINE}.py
-    restart: on-failure
-    stop_grace_period: 1m30s
-    # volumes:      
-    #   - ./asterisk_custom/google_credential.json:/tmp/google_credential.json
 
   minio:
     tty: true
-    container_name: oml-minio
     image: ${OMLMINIO_IMG}
     command: server --console-address "localhost:9001" /data
     environment:
       - MINIO_ROOT_USER=${S3_HTTP_ADMIN_USER}
       - MINIO_ROOT_PASSWORD=${S3_HTTP_ADMIN_PASS}
-      - MINIO_SERVER_URL=${S3_ENDPOINT_MINIO}
+      - MINIO_SERVER_URL=${S3_ENDPOINT}
       - MINIO_PROMETHEUS_AUTH_TYPE="public"
-    network_mode: host
+    networks:
+      - omnileads
+    ports:
+      - 9001:9001
+      - 9000:9000
     volumes:
-      - minio_data:/data
+      - minio:/data
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
       interval: 30s
@@ -574,29 +366,40 @@ services:
       retries: 3
 
   createbuckets:  
-    tty: true
-    image: minio/mc
-    container_name: oml-initminio
     depends_on:
       - minio
-    network_mode: host
+    tty: true
+    image: minio/mc
+    networks:
+      - omnileads
     entrypoint: >
       /bin/sh -c "
       /usr/bin/mc config host rm local;
-      /usr/bin/mc config host add --quiet --api s3v4 local http://localhost:9000 minio s3minio123;
+      /usr/bin/mc config host add --quiet --api s3v4 local http://minio:9000 minio s3minio123;
       /usr/bin/mc mb --quiet local/omnileads/;
       /usr/bin/mc admin user add local omlminio s3omnileads123;
       /usr/bin/mc admin policy attach local readwrite --user omlminio;
       exit 0;
       "
+      
+  rabbitmq:
+    image: rabbitmq:management
+    networks:
+      - omnileads
+  
+networks:
+  omnileads:
+    ipam:
+      driver: default
+      config:
+        - subnet: "${SUBNET}"
 
 volumes:
-  postgresql_data:
-  redis_data:
-  minio_data:
-  django_static:
+  postgresql:
+  redis:
+  minio:
   django_callrec_zip:
+  django_static:
   asterisk_callrec:
   asterisk_conf:
   asterisk_sounds:
-
