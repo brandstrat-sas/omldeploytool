@@ -1,0 +1,179 @@
+#!/bin/bash
+
+######################################################
+####################  NETWORKING #####################
+######################################################
+
+oml_nic=${NIC}
+lan_addr=${PRIVATE_IP}
+nat_addr=${NAT_IP}
+
+######################################################
+###################### STAGE #########################
+######################################################
+
+# --- "cloud" instance (access through public IP)
+# --- "lan" instance (access through private IP)
+# --- "nat" instance (access through Public NAT IP)    
+# --- or "all" in order to access through all NICs
+env=${ENV}
+
+# --- branch is about specific omnileads release
+branch=${BRANCH}
+
+######################################################
+##### External Object Storage Bucket integration #####
+######################################################
+bucket_url=${BUCKET_URL}
+bucket_access_key=${BUCKET_ACCESS_KEY}
+bucket_secret_key=${BUCKET_SECRET_KEY}
+bucket_region=${BUCKET_REGION}
+bucket_name=${BUCKET_NAME}
+
+# External PostgreSQL engine integration
+postgres_host=${PGSQL_HOST}
+postgres_port=${PGSQL_PORT}
+postgres_user=${PGSQL_USER}
+postgres_password=${PGSQL_PASSWORD}
+postgres_db=${PGDATABASE}
+
+################################################################################################
+
+if [[ -z "$lan_addr" ]]; then
+    lan_ipv4=$(ip addr show $oml_nic | grep "inet\b" | awk '{print $2}' | cut -d/ -f1)
+fi
+
+if [[ -z "$nat_addr" ]]; then
+    nat_addr=$(curl http://ipinfo.io/ip)
+    #nat_addr=$(curl ifconfig.co)
+fi
+
+# Obtener el ID de la distribución del sistema operativo
+if [ -f /etc/os-release ]; then
+    . /etc/os-release
+    OS_ID=$ID
+else
+    echo "No se puede determinar el sistema operativo."
+    exit 1
+fi
+
+# Debian family
+if [ "$OS_ID" = "debian" ] || [ "$OS_ID" = "ubuntu" ]; then    
+    apt update && apt install -y git
+    curl -fsSL https://get.docker.com -o ~/get-docker.sh
+    bash ~/get-docker.sh    
+
+# Redhat family
+elif [ "$OS_ID" = "rhel" ] || [ "$OS_ID" = "almalinux" ] || [ "$OS_ID" = "rocky" ] || [ "$OS_ID" = "centos" ]; then
+    dnf check-update
+    dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+    dnf install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin git
+    systemctl start docker
+    systemctl enable docker
+
+else
+    echo "Distribución no soportada."
+    exit 1
+fi
+
+ln -s /usr/libexec/docker/cli-plugins/docker-compose /usr/bin/
+
+git clone https://gitlab.com/omnileads/omldeploytool.git
+
+if [ -z "$branch" ];then
+    echo deploy a main branch
+else
+    echo "deploy a $branch branch"
+    cd ./omldeploytool    
+    git checkout $branch
+    cd ..
+fi
+
+cd ./omldeploytool/docker-compose
+cp env ./prod-env/.env
+cd ./prod-env
+
+sed -i "s/ENV=devenv/ENV=$env/g" .env
+
+# AIO con bucket externo    
+if [[ -n "$bucket_url" && -z "$postgres_host" ]]; then
+    sed -i "s/CALLREC_DEVICE=s3-minio/CALLREC_DEVICE=s3/g" .env
+    sed -i "s/S3_BUCKET_NAME=omnileads/S3_BUCKET_NAME=$bucket_name/g" .env
+    sed -i "s/AWS_ACCESS_KEY_ID=omlminio/AWS_ACCESS_KEY_ID=$bucket_access_key/g" .env
+    sed -i "s%\AWS_SECRET_ACCESS_KEY=s3omnileads123%AWS_SECRET_ACCESS_KEY=$bucket_secret_key%g" .env
+    sed -i "s%\S3_ENDPOINT=https://localhost%S3_ENDPOINT=$bucket_url%g" .env
+        if [[ "${aws_region}" != "NULL" ]];then
+            sed -i "s/bucket_region: us-east-1/bucket_region: ${aws_region}/g" .env
+        fi
+    sed -i "s/PGHOST=postgresql/PGHOST=localhost/g" .env    
+    /usr/libexec/docker/cli-plugins/docker-compose -f docker-compose_prod_external_bucket.yml up -d
+# AIO con bucket externo y postgres externo    
+elif [[ -n "$bucket_url" && -n "$postgres_host" ]]; then
+    sed -i "s/PGHOST=postgresql/PGHOST=$postgres_host/g" .env
+    sed -i "s/PGPORT=5432/PGPORT=$postgres_port/g" .env
+    sed -i "s/PGUSER=omnileads/PGUSER=$postgres_user/g" .env
+    sed -i "s/PGPASSWORD=admin123/PGPASSWORD=$postgres_password/g" .env
+    sed -i "s/PGDATABASE=omnileads/PGDATABASE=$postgres_db/g" .env
+    sed -i "s/CALLREC_DEVICE=s3-minio/CALLREC_DEVICE=s3/g" .env
+    sed -i "s/S3_BUCKET_NAME=omnileads/S3_BUCKET_NAME=$bucket_name/g" .env
+    sed -i "s/AWS_ACCESS_KEY_ID=omlminio/AWS_ACCESS_KEY_ID=$bucket_access_key/g" .env
+    sed -i "s%\AWS_SECRET_ACCESS_KEY=s3omnileads123%AWS_SECRET_ACCESS_KEY=$bucket_secret_key%g" .env
+    sed -i "s%\S3_ENDPOINT=https://localhost%S3_ENDPOINT=$bucket_url%g" .env
+        if [[ "${aws_region}" != "NULL" ]];then
+            sed -i "s/bucket_region: us-east-1/bucket_region: ${aws_region}/g" .env
+        fi
+    /usr/libexec/docker/cli-plugins/docker-compose -f docker-compose_prod_external.yml up -d
+else
+    exit 0
+fi
+
+ln -s ./omldeploytool/docker-compose/oml_manage /usr/local/bin/
+chmod +x /usr/local/bin/oml_manage
+
+if [[ "$env" == "devenv" ]];then
+    until curl -sk --head  --request GET https://localhost |grep "302" > /dev/null; do echo "Environment still initializing , sleeping 10 seconds"; sleep 10; done; echo "Environment is up"
+elif [[ "$env" == "lan" ]];then
+    until curl -sk --head  --request GET https://$lan_ipv4 |grep "302" > /dev/null; do echo "Environment still initializing , sleeping 10 seconds"; sleep 10; done; echo "Environment is up"
+else
+    until curl -sk --head  --request GET https://$nat_addr |grep "302" > /dev/null; do echo "Environment still initializing , sleeping 10 seconds"; sleep 10; done; echo "Environment is up"
+fi
+
+./oml_manage --reset_pass
+
+# Configuración de reglas de iptables y persistencia con rc.local
+setup_iptables() {
+    echo -e "\n*** Configurando iptables y asegurando persistencia con rc.local ***"
+
+    # Crear reglas de iptables
+    iptables -t nat -A PREROUTING -p udp --dport 5060 -j DNAT --to-destination 10.22.22.99
+    iptables -A FORWARD -p udp -d 10.22.22.99 --dport 5060 -j ACCEPT
+    iptables -t nat -A PREROUTING -p udp --dport 40000:50000 -j DNAT --to-destination 10.22.22.99
+    iptables -A FORWARD -p udp -d 10.22.22.99 --dport 40000:50000 -j ACCEPT
+    iptables -t nat -A PREROUTING -p udp --dport 20000:30000 -j DNAT --to-destination 10.22.22.98
+    iptables -A FORWARD -p udp -d 10.22.22.98 --dport 20000:30000 -j ACCEPT
+
+    # Crear o modificar rc.local
+    if [[ ! -f /etc/rc.local ]]; then
+        echo -e "#!/bin/bash\nexit 0" > /etc/rc.local
+        chmod +x /etc/rc.local
+    fi
+
+    # Verificar si las reglas ya están en rc.local
+    if ! grep -q "iptables -t nat -A PREROUTING -p udp --dport 5060" /etc/rc.local; then
+        sed -i '/^exit 0$/i \
+iptables -t nat -A PREROUTING -p udp --dport 5060 -j DNAT --to-destination 10.22.22.99\n\
+iptables -A FORWARD -p udp -d 10.22.22.99 --dport 5060 -j ACCEPT\n\
+iptables -t nat -A PREROUTING -p udp --dport 40000:50000 -j DNAT --to-destination 10.22.22.99\n\
+iptables -A FORWARD -p udp -d 10.22.22.99 --dport 40000:50000 -j ACCEPT\n\
+iptables -t nat -A PREROUTING -p udp --dport 20000:30000 -j DNAT --to-destination 10.22.22.98\n\
+iptables -A FORWARD -p udp -d 10.22.22.98 --dport 20000:30000 -j ACCEPT' /etc/rc.local
+        echo -e "*** Reglas de iptables añadidas a rc.local ***"
+    else
+        echo -e "*** Las reglas de iptables ya están configuradas en rc.local ***"
+    fi
+
+    # Asegurar que rc.local sea ejecutable
+    chmod +x /etc/rc.local
+}
+
+setup_iptables

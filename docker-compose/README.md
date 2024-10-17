@@ -10,16 +10,17 @@
 # Index
 
 * [Requirements](#requirements)
-* [Docker Desktop](#docker_desktop)
+* [Develpment environment](#dev-env)
+* [Quick localhost test environment](#test-env)
+* [Cloud VPS or Onpremise VM](#prod-env)
 * [Security](#security)
-* [Cloud VPS or Onpremise VM](#vps_vm)
 * [First login](#post_install)
 * [OMniLeads Eneterprise](#oml_enterprise)
 * [OMniLeads interaction tool](#oml_manage)
 * [Simulate calls (only for docker-desktop ENV)](#pstn_emulator)
 * [Predictive dialer setting (only for docker-desktop ENV)](#wombat_dialer)
 
-You need docker installed (on Linux, Mac or Windows) and this reposotory cloned <a name="requirements"></a>
+You need docker & docker-compose installed (on Linux, Mac or Windows) and this reposotory cloned <a name="requirements"></a>
 
 * [Docker Install documentation](https://docs.docker.com/get-docker/)
 
@@ -30,25 +31,45 @@ cd omldeploytool/docker-compose
 
 # OMniLeads & Docker Compose 
 
-In this folder, we will find three Docker Compose files.
+In this folder, we will find three Docker Compose environments.
 
-* **docker-compose.yml**: is used to launch the stack on the workstation with Docker Desktop.
-* **docker-compose_prod.yml**: is used to launch the stack on a VPS or VM."
-* **docker-compose_prod_external_bucket.yml**: is used to launch the stack on a VPS or VM and using an external bucket
+* **dev-env**: is used to launch the deveelopment stack on sthe workstation with Docker Desktop"
+* **test-env**: is used to launch the stack on the workstation with Docker Desktop.
+* **prod-env**: is used to launch the stack on a VPS or VM."
 
-## Setup your environment
+### **Workstation Docker-Desktop dev-env deploy** <a name="dev-env"></a>
 
-You need to create a .env file by using (cp) the environment file provided here.
+In this environment, the Django application runs using the framework's development mode. Additionally, Docker binding is used to mount the code of each component into its respective container.
 
-### **Workstation Docker-Desktop deploy** <a name="docker_desktop"></a>
-
-You don't need to work with the variables file, you can simply proceed with the instance execution through the command:
+With the following sequence of commands, you will have an environment ready to start using your development setup:
 
 ```
-$ docker-compose up -d 
+./download_oml_repos.sh --gitlab_clone=https | ssh
+cp env dev-env/.env
+cd dev-env
+ln -s ../oml_manage ./
+docker-compose build
+docker-compose up -d
+docker-compose exec -it django_app python manage.py cambiar_admin_password
+docker-compose exec -it django_app python manage.py inicializar_entorno
 ```
 
-![Diagrama deploy tool](../ansible/png/deploy-tool-tenant-compose-localhost.png)
+Once the environment is up, you can proceed to log in at https://localhost using the username admin and password admin
+
+### **Workstation Docker-Desktop test-env deploy** <a name="test-env"></a>
+
+This environment is ideal for quickly testing the application locally. It is not recommended for production.
+
+```
+cp env test-env/.env
+cd dev-env
+ln -s ../oml_manage ./
+docker-compose up -d
+docker-compose exec -it django_app python manage.py cambiar_admin_password
+docker-compose exec -it django_app python manage.py inicializar_entorno
+```
+
+Una vez arriba el entorno puede avanzar con el login sobre https://localhost utilizando el user admin y password admin.
 
 # Security  <a name="security"></a>
 
@@ -75,102 +96,49 @@ Below are the Firewall rules to be applied on All In One instance:
 
 * 9090/tcp Prometheus metrics: This is where the connections coming from the monitoring center. This port can be opened by restricting by origin in the IP of the monitoring center.
 
-
 ### **Onpremise Virtual Machine or Cloud VPS** <a name="vps_vm"></a>
 
+This environment is ideal for quickly testing the application locally. It is not recommended for production.
+
+
+```
+cp env prod-env/.env
+```
+
+En el .env se debe setear los parametros:
+
+```
+PUBLIC_IP=$YOUR_PUBLIC_ADDR
+PRIVATE_IP=$YOUR_LAN_ADDR
+ENV=nat
+```
+
+Luego se lanzan los siguientes comandos de iptables en pos de reenviar los puertos UDP correspondientes al audio (RTP) hacia los contenedores ACD y RTPENGINE.
+
+```
+iptables -t nat -A PREROUTING -p udp --dport 5060 -j DNAT --to-destination 10.22.22.99
+iptables -A FORWARD -p udp -d 10.22.22.99 --dport 5060 -j ACCEPT
+iptables -t nat -A PREROUTING -p udp --dport 40000:50000 -j DNAT --to-destination 10.22.22.99
+iptables -A FORWARD -p udp -d 10.22.22.99 --dport 40000:50000 -j ACCEPT
+iptables -t nat -A PREROUTING -p udp --dport 20000:30000 -j DNAT --to-destination 10.22.22.98
+iptables -A FORWARD -p udp -d 10.22.22.98 --dport 20000:30000 -j ACCEPT
+
+```
+
+```
+cd prod-env
+ln -s ../oml_manage ./
+docker-compose up -d
+./oml_manage --reset_pass
+```
+
+Una vez arriba el entorno puede avanzar con el login sobre https://your_linux_host_ip utilizando el user admin y password admin.
+
 >  Note: If working on a VPS with a public IP address, it is a mandatory requirement that it also has a network interface with the ability to associate a private IP address.
-
-The first_boot_installer.sh script can be used to deploy to a debian-based or red-hat linux clean instance.
-
-For example:
-
-```
-curl -o first_boot_installer.sh -L "https://gitlab.com/omnileads/omldeploytool/-/raw/main/docker-compose/first_boot_installer.sh" && chmod +x first_boot_installer.sh
-```
-
-Without dialer:
-
-```
-export NIC=eth0 ENV=lan && ./first_boot_installer.sh
-```
-
-
-#### Deploying a specific version of OMniLeads:
-
-There may be a need to deploy a specific release of the app. For this purpose, the BRANCH parameter can be used by adding BRANCH=release-1.33.2.
-
-```
-export NIC=eth0 BRANCH=release-1.33.2 ENV=cloud && ./first_boot_installer.sh)
-```
-
-#### NAT Environments:
-
-It may be necessary to deploy the app behind some type of NAT where we want to explicitly specify the IP address that will traverse the NAT. For this, the parameter NAT_IPV4=xxx.xxx.xxx or NAT_IPV4=tenant.example.com can be added. If no NAT IP is specified, the script will resolve to assign the public IP detected using curl.
-
-```
-export NIC=eth0 ENV=nat NAT_IPV4=182.333.20.12 && ./first_boot_installer.sh)
-```
-
-#### Deploying with Wombat Dialer integration.
-
-```
-export  NIC=eth0 ENV=lan DIALER_HOST=X.X.X.X DIALER_USER=demo DIALER_PASS=demoadmin && ./first_boot_installer.sh
-```
-
-You must to specify the private ipv4 NIC and scenario (ENV) we'll be working with, which will be cloud if we're working on a VPS (cloud), and lan if we're using an on-premise Virtual Machine (lan).
-The BUCKE_NAME=NULL is necesary in order to work with the minio (localhost) object storage.
-
-You can invoke the docker-compose with:
-
-```
-$ docker-compose -f docker-compose_prod.yml up -d
-```
-
-![Diagrama deploy tool](../ansible/png/deploy-tool-tenant-compose-vps.png)
 
 ### **Onpremise Virtual Machine and VPS Cloud deploy with external bucket & postgres DB**
 
 >  Note: If working on a VPS with a public IP address, it is a mandatory requirement that it also has a network interface with the ability to associate a private IP address.
-
->  Note: If working on a VPS with a public IP address, it is a mandatory requirement that it also has a network interface with the ability to associate a private IP address.
-
-The first_boot_installer.sh script can be used to deploy to a debian-based clean instance.
-
-For example:
-
-```
-curl -o first_boot_installer.sh -L "https://gitlab.com/omnileads/omldeploytool/-/raw/main/docker-compose/first_boot_installer.sh" && chmod +x first_boot_installer.sh
-```
-
-Without dialer:
-
-```
-export NIC=eth1 ENV=cloud BUCKET_URL=https://sfo1.digitaloceanspaces.com BUCKET_ACCESS_KEY=mbXUfdsjlh3424R9XY BUCKET_SECRET_KEY=iicHG76O+CIbRZ432iugdsa BUCKET_REGION=NULL BUCKET_NAME=curso-oml && ./first_boot_installer.sh
-```
-
-With dialer:
-
-```
-export NIC=eth1 ENV=cloud BUCKET_URL=https://sfo1.digitaloceanspaces.com BUCKET_ACCESS_KEY=mbXUfdsjlh3424R9XY BUCKET_SECRET_KEY=iicHG76O+CIbRZ432iugdsa BUCKET_REGION=NULL BUCKET_NAME=curso-oml DIALER_HOST=X.X.X.X DIALER_USER=demo DIALER_PASS=demoadmin && ./first_boot_installer.sh
-```
-
-You must to specify the private ipv4 NIC and scenario (ENV) we'll be working with, which will be cloud if we're working on a VPS (cloud), and lan if we're using an on-premise Virtual Machine (lan).
-The BUCKE_NAME=NULL is necesary in order to work with the minio (localhost) object storage.
-
-If we look at the .env file, we will see that the variables corresponding to the hostname of each component have been modified:
-
-```
-DJANGO_HOSTNAME=localhost
-DAPHNE_HOSTNAME=localhost
-ASTERISK_HOSTNAME=$PRIVATE_IPV4
-WEBSOCKET_HOSTNAME=localhosts
-WEBSOCKET_REDIS_HOSTNAME=redis://localhost:6379
-PGHOST=localhost
-OMNILEADS_HOSTNAME=$PRIVATE_IPV4
-RTPENGINE_HOSTNAME=$PRIVATE_IPV4
-REDIS_HOSTNAME=localhost
-KAMAILIO_HOSTNAME=localhost
-```
 
 The endpoint URL and access parameters must be specified. For example:
 
@@ -179,12 +147,12 @@ S3_ENDPOINT=https://sfo3.digitaloceanspaces.com
 S3_BUCKET_NAME=omnileads
 AWS_ACCESS_KEY_ID=ojkghjkhjkh4jk23h4jk23hjk4
 AWS_SECRET_ACCESS_KEY=HJGGH675675hjghjgHJGHJg67567HJHVHJGdsaddadakjhjk
-```
 
+```
 You can invoke the docker-compose with:
 
 ```
-$ docker-compose -f docker-compose_prod_external_bucket.yml up -d
+$ docker-compose up -d
 ```
 
 ![Diagrama deploy tool](../ansible/png/deploy-tool-tenant-compose-vps-external-bucket.png)
@@ -227,13 +195,7 @@ Finally, we run the command:
 If you are using Docker Desktop on localhost:
 
 ```
-docker-compose up -d --force-recreate app nginx
-```
-
-If you are using Docker on a VM:
-
-```
-docker-compose -f docker-compose_prod.yml up -d --force-recreate app nginx
+docker-compose up -d --force-recreate django_app nginx
 ```
 
 ## The oml_manage script <a name="oml_manage"></a>
@@ -263,7 +225,6 @@ For all users the pass is:
 ```
 usuario0*
 ```
-
 
 ## Simulate calls from/to PSTN (Only on Docker-Desktop scenary) <a name="pstn_emulator"></a>
 
@@ -304,18 +265,3 @@ domain: YOUR_HOSTNAME
 (Change "YOUR_HOSTNAME" with the VM hostname/IPADDR  or localhost)
 
 Then you can send calls to DID 01177660010 to 01177660015, an also send calls from an agent to this IAX2 account phone calling 1234567.
-
-
-## Configuring wombat dialer (only for docker-desktop scenary) <a name="wombat_dialer"></a>
-
-You only need to do this if you are going to work with Predictive Dialer campaigns.
-
-Wombat Dialer is a third-party software and not part of the FLOSS stack of OMniLeads. However, it is a valid option for implementing predictive dialing campaign logic.
-
-The docker-compose.yml includes the Wombat Dialer & MariaDB service (its SQL backend), so it is simply available for configuration and integration by accessing https://localhost:8082.
-
-Note: when configuring initial mariadb credentials the root pass is ***admin123***, then on the AMI connection, the server address is ***acd***.
-
-The **production** scenarios do not implement Wombat Dialer by default, so if you want to implement Wombat Dialer in production, you will need to have a VM/VPS to install the dialer there and then configure it to work with OMniLeads.
-
-Check our official documentation to check this: https://www.wombatdialer.com/installation.jsp
