@@ -10,14 +10,14 @@
     docker volume rm postgresql redis minio django django_callrec_zip mariadb
     docker-compose up -d
     until curl -sk --head  --request GET https://localhost |grep "302" > /dev/null; do echo "Environment still initializing , sleeping 10 seconds"; sleep 10; done; echo "Environment is up"
-    docker exec -it oml-uwsgi python3 /opt/omnileads/ominicontacto/manage.py cambiar_admin_password
+    docker exec -it oml-app-1 python3 /opt/omnileads/ominicontacto/manage.py cambiar_admin_password
     ;;
   --reset_pass)
     echo "reset django admin password"
-    docker exec -it oml-uwsgi python3 /opt/omnileads/ominicontacto/manage.py cambiar_admin_password
+    docker exec -it oml-app-1 python3 /opt/omnileads/ominicontacto/manage.py cambiar_admin_password
     ;;
   --init_env)
-    docker exec -it oml-uwsgi python3 /opt/omnileads/ominicontacto/manage.py inicializar_entorno
+    docker exec -it oml-app-1 python3 /opt/omnileads/ominicontacto/manage.py inicializar_entorno
     ;;
   --call_generate)
     echo "generate an ibound call through PSTN-Emulator container"
@@ -57,8 +57,8 @@
     if [[ $confirmacion == "yes" ]]; then
       echo "echo drop all on PostgreSQL"
       docker stop oml-nginx
-      docker stop oml-uwsgi
-      docker stop oml-uwsgi-cron
+      docker stop oml-app-1
+      docker stop oml-app-1-cron
       docker stop oml-asterisk
       docker stop oml-fastagi
       docker stop oml-postgres
@@ -66,7 +66,7 @@
       docker volume rm oml_postgresql_data
       docker-compose up -d 
       until curl -sk --head  --request GET https://localhost |grep "302" > /dev/null; do echo "Environment still initializing , sleeping 10 seconds"; sleep 10; done; echo "Environment is up"
-      docker exec -it oml-uwsgi python3 /opt/omnileads/ominicontacto/manage.py cambiar_admin_password
+      docker exec -it oml-app-1 python3 /opt/omnileads/ominicontacto/manage.py cambiar_admin_password
     else
       echo "Operación cancelada."
     fi
@@ -76,18 +76,18 @@
     read confirmacion
     if [[ $confirmacion == "yes" ]]; then
       echo "drop calls and agent count tables PostgreSQL"
-      docker exec -it oml-uwsgi psql -c 'DELETE FROM queue_log'
-      docker exec -it oml-uwsgi psql -c 'DELETE FROM reportes_app_llamadalog'
-      docker exec -it oml-uwsgi psql -c 'DELETE FROM reportes_app_actividadagentelog'
-      docker exec -it oml-uwsgi psql -c 'DELETE FROM ominicontacto_app_respuestaformulariogestion'
-      docker exec -it oml-uwsgi psql -c 'DELETE FROM ominicontacto_app_auditoriacalificacion'
-      docker exec -it oml-uwsgi psql -c 'DELETE FROM ominicontacto_app_calificacioncliente'
+      docker exec -it oml-app-1 psql -c 'DELETE FROM queue_log'
+      docker exec -it oml-app-1 psql -c 'DELETE FROM reportes_app_llamadalog'
+      docker exec -it oml-app-1 psql -c 'DELETE FROM reportes_app_actividadagentelog'
+      docker exec -it oml-app-1 psql -c 'DELETE FROM ominicontacto_app_respuestaformulariogestion'
+      docker exec -it oml-app-1 psql -c 'DELETE FROM ominicontacto_app_auditoriacalificacion'
+      docker exec -it oml-app-1 psql -c 'DELETE FROM ominicontacto_app_calificacioncliente'
     else
       echo "Operación cancelada."
     fi
     ;;
   --postgres_psql)
-    docker exec -it oml-uwsgi psql
+    docker exec -it oml-app-1 psql
     ;;      
   --redis_clean)
     echo "¿Are you sure you want to delete all redis cache? yes or no"
@@ -99,13 +99,13 @@
     fi
     ;;  
    --redis_sync)
-    docker exec -it oml-uwsgi python3 /opt/omnileads/ominicontacto/manage.py regenerar_asterisk
+    docker exec -it oml-app-1 python3 /opt/omnileads/ominicontacto/manage.py regenerar_asterisk
     ;;
   --redis_cli)
     docker exec -it oml-redis redis-cli
     ;;  
   --dialer_sync)
-    docker exec -it oml-uwsgi python3 /opt/omnileads/ominicontacto/manage.py regenerar_asterisk
+    docker exec -it oml-app-1 python3 /opt/omnileads/ominicontacto/manage.py regenerar_asterisk
     ;; 
   --bucket_show)
     mc alias set MINIO http://localhost:9000 minio s3minio123
@@ -124,17 +124,17 @@
     docker logs -f oml-kamailio
     ;;
   --django_logs)
-    docker logs -f oml-uwsgi
+    docker logs -f oml-app-1
     ;;
   --django_bash)
-    docker exec -it oml-uwsgi bash
+    docker exec -it oml-app-1 bash
     ;;  
   --django_shell)
-    docker exec -it oml-uwsgi python3 manage.py shell
+    docker exec -it oml-app-1 python3 manage.py shell
     ;;    
   --django_commands)
     REPO=$(cat .env | grep REPO= | awk -F'=' '{print $2}')
-    docker exec -it oml-uwsgi /opt/omnileads/bin/django_commands.sh
+    docker exec -it oml-app-1 /opt/omnileads/bin/django_commands.sh
     ;;      
   --fastagi_bash)
     docker exec -it oml-fastagi bash
@@ -167,7 +167,7 @@
     docker logs -f oml-nginx
     ;;    
   --dialer_sync)
-    docker exec -it oml-uwsgi python3 /opt/omnileads/ominicontacto/manage.py sincronizar_wombat
+    docker exec -it oml-app-1 python3 /opt/omnileads/ominicontacto/manage.py sincronizar_wombat
     ;;      
 
   --help)
