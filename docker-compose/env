@@ -34,7 +34,7 @@ OMLINTERACTION_PROC_IMG=${REPO}/interaction_processor:240506.01
 OMLDIALER_ACD_IMG=freetechsolutions/asterisk_dialer:241025.01
 OMLDIALER_CALL_MANAGER_IMG=freetechsolutions/omlcall_manager_dialer:241025.01
 
-OMLPSTNEMULATOR_IMG=${REPO}/pstn_emulator:240229.01
+OMLPSTNEMULATOR_IMG=${REPO}/pstn_emulator:241028.01
 OMLVIDEOCALLS_WIDGET_IMG=${REPO}/videocalls_widget:230905.01
 
 OMLPGSQL_IMG=postgres:14.9-bullseye
