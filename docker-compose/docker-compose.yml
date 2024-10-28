@@ -1,10 +1,10 @@
 services:
 
-  app:    
+  uwsgi:
     depends_on:
       - postgresql
       - redis
-      - acd
+      - asterisk
       - minio
       - django_commands
     dns: 8.8.8.8
@@ -27,7 +27,7 @@ services:
     depends_on:
       - postgresql
       - redis
-      - acd
+      - asterisk
       - minio
     dns: 8.8.8.8
     env_file: .env
@@ -45,11 +45,14 @@ services:
       - django_static:/opt/omnileads/static
       - django_callrec_zip:/opt/omnileads/asterisk/var/spool/asterisk/monitor
 
-  channels:
+  daphne:
     depends_on:
       - redis    
     dns: 8.8.8.8
     env_file: .env
+    environment:
+      - DAPHNE_ENABLE=True
+      - DJANGO_HOSTNAME=daphne
     image: ${OMLAPP_IMG}
     command: /opt/omnileads/bin/init_daphne.sh
     networks:
@@ -61,16 +64,17 @@ services:
     tty: true
     working_dir: /opt/omnileads/ominicontacto
 
-  crones:
+  omlcron:
     depends_on:
       - postgresql
-      - acd 
+      - asterisk 
       - minio
       - redis
     dns: 8.8.8.8
     env_file: .env
     environment:
       - UWSGI_PORT=8097
+      - DJANGO_HOSTNAME=omlcron
     image: ${OMLAPP_IMG}
     command: /opt/omnileads/bin/docker-entrypoint.sh
     networks:
@@ -103,7 +107,7 @@ services:
   
   ami:
     depends_on:
-      - acd
+      - asterisk
       - redis
     image: ${OMLAMI_IMG}
     environment:
@@ -171,7 +175,7 @@ services:
     volumes:
       - asterisk_callrec:/var/spool/asterisk/monitor
 
-  acd_config_retrieve:
+  asterisk_retrieve_conf:
     image: ${OMLACD_RETRIEVE_CONF_IMG}
     depends_on:      
       - nginx
@@ -179,7 +183,7 @@ services:
     dns: 8.8.8.8
     environment:
       - TZ=${TZ}
-      - ARI_HOST=acd
+      - ARI_HOST=asterisk
       - ARI_USER=omnileadsami
       - ARI_PASS=5_MeO_DMT
       - OMNILEADS_HOSTNAME=${OMNILEADS_HOSTNAME}
@@ -192,7 +196,7 @@ services:
       - asterisk_conf:/home/omnileads/astconf
       - asterisk_sounds:/home/omnileads/sounds
 
-  acd:
+  asterisk:
     depends_on:
       - fastagi      
     dns: 8.8.8.8
@@ -202,10 +206,11 @@ services:
       - SCALE=False      
       - FASTAGI=${FASTAGI_HOSTNAME}      
       - AMI_USER=${AMI_USER}
-      - AMI_PASSWORD=${AMI_PASSWORD}
+      - AMI_PASSWORD=${AMI_PASSWORD}      
       - RABBITMQ_HOST=${RABBITMQ_HOSTNAME}
-      - HOMERHOST=${HOMERHOST}
-      - HOMERPORT=${HOMERPORT}
+      - DIALER_HOST=${DIALER_ASTERISK_SIP_HOSTNAME}
+      - HOMER_HOST=${HOMER_HOSTNAME}
+      - HOMER_PORT=${HOMER_PORT}
       - HOMER_ENABLE=${HOMER_ENABLE}      
     image: ${OMLACD_IMG}
     networks:
@@ -223,43 +228,40 @@ services:
       - asterisk_conf:/etc/asterisk/retrieve_conf
       - asterisk_sounds:/var/lib/asterisk/sounds/oml
 
-  dialer_acd:
+  dialer_asterisk:
     image: ${OMLDIALER_ACD_IMG}
     dns: 8.8.8.8
     environment:
       - TZ=${TZ}
-      - PSTNGW_SIP_USER=${DIALER_PSTNGW_SIP_USER}
-      - PSTNGW_SIP_PASS=${DIALER_PSTNGW_SIP_PASS}
-      - PSTNGW_HOSTNAME=${DIALER_PSTNGW_HOST}
-      - PSTNGW_REGISTER=${DIALER_PSTNGW_REGISTER}
-      - PSTNGW_SIP_AUTH=${DIALER_PSTNGW_SIP_AUTH}
-      - OMLACD_SIP_USER=${DIALER_OMLACD_SIP_USER}
-      - OMLACD_SIP_PASS=${DIALER_OMLACD_SIP_PASS}
-      - OMLACD_HOSTNAME=${DIALER_OMLACD_SIP_HOST}
       - ARI_USER=${AMI_USER}
       - ARI_PASS=${AMI_PASSWORD}
       - ASTERISK_DIALER_HOSTNAME=0.0.0.0
+      - OMLACD_HOSTNAME=${DIALER_OMLACD_SIP_HOSTNAME}
+      #- PSTNGW_SIP_USER=${DIALER_PSTNGW_SIP_USER}
+      #- PSTNGW_SIP_PASS=${DIALER_PSTNGW_SIP_PASS}
+      #- PSTNGW_HOSTNAME=${DIALER_PSTNGW_HOST}
+      #- PSTNGW_REGISTER=${DIALER_PSTNGW_REGISTER}
+      #- PSTNGW_SIP_AUTH=${DIALER_PSTNGW_SIP_AUTH}
     networks:
       - omnileads
     privileged: true
     restart: on-failure
     stop_grace_period: 1m30s
     working_dir: /etc/asterisk
-
+    
   dialer_call_manager:
     depends_on:
-      - dialer_acd
+      - dialer_asterisk
     image: ${OMLDIALER_CALL_MANAGER_IMG}
     command: python /app/dialer_call_manager.py
     environment:
       - TZ=${TZ}
       - REDIS_HOSTNAME=${REDIS_HOSTNAME}
       - REDIS_PORT=${REDIS_PORT}
-      - ARI_HOST=${DIALER_OMLACD_ARI_HOST}
-      - ARI_PORT=8888
+      - ARI_HOST=${DIALER_ASTERISK_ARI_HOSTNAME}
+      - ARI_PORT=${DIALER_ASTERISK_ARI_PORT}
       - ARI_USER=${AMI_USER}
       - ARI_PASS=${AMI_PASSWORD}
-      - PSTN_GW=${DIALER_PSTNGW_ENDPOINT}
     restart: on-failure
     networks:
       - omnileads  
@@ -269,7 +271,7 @@ services:
       - /bin/bash
     depends_on:
       - redis
-      - acd
+      - asterisk
       - rtpengine
     dns: 8.8.8.8
     environment:
@@ -293,10 +295,10 @@ services:
 
   nginx:
     depends_on:
-      - app
+      - uwsgi
       - kamailio
       - websockets
-      - channels
+      - daphne
     dns: 8.8.8.8
     environment:
       - TZ=${TZ}
@@ -385,11 +387,11 @@ services:
       - "${WEBSOCKET_EXT_PORT}:8000"
     networks:
       - omnileads
-    # healthcheck:
-    #   test: ["CMD", "curl", "-f", "http://localhost:8000/health-checks"]
-    #   interval: 1s
-    #   timeout: 10s
-    #   retries: 10
+
+  rabbitmq:
+    image: rabbitmq:management
+    networks:
+      - omnileads
 
   minio:
     tty: true
@@ -430,11 +432,6 @@ services:
       exit 0;
       "
       
-  rabbitmq:
-    image: rabbitmq:management
-    networks:
-      - omnileads
-
   pbxemulator:
     hostname: pbxemulator
     dns: 8.8.8.8
