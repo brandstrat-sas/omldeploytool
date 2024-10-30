@@ -469,6 +469,44 @@ services:
     stop_grace_period: 1m30s
     tty: true
   
+  # wombat:  
+  #   command: >
+  #     bash -c "sed -i '/JDBC_URL/c\JDBC_URL=jdbc:mariadb:\/\/${MYSQL_HOST}\/${WOMBAT_DB}?user=${WOMBAT_DB_USER}&password=${WOMBAT_DB_PASS}&autoReconnect=true' /usr/local/tomcat/webapps/wombat/WEB-INF/tpf.properties && catalina.sh run"
+  #   container_name: oml-wombat
+  #   depends_on:
+  #     - mariadb
+  #   dns: 8.8.8.8
+  #   environment:
+  #     - TZ=${TZ}
+  #     - MYSQL_PWD=${MYSQL_ROOT_PASS}
+  #   image: ${WOMBAT_IMG}
+  #   networks:
+  #     - omnileads
+  #   ports:
+  #     - 8082:8080/tcp
+  #   privileged: true
+  #   restart: on-failure
+  #   stop_grace_period: 1m30s
+
+  # mariadb:
+  #   container_name: oml-mariadb
+  #   dns: 8.8.8.8
+  #   environment:
+  #     - ALLOW_EMPTY_PASSWORD=yes
+  #     - TZ=${TZ}
+  #     - MARIADB_ROOT_PASSWORD=${MYSQL_ROOT_PASS}
+  #     - MARIADB_DATABASE=${WOMBAT_DB}
+  #     - MARIADB_USER=${WOMBAT_DB_USER}
+  #     - MARIADB_PASSWORD=${WOMBAT_DB_PASS}
+  #   image: ${MARIADB_IMG}
+  #   networks:
+  #     - omnileads
+  #   privileged: true
+  #   restart: on-failure
+  #   stop_grace_period: 1m30s
+  #   volumes:
+  #     - mariadb:/bitnami
+
 networks:
   omnileads:
     ipam:
@@ -480,6 +518,7 @@ volumes:
   postgresql:
   redis:
   minio:
+  #mariadb:
   django_callrec_zip:
   django_static:
   asterisk_callrec:
