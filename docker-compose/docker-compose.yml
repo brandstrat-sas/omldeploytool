@@ -250,8 +250,11 @@ services:
     working_dir: /etc/asterisk
     
   dialer_call_manager:
+    build:
+      context: ../development-env/omnileads-repos/omldialer_call_manager
     depends_on:
       - dialer_asterisk
+      - redis
     image: ${OMLDIALER_CALL_MANAGER_IMG}
     command: python /app/dialer_call_manager.py
     environment:
