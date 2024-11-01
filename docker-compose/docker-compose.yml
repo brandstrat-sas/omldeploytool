@@ -1,6 +1,7 @@
 services:
 
   uwsgi:
+    container_name: oml-uwsgi
     depends_on:
       - postgresql
       - redis
@@ -24,6 +25,7 @@ services:
       - django_callrec_zip:/opt/omnileads/asterisk/var/spool/asterisk/monitor
 
   django_commands:
+    container_name: oml-django-commands
     depends_on:
       - postgresql
       - redis
@@ -46,6 +48,7 @@ services:
       - django_callrec_zip:/opt/omnileads/asterisk/var/spool/asterisk/monitor
 
   daphne:
+    container_name: oml-daphne
     depends_on:
       - redis    
     dns: 8.8.8.8
@@ -65,6 +68,7 @@ services:
     working_dir: /opt/omnileads/ominicontacto
 
   omlcron:
+    container_name: oml-cron
     depends_on:
       - postgresql
       - asterisk 
@@ -87,6 +91,7 @@ services:
     working_dir: /opt/omnileads
 
   fastagi:
+    container_name: oml-fastagi
     depends_on:
       - postgresql
       - redis
@@ -106,6 +111,7 @@ services:
       - omnileads  
   
   ami:
+    container_name: oml-ami
     depends_on:
       - asterisk
       - redis
@@ -156,6 +162,7 @@ services:
   #   #   - ./asterisk_custom/google_credential.json:/tmp/google_credential.json
 
   interaction_processor:
+    container_name: oml-interaction_processor
     depends_on:
       - rabbitmq
       - minio
@@ -176,6 +183,7 @@ services:
       - asterisk_callrec:/var/spool/asterisk/monitor
 
   asterisk_retrieve_conf:
+    container_name: oml-asterisk_retrieve_conf
     image: ${OMLACD_RETRIEVE_CONF_IMG}
     depends_on:      
       - nginx
@@ -197,6 +205,7 @@ services:
       - asterisk_sounds:/home/omnileads/sounds
 
   asterisk:
+    container_name: oml-asterisk
     depends_on:
       - fastagi      
     dns: 8.8.8.8
@@ -227,8 +236,10 @@ services:
       - asterisk_callrec:/var/spool/asterisk/monitor
       - asterisk_conf:/etc/asterisk/retrieve_conf
       - asterisk_sounds:/var/lib/asterisk/sounds/oml
+      #- ./asterisk_custom/pjsip_wizard_agents.conf:/etc/asterisk/oml_pjsip_wizard.conf:ro
 
   dialer_asterisk:
+    container_name: oml-asterisk_dialer
     image: ${OMLDIALER_ACD_IMG}
     dns: 8.8.8.8
     environment:
@@ -237,11 +248,11 @@ services:
       - ARI_PASS=${AMI_PASSWORD}
       - ASTERISK_DIALER_HOSTNAME=0.0.0.0
       - OMLACD_HOSTNAME=${DIALER_OMLACD_SIP_HOSTNAME}
-      - PSTNGW_SIP_USER=${DIALER_PSTNGW_SIP_USER}
-      - PSTNGW_SIP_PASS=${DIALER_PSTNGW_SIP_PASS}
-      - PSTNGW_HOSTNAME=${DIALER_PSTNGW_HOSTNAME}
-      - PSTNGW_REGISTER=${DIALER_PSTNGW_REGISTER}
-      - PSTNGW_SIP_AUTH=${DIALER_PSTNGW_SIP_AUTH}
+      # - PSTNGW_SIP_USER=${DIALER_PSTNGW_SIP_USER}
+      # - PSTNGW_SIP_PASS=${DIALER_PSTNGW_SIP_PASS}
+      # - PSTNGW_HOSTNAME=${DIALER_PSTNGW_HOSTNAME}
+      # - PSTNGW_REGISTER=${DIALER_PSTNGW_REGISTER}
+      # - PSTNGW_SIP_AUTH=${DIALER_PSTNGW_SIP_AUTH}
     networks:
       - omnileads
     privileged: true
@@ -250,6 +261,7 @@ services:
     working_dir: /etc/asterisk
     
   dialer_call_manager:
+    container_name: oml-call_manager_dialer
     build:
       context: ../development-env/omnileads-repos/omldialer_call_manager
     depends_on:
@@ -270,6 +282,7 @@ services:
       - omnileads  
 
   kamailio:
+    container_name: oml-kamailio
     command:
       - /bin/bash
     depends_on:
@@ -295,8 +308,10 @@ services:
     stop_grace_period: 1m30s
     volumes:
      - ./certs:/${KAMAILIO_CERTS_LOCATION}
+     #- ./asterisk_custom/kamailio.cfg:/etc/kamailio/kamailio.cfg:ro
 
   nginx:
+    container_name: oml-nginx
     depends_on:
       - uwsgi
       - kamailio
@@ -329,6 +344,7 @@ services:
       - django_callrec_zip:/opt/omnileads/asterisk/var/spool/asterisk/monitor
 
   postgresql:
+    container_name: oml-postgresql
     dns: 8.8.8.8
     environment:
       - TZ=${TZ}
@@ -347,6 +363,7 @@ services:
       - postgresql:/var/lib/postgresql/data
 
   redis:
+    container_name: oml-redis
     dns: 8.8.8.8
     environment:
       - TZ=${TZ}
@@ -363,6 +380,7 @@ services:
       - redis:/data
 
   rtpengine:
+    container_name: oml-rtpengine
     dns: 8.8.8.8
     environment:
       - TZ=${TZ}
@@ -376,6 +394,7 @@ services:
     stop_grace_period: 1m30s
 
   websockets:
+    container_name: oml-websockets
     tty: true
     image: ${OMLWS_IMG}
     depends_on:
@@ -392,11 +411,13 @@ services:
       - omnileads
 
   rabbitmq:
+    container_name: oml-rabbitmq
     image: rabbitmq:management
     networks:
       - omnileads
 
   minio:
+    container_name: oml-minio
     tty: true
     image: ${OMLMINIO_IMG}
     command: server --console-address "localhost:9001" /data
@@ -419,6 +440,7 @@ services:
       retries: 3
 
   createbuckets:  
+    container_name: oml-minio_create_bucket
     depends_on:
       - minio
     tty: true
@@ -436,6 +458,7 @@ services:
       "
       
   pbxemulator:
+    container_name: oml-pbxemulator
     hostname: pbxemulator
     dns: 8.8.8.8
     environment:
@@ -454,6 +477,7 @@ services:
     tty: true
 
   videocalls:
+    container_name: oml-videocalls_phone
     dns: 8.8.8.8
     image: ${OMLVIDEOCALLS_WIDGET_IMG}
     environment:
