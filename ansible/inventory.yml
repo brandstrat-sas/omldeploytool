@@ -192,8 +192,11 @@ all:
     # --- Wombat Dialer API user & pass
     dialer_user: demoadmin
     dialer_password: demo
-    # --- is the time in seconds that will last the https session when inactivity
+    # --- Session Cookie Age, is the time in seconds that will last 
+    # --- the https session when inactivity
     SCA: 3600
+    # --- Session API token (seconds)
+    #api_token_expired_after: 3600
     # --- Ephemeral Credentials TTL (ECTTL) is the time in seconds            #
     # --- that will last the SIP credentials used to authenticate a SIP user  #
     # --- in the telephony system
@@ -355,8 +358,8 @@ all:
     # --- If you want to deploy OMniLeads Enterprise, you just need to add "-enterprise" as a suffix to the omnileads_img image tag
     # --- for example: omnileads_img: docker.io/omnileads/omlapp:240216.01-enterprise.
 
-    omnileads_img: docker.io/freetechsolutions/omlapp:241002.01-2779
-    asterisk_img: docker.io/freetechsolutions/asterisk:240920.01
+    omnileads_img: docker.io/omnileads/omlapp:241008.01
+    asterisk_img: docker.io/omnileads/asterisk:240920.01
 
 ##############################################################################################################
 ## -- In this section the hosts are grouped based on the type of deployment (AIO, Cluster & Cluster HA).  -- #
