@@ -116,6 +116,8 @@ services:
       - ${REPO_PATH}/omlami/ami.py:/app/ami.py  
 
   acd_config_retrieve:
+    build:
+      context: ${REPO_PATH}/acd_retrieve_conf
     image: ${OMLACD_RETRIEVE_CONF_IMG}
     container_name: oml-asterisk-conf-retrieve    
     depends_on:
@@ -148,6 +150,7 @@ services:
       - fastagi
     dns: 8.8.8.8
     environment:
+      - ENV=devenv
       - RABBITMQ_HOST=${RABBITMQ_HOSTNAME}
       - FASTAGI=${FASTAGI_HOSTNAME}
       - TZ=${TZ}
@@ -229,9 +232,10 @@ services:
     
   dialer_call_manager:
     container_name: oml-call_manager_dialer
-    image: ${OMLDIALER_CALL_MANAGER_IMG}
     build:
+      target: run
       context: ${REPO_PATH}/omldialer_call_manager
+    image: ${OMLDIALER_CALL_MANAGER_IMG}  
     depends_on:
       - dialer_asterisk
       - redis
@@ -248,7 +252,6 @@ services:
     networks:
       - omnileads  
     
-
   # voice_queue_delivery:
   #   image: ${OMLFASTAGI_IMG}
   #   container_name: oml-voice_queue_delivery
@@ -406,6 +409,47 @@ services:
       - ${REPO_PATH}/omlnginx/source/set_environment.sh:/docker-entrypoint.d/set_environment.sh
       - django_callrec_zip:/opt/omnileads/asterisk/var/spool/asterisk/monitor
 
+  rtpengine:
+    build:
+      target: run
+      context: ${REPO_PATH}/omlrtpengine
+    image: ${OMLRTPENGINE_IMG}
+    container_name: oml-rtpengine
+    dns: 8.8.8.8
+    environment:
+      - ENV=devenv
+      - TZ=${TZ}
+    networks:
+      - omnileads
+    privileged: true
+    restart: on-failure
+    stop_grace_period: 1m30s
+
+  websockets:
+    #build:
+    #  target: run
+    #  context: ${REPO_PATH}/omlwebsockets/etc/fts/oml/services/websockets
+    tty: true
+    container_name: oml-websockets
+    image: ${OMLWS_IMG}
+    depends_on:
+      - redis
+    environment:
+      - BIND_ADDRESS=0.0.0.0:8000
+      - EVENT_LOOP=uvloop
+      - LOGGERS=${WEBSOCKET_LOGGER}
+      - REDIS_HOST=${WEBSOCKET_REDIS_HOSTNAME}
+      - PYTHONUNBUFFERED=1
+    networks:
+      - omnileads
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health-checks"]
+      interval: 1s
+      timeout: 10s
+      retries: 10
+    volumes:
+      - ${REPO_PATH}/omlwebsockets/source/:/opt/services/webapp/src/
+
   postgresql:
     container_name: oml-postgres
     image: ${OMLPGSQL_IMG}
@@ -439,44 +483,6 @@ services:
     stop_grace_period: 1m30s
     volumes:
       - redis:/data
-
-  rtpengine:
-    build:
-      target: run
-      context: ${REPO_PATH}/omlrtpengine
-    image: ${OMLRTPENGINE_IMG}
-    container_name: oml-rtpengine
-    dns: 8.8.8.8
-    environment:
-      - ENV=devenv
-      - TZ=${TZ}
-    networks:
-      - omnileads
-    privileged: true
-    restart: on-failure
-    stop_grace_period: 1m30s
-
-  websockets:
-    tty: true
-    container_name: oml-websockets
-    image: ${OMLWS_IMG}
-    depends_on:
-      - redis
-    environment:
-      - BIND_ADDRESS=0.0.0.0:8000
-      - EVENT_LOOP=uvloop
-      - LOGGERS=${WEBSOCKET_LOGGER}
-      - REDIS_HOST=${WEBSOCKET_REDIS_HOSTNAME}
-      - PYTHONUNBUFFERED=1
-    networks:
-      - omnileads
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health-checks"]
-      interval: 1s
-      timeout: 10s
-      retries: 10
-    volumes:
-      - ${REPO_PATH}/omlwebsockets/source/:/opt/services/webapp/src/
 
   vue-cli:
     tty: true
@@ -521,11 +527,6 @@ services:
       - 9000:9000
     volumes:
       - minio:/data
-    # healthcheck:
-    #   test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
-    #   interval: 30s
-    #   timeout: 20s
-    #   retries: 3
 
   createbuckets:
     tty: true
@@ -546,6 +547,8 @@ services:
       "
 
   pbxemulator:
+    build:
+      context: ${REPO_PATH}/omlqa/pstn_emulator
     container_name: oml-pstn-emulator
     hostname: pbxemulator
     dns: 8.8.8.8
@@ -564,11 +567,13 @@ services:
     stop_grace_period: 1m30s
     tty: true
 
-  nginxcgi:
-    container_name: oml-nginx-cgi
+  nginx_qa:
+    build:
+      context: ${REPO_PATH}/omlqa/nginx
+    container_name: oml-nginxqa
+    image: ${OMLNGINXQA_IMG}
     hostname: nginxcgi
     dns: 8.8.8.8
-    image: omnileads/nginxqa:latest
     environment:
       - PGHOST=${PGHOST}
       - PGPASSWORD=${PGPASSWORD}
@@ -599,8 +604,8 @@ services:
     stdin_open: true
     stop_grace_period: 1m30s
     tty: true
-    volumes:
-      - ${REPO_PATH}/webphone_client_app/demo/:/usr/src/app
+    # volumes:
+    #   - ${REPO_PATH}/webphone_client_app/demo/:/usr/src/app
 
   pgadmin:
     container_name: pgadmin

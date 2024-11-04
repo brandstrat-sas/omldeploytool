@@ -22,34 +22,33 @@ REPO_PATH=./omnileads-repos
 #           versions of each image to deploy                #
 #############################################################
 
-REPO=omnileads
+REPO=repo
 
-OMLAPP_IMG=${REPO}/omlapp:240802.01
-OMLACD_IMG=freetechsolutions/asterisk:240728.dialer
-OMLACD_RETRIEVE_CONF_IMG=${REPO}/acd_retrieve_conf:240729.01
-OMLFASTAGI_IMG=${REPO}/fastagi:240228.01
-OMLAMI_IMG=${REPO}/astami:231230.01
-OMLNGINX_IMG=${REPO}/nginx:240705.01
-OMLKAM_IMG=${REPO}/kamailio:240625.01
-OMLRTPENGINE_IMG=${REPO}/rtpengine:240625.01
-OMLWS_IMG=${REPO}/websockets:240705.01
-OMLREDIS_IMG=${REPO}/redis:231125.01
-OMLSENTIMENT_IMG=${REPO}/sentiment_analysis:240427.01
-OMLINTERACTION_PROC_IMG=${REPO}/interaction_processor:240506.01
+# OML project img
+OMLAPP_IMG=${REPO}/omlapp:latest
+OMLACD_IMG=${REPO}/asterisk:latest
+OMLACD_RETRIEVE_CONF_IMG=${REPO}/acd_retrieve_conf:latest
+OMLFASTAGI_IMG=${REPO}/fastagi:latest
+OMLAMI_IMG=${REPO}/astami:latest
+OMLNGINX_IMG=${REPO}/nginx:latest
+OMLKAM_IMG=${REPO}/kamailio:latest
+OMLRTPENGINE_IMG=${REPO}/rtpengine:latest
+OMLWS_IMG=omnileads/websockets:240705.01
+OMLSENTIMENT_IMG=${REPO}/sentiment_analysis:latest
+OMLINTERACTION_PROC_IMG=${REPO}/interaction_processor:latest
+OMLDIALER_ACD_IMG=${REPO}/asterisk_dialer:latest
+OMLDIALER_CALL_MANAGER_IMG=${REPO}/call_manager_dialer:latest
 
-OMLDIALER_ACD_IMG=${REPO}/asterisk_dialer:240820.01
-OMLDIALER_CALL_MANAGER_IMG=freetechsolutions/omlcall_manager_dialer:240729.01
-
-OMLVIDEOCALLS_WIDGET_IMG=omnileads/videocalls_widget:230905.01
-OMLPSTNEMULATOR_IMG=omnileads/pstn_emulator:231118.01
-
-CX_SURVEY_REDIS2PGSQL_IMG=freetechsolutions/omlredis2pgsql:develop
-OMLVUEJS_IMG=freetechsolutions/vue-cli:develop
-
+# Backend generic img
 OMLPGSQL_IMG=postgres:14.9-bullseye
 OMLMINIO_IMG=quay.io/minio/minio:RELEASE.2023-09-27T15-22-50Z
-MARIADB_IMG=bitnami/mariadb:latest
-WOMBAT_IMG=freetechsolutions/wombat:21.06.4-9
+OMLREDIS_IMG=redislabs/redisgears:1.0.9
+
+# Development tools img
+OMLVIDEOCALLS_WIDGET_IMG=omnileads/videocalls_widget:230905.01
+OMLPSTNEMULATOR_IMG=${REPO}/pstn_emulator:latest
+OMLNGINXQA_IMG=${REPO}/nginxqa:latest
+OMLVUEJS_IMG=freetechsolutions/vue-cli:develop
 
 ################################
 # Timezone for the environment #
@@ -74,6 +73,8 @@ CALLREC_DEVICE=s3-minio
 DJANGO_HOSTNAME=app
 DAPHNE_HOSTNAME=channels
 
+UWSGI_PORT=8099
+DAPHNE_PORT=8098
 # Session Cookie Age (SCA) is the time in seconds that will last the https session when inactivity
 # is detected in the session (by default is 1 hour)
 SESSION_COOKIE_AGE=3600
@@ -181,6 +182,7 @@ NGINX_EXT_PORT=443
 # -----------------------------------------------------------------------------
 # --- IP or hostname that each instance will invoke when locating the other    
 REDIS_HOSTNAME=redis
+REDIS_PORT=6379
 
 # ------------------------------------------------------------------------------
 # --- IP or hostname that each instance will invoke when locating the other    
@@ -247,11 +249,26 @@ MYSQL_HOST=mariadb
 MYSQL_ROOT_PASS=admin123
 
 # --- OMni Dialer
+OML_DIALER_ENGINE=omnidialer
+OMNIDIALER_HOST=omnidialer-api:1440
 
-DIALER_ACD_SIP_USER=omnidialer
-DIALER_ACD_SIP_PASS=OMn1P455098#
-ACD_SIP_TRUNK_ADDR=acd:5060
-DIALER_ACD_HOST=dialer_acd
+# --- OMniLeads Dialer params
+### PSTN SIP gateway (for dialer_acd),son opcionales, solo en caso de sacar las llamadas
+### por un gateway PSTN en lugar de usar el OMLACD en caso de demandar escalabilidad.
+DIALER_PSTNGW_REGISTER=yes
+DIALER_PSTNGW_SIP_AUTH=yes
+DIALER_PSTNGW_SIP_USER=01177660020
+DIALER_PSTNGW_SIP_PASS=omnileads
+DIALER_PSTNGW_HOSTNAME=pbxemulator:5070
+
+### ACD omnileads asterisk (for dialer_acd)
+DIALER_OMLACD_SIP_HOSTNAME=asterisk:5260
+
+### Dialer omnileads asterisk (for call_manager WS)
+DIALER_ASTERISK_ARI_HOSTNAME=dialer_asterisk
+DIALER_ASTERISK_ARI_PORT=8888
+DIALER_ASTERISK_SIP_HOSTNAME=dialer_asterisk:5060
+
 
 #########################################################################################################
 #                                    VIDEOCALLS WIDGET                                                  #
