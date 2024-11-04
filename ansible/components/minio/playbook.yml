@@ -25,6 +25,8 @@
     - all_components
     - minio
     - install
+  vars:
+    minio_cmd: /usr/bin/minio_cmd
 
   tasks:
 
@@ -80,41 +82,57 @@
   - name: MINIO install command line client
     get_url:
       url: https://dl.min.io/client/mc/release/linux-amd64/mc
-      dest: /usr/bin/minio_cmd
+      dest: '{{ minio_cmd }}'
       mode: '0777'
 
   - name: MINIO instance alias minio cluster to manage
-    shell: "/usr/bin/minio_cmd alias set MINIO http://{{ data_host }}:9000 '{{ s3_http_admin_user }}' '{{ s3_http_admin_pass }}'"
+    shell: "{{ minio_cmd }} alias set MINIO http://{{ data_host }}:9000 '{{ s3_http_admin_user }}' '{{ s3_http_admin_pass }}'"
     args:
       executable: /bin/bash
-    when: inventory_hostname in groups['omnileads_data']
+    when: 
+      - omnileads_ha is not defined
+      - inventory_hostname in groups['omnileads_data']
 
   - name: MINIO instance alias minio AIO to manage
-    shell: "/usr/bin/minio_cmd alias set MINIO http://localhost:9000 '{{ s3_http_admin_user }}' '{{ s3_http_admin_pass }}'"
+    shell: "{{ minio_cmd }} alias set MINIO http://localhost:9000 '{{ s3_http_admin_user }}' '{{ s3_http_admin_pass }}'"
     args:
       executable: /bin/bash
-    when: inventory_hostname in groups['omnileads_aio']
+    when: 
+      - omnileads_ha is not defined
+      - inventory_hostname in groups['omnileads_aio']
 
   - name: MINIO check if bucket exist
-    shell: "/usr/bin/minio_cmd ls MINIO/{{ bucket_name }}"
+    shell: "{{ minio_cmd }} ls MINIO/{{ bucket_name }}"
     args:
       executable: /bin/bash
     register: bucket_exist
-    ignore_errors: yes
-
+    ignore_errors: true
+    when: 
+      - omnileads_ha is not defined
+    
   - name: MINIO create bucket
-    shell: "/usr/bin/minio_cmd mb MINIO/{{ bucket_name }}"
+    shell: "{{ minio_cmd }} mb MINIO/{{ bucket_name }}"
     args:
       executable: /bin/bash
-    when: bucket_exist.rc != 0
+    when: 
+      - bucket_exist.rc is defined and bucket_exist.rc != 0
+      - omnileads_ha is not defined
     
   - name: MINIO create user and secret access keys
-    shell: "/usr/bin/minio_cmd admin user add MINIO {{ bucket_access_key }} {{ bucket_secret_key }}"
+    shell: "{{ minio_cmd }} admin user add MINIO {{ bucket_access_key }} {{ bucket_secret_key }}"
     args:
       executable: /bin/bash
+    when: 
+      - omnileads_ha is not defined
 
   - name: MINIO attach readwrite policy to key-user created
-    shell: "/usr/bin/minio_cmd admin policy attach MINIO readwrite --user {{ bucket_access_key }}"
+    shell: "{{ minio_cmd }} admin policy attach MINIO readwrite --user {{ bucket_access_key }}"
     args:
       executable: /bin/bash
-    ignore_errors: yes
+    ignore_errors: true
+    when: 
+      - omnileads_ha is not defined
+
+- name: MINIO Include High Availability playbook
+  import_playbook: ha.yml
+  when: omnileads_ha is defined

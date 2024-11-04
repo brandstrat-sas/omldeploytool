@@ -108,44 +108,28 @@ all:
     ha_instances:
       children:
         tenant_example_7:
-          hosts:
-            tenant_example_7_sql_A:
-              tenant_id: tenant_example_7_sql_A
-              ansible_host: 172.16.101.101
-              omni_ip_lan: 172.16.101.101              
-              ha_rol: main
-            tenant_example_7_sql_B:
-              tenant_id: tenant_example_7_sql_B
-              ansible_host: 172.16.101.102
-              omni_ip_lan: 172.16.101.102
-              ha_rol: backup
+          hosts:              
             tenant_example_7_aio_A:
               tenant_id: tenant_example_7_aio_A
-              ansible_host: 172.16.101.109
-              omni_ip_lan: 172.16.101.109
-              ha_rol: main
+              ansible_host: 172.16.101.103
+              omni_ip_lan: 172.16.101.103
+              ha_role: main
             tenant_example_7_aio_B:
               tenant_id: tenant_example_7_aio_B
-              ansible_host: 172.16.101.110
-              omni_ip_lan: 172.16.101.110
-              ha_rol: backup              
-          vars:            
-            infra_env: lan
+              ansible_host: 172.16.101.104
+              omni_ip_lan: 172.16.101.104
+              ha_role: backup                            
+          vars:                        
             omnileads_ha: true
-            netaddr: 172.16.101.0/16
-            netprefix: 16
-            ha_vip_nic: ens18             
-            postgres_1: 172.16.101.101
-            postgres_2: 172.16.101.102
-            aio_1: 172.16.101.109
-            aio_2: 172.16.101.110
-            omnileads_vip: 172.16.101.200
-            postgres_rw_vip: 172.16.101.201
-            postgres_ro_vip: 172.16.101.202
-            bucket_url: https://172.16.101.3:9000
-            bucket_access_key: mYLcr7sx5vEbe7PO
-            bucket_secret_key: v1Dl34Q29Bv6ruaWS7cUAEvSVfAtvGkR
-            bucket_name: tenant_example_7
+            ha_vip_nic: ens18 
+            netaddr: 172.16.101.0/24
+            netprefix: 24                        
+            aio_1: 172.16.101.103
+            aio_2: 172.16.101.104
+            omnileads_vip: 172.16.101.205            
+            postgres_rw_vip: 172.16.101.206
+            postgres_ro_vip: 172.16.101.207   
+            infra_env: lan
 
 ##################################################################################################################
 # -- OMniLeads Common Variables                                                                                  #
@@ -208,8 +192,11 @@ all:
     # --- Wombat Dialer API user & pass
     dialer_user: demoadmin
     dialer_password: demo
-    # --- is the time in seconds that will last the https session when inactivity
+    # --- Session Cookie Age, is the time in seconds that will last 
+    # --- the https session when inactivity
     SCA: 3600
+    # --- Session API token (seconds)
+    #api_token_expired_after: 3600
     # --- Ephemeral Credentials TTL (ECTTL) is the time in seconds            #
     # --- that will last the SIP credentials used to authenticate a SIP user  #
     # --- in the telephony system
@@ -315,6 +302,44 @@ all:
     #kamailio_shm_size: 64
     #kamailio_pkg_size: 8
 
+    # Postgres performance tuning
+    # https://wiki.postgresql.org/wiki/Tuning_Your_PostgreSQL_Server
+    #scale_postgres: True
+    #postgres_max_connections: 20 # max(4 * number of CPU cores, 100)
+    #postgres_shared_buffers: 1GB #  Min 128kB Max 25% of total MEM RAM 
+    #postgres_statement_timeout: 60000 # query timeout in milliseconds, 0 is disabled
+    #postgres_effective_cache_size: 4GB # between 50% and 75% of total MEM RAM
+    #postgres_wal_buffers: 32MB # between 64KB & 16MB
+    #postgres_checkpoint_timeout: 10min # range 30s-1d s (sec), min (minutes), h (hour) or d (days)
+    #postgres_work_mem:  12MB # Increase the working memory to allow for more complex query operations
+    #postgres_maintenance_work_mem: 128MB # Increase the maintenance memory to speed up vacuum and index creation operations
+
+    # Redis performance tuning
+    # https://loadforge.com/guides/enhancing-redis-performance-top-configuration-tweaks-to-accelerate-data-access
+    #scale_redis: True
+    #redis_maxmemory: 2gb
+    #redis_maxmemory_policy: allkeys-lru
+    #redis_tcp_backlog: 511
+    #redis_maxclients: 2000
+    #redis_lazyfree_lazy_eviction: yes
+    #redis_lazyfree_lazy_expire: yes
+
+
+    # ------------------------------------------------------------------------------------------------ #
+    # ---------------------------------- Backup Automation ------------------------------------------- #
+    # ------------------------------------------------------------------------------------------------ #
+
+    # Enable daily PostgreSQL Database backups into centralized Object Storage bucket
+
+    # backup_bucket_url: https://sfo3.digitaloceanspaces.com
+    # backup_bucket_name: your-tenants-backup-bucket
+    # backup_bucket_key_id: lfkdhsfjkldhsjkh54jkh5jk3h4jk5h34
+    # backup_bucket_secret_key: KkjhjkKJHJKH78678hjghjgHJGHJjhghjgjhjg67567
+
+    # Time format from 00:00 to 23:59
+    # cron_backup_mm: 00
+    # cron_backup_hh: 01 
+
     # ------------------------------------------------------------------------------------------------ #
     # ------------------------------------ Upgrade from OML 1.X -------------------------------------- #
     # ------------------------------------ Restore filename ------------------------------------------ #
@@ -333,8 +358,8 @@ all:
     # --- If you want to deploy OMniLeads Enterprise, you just need to add "-enterprise" as a suffix to the omnileads_img image tag
     # --- for example: omnileads_img: docker.io/omnileads/omlapp:240216.01-enterprise.
 
-    omnileads_img: docker.io/omnileads/omlapp:240829.01
-    asterisk_img: docker.io/omnileads/asterisk:240728.01
+    omnileads_img: docker.io/omnileads/omlapp:241008.01
+    asterisk_img: docker.io/omnileads/asterisk:240920.01
 
 ##############################################################################################################
 ## -- In this section the hosts are grouped based on the type of deployment (AIO, Cluster & Cluster HA).  -- #
@@ -349,26 +374,30 @@ omnileads_aio:
     #tenant_example_2:
     #tenant_example_3:
     #tenant_example_4:
+    #tenant_example_5:
+
+################ Active/Pasive HA cluster ######################
+################ Active/Pasive HA cluster ######################
+
     #tenant_example_7_HA_1:
     #tenant_example_7_HA_2:
-################################################    
+
+##################### 3 Host cluster ###########################    
+##################### 3 Host cluster ###########################    
 
 omnileads_data:
   hosts:
     #tenant_example_5_data:  
+    #tenant_example_6_data:  
     
 omnileads_voice:
   hosts:
     #tenant_example_5_voice:
+    #tenant_example_6_voice:
 
 omnileads_app:
   hosts:
     #tenant_example_5_app:
+    #tenant_example_6_app:
 
-################################################
 
-ha_omnileads_sql:
-  hosts:
-    #tenant_example_7_HA_1:
-    #tenant_example_7_HA_2:
-    

@@ -1,4 +1,4 @@
-# qa_repoCopyright (C) 2024 Freetech Solutions
+# Copyright (C) 2024 Freetech Solutions
 
 # This file is part of OMniLeads
 
@@ -28,27 +28,18 @@
 
   tasks:
 
-  - name: ADDON SURVEY from REDIS to Postgres Pull image
-    command: podman pull --quiet {{ survey_worker_img }}
-    register: podman_pull
-    until: podman_pull is success
-    tags:
-      - install
-      - upgrade
-      - update
-
-  - name: ADDON SURVEY Copy REDIS2POSTGRES systemd service
+  - name: ADDON WALLBOARD Copy systemd service
     template:
-      src: "{{ addons_repo_path }}templates/survey_worker.service"
-      dest: /etc/systemd/system/survey_worker.service
+      src: "{{ addons_repo_path }}templates/wallboard_listener.service"
+      dest: /etc/systemd/system/wallboard_listener.service
     tags:
       - install
       - upgrade
       - update
 
-  - name: ADDON SURVEY Redis2Postgres Enable and start systemd service
+  - name: ADDON WALLBOARD Enable and start systemd service
     systemd:
-      name: survey_worker.service
+      name: wallboard_listener.service
       state: restarted
       enabled: yes
       daemon_reload: yes

@@ -2,17 +2,18 @@
 
 #################### containers img tags  ################################
 
-fastagi_img: docker.io/omnileads/fastagi:240228.01
+fastagi_img: docker.io/omnileads/fastagi:241017.01
 sentiment_analysis_img: docker.io/omnileads/sentiment_analysis:240427.01
 interaction_processor_img: docker.io/omnileads/interaction_processor:240506.01
 asterisk_retrieve_conf_img: docker.io/omnileads/acd_retrieve_conf:240729.01
-astami_img: docker.io/omnileads/astami:231230.01
-nginx_img: docker.io/omnileads/nginx:240705.01
+astami_img: docker.io/omnileads/astami:241017.01
+nginx_img: docker.io/omnileads/nginx:241009.01
 websockets_img: docker.io/omnileads/websockets:240705.01
 kamailio_img: docker.io/omnileads/kamailio:240625.01
 rtpengine_img: docker.io/omnileads/rtpengine:240625.01
 redis_img: docker.io/omnileads/redis:231125.01
 postgres_img: docker.io/postgres:14.9-bullseye
+postgres_ha_img: docker.io/omnileads/postgres:240902.02
 #postgres_img: docker.io/omnileads/postgres:230624.01 # for upgrade from centos7 1.X
 prometheus_img: docker.io/prom/prometheus:v2.49.1
 prometheus_node_exp_img: docker.io/prom/node-exporter:v1.7.0
@@ -28,6 +29,7 @@ wombat_img: docker.io/freetechsolutions/wombat:21.06.4-9
 mysql_img: docker.io/bitnami/mariadb:latest
 survey_worker_img: docker.io/omnileads/survey_worker:231201.01
 certbot_img: docker.io/omnileads/certbot:240201.01
+haproxy_img: docker.io/omnileads/2.0-buster
 
 ################ Some components NETWORKING ports ########################
 
@@ -61,7 +63,7 @@ USUARIO: omnileads
 MONITORFORMAT: mp3
 redis_ha_version: develop
 haproxy_version: 2.0-buster
-centos_postgresql_version: 11
+ha_postgresql_version: 14
 postgres_homer_db: homer7
 schedule: Agenda
 usuario: omnileads

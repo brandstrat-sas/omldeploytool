@@ -1,18 +1,18 @@
 [Unit]
 Description=Podman asterisk.service
 Documentation=man:podman-generate-systemd(1)
-Wants=network-online.target
-After=network-online.target
+Wants=network-online.target asterisk_retrieve_conf.service
+After=network-online.target asterisk_retrieve_conf.service
 RequiresMountsFor=%t/containers
 
 [Service]
 Environment=PODMAN_SYSTEMD_UNIT=%n
 Restart=on-failure
 TimeoutStopSec=70
-{% if scale_asterisk is defined %}
-MemoryLimit={{ asterisk_mem_limit }}
+{% if scale_asterisk is defined and scale_asterisk %}
+MemoryMax={{ asterisk_mem_limit }}
 {% else %}
-MemoryLimit=
+MemoryMax=
 {% endif %}
 ExecStartPre=/bin/rm -f %t/%n.ctr-id
 {% if tts_external_engine is defined and tts_external_engine == "gcp" %}  

@@ -21,7 +21,7 @@ ExecStart=/usr/bin/podman run \
   -v /etc/omnileads/hap.pem:/etc/haproxy/certs/hap.pem:ro \
   --name=oml-haproxy-server \
   --network=host \
-  {{ container_image_registry }}/haproxy:{{ haproxy_version }} 
+  {{ haproxy_img }} 
 ExecStop=/usr/bin/podman stop --ignore --cidfile=%t/%n.ctr-id
 ExecStopPost=/usr/bin/podman rm -f --ignore --cidfile=%t/%n.ctr-id
 Type=notify
