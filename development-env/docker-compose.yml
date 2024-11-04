@@ -197,6 +197,29 @@ services:
       - asterisk_conf:/home/omnileads/astconf
       - asterisk_sounds:/home/omnileads/sounds
 
+  acd_config_retrieve:
+    image: ${OMLACD_RETRIEVE_CONF_IMG}
+    container_name: oml-asterisk-conf-retrieve    
+    depends_on:      
+      - nginx
+      - redis
+    dns: 8.8.8.8
+    environment:
+      - TZ=${TZ}
+      - ASTERISK_LOCATION=
+      - ARI_HOST=acd
+      - ARI_USER=omnileadsami
+      - ARI_PASS=5_MeO_DMT
+      - OMNILEADS_HOSTNAME=${OMNILEADS_HOSTNAME}
+    networks:
+      - omnileads
+    privileged: true
+    restart: on-failure
+    stop_grace_period: 1m30s
+    volumes:
+      - asterisk_conf:/home/omnileads/astconf
+      - asterisk_sounds:/home/omnileads/sounds
+
   acd:
     build:
       target: run
