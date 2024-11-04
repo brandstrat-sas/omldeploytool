@@ -720,7 +720,7 @@ We can use asterisk_mem_limit to limit the amount of memory the process can cons
 By setting the scale_asterisk value on the inventory.yml host or group, you enable the ability to specify some params.
 
 ```
-scale_asterisk: true
+scale_asterisk: True
   asterisk_mem_limit: 1G
   pjsip_threadpool_idle_timeout: 120
   pjsip_threadpool_max_size: 150
@@ -733,7 +733,7 @@ This is the application server that powers the OMniLeads Django application.
 By setting the scale_uwsgi value on the host or group, you enable the ability to specify the number of processes and threads it will handle.
 
 ```
-scale_uwsgi: true
+scale_uwsgi: True
   processes: 8
   threads: 1 
 ```
