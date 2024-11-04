@@ -11,54 +11,10 @@ services:
       - acd
       - minio
     dns: 8.8.8.8
+    env_file: .env
     environment:
       - DJANGO_ALLOW_ASYNC_UNSAFE=true
       - CRON_ENABLE=false
-      - TZ=${TZ}
-      - ASTERISK_HOSTNAME=${ASTERISK_HOSTNAME}
-      - AMI_USER=${AMI_USER}
-      - AMI_PASSWORD=${AMI_PASSWORD}
-      - KAMAILIO_HOSTNAME=${KAMAILIO_HOSTNAME}
-      - PGHOST=${PGHOST}
-      - PGDATABASE=${PGDATABASE}
-      - PGPORT=${PGPORT}
-      - PGUSER=${PGUSER}
-      - PGPASSWORD=${PGPASSWORD}
-      - PGHOSTHA=${PGHOSTHA}
-      - PGHOSTRO=${PGHOSTRO}
-      - REDIS_HOSTNAME=${REDIS_HOSTNAME}
-      - WEBSOCKET_HOST=${WEBSOCKET_HOSTNAME}
-      - WEBSOCKET_PORT=${WEBSOCKET_PORT}
-      - CALIFICACION_REAGENDA=${CALIFICACION_REAGENDA}
-      - DJANGO_SETTINGS_MODULE=${DJANGO_SETTINGS_MODULE}
-      - EPHEMERAL_USER_TTL=${EPHEMERAL_USER_TTL}
-      - INSTALL_PREFIX=${INSTALL_PREFIX}
-      - LOGIN_FAILURE_LIMIT=${LOGIN_FAILURE_LIMIT}
-      - OMNILEADS_HOSTNAME=${OMNILEADS_HOSTNAME}
-      - PYTHONPATH=${PYTHONPATH}
-      - SESSION_COOKIE_AGE=${SESSION_COOKIE_AGE}
-      - CALLREC_DEVICE=${CALLREC_DEVICE}
-      - MONITORFORMAT=mp3
-      - S3_STORAGE_ENABLED=true
-      - S3_BUCKET_NAME=${S3_BUCKET_NAME}
-      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
-      - S3_ENDPOINT=${S3_ENDPOINT}
-      - S3_ENDPOINT_MINIO=${S3_ENDPOINT_MINIO}
-      - AWS_DEFAULT_REGION=us-east-1
-      - GOOGLE_MAPS_API_KEY=${GOOGLE_MAPS_API_KEY}
-      - GOOGLE_MAPS_CENTER='${GOOGLE_MAPS_CENTER}'
-      - EMAIL_BACKEND=django.core.mail.backends.dummy.EmailBackend
-      - OML_BRANCH=${OML_BRANCH}
-      - OML_COMMIT=${OML_COMMIT}
-      - OML_BUILD_DATE=${OML_BUILD_DATE}
-      - WOMBAT_HOSTNAME=wombat
-      - WOMBAT_USER=${WOMBAT_USER}
-      - WOMBAT_PASSWORD=${WOMBAT_PASSWORD}
-      - OML_LOGGING_SLOWSQL_ENABLED=
-      - OML_LOGGING_SLOWSQL_OUTPUT="-"
-      - OML_LOGGING_SLOWSQL_DURATION=1
-    #image: ${OMLAPP_IMG}
     command: /opt/omnileads/bin/init_devenv.sh
     networks:
       - omnileads
@@ -76,55 +32,17 @@ services:
       - ${REPO_PATH}/premium_reports_app/:/opt/omnileads/ominicontacto/premium_reports_app
       - ${REPO_PATH}/webphone_client_app/:/opt/omnileads/ominicontacto/webphone_client_app
 
-  crones:
-    container_name: oml-django-cron
+  daphne:
+    container_name: oml-daphne
+    depends_on:
+      - redis    
     dns: 8.8.8.8
+    env_file: .env
     environment:
-      - TZ=${TZ}
-      - ASTERISK_HOSTNAME=${ASTERISK_HOSTNAME}
-      - AMI_USER=${AMI_USER}
-      - AMI_PASSWORD=${AMI_PASSWORD}
-      - KAMAILIO_HOSTNAME=${KAMAILIO_HOSTNAME}
-      - PGHOST=${PGHOST}
-      - PGDATABASE=${PGDATABASE}
-      - PGPORT=${PGPORT}
-      - PGUSER=${PGUSER}
-      - PGPASSWORD=${PGPASSWORD}
-      - PGHOSTHA=${PGHOSTHA}
-      - PGHOSTRO=${PGHOSTRO}
-      - REDIS_HOSTNAME=${REDIS_HOSTNAME}
-      - WEBSOCKET_HOST=${WEBSOCKET_HOSTNAME}
-      - WEBSOCKET_PORT=${WEBSOCKET_PORT}
-      - CALIFICACION_REAGENDA=${CALIFICACION_REAGENDA}
-      - DJANGO_SETTINGS_MODULE=${DJANGO_SETTINGS_MODULE}
-      - EPHEMERAL_USER_TTL=${EPHEMERAL_USER_TTL}
-      - INSTALL_PREFIX=${INSTALL_PREFIX}
-      - LOGIN_FAILURE_LIMIT=${LOGIN_FAILURE_LIMIT}
-      - OMNILEADS_HOSTNAME=${OMNILEADS_HOSTNAME}
-      - PYTHONPATH=${PYTHONPATH}
-      - SESSION_COOKIE_AGE=${SESSION_COOKIE_AGE}
-      - CALLREC_DEVICE=${CALLREC_DEVICE}
-      - MONITORFORMAT=mp3
-      - S3_STORAGE_ENABLED=true
-      - S3_BUCKET_NAME=${S3_BUCKET_NAME}
-      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
-      - S3_ENDPOINT=${S3_ENDPOINT_MINIO}
-      - AWS_DEFAULT_REGION=us-east-1
-      - GOOGLE_MAPS_API_KEY=${GOOGLE_MAPS_API_KEY}
-      - GOOGLE_MAPS_CENTER='${GOOGLE_MAPS_CENTER}'
-      - EMAIL_BACKEND=django.core.mail.backends.dummy.EmailBackend
-      - OML_BRANCH=${OML_BRANCH}
-      - OML_COMMIT=${OML_COMMIT}
-      - OML_BUILD_DATE=${OML_BUILD_DATE}
-      - WOMBAT_HOSTNAME=localhost
-      - WOMBAT_USER=${WOMBAT_USER}
-      - WOMBAT_PASSWORD=${WOMBAT_PASSWORD}
-      - OML_LOGGING_SLOWSQL_ENABLED=
-      - OML_LOGGING_SLOWSQL_OUTPUT="-"
-      - OML_LOGGING_SLOWSQL_DURATION=1
+      - DAPHNE_ENABLE=True
+      - DJANGO_HOSTNAME=daphne
     image: ${OMLAPP_IMG}
-    command: /opt/omnileads/bin/init_cronos.sh
+    command: /opt/omnileads/bin/init_daphne.sh
     networks:
       - omnileads
     privileged: true
@@ -132,7 +50,30 @@ services:
     stdin_open: true
     stop_grace_period: 1m30s
     tty: true
-    working_dir: /opt/omnileads/
+    working_dir: /opt/omnileads/ominicontacto
+
+  omlcron:
+    container_name: oml-cron
+    depends_on:
+      - postgresql
+      - asterisk 
+      - minio
+      - redis
+    dns: 8.8.8.8
+    env_file: .env
+    environment:
+      - UWSGI_PORT=8097
+      - DJANGO_HOSTNAME=omlcron
+    image: ${OMLAPP_IMG}
+    command: /opt/omnileads/bin/docker-entrypoint.sh
+    networks:
+      - omnileads
+    privileged: true
+    restart: on-failure
+    stdin_open: true
+    stop_grace_period: 1m30s
+    tty: true
+    working_dir: /opt/omnileads
 
   fastagi:
     build:
@@ -149,12 +90,12 @@ services:
       - PGDATABASE=${PGDATABASE}
       - PGPASSWORD=${PGPASSWORD}
       - REDIS_HOSTNAME=${REDIS_HOSTNAME}
-      - REDIS_PORT=6379
-    volumes:
-      - ${REPO_PATH}/omlfastagi/fastagi.py:/app/fastagi.py
+      - REDIS_PORT=${REDIS_PORT}    
     restart: on-failure
     networks:
       - omnileads
+    volumes:
+      - ${REPO_PATH}/omlfastagi/fastagi.py:/app/fastagi.py  
 
   ami:
     build:
@@ -168,11 +109,11 @@ services:
       - AMI_USER=${AMI_USER}
       - AMI_PASSWORD=${AMI_PASSWORD}
       - REDIS_HOSTNAME=${REDIS_HOSTNAME}
-    restart: on-failure
-    volumes:
-      - ${REPO_PATH}/omlami/ami.py:/app/ami.py
+    restart: on-failure    
     networks:
       - omnileads
+    volumes:
+      - ${REPO_PATH}/omlami/ami.py:/app/ami.py  
 
   acd_config_retrieve:
     image: ${OMLACD_RETRIEVE_CONF_IMG}
