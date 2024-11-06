@@ -32,7 +32,7 @@ OMLSENTIMENT_IMG=${REPO}/sentiment_analysis:240427.01
 OMLINTERACTION_PROC_IMG=${REPO}/interaction_processor:240506.01
 
 OMLDIALER_ACD_IMG=freetechsolutions/asterisk_dialer:241025.01
-OMLDIALER_CALL_MANAGER_IMG=freetechsolutions/call_manager_dialer:241105.01
+OMLDIALER_CALL_MANAGER_IMG=omnileads/omlcall_manager_dialer:241105.01
 
 OMLPSTNEMULATOR_IMG=${REPO}/pstn_emulator:241028.01
 OMLVIDEOCALLS_WIDGET_IMG=${REPO}/videocalls_widget:230905.01
@@ -66,6 +66,19 @@ CALLREC_DEVICE=s3-minio
 # --- IP or hostname that each instance will invoke when locating the other    
 DJANGO_HOSTNAME=uwsgi
 DAPHNE_HOSTNAME=daphne
+
+# Scale UWSGI
+UWSGI_CUSTOM=True
+#UWSGI_PROCESSES=4
+#UWSGI_THREADS=1
+#UWSGI_LISTEN_QUEUE_SIZE=2048
+#UWSGI_WORKER_RELOAD_MERCY=60
+#UWSGI_MAX_WORKER_LIFETIME=7200
+#UWSGI_MAX_WORKER_LIFETIME_DELTA=300
+#UWSGI_RELOAD_ON_RSS=1024
+#UWSGI_RELOAD_ON_AS=2048
+#UWSGI_EVIL_RELOAD_ON_RSS=3096
+#UWSGI_MAX_REQUESTS=2000
 
 # Session Cookie Age (SCA) is the time in seconds that will last the https session when inactivity
 # is detected in the session (by default is 1 hour)
