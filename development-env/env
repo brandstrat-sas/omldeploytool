@@ -304,8 +304,8 @@ MODEL=local
 #######################################################################################
 # Subnet for the docker bridge network, change it if this subnet conflicts with yours #
 #######################################################################################
-SUBNET=10.12.12.0/24
-GATEWAY=10.12.12.254
+SUBNET=10.22.22.0/24
+GATEWAY=10.22.22.254
 
 ###########################
 # Django default settings #
