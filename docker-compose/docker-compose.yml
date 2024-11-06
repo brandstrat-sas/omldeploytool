@@ -238,8 +238,6 @@ services:
     
   dialer_call_manager:
     container_name: oml-call_manager_dialer
-    build:
-      context: ../development-env/omnileads-repos/omldialer_call_manager
     depends_on:
       - dialer_asterisk
       - redis

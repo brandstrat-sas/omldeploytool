@@ -16,9 +16,9 @@ PUBLIC_IP=
 #           versions of each image to deploy                #
 #############################################################
 
-REPO=omnileads
+REPO=docker.io/omnileads
 
-OMLAPP_IMG=${REPO}/omlapp:241008.01-enterprise
+OMLAPP_IMG=freetechsolutions/omlapp:241105.01
 OMLACD_IMG=freetechsolutions/asterisk:241027.dialer
 OMLACD_RETRIEVE_CONF_IMG=${REPO}/acd_retrieve_conf:240729.01
 OMLFASTAGI_IMG=${REPO}/fastagi:241017.01
@@ -32,7 +32,7 @@ OMLSENTIMENT_IMG=${REPO}/sentiment_analysis:240427.01
 OMLINTERACTION_PROC_IMG=${REPO}/interaction_processor:240506.01
 
 OMLDIALER_ACD_IMG=freetechsolutions/asterisk_dialer:241025.01
-OMLDIALER_CALL_MANAGER_IMG=freetechsolutions/omlcall_manager_dialer:241105.01
+OMLDIALER_CALL_MANAGER_IMG=freetechsolutions/call_manager_dialer:241105.01
 
 OMLPSTNEMULATOR_IMG=${REPO}/pstn_emulator:241028.01
 OMLVIDEOCALLS_WIDGET_IMG=${REPO}/videocalls_widget:230905.01
@@ -228,11 +228,18 @@ WOMBAT_HOSTNAME=wombat
 
 WOMBAT_USER=demoadmin
 WOMBAT_PASSWORD=demo
+OML_WOMBAT_USER=demoadmin
 
 # --- Wombat Dialer mysql params
 WOMBAT_DB=wombat
 WOMBAT_DB_USER=wombat
 WOMBAT_DB_PASS=dials
+
+MYSQL_HOST=mariadb
+MYSQL_ROOT_PASS=admin123
+
+OML_DIALER_ENGINE=omnidialer
+OMNIDIALER_HOST=omnidialer-api:1440
 
 # --- OMniLeads Dialer params
 ### PSTN SIP gateway (for dialer_acd),son opcionales, solo en caso de sacar las llamadas
