@@ -23,6 +23,28 @@ services:
       - django_static:/opt/omnileads/static
       - django_callrec_zip:/opt/omnileads/asterisk/var/spool/asterisk/monitor
 
+  django_commands:
+    depends_on:
+      - postgresql
+      - redis
+      - asterisk
+      - minio
+    dns: 8.8.8.8
+    env_file: .env    
+    image: ${OMLAPP_IMG}
+    command: /opt/omnileads/bin/django_commands.sh
+    networks:
+      - omnileads
+    privileged: true
+    #restart: on-failure
+    stdin_open: true
+    stop_grace_period: 1m30s
+    tty: true
+    working_dir: /opt/omnileads/ominicontacto
+    volumes:
+      - django_static:/opt/omnileads/static
+      - django_callrec_zip:/opt/omnileads/asterisk/var/spool/asterisk/monitor
+
   daphne:
     container_name: oml-daphne
     depends_on:
