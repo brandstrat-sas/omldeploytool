@@ -25,19 +25,19 @@ REPO_PATH=./omnileads-repos
 REPO=repo
 
 # OML project img
-OMLAPP_IMG=${REPO}/omlapp:latest
-OMLACD_IMG=${REPO}/asterisk:latest
-OMLACD_RETRIEVE_CONF_IMG=${REPO}/acd_retrieve_conf:latest
-OMLFASTAGI_IMG=${REPO}/fastagi:latest
-OMLAMI_IMG=${REPO}/astami:latest
-OMLNGINX_IMG=${REPO}/nginx:latest
-OMLKAM_IMG=${REPO}/kamailio:latest
-OMLRTPENGINE_IMG=${REPO}/rtpengine:latest
+OMLAPP_IMG=${REPO}/omlapp:dev
+OMLACD_IMG=${REPO}/asterisk:dev
+OMLACD_RETRIEVE_CONF_IMG=${REPO}/acd_retrieve_conf:dev
+OMLFASTAGI_IMG=${REPO}/fastagi:dev
+OMLAMI_IMG=${REPO}/astami:dev
+OMLNGINX_IMG=${REPO}/nginx:dev
+OMLKAM_IMG=${REPO}/kamailio:dev
+OMLRTPENGINE_IMG=${REPO}/rtpengine:dev
 OMLWS_IMG=omnileads/websockets:240705.01
-OMLSENTIMENT_IMG=${REPO}/sentiment_analysis:latest
-OMLINTERACTION_PROC_IMG=${REPO}/interaction_processor:latest
-OMLDIALER_ACD_IMG=${REPO}/asterisk_dialer:latest
-OMLDIALER_CALL_MANAGER_IMG=${REPO}/call_manager_dialer:latest
+OMLSENTIMENT_IMG=${REPO}/sentiment_analysis:dev
+OMLINTERACTION_PROC_IMG=${REPO}/interaction_processor:dev
+OMLDIALER_ACD_IMG=${REPO}/asterisk_dialer:dev
+OMLDIALER_CALL_MANAGER_IMG=${REPO}/call_manager_dialer:dev
 
 # Backend generic img
 OMLPGSQL_IMG=postgres:14.9-bullseye
@@ -46,8 +46,8 @@ OMLREDIS_IMG=redislabs/redisgears:1.0.9
 
 # Development tools img
 OMLVIDEOCALLS_WIDGET_IMG=omnileads/videocalls_widget:230905.01
-OMLPSTNEMULATOR_IMG=${REPO}/pstn_emulator:latest
-OMLNGINXQA_IMG=${REPO}/nginxqa:latest
+OMLPSTNEMULATOR_IMG=${REPO}/pstn_emulator:dev
+OMLNGINXQA_IMG=${REPO}/nginxqa:dev
 OMLVUEJS_IMG=freetechsolutions/vue-cli:develop
 
 ################################
