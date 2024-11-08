@@ -369,8 +369,8 @@ services:
     privileged: true
     restart: on-failure
     stop_grace_period: 1m30s
-    volumes:
-      - ${REPO_PATH}/omlkamailio/source:/etc/kamailio:ro
+    #volumes:
+    #  - ${REPO_PATH}/omlkamailio/source:/etc/kamailio:ro
 
   nginx:
     build:

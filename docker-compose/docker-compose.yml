@@ -13,6 +13,8 @@ services:
     command: /opt/omnileads/bin/init_uwsgi.sh
     networks:
       - omnileads
+    ports:
+      - 8099:8099  
     privileged: true
     restart: on-failure
     stdin_open: true
@@ -281,8 +283,6 @@ services:
 
   kamailio:
     container_name: oml-kamailio
-    command:
-      - /bin/bash
     depends_on:
       - redis
       - asterisk
