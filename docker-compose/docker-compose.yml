@@ -18,7 +18,7 @@ services:
     privileged: true
     restart: on-failure
     stdin_open: true
-    stop_grace_period: 1m30s
+    stop_grace_period: 30s
     tty: true
     working_dir: /opt/omnileads/ominicontacto
     volumes:
@@ -40,7 +40,7 @@ services:
     privileged: true
     #restart: on-failure
     stdin_open: true
-    stop_grace_period: 1m30s
+    stop_grace_period: 30s
     tty: true
     working_dir: /opt/omnileads/ominicontacto
     volumes:
@@ -63,7 +63,7 @@ services:
     privileged: true
     restart: on-failure
     stdin_open: true
-    stop_grace_period: 1m30s
+    stop_grace_period: 30s
     tty: true
     working_dir: /opt/omnileads/ominicontacto
 
@@ -86,7 +86,7 @@ services:
     privileged: true
     restart: on-failure
     stdin_open: true
-    stop_grace_period: 1m30s
+    stop_grace_period: 30s
     tty: true
     working_dir: /opt/omnileads
 
@@ -107,6 +107,7 @@ services:
       - PGPASSWORD=${PGPASSWORD}
       - REDIS_HOSTNAME=${REDIS_HOSTNAME}
       - REDIS_PORT=6379
+    stop_grace_period: 30s  
     networks:
       - omnileads  
   
@@ -122,7 +123,8 @@ services:
       - AMI_USER=${AMI_USER}
       - AMI_PASSWORD=${AMI_PASSWORD}
       - REDIS_HOSTNAME=${REDIS_HOSTNAME}
-    restart: on-failure  
+    restart: on-failure
+    stop_grace_period: 30s  
     networks:
       - omnileads
 
@@ -179,6 +181,7 @@ services:
       - CALLREC_DEVICE=s3
     networks:
       - omnileads
+    stop_grace_period: 30s  
     volumes:
       - asterisk_callrec:/var/spool/asterisk/monitor
 
@@ -199,7 +202,7 @@ services:
       - omnileads
     privileged: true
     restart: on-failure
-    stop_grace_period: 1m30s
+    stop_grace_period: 30s
     volumes:
       - asterisk_conf:/home/omnileads/astconf
       - asterisk_sounds:/home/omnileads/sounds
@@ -230,13 +233,12 @@ services:
       - ${SIP_EXT_PORT}:5060/udp
     privileged: true
     restart: on-failure
-    stop_grace_period: 1m30s
+    stop_grace_period: 30s
     working_dir: /etc/asterisk
     volumes:
       - asterisk_callrec:/var/spool/asterisk/monitor
       - asterisk_conf:/etc/asterisk/retrieve_conf
       - asterisk_sounds:/var/lib/asterisk/sounds/oml
-      #- ./asterisk_custom/pjsip_wizard_agents.conf:/etc/asterisk/oml_pjsip_wizard.conf:ro
 
   dialer_asterisk:
     container_name: oml-asterisk_dialer
@@ -259,7 +261,7 @@ services:
       - 8888:8888
     privileged: true
     restart: on-failure
-    stop_grace_period: 1m30s
+    stop_grace_period: 30s
     working_dir: /etc/asterisk
     
   dialer_call_manager:
@@ -278,6 +280,7 @@ services:
       - ARI_USER=${AMI_USER}
       - ARI_PASS=${AMI_PASSWORD}
     restart: on-failure
+    stop_grace_period: 30s
     networks:
       - omnileads  
 
@@ -303,10 +306,9 @@ services:
       - omnileads
     privileged: true
     restart: on-failure
-    stop_grace_period: 1m30s
+    stop_grace_period: 30s
     volumes:
      - ./certs:/${KAMAILIO_CERTS_LOCATION}
-     #- ./asterisk_custom/kamailio.cfg:/etc/kamailio/kamailio.cfg:ro
 
   nginx:
     container_name: oml-nginx
@@ -336,13 +338,13 @@ services:
     ports:
       - ${NGINX_EXT_PORT}:443/tcp
     restart: on-failure
-    stop_grace_period: 1m30s
+    stop_grace_period: 30s
     volumes:
       - django_static:/opt/omnileads/static
       - django_callrec_zip:/opt/omnileads/asterisk/var/spool/asterisk/monitor
 
   postgresql:
-    container_name: oml-postgresql
+    container_name: oml-postgres
     dns: 8.8.8.8
     environment:
       - TZ=${TZ}
@@ -356,7 +358,7 @@ services:
       - ${PG_EXT_PORT}:5432/tcp
     privileged: true
     restart: on-failure
-    stop_grace_period: 1m30s
+    stop_grace_period: 30s
     volumes:
       - postgresql:/var/lib/postgresql/data
 
@@ -373,7 +375,7 @@ services:
     image: ${OMLREDIS_IMG}
     privileged: true
     restart: on-failure
-    stop_grace_period: 1m30s
+    stop_grace_period: 30s
     volumes:
       - redis:/data
 
@@ -389,7 +391,7 @@ services:
       - omnileads
     privileged: true
     restart: on-failure
-    stop_grace_period: 1m30s
+    stop_grace_period: 30s
 
   websockets:
     container_name: oml-websockets
@@ -407,12 +409,14 @@ services:
       - "${WEBSOCKET_EXT_PORT}:8000"
     networks:
       - omnileads
+    stop_grace_period: 30s
 
   rabbitmq:
     container_name: oml-rabbitmq
     image: rabbitmq:management
     networks:
       - omnileads
+    stop_grace_period: 30s  
 
   minio:
     container_name: oml-minio
@@ -471,7 +475,7 @@ services:
     privileged: true
     restart: on-failure
     stdin_open: true
-    stop_grace_period: 1m30s
+    stop_grace_period: 30s
     tty: true
 
   videocalls:
@@ -488,46 +492,9 @@ services:
     privileged: true
     restart: on-failure
     stdin_open: true
-    stop_grace_period: 1m30s
+    stop_grace_period: 30s
     tty: true
   
-  # wombat:  
-  #   command: >
-  #     bash -c "sed -i '/JDBC_URL/c\JDBC_URL=jdbc:mariadb:\/\/${MYSQL_HOST}\/${WOMBAT_DB}?user=${WOMBAT_DB_USER}&password=${WOMBAT_DB_PASS}&autoReconnect=true' /usr/local/tomcat/webapps/wombat/WEB-INF/tpf.properties && catalina.sh run"
-  #   container_name: oml-wombat
-  #   depends_on:
-  #     - mariadb
-  #   dns: 8.8.8.8
-  #   environment:
-  #     - TZ=${TZ}
-  #     - MYSQL_PWD=${MYSQL_ROOT_PASS}
-  #   image: ${WOMBAT_IMG}
-  #   networks:
-  #     - omnileads
-  #   ports:
-  #     - 8082:8080/tcp
-  #   privileged: true
-  #   restart: on-failure
-  #   stop_grace_period: 1m30s
-
-  # mariadb:
-  #   container_name: oml-mariadb
-  #   dns: 8.8.8.8
-  #   environment:
-  #     - ALLOW_EMPTY_PASSWORD=yes
-  #     - TZ=${TZ}
-  #     - MARIADB_ROOT_PASSWORD=${MYSQL_ROOT_PASS}
-  #     - MARIADB_DATABASE=${WOMBAT_DB}
-  #     - MARIADB_USER=${WOMBAT_DB_USER}
-  #     - MARIADB_PASSWORD=${WOMBAT_DB_PASS}
-  #   image: ${MARIADB_IMG}
-  #   networks:
-  #     - omnileads
-  #   privileged: true
-  #   restart: on-failure
-  #   stop_grace_period: 1m30s
-  #   volumes:
-  #     - mariadb:/bitnami
 
 networks:
   omnileads:
@@ -540,7 +507,6 @@ volumes:
   postgresql:
   redis:
   minio:
-  #mariadb:
   django_callrec_zip:
   django_static:
   asterisk_callrec:

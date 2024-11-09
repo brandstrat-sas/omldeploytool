@@ -21,7 +21,7 @@ services:
     privileged: true
     restart: on-failure
     stdin_open: true
-    stop_grace_period: 1m30s
+    stop_grace_period: 30s
     tty: true
     working_dir: /opt/omnileads/ominicontacto
     volumes:
@@ -112,8 +112,6 @@ services:
     restart: on-failure    
     networks:
       - omnileads
-    volumes:
-      - ${REPO_PATH}/omlami/ami.py:/app/ami.py  
 
   acd_config_retrieve:
     build:
@@ -134,11 +132,10 @@ services:
       - omnileads
     privileged: true
     restart: on-failure
-    stop_grace_period: 1m30s
+    stop_grace_period: 10s
     volumes:      
       - asterisk_conf:/home/omnileads/astconf
       - asterisk_sounds:/home/omnileads/sounds
-      - ${REPO_PATH}/acd_retrieve_conf/:/home/omnileads
 
   acd:
     build:
@@ -164,7 +161,7 @@ services:
       - omnileads
     privileged: true
     restart: on-failure
-    stop_grace_period: 1m30s
+    stop_grace_period: 30s
     volumes:
       - ${REPO_PATH}/omlacd/source/astconf:/etc/asterisk
       - ${REPO_PATH}/omlacd/source/scripts:/opt/asterisk/scripts
@@ -200,10 +197,9 @@ services:
       - omnileads
     privileged: true
     restart: on-failure
-    stop_grace_period: 1m30s
+    stop_grace_period: 10s
     command: python /app/app.py
     volumes:
-      - ${REPO_PATH}/oml_interactions_processor/app.py:/app/app.py
       - asterisk_callrec:/var/spool/asterisk/monitor/
 
   dialer_asterisk:
@@ -225,9 +221,11 @@ services:
       # - PSTNGW_SIP_AUTH=${DIALER_PSTNGW_SIP_AUTH}
     networks:
       - omnileads
+    ports:
+      - 8888:8888  
     privileged: true
     restart: on-failure
-    stop_grace_period: 1m30s
+    stop_grace_period: 30s
     working_dir: /etc/asterisk
     
   dialer_call_manager:
@@ -249,6 +247,7 @@ services:
       - ARI_USER=${AMI_USER}
       - ARI_PASS=${AMI_PASSWORD}
     restart: on-failure
+    stop_grace_period: 30s
     networks:
       - omnileads  
     
@@ -368,9 +367,7 @@ services:
       - omnileads
     privileged: true
     restart: on-failure
-    stop_grace_period: 1m30s
-    #volumes:
-    #  - ${REPO_PATH}/omlkamailio/source:/etc/kamailio:ro
+    stop_grace_period: 10s
 
   nginx:
     build:
@@ -398,7 +395,6 @@ services:
       - S3_ENDPOINT=${S3_ENDPOINT_MINIO}
       - WEBUI_MODE=rproxy
       - WALLBOARD_WEBUI_HOST=kamailio
-
     networks:
       - omnileads
     privileged: true
@@ -427,7 +423,7 @@ services:
       - omnileads
     privileged: true
     restart: on-failure
-    stop_grace_period: 1m30s
+    stop_grace_period: 10s
 
   websockets:
     #build:
@@ -451,6 +447,7 @@ services:
       interval: 1s
       timeout: 10s
       retries: 10
+    stop_grace_period: 30s  
     volumes:
       - ${REPO_PATH}/omlwebsockets/source/:/opt/services/webapp/src/
 
@@ -580,11 +577,11 @@ services:
     networks:
       - omnileads
     ports:
-      - 8888:8888
+      - 8877:8888
     privileged: true
     restart: on-failure
     stdin_open: true
-    stop_grace_period: 1m30s
+    stop_grace_period: 10s
     tty: true
 
   videocalls:
