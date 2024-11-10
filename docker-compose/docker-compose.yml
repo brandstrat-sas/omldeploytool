@@ -207,8 +207,8 @@ services:
       - asterisk_conf:/home/omnileads/astconf
       - asterisk_sounds:/home/omnileads/sounds
 
-  asterisk:
-    container_name: oml-asterisk
+  acd:
+    container_name: oml-acd
     depends_on:
       - fastagi      
     dns: 8.8.8.8

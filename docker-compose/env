@@ -24,7 +24,7 @@ OMLACD_RETRIEVE_CONF_IMG=${REPO}/acd_retrieve_conf:240729.01
 OMLFASTAGI_IMG=${REPO}/fastagi:241017.01
 OMLAMI_IMG=${REPO}/astami:241017.01
 OMLNGINX_IMG=${REPO}/nginx:241009.01
-OMLKAM_IMG=${REPO}/kamailio:240625.01
+OMLKAM_IMG=freetechsolutions/kamailio:241109.01
 OMLRTPENGINE_IMG=${REPO}/rtpengine:240625.01
 OMLWS_IMG=${REPO}/websockets:240705.01
 OMLREDIS_IMG=${REPO}/redis:231125.01
@@ -264,7 +264,7 @@ DIALER_PSTNGW_SIP_PASS=omnileads
 DIALER_PSTNGW_HOSTNAME=pbxemulator:5070
 
 ### ACD omnileads asterisk (for dialer_acd)
-DIALER_OMLACD_SIP_HOSTNAME=asterisk:5260
+DIALER_OMLACD_SIP_HOSTNAME=acd:5260
 
 ### Dialer omnileads asterisk (for call_manager WS)
 DIALER_ASTERISK_ARI_HOSTNAME=dialer_asterisk

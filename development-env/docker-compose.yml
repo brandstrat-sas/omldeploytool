@@ -204,6 +204,7 @@ services:
 
   dialer_asterisk:
     build:
+      target: run
       context: ${REPO_PATH}/omldialer_acd
     container_name: oml-asterisk_dialer
     image: ${OMLDIALER_ACD_IMG}
@@ -393,8 +394,8 @@ services:
       - WEBSOCKETS_PORT=8000
       - CALLREC_DEVICE=${CALLREC_DEVICE}
       - S3_ENDPOINT=${S3_ENDPOINT_MINIO}
-      - WEBUI_MODE=rproxy
-      - WALLBOARD_WEBUI_HOST=kamailio
+      #- WEBUI_MODE=rproxy
+      #- WALLBOARD_WEBUI_HOST=kamailio
     networks:
       - omnileads
     privileged: true
@@ -600,8 +601,6 @@ services:
     stdin_open: true
     stop_grace_period: 1m30s
     tty: true
-    # volumes:
-    #   - ${REPO_PATH}/webphone_client_app/demo/:/usr/src/app
 
   pgadmin:
     container_name: pgadmin
