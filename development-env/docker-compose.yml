@@ -412,7 +412,6 @@ services:
 
   rtpengine:
     build:
-      target: run
       context: ${REPO_PATH}/omlrtpengine
     image: ${OMLRTPENGINE_IMG}
     container_name: oml-rtpengine
@@ -421,10 +420,13 @@ services:
       - ENV=devenv
       - TZ=${TZ}
     networks:
-      - omnileads
+      - omnileads    
     privileged: true
     restart: on-failure
     stop_grace_period: 10s
+    # command: rtpengine --config-file /etc/rtpengine.conf   
+    # volumes:
+    #   - ./conf/rtpengine.conf:/etc/rtpengine.conf:ro
 
   websockets:
     #build:
@@ -443,11 +445,11 @@ services:
       - PYTHONUNBUFFERED=1
     networks:
       - omnileads
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health-checks"]
-      interval: 1s
-      timeout: 10s
-      retries: 10
+    # healthcheck:
+    #   test: ["CMD", "curl", "-f", "http://localhost:8000/health-checks"]
+    #   interval: 1s
+    #   timeout: 10s
+    #   retries: 10
     stop_grace_period: 30s  
     volumes:
       - ${REPO_PATH}/omlwebsockets/source/:/opt/services/webapp/src/

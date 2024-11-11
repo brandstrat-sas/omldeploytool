@@ -1,8 +1,8 @@
 development-env/omnileads-repos
-development-env/asterisk_custom
 development-env/.env
+development-env/.conf
 docker-compose/.env
-docker-compose/asterisk_custom
+docker-compose/.conf
 docker-compose/rasa_custom
 docker-compose-qa/.env
 ansible/instances
