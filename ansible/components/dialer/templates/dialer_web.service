@@ -1,0 +1,20 @@
+[Unit]
+Description=Podman Omnidialer Flask API
+After=network.target gearman-server.service redis.service postgresql.service
+Requires=network.target gearman-server.service redis.service postgresql.service
+
+[Service]
+Restart=always
+Environment=GEARMAN_JOB_SERVERS=gearman_job_server:4730
+ExecStartPre=-/usr/bin/podman rm -f omnidialer-api
+ExecStart=/usr/bin/podman run --name omnidialer-api \
+  --network omnidialer-network \
+  -p 1440:1440 \
+  -v /path/to/your/interface/src:/app \
+  -e GEARMAN_JOB_SERVERS=${GEARMAN_JOB_SERVERS} \
+  --rm -d \
+  your_dockerhub_username/omnidialer-api-image
+ExecStop=/usr/bin/podman stop omnidialer-api
+
+[Install]
+WantedBy=multi-user.target

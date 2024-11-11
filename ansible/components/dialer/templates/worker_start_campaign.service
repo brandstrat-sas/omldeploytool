@@ -1,0 +1,20 @@
+[Unit]
+Description=Podman Gearman Worker - Start Campaign
+After=gearman-workers-pod.service
+Requires=gearman-workers-pod.service
+
+[Service]
+Restart=always
+Environment=GEARMAN_JOB_SERVERS=gearman_job_server:4730
+Environment=GEARMAN_JOBS=start-campaign
+ExecStartPre=-/usr/bin/podman rm -f start-campaign-worker
+ExecStart=/usr/bin/podman run --name start-campaign-worker \
+  --pod gearman-workers-pod \
+  -e GEARMAN_JOB_SERVERS=${GEARMAN_JOB_SERVERS} \
+  -e GEARMAN_JOBS=${GEARMAN_JOBS} \
+  --rm -d \
+  your_dockerhub_username/omnidialer-worker-image
+ExecStop=/usr/bin/podman stop start-campaign-worker
+
+[Install]
+WantedBy=multi-user.target

@@ -207,7 +207,7 @@ services:
       - asterisk_conf:/home/omnileads/astconf
       - asterisk_sounds:/home/omnileads/sounds
 
-  acd:
+  asterisk:
     container_name: oml-acd
     depends_on:
       - fastagi      
@@ -392,8 +392,9 @@ services:
     privileged: true
     restart: on-failure
     stop_grace_period: 30s
-    volumes:
-      - conf/rtpengine.conf:/etc/rtpengine.conf
+    # command: rtpengine --config-file /etc/rtpengine.conf   
+    # volumes:
+    #   - ./conf/rtpengine.conf:/etc/rtpengine.conf:ro
 
   websockets:
     container_name: oml-websockets
