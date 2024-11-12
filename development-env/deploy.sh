@@ -36,14 +36,17 @@ done
 if [ "$gitlab_clone" == "ssh" ]; then
   git clone git@gitlab.com:omnileads/omnileads-websockets.git omlwebsockets
   git clone git@gitlab.com:omnileads/ominicontacto omlapp
-  git clone git@gitlab.com:omnileads/oml_sentiment_analysis
   git clone git@gitlab.com:omnileads/omldialer_call_manager.git
   git clone git@gitlab.com:omnileads/omldialer_acd.git
   git clone git@gitlab.com:omnileads/acd_retrieve_conf.git
-  git clone git@gitlab.com:omnileads/omlpstngw.git  
+  git clone git@gitlab.com:omnileads/omlqa.git
 else
   git clone https://gitlab.com/omnileads/omnileads-websockets.git omlwebsockets
   git clone https://gitlab.com/omnileads/ominicontacto omlapp
+  git clone https://gitlab.com/omnileads/omldialer_call_manager.git
+  git clone https://gitlab.com/omnileads/omldialer_acd.git
+  git clone https://gitlab.com/omnileads/acd_retrieve_conf.git
+  git clone https://gitlab.com/omnileads/omlqa.git
 fi
 
 # Addons
@@ -57,15 +60,14 @@ fi
 echo "********* [OML devenv] All repositories were cloned in $(pwd)"
 sleep 5
 
-repositories=("acd" "kamailio" "nginx" "rtpengine" "websockets")
+repositories=("kamailio" "rtpengine")
 for i in "${repositories[@]}"; do
-cd oml${i} && git checkout master-2.0 && cd ..
+cd oml${i} && git checkout oml-658-dev-kamailio-img-2024 && cd ..
 done
 
 cd ../
 cp env .env
-docker-compose pull
-docker-compose up -d --no-build
+docker-compose up -d
 
 }
 
@@ -99,3 +101,4 @@ How to use it:
 done
 
 Deploy
+

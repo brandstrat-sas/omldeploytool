@@ -35,7 +35,8 @@ services:
   daphne:
     container_name: oml-daphne
     depends_on:
-      - redis    
+      - redis
+      - app
     dns: 8.8.8.8
     env_file: .env
     environment:
@@ -55,6 +56,7 @@ services:
   omlcron:
     container_name: oml-cron
     depends_on:
+      - app
       - postgresql
       - acd 
       - minio
@@ -651,3 +653,4 @@ volumes:
   asterisk_callrec:
   asterisk_sounds:
   asterisk_conf:
+
