@@ -276,6 +276,7 @@ all:
     #uwsgi_threads: 1
     #uwsgi_listen_queue_size: 2048
     #uwsgi_worker_reload_mercy: 60
+    #uwsgi_evil_reload_on_rss: 3600
 
     # If you set scale_asterisk to true, then you must assign values to 
     # asterisk_mem_limit, pjsip_threadpool_idle_timeout & pjsip_threadpool_max_size
