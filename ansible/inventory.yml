@@ -276,6 +276,7 @@ all:
     #uwsgi_threads: 1
     #uwsgi_listen_queue_size: 2048
     #uwsgi_worker_reload_mercy: 60
+    #uwsgi_evil_reload_on_rss: 3096
 
     # If you set scale_asterisk to true, then you must assign values to 
     # asterisk_mem_limit, pjsip_threadpool_idle_timeout & pjsip_threadpool_max_size
@@ -358,7 +359,7 @@ all:
     # --- If you want to deploy OMniLeads Enterprise, you just need to add "-enterprise" as a suffix to the omnileads_img image tag
     # --- for example: omnileads_img: docker.io/omnileads/omlapp:240216.01-enterprise.
 
-    omnileads_img: docker.io/omnileads/omlapp:241008.01
+    omnileads_img: docker.io/omnileads/omlapp:241113.01
     asterisk_img: docker.io/omnileads/asterisk:240920.01
 
 ##############################################################################################################
