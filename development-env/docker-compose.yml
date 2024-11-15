@@ -150,6 +150,7 @@ services:
     dns: 8.8.8.8
     environment:
       - ENV=devenv
+      - DIALER_HOST=${DIALER_SIP_MATCH}
       - RABBITMQ_HOST=${RABBITMQ_HOSTNAME}
       - FASTAGI=${FASTAGI_HOSTNAME}
       - TZ=${TZ}
@@ -204,56 +205,6 @@ services:
     volumes:
       - asterisk_callrec:/var/spool/asterisk/monitor/
 
-  dialer_asterisk:
-    build:
-      target: run
-      context: ${REPO_PATH}/omldialer_acd
-    container_name: oml-asterisk_dialer
-    image: ${OMLDIALER_ACD_IMG}
-    dns: 8.8.8.8
-    environment:
-      - TZ=${TZ}
-      - ARI_USER=${AMI_USER}
-      - ARI_PASS=${AMI_PASSWORD}
-      - ASTERISK_DIALER_HOSTNAME=0.0.0.0
-      - OMLACD_HOSTNAME=${DIALER_OMLACD_SIP_HOSTNAME}
-      # - PSTNGW_SIP_USER=${DIALER_PSTNGW_SIP_USER}
-      # - PSTNGW_SIP_PASS=${DIALER_PSTNGW_SIP_PASS}
-      # - PSTNGW_HOSTNAME=${DIALER_PSTNGW_HOSTNAME}
-      # - PSTNGW_REGISTER=${DIALER_PSTNGW_REGISTER}
-      # - PSTNGW_SIP_AUTH=${DIALER_PSTNGW_SIP_AUTH}
-    networks:
-      - omnileads
-    ports:
-      - 8888:8888  
-    privileged: true
-    restart: on-failure
-    stop_grace_period: 30s
-    working_dir: /etc/asterisk
-    
-  dialer_call_manager:
-    container_name: oml-call_manager_dialer
-    build:
-      target: run
-      context: ${REPO_PATH}/omldialer_call_manager
-    image: ${OMLDIALER_CALL_MANAGER_IMG}  
-    depends_on:
-      - dialer_asterisk
-      - redis
-    command: python /app/dialer_call_manager.py
-    environment:
-      - TZ=${TZ}
-      - REDIS_HOSTNAME=${REDIS_HOSTNAME}
-      - REDIS_PORT=${REDIS_PORT}
-      - ARI_HOST=${DIALER_ASTERISK_ARI_HOSTNAME}
-      - ARI_PORT=${DIALER_ASTERISK_ARI_PORT}
-      - ARI_USER=${AMI_USER}
-      - ARI_PASS=${AMI_PASSWORD}
-    restart: on-failure
-    stop_grace_period: 30s
-    networks:
-      - omnileads  
-    
   # voice_queue_delivery:
   #   image: ${OMLFASTAGI_IMG}
   #   container_name: oml-voice_queue_delivery
@@ -428,7 +379,7 @@ services:
     stop_grace_period: 10s
     # command: rtpengine --config-file /etc/rtpengine.conf   
     # volumes:
-    #   - ./conf/rtpengine.conf:/etc/rtpengine.conf:ro
+    #   - ./.conf/rtpengine.conf:/etc/rtpengine.conf:ro
 
   websockets:
     #build:
@@ -561,13 +512,13 @@ services:
     ports:
       - 4569:4569/udp
     volumes:
-      - ./pstn_emulator_custom_conf:/etc/asterisk/custom/
+      - ./.conf/pstn_emulator_extensions.conf:/etc/asterisk/extensions.conf:ro
     privileged: true
     restart: on-failure
     stdin_open: true
-    stop_grace_period: 1m30s
+    stop_grace_period: 30s
     tty: true
-
+    
   nginx_qa:
     build:
       context: ${REPO_PATH}/omlqa/nginx

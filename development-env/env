@@ -25,19 +25,19 @@ REPO_PATH=./omnileads-repos
 REPO=repo
 
 # OML project img
-OMLAPP_IMG=${REPO}/omlapp:dev
-OMLACD_IMG=${REPO}/asterisk:dev
-OMLACD_RETRIEVE_CONF_IMG=${REPO}/acd_retrieve_conf:dev
-OMLFASTAGI_IMG=${REPO}/fastagi:dev
-OMLAMI_IMG=${REPO}/astami:dev
-OMLNGINX_IMG=${REPO}/nginx:dev
-OMLKAM_IMG=${REPO}/kamailio:dev
-OMLRTPENGINE_IMG=${REPO}/rtpengine:dev
+OMLAPP_IMG=${REPO}/omlapp:devenv
+OMLACD_IMG=${REPO}/asterisk:devenv
+OMLACD_RETRIEVE_CONF_IMG=${REPO}/acd_retrieve_conf:devenv
+OMLFASTAGI_IMG=${REPO}/fastagi:devenv
+OMLAMI_IMG=${REPO}/astami:devenv
+OMLNGINX_IMG=${REPO}/nginx:devenv
+OMLKAM_IMG=${REPO}/kamailio:devenv
+OMLRTPENGINE_IMG=${REPO}/rtpengine:devenv
 OMLWS_IMG=omnileads/websockets:240705.01
-OMLSENTIMENT_IMG=${REPO}/sentiment_analysis:dev
-OMLINTERACTION_PROC_IMG=${REPO}/interaction_processor:dev
-OMLDIALER_ACD_IMG=${REPO}/asterisk_dialer:dev
-OMLDIALER_CALL_MANAGER_IMG=${REPO}/call_manager_dialer:dev
+OMLSENTIMENT_IMG=${REPO}/sentiment_analysis:devenv
+OMLINTERACTION_PROC_IMG=${REPO}/interaction_processor:devenv
+OMLDIALER_ACD_IMG=${REPO}/asterisk_dialer:devenv
+OMLDIALER_CALL_MANAGER_IMG=${REPO}/call_manager_dialer:devenv
 
 # Backend generic img
 OMLPGSQL_IMG=postgres:14.9-bullseye
@@ -46,8 +46,9 @@ OMLREDIS_IMG=redislabs/redisgears:1.0.9
 
 # Development tools img
 OMLVIDEOCALLS_WIDGET_IMG=omnileads/videocalls_widget:230905.01
-OMLPSTNEMULATOR_IMG=${REPO}/pstn_emulator:dev
-OMLNGINXQA_IMG=${REPO}/nginxqa:dev
+OMLPSTNEMULATOR_IMG=${REPO}/pstn_emulator:devenv
+OMLNGINXQA_IMG=${REPO}/nginxqa:devenv
+#   OMLVUEJS_IMG=node:18-alpine
 OMLVUEJS_IMG=freetechsolutions/vue-cli:develop
 
 ################################
@@ -75,6 +76,20 @@ DAPHNE_HOSTNAME=channels
 
 UWSGI_PORT=8099
 DAPHNE_PORT=8098
+
+# Scale UWSGI
+UWSGI_CUSTOM=True
+#UWSGI_PROCESSES=4
+#UWSGI_THREADS=1
+#UWSGI_LISTEN_QUEUE_SIZE=2048
+#UWSGI_WORKER_RELOAD_MERCY=60
+#UWSGI_MAX_WORKER_LIFETIME=7200
+#UWSGI_MAX_WORKER_LIFETIME_DELTA=300
+#UWSGI_RELOAD_ON_RSS=1024
+#UWSGI_RELOAD_ON_AS=2048
+#UWSGI_EVIL_RELOAD_ON_RSS=3096
+#UWSGI_MAX_REQUESTS=2000
+
 # Session Cookie Age (SCA) is the time in seconds that will last the https session when inactivity
 # is detected in the session (by default is 1 hour)
 SESSION_COOKIE_AGE=3600
@@ -160,8 +175,8 @@ KAMAILIO_WS_PORT=10080
 # Variables for Kamailio memory. SHM is the maximum memory ammount.
 # PKG is the minimum memory ammount
 
-SHM_SIZE=64
-PKG_SIZE=8
+SHM_SIZE=128
+PKG_SIZE=16
 
 
 #########################################################################################################
@@ -251,23 +266,7 @@ MYSQL_ROOT_PASS=admin123
 # --- OMni Dialer
 OML_DIALER_ENGINE=omnidialer
 OMNIDIALER_HOST=omnidialer-api:1440
-
-# --- OMniLeads Dialer params
-### PSTN SIP gateway (for dialer_acd),son opcionales, solo en caso de sacar las llamadas
-### por un gateway PSTN en lugar de usar el OMLACD en caso de demandar escalabilidad.
-DIALER_PSTNGW_REGISTER=yes
-DIALER_PSTNGW_SIP_AUTH=yes
-DIALER_PSTNGW_SIP_USER=01177660020
-DIALER_PSTNGW_SIP_PASS=omnileads
-DIALER_PSTNGW_HOSTNAME=pbxemulator:5070
-
-### ACD omnileads asterisk (for dialer_acd)
-DIALER_OMLACD_SIP_HOSTNAME=asterisk:5260
-
-### Dialer omnileads asterisk (for call_manager WS)
-DIALER_ASTERISK_ARI_HOSTNAME=dialer_asterisk
-DIALER_ASTERISK_ARI_PORT=8888
-DIALER_ASTERISK_SIP_HOSTNAME=dialer_asterisk:5060
+DIALER_SIP_MATCH=omnidialer-asterisk:5060
 
 
 #########################################################################################################

@@ -40,6 +40,7 @@ if [ "$gitlab_clone" == "ssh" ]; then
   git clone git@gitlab.com:omnileads/omldialer_acd.git
   git clone git@gitlab.com:omnileads/acd_retrieve_conf.git
   git clone git@gitlab.com:omnileads/omlqa.git
+  git clone git@gitlab.com:omnileads/omnidialer.git
 else
   git clone https://gitlab.com/omnileads/omnileads-websockets.git omlwebsockets
   git clone https://gitlab.com/omnileads/ominicontacto omlapp
@@ -47,6 +48,7 @@ else
   git clone https://gitlab.com/omnileads/omldialer_acd.git
   git clone https://gitlab.com/omnileads/acd_retrieve_conf.git
   git clone https://gitlab.com/omnileads/omlqa.git
+  git clone https://gitlab.com/omnileads/omnidialer.git
 fi
 
 # Addons
