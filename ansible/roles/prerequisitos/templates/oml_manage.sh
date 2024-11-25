@@ -79,6 +79,9 @@ case $1 in
   --pgsql)
     docker exec -it oml-uwsgi-server psql
     ;;    
+  --psql_reindex)
+    podman exec -it --env-file /etc/default/django.env oml-uwsgi-server bash -c 'psql -c "reindex database ${PGDATABASE};"'
+    ;;
   --sentinel_logs)
     docker logs -f oml-sentinel-server
     ;;
