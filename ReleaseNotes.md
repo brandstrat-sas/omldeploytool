@@ -1,21 +1,14 @@
-# Release Notes - OMniLeads 2.2.2
-[2024-11-22]
+# Release Notes - OMniLeads 2.2.3
+[2024-12-05]
 
 ## Added
 
-* oml-2757 New fields for Whatsapp interactive menu.
-* oml-2813 Add new scalability parameter for uwsgi (evil reload on rss).
-* oml-2757 Multiple level interactive menu for Whatsapp Line destination.
-* oml-2785 Inbound Routes can have Agents as a destination.
+* oml-2796 Campaigns Agents list saved in redis
+* oml-655 Add proxy web deploy parameters
 
 ## Improvements
 
-* Agent event stream data expires after 2 days.
-* oml-2720 Prevent button click while fetch is in progress.
-
 ## Fixes
-
-* Strange django migration dependency problems
 
 ## Component changes
 
