@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 ######################################################
 ####################  NETWORKING #####################
 ######################################################
@@ -16,10 +18,10 @@ nat_addr=${NAT_IP}
 # --- "lan" instance (access through private IP)
 # --- "nat" instance (access through Public NAT IP)    
 # --- or "all" in order to access through all NICs
-env=${ENV}
+env=docker-compose
 
 # --- branch is about specific omnileads release
-branch=${BRANCH}
+branch=${BRANCH:-main}  # Default to "main" if not specified
 
 ######################################################
 ##### External Object Storage Bucket integration #####
@@ -37,112 +39,79 @@ postgres_user=${PGSQL_USER}
 postgres_password=${PGSQL_PASSWORD}
 postgres_db=${PGDATABASE}
 
-################################################################################################
+######################################################
+###################### FUNC ##########################
+######################################################
 
-if [[ -z "$lan_addr" ]]; then
-    lan_ipv4=$(ip addr show $oml_nic | grep "inet\b" | awk '{print $2}' | cut -d/ -f1)
-fi
+log_info() {
+    echo -e "\033[0;32m$1\033[0m"  # Mensaje en verde
+}
 
-if [[ -z "$nat_addr" ]]; then
-    nat_addr=$(curl http://ipinfo.io/ip)
-    #nat_addr=$(curl ifconfig.co)
-fi
-
-# Obtener el ID de la distribución del sistema operativo
-if [ -f /etc/os-release ]; then
-    . /etc/os-release
-    OS_ID=$ID
-else
-    echo "No se puede determinar el sistema operativo."
+log_error() {
+    echo -e "\033[0;31m$1\033[0m" >&2  # Mensaje en rojo
     exit 1
-fi
+}
 
-# Debian family
-if [ "$OS_ID" = "debian" ] || [ "$OS_ID" = "ubuntu" ]; then    
-    apt update && apt install -y git
-    curl -fsSL https://get.docker.com -o ~/get-docker.sh
-    bash ~/get-docker.sh    
+setup_networking() {
+    log_info "*** Configurando direcciones de red ***"
+    if [[ -z "$lan_addr" ]]; then
+        lan_ipv4=$(ip addr show "$oml_nic" | grep "inet\b" | awk '{print $2}' | cut -d/ -f1) || log_error "No se pudo obtener la dirección privada."
+    else
+        lan_ipv4="$lan_addr"
+    fi
 
-# Redhat family
-elif [ "$OS_ID" = "rhel" ] || [ "$OS_ID" = "almalinux" ] || [ "$OS_ID" = "rocky" ] || [ "$OS_ID" = "centos" ]; then
-    dnf check-update
-    dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
-    dnf install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin git
-    systemctl start docker
-    systemctl enable docker
+    if [[ -z "$nat_addr" ]]; then
+        nat_addr=$(curl -s http://ipinfo.io/ip) || log_error "No se pudo obtener la dirección pública."
+    fi
+}
 
-else
-    echo "Distribución no soportada."
-    exit 1
-fi
+setup_os_dependencies() {
+    log_info "*** Instalando dependencias del sistema operativo ***"
+    if [ -f /etc/os-release ]; then
+        . /etc/os-release
+        OS_ID=$ID
+    else
+        log_error "No se puede determinar el sistema operativo."
+    fi
 
-ln -s /usr/libexec/docker/cli-plugins/docker-compose /usr/bin/
+    if [[ "$OS_ID" =~ (debian|ubuntu) ]]; then
+        apt update && apt install -y git curl
+        curl -fsSL https://get.docker.com -o ~/get-docker.sh
+        bash ~/get-docker.sh
+    elif [[ "$OS_ID" =~ (rhel|almalinux|rocky|centos) ]]; then
+        dnf check-update
+        dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+        dnf install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin git
+        systemctl start docker
+        systemctl enable docker
+    else
+        log_error "Distribución no soportada."
+    fi
 
-git clone https://gitlab.com/omnileads/omldeploytool.git
+    ln -sf /usr/libexec/docker/cli-plugins/docker-compose /usr/bin/docker-compose
+}
 
-if [ -z "$branch" ];then
-    echo deploy a main branch
-else
-    echo "deploy a $branch branch"
-    cd ./omldeploytool    
-    git checkout $branch
-    cd ..
-fi
+deploy_omnileads() {
+    log_info "*** Clonando y desplegando Omnileads ***"
+    git clone https://gitlab.com/omnileads/omldeploytool.git || log_error "Error al clonar el repositorio."
 
-cd ./omldeploytool/docker-compose
-cp env ./prod-env/.env
-cd ./prod-env
+    cd omldeploytool || log_error "No se pudo acceder al directorio 'omldeploytool'."
 
-sed -i "s/ENV=devenv/ENV=$env/g" .env
+    if [[ "$branch" != "main" ]]; then
+        git checkout "$branch" || log_error "Error al cambiar a la rama '$branch'."
+    fi
 
-# AIO con bucket externo    
-if [[ -n "$bucket_url" && -z "$postgres_host" ]]; then
-    sed -i "s/CALLREC_DEVICE=s3-minio/CALLREC_DEVICE=s3/g" .env
-    sed -i "s/S3_BUCKET_NAME=omnileads/S3_BUCKET_NAME=$bucket_name/g" .env
-    sed -i "s/AWS_ACCESS_KEY_ID=omlminio/AWS_ACCESS_KEY_ID=$bucket_access_key/g" .env
-    sed -i "s%\AWS_SECRET_ACCESS_KEY=s3omnileads123%AWS_SECRET_ACCESS_KEY=$bucket_secret_key%g" .env
-    sed -i "s%\S3_ENDPOINT=https://localhost%S3_ENDPOINT=$bucket_url%g" .env
-        if [[ "${aws_region}" != "NULL" ]];then
-            sed -i "s/bucket_region: us-east-1/bucket_region: ${aws_region}/g" .env
-        fi
-    sed -i "s/PGHOST=postgresql/PGHOST=localhost/g" .env    
-    /usr/libexec/docker/cli-plugins/docker-compose -f docker-compose_prod_external_bucket.yml up -d
-# AIO con bucket externo y postgres externo    
-elif [[ -n "$bucket_url" && -n "$postgres_host" ]]; then
-    sed -i "s/PGHOST=postgresql/PGHOST=$postgres_host/g" .env
-    sed -i "s/PGPORT=5432/PGPORT=$postgres_port/g" .env
-    sed -i "s/PGUSER=omnileads/PGUSER=$postgres_user/g" .env
-    sed -i "s/PGPASSWORD=admin123/PGPASSWORD=$postgres_password/g" .env
-    sed -i "s/PGDATABASE=omnileads/PGDATABASE=$postgres_db/g" .env
-    sed -i "s/CALLREC_DEVICE=s3-minio/CALLREC_DEVICE=s3/g" .env
-    sed -i "s/S3_BUCKET_NAME=omnileads/S3_BUCKET_NAME=$bucket_name/g" .env
-    sed -i "s/AWS_ACCESS_KEY_ID=omlminio/AWS_ACCESS_KEY_ID=$bucket_access_key/g" .env
-    sed -i "s%\AWS_SECRET_ACCESS_KEY=s3omnileads123%AWS_SECRET_ACCESS_KEY=$bucket_secret_key%g" .env
-    sed -i "s%\S3_ENDPOINT=https://localhost%S3_ENDPOINT=$bucket_url%g" .env
-        if [[ "${aws_region}" != "NULL" ]];then
-            sed -i "s/bucket_region: us-east-1/bucket_region: ${aws_region}/g" .env
-        fi
-    /usr/libexec/docker/cli-plugins/docker-compose -f docker-compose_prod_external.yml up -d
-else
-    exit 0
-fi
+    cd docker-compose/prod-env || log_error "No se pudo acceder al directorio 'prod-env'."
 
-ln -s ./omldeploytool/docker-compose/oml_manage /usr/local/bin/
-chmod +x /usr/local/bin/oml_manage
+    cp ../env ./.env
+    sed -i "s/ENV=devenv/ENV=${env}/g" .env
+    sed -i "s/PRIVATE_IP=/PRIVATE_IP=${lan_ipv4}/g" .env
 
-if [[ "$env" == "devenv" ]];then
-    until curl -sk --head  --request GET https://localhost |grep "302" > /dev/null; do echo "Environment still initializing , sleeping 10 seconds"; sleep 10; done; echo "Environment is up"
-elif [[ "$env" == "lan" ]];then
-    until curl -sk --head  --request GET https://$lan_ipv4 |grep "302" > /dev/null; do echo "Environment still initializing , sleeping 10 seconds"; sleep 10; done; echo "Environment is up"
-else
-    until curl -sk --head  --request GET https://$nat_addr |grep "302" > /dev/null; do echo "Environment still initializing , sleeping 10 seconds"; sleep 10; done; echo "Environment is up"
-fi
+    docker-compose up -d || log_error "Error al iniciar los contenedores con Docker Compose."
+}
 
-./oml_manage --reset_pass
-
-# Configuración de reglas de iptables y persistencia con rc.local
 setup_iptables() {
-    echo -e "\n*** Configurando iptables y asegurando persistencia con rc.local ***"
+    log_info "*** Configurando iptables y persistencia con rc.local ***"
 
     # Crear reglas de iptables
     iptables -t nat -A PREROUTING -p udp --dport 5060 -j DNAT --to-destination 10.22.22.99
@@ -158,7 +127,7 @@ setup_iptables() {
         chmod +x /etc/rc.local
     fi
 
-    # Verificar si las reglas ya están en rc.local
+    # Añadir reglas a rc.local si no existen
     if ! grep -q "iptables -t nat -A PREROUTING -p udp --dport 5060" /etc/rc.local; then
         sed -i '/^exit 0$/i \
 iptables -t nat -A PREROUTING -p udp --dport 5060 -j DNAT --to-destination 10.22.22.99\n\
@@ -167,13 +136,33 @@ iptables -t nat -A PREROUTING -p udp --dport 40000:50000 -j DNAT --to-destinatio
 iptables -A FORWARD -p udp -d 10.22.22.99 --dport 40000:50000 -j ACCEPT\n\
 iptables -t nat -A PREROUTING -p udp --dport 20000:30000 -j DNAT --to-destination 10.22.22.98\n\
 iptables -A FORWARD -p udp -d 10.22.22.98 --dport 20000:30000 -j ACCEPT' /etc/rc.local
-        echo -e "*** Reglas de iptables añadidas a rc.local ***"
+        log_info "Reglas de iptables añadidas a rc.local."
     else
-        echo -e "*** Las reglas de iptables ya están configuradas en rc.local ***"
+        log_info "Las reglas de iptables ya están configuradas en rc.local."
     fi
-
-    # Asegurar que rc.local sea ejecutable
-    chmod +x /etc/rc.local
 }
 
+wait_for_env() {
+    log_info "*** Esperando que el entorno se inicie ***"
+    until curl -sk --head --request GET "https://${lan_ipv4}" | grep "302" > /dev/null; do
+        log_info "El entorno aún se está inicializando, esperando 10 segundos..."
+        sleep 10
+    done
+    log_info "¡Deploy ready!"
+}
+
+reset_admin_password() {
+    log_info "*** Reseteando la contraseña de administrador ***"
+    /usr/bin/oml_manage --reset_pass || log_error "Error al resetear la contraseña de administrador."
+}
+
+######################################################
+####################### EXEC #########################
+######################################################
+
+setup_networking
+setup_os_dependencies
+deploy_omnileads
 setup_iptables
+wait_for_env
+reset_admin_password

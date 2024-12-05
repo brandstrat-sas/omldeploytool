@@ -100,6 +100,19 @@ Below are the Firewall rules to be applied on All In One instance:
 
 This environment is ideal for quickly testing the application locally. It is not recommended for production.
 
+```
+curl -o deploy.sh -L "https://gitlab.com/omnileads/omldeploytool/-/raw/oml-2679-dev-discador-oml/docker-compose/prod-env/deploy.sh?ref_type=heads" && chmod +x deploy.sh
+```
+
+Una vez disponible el script de deploy.sh, pasamos a invicarlo.
+
+```
+export NIC=eth1 ENV=docker-compose && ./deploy.sh
+```
+
+Los parametros NIC y ENV refieren a la interfaz de red que llevara la IP 
+
+You can deploy it manually .....
 
 ```
 cp env prod-env/.env
@@ -110,7 +123,7 @@ En el .env se debe setear los parametros:
 ```
 PUBLIC_IP=$YOUR_PUBLIC_ADDR
 PRIVATE_IP=$YOUR_LAN_ADDR
-ENV=nat
+ENV=docker-compose
 ```
 
 Luego se lanzan los siguientes comandos de iptables en pos de reenviar los puertos UDP correspondientes al audio (RTP) hacia los contenedores ACD y RTPENGINE.
