@@ -48,53 +48,25 @@ function deploy {
 
   echo "***[OML devenv] Cloning the repositories of modules"
 
-  # Lista de repositorios principales
-  local main_repos=("acd" "kamailio" "nginx" "pgsql" "rtpengine" "fastagi" "ami" "redis" "_interactions_processor" "_sentiment_analysis")
+  # Lista de repositorios
+  local main_repos=("omlacd" "omlkamailio" "omlnginx" "omlpgsql" "omlrtpengine" "omlfastagi" "omlami" "oml_interactions_processor" "oml_sentiment_analysis" "omnileads-websockets" "ominicontacto" "acd_retrieve_conf" "omlqa" "omnidialer") 
   for repo in "${main_repos[@]}"; do
-    clone_repo "oml$repo" "oml$repo"
+    clone_repo "$repo" "$repo"
   done
-
-  # Clonar repositorios adicionales
-  local additional_repos=(
-    "omnileads-websockets:omlwebsockets"
-    "ominicontacto:omlapp"
-    "acd_retrieve_conf"
-    "omlqa"
-    "omnidialer"
-  )
-  for repo_info in "${additional_repos[@]}"; do
-    local repo_name="${repo_info%%:*}"
-    local repo_path="${repo_info##*:}"
-    clone_repo "$repo_name" "$repo_path"
-  done
-
-  # Clonar addons si es SSH
-  if [ "$gitlab_clone" == "ssh" ]; then
-    local addons=("premium_reports_app" "wallboard_app" "survey_app" "webphone_client_app")
-    for addon in "${addons[@]}"; do
-      clone_repo "$addon" "$addon"
-    done
-  fi
 
   echo -e "${GREEN}[INFO] All repositories were cloned in $(pwd)${NC}"
   sleep 2
-
-  # Cambiar a ramas específicas en algunos repositorios
-  local branch_repos_kamailio=("kamailio" "rtpengine")
-  for repo in "${branch_repos_kamailio[@]}"; do
-    cd "oml$repo" && git checkout oml-658-dev-kamailio-img-2024 && cd ..
-  done
 
   local branch_repos_omlacd=("omlacd" "omnidialer" "omlapp")
   for repo in "${branch_repos_omlacd[@]}"; do
     cd "$repo" && git checkout oml-2679-dev-discador-oml && cd ..
   done
-}
 
-cd ..
-cp ../env .env
-docker-compose build
-docker-compose up -d
+  cd ..
+  cp ../env .env
+  docker-compose build
+  docker-compose up -d
+}
 
 # Manejo de parámetros de entrada
 function parse_arguments {
