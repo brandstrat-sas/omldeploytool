@@ -51,16 +51,26 @@ function deploy {
   # Lista de repositorios
   local main_repos=("omlacd" "omlkamailio" "omlnginx" "omlpgsql" "omlrtpengine" "omlfastagi" "omlami" "oml_interactions_processor" "oml_sentiment_analysis" "omnileads-websockets" "ominicontacto" "acd_retrieve_conf" "omlqa" "omnidialer") 
   for repo in "${main_repos[@]}"; do
-    clone_repo "$repo" "$repo"
+    if [ "$repo" == "ominicontacto" ]; then
+      clone_repo "$repo" "omlapp"
+    elif [ "$repo" == "omnileads-websockets" ]; then
+      clone_repo "$repo" "omlwebsockets"
+    else
+      clone_repo "$repo" "$repo"
+    fi
   done
 
   echo -e "${GREEN}[INFO] All repositories were cloned in $(pwd)${NC}"
   sleep 2
 
-  local branch_repos_omlacd=("omlacd" "omnidialer" "omlapp")
-  for repo in "${branch_repos_omlacd[@]}"; do
-    cd "$repo" && git checkout oml-2679-dev-discador-oml && cd ..
-  done
+  # temportal solo en 2679 luego eliminar # temportal solo en 2679 luego eliminar
+  # temportal solo en 2679 luego eliminar # temportal solo en 2679 luego eliminar
+  local branch_repos_omlacd=("omlacd" "omnidialer" "omlapp")        #############
+  for repo in "${branch_repos_omlacd[@]}"; do                       #############
+    cd "$repo" && git checkout oml-2679-dev-discador-oml && cd ..   #############
+  done                                                              #############                  
+  # temportal solo en 2679 luego eliminar # temportal solo en 2679 luego eliminar
+  # temportal solo en 2679 luego eliminar # temportal solo en 2679 luego eliminar
 
   cd ..
   cp ../env .env

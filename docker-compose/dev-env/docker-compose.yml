@@ -15,7 +15,7 @@ services:
     environment:
       - DJANGO_ALLOW_ASYNC_UNSAFE=true
       - CRON_ENABLE=false
-      - DJANGO_SETTINGS_MODULE=ominicontacto.settings.develop
+      - DJANGO_SETTINGS_MODULE=omlapp.settings.develop
     command: /opt/omnileads/bin/init_devenv.sh
     networks:
       - omnileads
@@ -294,7 +294,7 @@ services:
   websockets:
     #build:
     #  target: run
-    #  context: ${REPO_PATH}/omlwebsockets/etc/fts/oml/services/websockets
+    #  context: ${REPO_PATH}/omnileads-websockets/etc/fts/oml/services/websockets
     tty: true
     container_name: oml-websockets
     image: ${OMLWS_IMG}
@@ -310,7 +310,7 @@ services:
       - omnileads
     stop_grace_period: 30s  
     volumes:
-      - ${REPO_PATH}/omlwebsockets/source/:/opt/services/webapp/src/
+      - ${REPO_PATH}/omnileads-websockets/source/:/opt/services/webapp/src/
 
   postgresql:
     container_name: oml-postgres
