@@ -78,7 +78,10 @@ case $1 in
     ;;
   --pgsql)
     docker exec -it oml-uwsgi-server psql
-    ;;    
+    ;;
+  --psql_reindex)
+    podman exec -it --env-file /etc/default/django.env oml-uwsgi-server bash -c 'psql -c "reindex database ${PGDATABASE};"'
+    ;;
   --sentinel_logs)
     docker logs -f oml-sentinel-server
     ;;
@@ -166,6 +169,9 @@ case $1 in
   --psql)
     podman exec -it oml-uwsgi-server psql
     ;;
+  --psql_reindex)
+    podman exec -it --env-file /etc/default/django.env oml-uwsgi-server bash -c 'psql -c "reindex database ${PGDATABASE};"'
+    ;;
   --redis_cli)
     podman run -it --name oml-redis-cli docker.io/redis redis-cli -h $(cat /etc/default/django.env |grep REDIS | awk -F= '{print $2}')
     ;;
@@ -216,6 +222,7 @@ USAGE:
   --redis_clean: clean cache  
   --redis_cli: launch redis CLI 
   --psql: launch psql CLI 
+  --psql_reindex: reindex database
   --asterisk_cli: launch asterisk CLI 
   --asterisk_bash: launch asterisk container bash shell 
   --kamailio_logs: show container logs 
