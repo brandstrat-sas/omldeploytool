@@ -12,13 +12,11 @@
 * [Requirements](#requirements)
 * [Develpment environment](#dev-env)
 * [Quick localhost test environment](#test-env)
-* [Cloud VPS or Onpremise VM](#prod-env)
 * [Security](#security)
-* [First login](#post_install)
+* [Cloud VPS or Onpremise VM](#vps_vm)
 * [OMniLeads Eneterprise](#oml_enterprise)
 * [OMniLeads interaction tool](#oml_manage)
 * [Simulate calls (only for docker-desktop ENV)](#pstn_emulator)
-* [Predictive dialer setting (only for docker-desktop ENV)](#wombat_dialer)
 
 You need docker & docker-compose installed (on Linux, Mac or Windows) and this reposotory cloned <a name="requirements"></a>
 
@@ -33,25 +31,25 @@ cd omldeploytool/docker-compose
 
 In this folder, we will find three Docker Compose environments.
 
-* **dev-env**: is used to launch the deveelopment stack on sthe workstation with Docker Desktop"
+* **dev-env**: is used to launch the deveelopment stack on sthe workstation with Docker Desktop
 * **test-env**: is used to launch the stack on the workstation with Docker Desktop.
-* **prod-env**: is used to launch the stack on a VPS or VM."
+* **prod-env**: is used to launch the stack on a VPS or VM.
 
-### **Workstation Docker-Desktop dev-env deploy** <a name="dev-env"></a>
+### **Development environment deploy** <a name="dev-env"></a>
 
 In this environment, the Django application runs using the framework's development mode. Additionally, Docker binding is used to mount the code of each component into its respective container.
 
 With the following sequence of commands, you will have an environment ready to start using your development setup:
 
 ```
-./download_oml_repos.sh --gitlab_clone=https | ssh
 cp env dev-env/.env
 cd dev-env
-ln -s ../oml_manage ./
+./deploy.sh --gitlab_clone=https|ssh
 docker-compose build
 docker-compose up -d
-docker-compose exec -it django_app python manage.py cambiar_admin_password
-docker-compose exec -it django_app python manage.py inicializar_entorno
+ln -s ../oml_manage ./
+./oml_manage --reset_pass
+./oml_manage --init_env
 ```
 
 Once the environment is up, you can proceed to log in at https://localhost using the username admin and password admin
@@ -62,14 +60,14 @@ This environment is ideal for quickly testing the application locally. It is not
 
 ```
 cp env test-env/.env
-cd dev-env
-ln -s ../oml_manage ./
+cd test-env
 docker-compose up -d
-docker-compose exec -it django_app python manage.py cambiar_admin_password
-docker-compose exec -it django_app python manage.py inicializar_entorno
+ln -s ../oml_manage ./
+./oml_manage --reset_pass
+./oml_manage --init_env
 ```
 
-Una vez arriba el entorno puede avanzar con el login sobre https://localhost utilizando el user admin y password admin.
+Once the environment is up, you can proceed to log in at https://localhost using the username admin and password admin
 
 # Security  <a name="security"></a>
 
@@ -98,27 +96,31 @@ Below are the Firewall rules to be applied on All In One instance:
 
 ### **Onpremise Virtual Machine or Cloud VPS** <a name="vps_vm"></a>
 
-This environment is ideal for quickly testing the application locally. It is not recommended for production.
+This environment is ideal for quickly and simple deploy on production. For instances small por abajo de 50 usuarios. 
+
+
+#### deploy.sh script based deploy
 
 ```
 curl -o deploy.sh -L "https://gitlab.com/omnileads/omldeploytool/-/raw/oml-2679-dev-discador-oml/docker-compose/prod-env/deploy.sh?ref_type=heads" && chmod +x deploy.sh
 ```
 
-Una vez disponible el script de deploy.sh, pasamos a invicarlo.
+Upon the availability of the deploy.sh script, we will trigger its execution.
 
 ```
 export NIC=eth1 ENV=docker-compose && ./deploy.sh
 ```
 
-Los parametros NIC y ENV refieren a la interfaz de red que llevara la IP 
+The NIC and ENV parameters specify the network interface card that will be assigned the IP address, and the BRANCH parameter designates the specific OmniLeads release version to be installed.
 
-You can deploy it manually .....
+#### Manual docker-compose deploy
 
 ```
 cp env prod-env/.env
+cd prod-env
 ```
 
-En el .env se debe setear los parametros:
+The following parameters need to be defined in the .env file:
 
 ```
 PUBLIC_IP=$YOUR_PUBLIC_ADDR
@@ -126,7 +128,7 @@ PRIVATE_IP=$YOUR_LAN_ADDR
 ENV=docker-compose
 ```
 
-Luego se lanzan los siguientes comandos de iptables en pos de reenviar los puertos UDP correspondientes al audio (RTP) hacia los contenedores ACD y RTPENGINE.
+The following iptables rules are set up to redirect UDP traffic for RTP audio to the ACD and RTPENGINE containers.
 
 ```
 iptables -t nat -A PREROUTING -p udp --dport 5060 -j DNAT --to-destination 10.22.22.99
@@ -135,61 +137,15 @@ iptables -t nat -A PREROUTING -p udp --dport 40000:50000 -j DNAT --to-destinatio
 iptables -A FORWARD -p udp -d 10.22.22.99 --dport 40000:50000 -j ACCEPT
 iptables -t nat -A PREROUTING -p udp --dport 20000:30000 -j DNAT --to-destination 10.22.22.98
 iptables -A FORWARD -p udp -d 10.22.22.98 --dport 20000:30000 -j ACCEPT
-
 ```
 
 ```
-cd prod-env
-ln -s ../oml_manage ./
 docker-compose up -d
+ln -s ../oml_manage ./
 ./oml_manage --reset_pass
 ```
 
-Una vez arriba el entorno puede avanzar con el login sobre https://your_linux_host_ip utilizando el user admin y password admin.
-
->  Note: If working on a VPS with a public IP address, it is a mandatory requirement that it also has a network interface with the ability to associate a private IP address.
-
-### **Onpremise Virtual Machine and VPS Cloud deploy with external bucket & postgres DB**
-
->  Note: If working on a VPS with a public IP address, it is a mandatory requirement that it also has a network interface with the ability to associate a private IP address.
-
-The endpoint URL and access parameters must be specified. For example:
-
-```
-S3_ENDPOINT=https://sfo3.digitaloceanspaces.com
-S3_BUCKET_NAME=omnileads
-AWS_ACCESS_KEY_ID=ojkghjkhjkh4jk23h4jk23hjk4
-AWS_SECRET_ACCESS_KEY=HJGGH675675hjghjgHJGHJg67567HJHVHJGdsaddadakjhjk
-
-```
-You can invoke the docker-compose with:
-
-```
-$ docker-compose up -d
-```
-
-![Diagrama deploy tool](../ansible/png/deploy-tool-tenant-compose-vps-external-bucket.png)
-
-## Log in to the Admin UI <a name="post_install"></a>
-
-Before first time you login must to exec:
-
-```
-./oml_manage --reset_pass
-```
-
-Then acces the URL with your browser 
-
-https://localhost or https://your_VM_VPS
-
-Default Admin User & Pass:
-
-```
-admin
-admin
-```
-
-Finally  you can choice a custom password. 
+Once the environment is up, you can proceed to log in at https://LINUX_HOST_ADDR using the username admin and password admin
 
 ## OMniLeads Enterprise <a name="oml_enterprise"></a>
 
@@ -239,7 +195,7 @@ For all users the pass is:
 usuario0*
 ```
 
-## Simulate calls from/to PSTN (Only on Docker-Desktop scenary) <a name="pstn_emulator"></a>
+## Simulate calls from/to PSTN (Only on test-env & dev-env) <a name="pstn_emulator"></a>
 
 Adittionally with omnileads container is the pstn-emulator, this an emulation of a PSTN provider,
 so you can make calls via Omnileads and have different results of the call based on what you dialed
