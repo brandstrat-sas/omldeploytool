@@ -35,7 +35,7 @@ OMLWS_IMG=omnileads/websockets:240705.01
 OMLINTERACTION_PROC_IMG=omnileads/interaction_processor:240506.01
 # OMLSENTIMENT_IMG=omnileads/sentiment_analysis:
 
-OMLPSTNEMULATOR_IMG=omnileads/pstn_emulator:241127.01
+OMLPSTNEMULATOR_IMG=omnileads/pstn_emulator:241209.01
 OMLVIDEOCALLS_WIDGET_IMG=omnileads/videocalls_widget:230905.01
 OMLVUEJS_IMG=freetechsolutions/vue-cli:develop
 OMLNGINXQA_IMG=omnileads/nginxqa:241028.01
