@@ -176,10 +176,6 @@ services:
       #- ./asterisk_custom/google_credential.json:/tmp/google_credential.json
       #- ./asterisk_custom/oml_extensions_custom.conf:/etc/asterisk/oml_extensions_custom.conf
     working_dir: /etc/asterisk
-    logging:
-      driver: loki
-      options:
-        loki-url: "http://loki/loki/api/v1/push"
 
   interaction_processor:
     image: ${OMLINTERACTION_PROC_IMG}
