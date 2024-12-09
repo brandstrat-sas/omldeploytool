@@ -96,11 +96,12 @@ deploy_omnileads() {
     git clone https://gitlab.com/omnileads/omldeploytool.git || log_error "Error al clonar el repositorio."
 
     cd omldeploytool || log_error "No se pudo acceder al directorio 'omldeploytool'."
-
+    
     if [[ "$branch" != "main" ]]; then
         git checkout "$branch" || log_error "Error al cambiar a la rama '$branch'."
     fi
-
+    
+    cp docker-compose/oml_manage /usr/local/bin/oml_manage
     cd docker-compose/prod-env || log_error "No se pudo acceder al directorio 'prod-env'."
 
     cp ../env ./.env
@@ -153,7 +154,7 @@ wait_for_env() {
 
 reset_admin_password() {
     log_info "*** Reseteando la contraseña de administrador ***"
-    /usr/bin/oml_manage --reset_pass || log_error "Error al resetear la contraseña de administrador."
+    /usr/local/bin/oml_manage --reset_pass || log_error "Error al resetear la contraseña de administrador."
 }
 
 ######################################################
